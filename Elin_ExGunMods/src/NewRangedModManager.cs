@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -18,9 +19,17 @@ namespace Elin_Mod
 	{
 		const string c_ElemName_ElemIDStart = "itukiyu_modEX_IDStart";
 		const string c_ElemName_ElemIDEnd = "itukiyu_modEX_IDEnd";
+		const string c_ElemName_ElemIDStartOld = "itukiyu_modEX_IDStartOld";
+		const string c_ElemName_ElemIDEndOld = "itukiyu_modEX_IDEndOld";
 
 		public int ElemIDStart { get; private set; } = 0;
 		public int ElemIDEnd { get; private set; } = 0;
+
+
+		public int ElemIDStartOld { get; private set; } = 0;
+		public int ElemIDEndOld { get; private set; } = 0;
+
+
 
 		int[] m_ElemIndexToAliasHashes;
 		int[] m_ElemIndexToIDs;
@@ -49,27 +58,11 @@ namespace Elin_Mod
 			foreach ( var itr in elemNews.map) {
 				SourceElement.Row tmp = null;
 				if ( elemsMap.TryGetValue( itr.Key, out tmp )) {
-					DebugUtil.LogError( $"[Elin_ExGunMods] conflict element id!!!! --> id={itr.Key}  baseName={tmp.name}  newModName={itr.Value.name} " );
+					DebugUtil.LogError( $"[Elin_ExGunMods] conflict element elemID!!!! --> elemID={itr.Key}  baseName={tmp.name}  newModName={itr.Value.name} " );
 					continue;
 				}
-			//	DebugUtil.LogError( itr.Value.name_JP + " : " + itr.Key);
 
-				// マジ舐めんな.
-			//	elems.SetRow(itr.Value);
 				elems.rows.Add(itr.Value);
-				//	elems.alias.Add(itr.Value.GetAlias, itr.Value);
-
-				// 2025/08/26追加.
-				// なにかの変更でsocketsの格納値が1000倍されるようになった.
-				// そのせいでギリギリを攻めていたうちのID群がオーバーフローするようになった(最悪).
-				// なので一旦1000倍オーバーフロー値も同一値とみなすようにする.
-				// あと2桁増えたら破綻するので怖い.
-				// 
-				// 大体こういう正規化はボカァよくないと思うんですよね.
-				// Mod推奨してるならせめてintじゃなくてlongとかにしようよ.
-				int ofID = itr.Key * 1000;
-				ofID = ofID / 1000;
-				elemsMap.Add(ofID, itr.Value);
 			}
 		}
 
@@ -93,6 +86,8 @@ namespace Elin_Mod
 			// 追加パーツ群の管理.
 			ElemIDStart = GetElement(c_ElemName_ElemIDStart).id;
 			ElemIDEnd = GetElement(c_ElemName_ElemIDEnd).id;
+			ElemIDStartOld = GetElement(c_ElemName_ElemIDStartOld).id;
+			ElemIDEndOld = GetElement(c_ElemName_ElemIDEndOld).id;
 			m_NewModElemRows = new Dictionary<int, SourceElement.Row>();
 			foreach (var itr in elemsMap) {
 				if (itr.Key < ElemIDStart)
@@ -100,13 +95,6 @@ namespace Elin_Mod
 				if (itr.Key > ElemIDEnd)
 					continue;
 				m_NewModElemRows.Add(itr.Key, itr.Value);
-
-				// 2025/08/26追加 1000倍のやつ.
-				int overflowCheckID = itr.Key * 1000;
-				if ( overflowCheckID < 0 ) {
-					overflowCheckID = overflowCheckID / 1000;
-					m_NewModElemRows.Add(overflowCheckID, itr.Value);
-				}
 			}
 
 			foreach (var itr in m_NewMods)
@@ -142,6 +130,52 @@ namespace Elin_Mod
 			if (!IsNewRangeModIDBand(id))
 				return false;
 			return m_NewModElemRows.ContainsKey(id);
+		}
+
+		public static int ElemToSocketData( int id, int lv ) {
+			return id * 1000 + lv;
+		}
+
+		public static ( int id, int lv ) SocketDataToElem( long socketData ) {
+			return ( (int)( socketData / 1000 ), (int)( socketData % 1000 ) );
+		}
+
+		public static (int id, int lv) SocketDataToElem(int socketData) {
+			return SocketDataToElem((long)socketData);
+		}
+
+
+		public static long FixNewRangeSocketData(int rawSocketData) {
+			// 2025/08/27追加.
+			// オーバーフローIDを正しいIDに治す...
+			if (rawSocketData > 0) {
+				return rawSocketData;
+			}
+
+			uint asUnsigned = unchecked((uint)rawSocketData);
+			ulong recovered = asUnsigned;
+			return (long)recovered;
+		}
+
+		public static bool IsOldVerRangeElemID( int elemID ) {
+			if (elemID < Instance.ElemIDStartOld || elemID > Instance.ElemIDEndOld) {
+				return false;
+			}
+			return true;
+		}
+
+		public static int FixNewRangeElemID(int elemID) {
+			if (!IsOldVerRangeElemID(elemID)) {
+				return elemID;
+			}
+			string s = elemID.ToString();
+			int idx = s.IndexOf("00");
+			if (idx >= 0)
+				s = s.Substring(0, idx) + "0" + s.Substring(idx + 2);
+			int ret = 0;
+			if (int.TryParse(s, out ret))
+				elemID = ret;
+			return elemID;
 		}
 
 
@@ -232,11 +266,10 @@ namespace Elin_Mod
 					foreach (var itr in m_NewModElemRows) {
 						if (thing.sockets != null) {
 							for (int i = 0; i < thing.sockets.Count; ++i) {
-								int elemID = thing.sockets[i] / 100;
-								if (elemID != itr.Key)
+								var socketElem = SocketDataToElem(thing.sockets[i]);
+								if (socketElem.id != itr.Key)
 									continue;
-								int lv = thing.sockets[i] % 100;
-								thing.elements?.ModBase(elemID, -lv);
+								thing.elements?.ModBase(socketElem.id, -socketElem.lv);
 								thing.sockets[i] = 0;
 							}
 						}
@@ -269,6 +302,26 @@ namespace Elin_Mod
 		public static void Postfix_OnDeserialized(Card __instance, StreamingContext context) {
 			if (__instance == null)
 				return;
+			// 2025/08/27追加.
+			// なにかの変更でsocketsの格納値が1000倍されるようになった.
+			// そのせいでギリギリを攻めていたうちのID群がオーバーフローするようになった(最悪).
+			// なのでセーブデータデシリアライズ時に古いIDと新しいIDを置き換えるように対処する.
+			// 
+			// いきなり1000掛けに治すのはまあ最悪良いとしてもですよ、大体もともとの設計でこういう正規化はボカァよくないと思うんですよ.
+			// Mod推奨してるならせめてintじゃなくてlongとかにしようよ.
+			
+
+			// IDを差し替えたパーツ群の対処.
+			// マジめんどい.
+			var trait = __instance.trait as TraitMod;
+			if (trait != null) {
+				int old = __instance.refVal;
+				__instance.refVal = FixNewRangeElemID(__instance.refVal);
+				if ( old != __instance.refVal)
+					DebugUtil.LogWarning($"!!! Convert TraitMod : {__instance.id} : {old} -> {__instance.refVal}");
+			}
+
+			// 以降はソケットにのみ対処.
 			if (__instance.sockets == null || __instance.sockets.Count <= 0)
 				return;
 			if (__instance.elements == null || __instance.elements.list == null)
@@ -283,14 +336,36 @@ namespace Elin_Mod
 			for (int i = 0; i < __instance.sockets.Count; ++i) {
 				if (__instance.sockets[i] == 0)
 					continue;
-				int elemID = __instance.sockets[i] / 100;
-				if (elemID == 0)
+				(int id, int lv) socketElem;
+
+				// 2025/08/27追加.
+				// オーバーフローしている古いソケットデータを置き換える.
+				if (__instance.sockets[i] < 0 ) {
+					var trueSocketData = FixNewRangeSocketData(__instance.sockets[i]);
+					socketElem = SocketDataToElem(trueSocketData);
+					if (IsOldVerRangeElemID(socketElem.id)) {
+						// 他のModの溢れてるもんは知らん.
+						int newElemID = FixNewRangeElemID(socketElem.id);
+
+						// 古いのを全削除.
+						var oldElem = __instance.elements.GetElement(socketElem.id);
+						if (oldElem != null)
+							__instance.elements.ModBase(socketElem.id, -socketElem.lv);
+						var old = __instance.sockets[i];
+						__instance.sockets[i] = ElemToSocketData(newElemID, socketElem.lv);
+
+						DebugUtil.LogWarning($"!!! Convert RangeElement Data : {__instance.id} : {socketElem.id}, {old} --> {newElemID}, {__instance.sockets[i]}");
+					}
+				}
+
+				socketElem = SocketDataToElem(__instance.sockets[i]);
+				if (socketElem.id == 0)
 					continue;
-				
-				if (!Instance.IsNewRangeModID(elemID))
+
+				if (!Instance.IsNewRangeModID(socketElem.id))
 					continue;
-				int elemLv = __instance.sockets[i] % 100;
-				s_TmpSocketElements.Add((elemID, elemLv));
+
+				s_TmpSocketElements.Add(socketElem);
 			}
 
 			// 存在していないelementをチェック.
@@ -302,15 +377,32 @@ namespace Elin_Mod
 				}
 				for (int i = 0; i < s_TmpSocketElements.Count; ++i) {
 					var socketElem = s_TmpSocketElements[i];
+					// 2025/08/27追加.
+					if (socketElem.Item1 < 0)
+						continue;
 					if (s_TmpElementsListElemIDs.Contains(socketElem.Item1))
 						continue;
 					// 存在していない場合はSetBaseで付与.
-					DebugUtil.LogWarning($"[Warning!]Parts in socket are not included in elements.list  id={socketElem.Item1}");
+					DebugUtil.LogWarning($"[Warning!]Parts in socket are not included in elements.list  elemID={socketElem.Item1}");
 					__instance.elements.SetBase(socketElem.Item1, socketElem.Item2);
 				}
 			}
 			s_TmpSocketElements.Clear();
 			s_TmpElementsListElemIDs.Clear();
 		}
+
+
+#if false
+		[HarmonyPatch(typeof(Thing), "WriteNote")]
+		[HarmonyPrefix]
+		public static void Test(UINote n, Action<UINote> onWriteNote = null, IInspect.NoteMode mode = IInspect.NoteMode.Default, Recipe recipe = null, Thing __instance = null) {
+
+			if (__instance.sockets != null) {
+				foreach (int socket in __instance.sockets) {
+					DebugUtil.LogError($"{__instance.id} : {socket} : {socket / 1000} : {socket % 1000}");
+				}
+			}
+		}
+#endif
 	}
 }
