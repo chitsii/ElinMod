@@ -7,6 +7,6 @@ namespace Elin_Mod
 
 		public const string c_ModName = "ExGunMods";
 
-		public const string c_ModVersion = "1.0.0.8";
+		public const string c_ModVersion = "1.0.1.0";
 	}
 }

@@ -45,17 +45,31 @@ namespace Elin_Mod
 			var elemsMap = elems.map;
 			SourceElementNew elemNews = ScriptableObject.CreateInstance<SourceElementNew>();
 			ModUtil.ImportExcel(CommonUtil.GetResourcePath("tables/add_datas.xlsx"), "elements", elemNews);
-
+			
 			foreach ( var itr in elemNews.map) {
 				SourceElement.Row tmp = null;
 				if ( elemsMap.TryGetValue( itr.Key, out tmp )) {
-					DebugUtil.LogError( $"[Elin_ExGunMods] conlict element id!!!! --> id={itr.Key}  baseName={tmp.name}  newModName={itr.Value.name} " );
+					DebugUtil.LogError( $"[Elin_ExGunMods] conflict element id!!!! --> id={itr.Key}  baseName={tmp.name}  newModName={itr.Value.name} " );
 					continue;
 				}
+			//	DebugUtil.LogError( itr.Value.name_JP + " : " + itr.Key);
+
 				// マジ舐めんな.
 			//	elems.SetRow(itr.Value);
-				elems.rows.Add(itr.Value);  
-			//	elems.alias.Add(itr.Value.GetAlias, itr.Value);
+				elems.rows.Add(itr.Value);
+				//	elems.alias.Add(itr.Value.GetAlias, itr.Value);
+
+				// 2025/08/26追加.
+				// なにかの変更でsocketsの格納値が1000倍されるようになった.
+				// そのせいでギリギリを攻めていたうちのID群がオーバーフローするようになった(最悪).
+				// なので一旦1000倍オーバーフロー値も同一値とみなすようにする.
+				// あと2桁増えたら破綻するので怖い.
+				// 
+				// 大体こういう正規化はボカァよくないと思うんですよね.
+				// Mod推奨してるならせめてintじゃなくてlongとかにしようよ.
+				int ofID = itr.Key * 1000;
+				ofID = ofID / 1000;
+				elemsMap.Add(ofID, itr.Value);
 			}
 		}
 
@@ -86,6 +100,13 @@ namespace Elin_Mod
 				if (itr.Key > ElemIDEnd)
 					continue;
 				m_NewModElemRows.Add(itr.Key, itr.Value);
+
+				// 2025/08/26追加 1000倍のやつ.
+				int overflowCheckID = itr.Key * 1000;
+				if ( overflowCheckID < 0 ) {
+					overflowCheckID = overflowCheckID / 1000;
+					m_NewModElemRows.Add(overflowCheckID, itr.Value);
+				}
 			}
 
 			foreach (var itr in m_NewMods)
@@ -265,6 +286,7 @@ namespace Elin_Mod
 				int elemID = __instance.sockets[i] / 100;
 				if (elemID == 0)
 					continue;
+				
 				if (!Instance.IsNewRangeModID(elemID))
 					continue;
 				int elemLv = __instance.sockets[i] % 100;

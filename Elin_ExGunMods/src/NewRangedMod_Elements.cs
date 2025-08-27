@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 
 using UnityEngine;
 
+using static UnityEngine.UI.Image;
+
 namespace Elin_Mod
 {
 	[HarmonyPatch]
@@ -61,10 +63,28 @@ namespace Elin_Mod
 		/// </summary>
 		/// <param name="__instance"></param>
 		/// <param name="__result"></param>
-		[HarmonyPatch(typeof(Card), "DamageHP", 
-			new System.Type[] { typeof(int), typeof(int), typeof(int), typeof(AttackSource), typeof(Card), typeof(bool), typeof(Thing) })]
-		[HarmonyPrefix]
-		public static bool Prefix(Card __instance, int dmg, int ele, int eleP = 100, AttackSource attackSource = AttackSource.None, Card origin = null, bool showEffect = true, Thing weapon = null) {
+		[HarmonyPatch(typeof(Card), "DamageHP",
+			new System.Type[] {
+				typeof(int), 
+				typeof(int), 
+				typeof(int),
+				typeof(AttackSource), 
+				typeof(Card), 
+				typeof(bool), 
+				typeof(Thing), 
+				typeof(Chara) })]
+	   [HarmonyPrefix]
+		public static bool Prefix(
+			Card __instance,
+			ref int dmg, 
+			ref int ele,
+			int eleP = 100, 
+			AttackSource attackSource = AttackSource.None, 
+			Card origin = null, 
+			bool showEffect = true, 
+			Thing weapon = null,
+			Chara originalTarget = null)
+		{
 
 			// ダメージ計算時に属性IDだけ変換して.
 			// あとは元の処理にバイパスしてやる.
