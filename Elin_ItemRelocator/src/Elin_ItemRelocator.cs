@@ -102,7 +102,7 @@ namespace Elin_ItemRelocator
                 if (btnRelocate.mainText != null)
                 {
                    btnRelocate.mainText.SetActive(true);
-                   btnRelocate.mainText.SetText(RelocatorUI.GetText(RelocatorUI.LangKey.Execute));
+                   btnRelocate.mainText.SetText(RelocatorLang.GetText(RelocatorLang.LangKey.Execute));
                 }
                 else
                 {
@@ -111,7 +111,7 @@ namespace Elin_ItemRelocator
                     if (t != null)
                     {
                         t.SetActive(true);
-                        t.SetText(RelocatorUI.GetText(RelocatorUI.LangKey.Execute));
+                        t.SetText(RelocatorLang.GetText(RelocatorLang.LangKey.Execute));
                     }
                 }
 

@@ -104,9 +104,9 @@ namespace Elin_ItemRelocator
             foreach(var part in parts)
             {
                 string term = part.Trim();
-                if (term.StartsWith(":"))
+                if (term.StartsWith("@"))
                 {
-                    // Attribute search
+                    // Native-style Attribute search
                     if (!EvaluateAttribute(t, term.Substring(1))) return false;
                 }
                 else

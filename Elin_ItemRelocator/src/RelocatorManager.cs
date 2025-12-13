@@ -209,7 +209,7 @@ namespace Elin_ItemRelocator
 
                  if (container.things.IsFull())
                  {
-                     Msg.Say("Container is full.");
+                     Msg.Say(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_ContainerFull));
                      break;
                  }
 
@@ -220,11 +220,11 @@ namespace Elin_ItemRelocator
              if (count > 0)
              {
                  EClass.pc.PlaySound("grab");
-                 Msg.Say(string.Format("Relocated {0} stacks to {1}.", count, container.Name));
+                 Msg.Say(string.Format(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_RelocatedResult), count, container.Name));
              }
              else
              {
-                 Msg.Say("No matching items found.");
+                 Msg.Say(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_NoMatchLog));
              }
         }
     }
