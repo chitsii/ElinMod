@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
+using System.Reflection;
+using System.IO;
+using System.Text;
 
 namespace Elin_ItemRelocator
 {
@@ -10,36 +13,7 @@ namespace Elin_ItemRelocator
     {
         public enum LangKey
         {
-            Settings,
-            AddFilter,
-            Preview,
-            Execute,
-            Scope,
-            ExcludeHotbar,
-            Rarity,
-            Quality,
-            Category,
-            Text,
-            Enchant,
-            Remove,
-            Edit,
-            Enable,
-            Disable,
-            Title,
-            Operator,
-            Msg_Relocated,
-            Inventory,
-            Zone,
-            ON,
-            OFF,
-            NoMatches,
-            SelectEnchant,
-            RelocatorCaption,
-            DisabledSuffix,
-            All,
-            EditSearchText,
-            EditCategoryID,
-            EditQuality
+            Settings, AddFilter, Preview, Execute, Scope, ExcludeHotbar, Rarity, Quality, Category, Text, Enchant, Remove, Edit, Enable, Disable, Title, Operator, Msg_Relocated, Inventory, Zone, ON, OFF, NoMatches, SelectEnchant, RelocatorCaption, DisabledSuffix, All, EditSearchText, EditCategoryID, EditQuality
         }
 
         private static Dictionary<LangKey, string[]> _dict = new Dictionary<LangKey, string[]>
@@ -85,68 +59,69 @@ namespace Elin_ItemRelocator
 
         public static void Open(Thing container)
         {
-             // 1. Create Main Layer (Settings)
+             // 1. Create Main Layer
              var layer = EClass.ui.AddLayer<LayerList>();
              var winMain = layer.windows[0];
              winMain.SetCaption(GetText(LangKey.Title));
 
-             // 2. Create Preview Layer (Results)
+             // 2. Create Preview Layer
              var layerPreview = EClass.ui.AddLayer<LayerList>();
              var winPreview = layerPreview.windows[0];
              winPreview.SetCaption(GetText(LangKey.Preview));
 
-             // INTERACTION FIX:
-             // 1. Put Preview Layer ON TOP (Last Sibling)
+             // INTERACTION FIX
              layerPreview.transform.SetAsLastSibling();
-
-             // 2. Disable logic for background blocker
-             // Iterate ALL graphics in the layer. If it's NOT the window or its children, disable raycast.
-             // This ensures the "veil" is removed, but the window (and its scrollbar/buttons) keeps raycast.
              foreach (var g in layerPreview.GetComponentsInChildren<Graphic>(true))
              {
                  if (g.transform.IsChildOf(winPreview.transform) || g.gameObject == winPreview.gameObject)
-                 {
-                     // This is part of the window content (Text, Image, Scrollbar). Keep it.
                      continue;
-                 }
-                 // This is likely the background veil or debugger clutter. Disable input.
                  g.raycastTarget = false;
              }
 
-             // Resize Logic: Apply AFTER layer creation
-             // Sometimes AddLayer initializes size. We override it here.
-             winMain.setting.allowResize = true;
-             winPreview.setting.allowResize = true;
+             // --- FIX: SET SIZE EXPLICITLY TO DISABLE AUTO-RESIZE ---
+             layer.SetSize(700, 800);
+             layerPreview.SetSize(700, 800);
 
-             // Initial Show (False) triggers some layout logic?
-             // Let's set size explicitly.
+             // Set Position
              var rectMain = winMain.GetComponent<RectTransform>();
              var rectPreview = winPreview.GetComponent<RectTransform>();
-
-             rectMain.sizeDelta = new Vector2(700, 800);
-             rectPreview.sizeDelta = new Vector2(700, 800);
              rectMain.anchoredPosition = new Vector2(-360, 0);
              rectPreview.anchoredPosition = new Vector2(360, 0);
 
-             // Sync Closing: Mutual Close
+             // Sync Closing
              bool closing = false;
-             layer.onKill.AddListener(() => {
+             OnKill(layer, () => {
                 if (closing) return;
                 closing = true;
                 if (layerPreview != null) layerPreview.Close();
              });
-             layerPreview.onKill.AddListener(() => {
+             OnKill(layerPreview, () => {
                  if (closing) return;
                  closing = true;
                  if (layer != null) layer.Close();
              });
 
+             // REFLECTION: Disable 'numbering' on Preview
+             try {
+                 var pNumbering = typeof(BaseList).GetField("numbering", BindingFlags.Public | BindingFlags.Instance);
+                 if (pNumbering != null) {
+                     pNumbering.SetValue(layerPreview.list, false);
+                 } else {
+                     var f = layerPreview.list.GetType().GetField("numbering", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+                     if (f != null) f.SetValue(layerPreview.list, false);
+                 }
+
+                 var pUseKey = layerPreview.list.GetType().GetField("useKey", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                 if (pUseKey != null) pUseKey.SetValue(layerPreview.list, false);
+             } catch {}
+
+
              var profile = RelocatorManager.Instance.GetProfile(container);
 
-             // Define Refresh
+             // --- REFRESH LOGIC ---
              Action refresh = null;
              refresh = () => {
-                 // --- 1. Update Main Filter List ---
+                 // Update Settings List
                  layer.customItems.Clear();
 
                  foreach(var filter in profile.Filters)
@@ -164,62 +139,110 @@ namespace Elin_ItemRelocator
                           menu.Show();
                       });
                   }
+
+                  // Refreshes the UIList content without re-showing/adding buttons
                   layer.list.List();
 
-                  // --- 2. Update Preview List ---
-                  layerPreview.customItems.Clear();
 
-                  var matches = RelocatorManager.Instance.GetMatches(container);
-                  int count = matches.Count();
-
+                  // Update Preview List
+                  var matches = RelocatorManager.Instance.GetMatches(container).ToList();
+                  int count = matches.Count;
                   string countStr = count >= 100 ? "100+" : count.ToString();
                   winPreview.SetCaption(GetText(LangKey.Preview) + " (" + countStr + ")");
 
                   if (count == 0)
                   {
-                      layerPreview.Add(GetText(LangKey.NoMatches), (idx)=>{});
+                      layerPreview.SetList2(
+                          new List<string> { GetText(LangKey.NoMatches) },
+                          (s) => s,
+                          (s, b) => {},
+                          (s, b) => { b.SetMainText(s); },
+                          false
+                      );
                   }
                   else
                   {
-                      foreach(var t in matches)
-                      {
-                          string s = t.Name;
-                          if (t.Num > 1) s += " x" + t.Num;
-                          Card p = t.parent as Card;
-                          if (p != null && p != EClass.pc) s += " <size=10>(" + p.Name + ")</size>";
-                          layerPreview.Add(s, (idx)=> {
-                              // Optional: Preview item details on click?
-                          });
-                      }
-                      if(count >= 100) layerPreview.Add("... (Max 100)", (idx)=>{});
+                      layerPreview.SetList2<Thing>(
+                          matches,
+                          (t) => { return t != null ? t.Name : ""; },
+                          (t, b) => { EClass.Sound.Play("click"); },
+                          (t, b) => {
+                             if (t == null) return;
+
+                             string richText = t.Name;
+                             if (t.Num > 1) richText += " x" + t.Num;
+
+                             Card p = t.parent as Card;
+                             string extra = "";
+                             if (p != null) extra += "(" + p.Name + ") ";
+                             if (t.category != null) extra += t.category.GetName();
+                             if (t.encLV > 0) extra += " +" + t.encLV;
+                             if (t.rarity > 0) extra += " [" + t.rarity + "]";
+
+                             string finalHtml = richText + " <size=11><color=#808080>" + extra + "</color></size>";
+
+                             if (b.text1 != null) {
+                                b.text1.supportRichText = true;
+                                b.text1.text = finalHtml;
+                                b.text1.horizontalOverflow = HorizontalWrapMode.Overflow;
+                                b.text1.verticalOverflow = VerticalWrapMode.Truncate;
+                                b.text1.resizeTextForBestFit = false;
+                             } else {
+                                b.SetMainText(finalHtml);
+                             }
+
+                             b.DisableIcon();
+                             if (b.image1 != null) b.image1.SetActive(false);
+                             if (b.text2 != null) b.text2.gameObject.SetActive(false);
+
+                             // NATIVE TOOLTIP FIX
+                             UIButton btn = b.button1 != null ? b.button1 : b.GetComponentInChildren<UIButton>();
+                             if (btn != null)
+                             {
+                                 btn.SetTooltip((tooltip) => {
+                                      // Correct Native Pattern: Use WriteNote for Things/Cards
+                                      if (t != null && tooltip.note != null) {
+                                          t.WriteNote(tooltip.note);
+                                      }
+                                 }, true);
+                             }
+                          },
+                          false
+                      );
+
+                      // RE-ENFORCE SIZE AFTER SetList2 (just in case SetList2 alters it)
+                      layerPreview.SetSize(700, 800);
                   }
-                  layerPreview.list.List();
              };
 
+             // --- ONE TIME SETUP ---
+             // Add Buttons Only Once
              AddButtons(layer, profile, container, refresh);
 
-             // Final Show
-             layerPreview.Show(false);
+             // Show Layers Only Once
              layer.Show(false);
+             // layerPreview is shown implicitly by SetList2 or we can call it here,
+             // but SetList2 calls List() which builds it.
+             // We ensure it's visible.
+             // layerPreview.Show(false); // SetList2 calls this internally effectively? No, SetList2 calls list.List().
+             // Actually, LayerList.SetList2 does NOT call Show()! It sets callbacks and runs list.List().
+             // So we must call Show() at least once or ensure the layer is open.
+             // Since we added it via 'AddLayer', it is open.
 
-             // Ensure size again after Show, just in case Open/Show resets it
-             rectMain.sizeDelta = new Vector2(700, 800);
-             rectPreview.sizeDelta = new Vector2(700, 800);
-
+             // Initial Refresh
              refresh();
         }
 
-        private static int CountMatches(Thing container, RelocationProfile profile)
-        {
-            return RelocatorManager.Instance.GetMatches(container).Count();
+        private static void OnKill(ELayer layer, Action action) {
+             layer.onKill.AddListener(() => action());
         }
+
 
         private static void AddButtons(LayerList layer, RelocationProfile profile, Thing container, Action refresh)
         {
-             // Add Filter Button
              layer.windows[0].AddBottomButton(GetText(LangKey.AddFilter), () => {
                  var menu = EClass.ui.CreateContextMenu("ContextMenu");
-
+                 // ... (Menu Logic)
                  menu.AddButton(GetText(LangKey.Text), () => {
                      Dialog.InputName("Enter Text/Tag", "", (cancel, text) => {
                          if (!cancel && !string.IsNullOrEmpty(text)) {
@@ -228,13 +251,11 @@ namespace Elin_ItemRelocator
                          }
                      });
                  });
-
+                 // ... Check other menu items
                  menu.AddButton(GetText(LangKey.Enchant), () => {
                      ShowEnchantPicker((ele) => {
                          Dialog.InputName("Amount (e.g. >=10)", "", (c2, val) => {
                               if (!c2) {
-                                  // Construct a text query that matches the enchant
-                                  // This relies on `MatchEncSearch`.
                                   profile.Filters.Add(new RelocationFilter { Text = ele.alias });
                                   refresh();
                               }
@@ -278,15 +299,11 @@ namespace Elin_ItemRelocator
                           }
                       });
                   });
-
                  menu.Show();
              });
 
-             // Settings Button (Replaces Scope/Hotbar buttons)
              layer.windows[0].AddBottomButton(GetText(LangKey.Settings), () => {
                  var menu = EClass.ui.CreateContextMenu("ContextMenu");
-
-                 // Scope
                  string scopeText = GetText(LangKey.Scope) + ": " + (profile.Scope == RelocationProfile.FilterScope.Inventory ? GetText(LangKey.Inventory) : GetText(LangKey.Zone));
                  menu.AddButton(scopeText, () => {
                     if (profile.Scope == RelocationProfile.FilterScope.Inventory)
@@ -295,36 +312,20 @@ namespace Elin_ItemRelocator
                         profile.Scope = RelocationProfile.FilterScope.Inventory;
                     refresh();
                  });
-
-                 // Hotbar
                  string hotbarText = GetText(LangKey.ExcludeHotbar) + ": " + (profile.ExcludeHotbar ? GetText(LangKey.ON) : GetText(LangKey.OFF));
                  menu.AddButton(hotbarText, () => {
                      profile.ExcludeHotbar = !profile.ExcludeHotbar;
                      refresh();
                  });
-
-                 // Removed Import/Export/Clear as per user request
-
                  menu.Show();
              });
 
-             // Preview Button REMOVED (Real-time now)
-
-             // Execute
              layer.windows[0].AddBottomButton(GetText(LangKey.Execute), () => {
                  RelocatorManager.Instance.ExecuteRelocation(container);
-                 Msg.Say(string.Format(GetText(LangKey.Msg_Relocated), "")); // Just a dummy msg or real count if possible
+                 Msg.Say(string.Format(GetText(LangKey.Msg_Relocated), ""));
                  layer.Close();
              });
         }
-
-        // ShowPreview method removed or unused logic can be deleted, but keeping AddButtons clean first.
-
-        private static void ShowPreview(Thing container)
-        {
-             // Deprecated by dual-window mode
-        }
-
 
 
         private static void EditFilter(RelocationFilter filter, RelocationProfile profile, Action refresh)
@@ -347,7 +348,7 @@ namespace Elin_ItemRelocator
                       }
                  });
             }
-            else if (filter.Rarity.HasValue)
+             else if (filter.Rarity.HasValue)
             {
                  var rareMenu = EClass.ui.CreateContextMenu("ContextMenu");
                  var updateList = Lang.GetList("quality");
@@ -355,7 +356,6 @@ namespace Elin_ItemRelocator
                       int r = i - 1;
                       string text = updateList[i] + " (" + r + ")";
                       rareMenu.AddButton(text, () => {
-                          // Step 2: Select Operator
                           var opMenu = EClass.ui.CreateContextMenu("ContextMenu");
                           string[] ops = new string[] { ">=", "=", "<=", ">", "<", "!=" };
                           foreach(var op in ops) {
@@ -381,11 +381,9 @@ namespace Elin_ItemRelocator
             }
         }
 
-        // Re-implemented Dynamic Category Picker
         private static void ShowCategoryPicker(Action<string> onSelect)
         {
             var menu = EClass.ui.CreateContextMenu("ContextMenu");
-            // Sort roots by name? Or sortVal?
             var roots = EClass.sources.categories.rows.Where(r => r.parent == null).OrderBy(r => r.id).ToList();
 
             foreach(var root in roots) {
@@ -397,25 +395,19 @@ namespace Elin_ItemRelocator
         private static void AddCategoryToMenu(UIContextMenu menu, SourceCategory.Row cat, Action<string> onSelect)
         {
             if (cat.children.Count > 0) {
-               // Branch: Button opens sub-menu
                menu.AddButton(cat.GetName() + " >", () => {
                    var subMenu = EClass.ui.CreateContextMenu("ContextMenu");
-                   // "Select All [This Category]" option
                    subMenu.AddButton(GetText(LangKey.All) + cat.GetName(), () => onSelect(cat.id));
-
-                   // Separator logic is not directly exposed in simple AddButton API, but we can just list children.
                    foreach(var child in cat.children) {
                        AddCategoryToMenu(subMenu, child, onSelect);
                    }
                    subMenu.Show();
                });
             } else {
-               // Leaf: Selects category
                  menu.AddButton(cat.GetName(), () => onSelect(cat.id));
             }
         }
 
-        // Renamed and Filtered Attribute Picker
         private static void ShowEnchantPicker(Action<SourceElement.Row> onConfirm)
         {
             var layer = EClass.ui.AddLayer<LayerList>();
@@ -424,35 +416,14 @@ namespace Elin_ItemRelocator
             var sources = new List<SourceElement.Row>();
             foreach(var row in EClass.sources.elements.rows)
             {
-                // Filter Logic: Weapon/Armor Enchants
-                // 1. Must have an alias (to be searchable/usable in filter)
                 if (string.IsNullOrEmpty(row.alias)) continue;
-
-                // 2. Must be an Enchant
-                // Check IsWeaponEnc, IsShieldEnc, or has encSlot defined (and valid)
                 bool isEnc = row.IsWeaponEnc || row.IsShieldEnc;
-                if (!string.IsNullOrEmpty(row.encSlot) && row.encSlot != "global")
-                {
-                    isEnc = true;
-                }
-
-                // 3. Include Primary Attributes? (STR, END...) usually fine to filter by.
-                // But user specifically asked for "Weapon/Armor Enchants".
-                // Let's stick to Enchants.
-                // However, things like "Sustain STR" are enchants. "STR" itself is a stat.
-                // Pure stats usually don't have encSlot?
-                // Actually SourceElement.row (id=10 STR) has encSlot="global".
-                // If we exclude 'global', we might exclude stats.
-                // Let's check user intent: "Attributes... too many... only Weapon/Armor Enchants".
-                // I'll exclude 'global' (stats) unless they claim to be weapon enc.
+                if (!string.IsNullOrEmpty(row.encSlot) && row.encSlot != "global") isEnc = true;
 
                 if (isEnc)
                 {
-                    // 4. Exclude unnatural enchants
-                    // Must have a chance to appear and not be excluded from random generation
                     if (row.chance == 0) continue;
                     if (row.tag.Contains("noRandomEnc")) continue;
-
                     sources.Add(row);
                 }
             }
