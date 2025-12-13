@@ -25,6 +25,7 @@ echo Compiling...
     /reference:"%~dp0elin_link\Elin_Data\Managed\UnityEngine.UI.dll" ^
     /reference:"%~dp0elin_link\Elin_Data\Managed\UnityEngine.TextRenderingModule.dll" ^
     /reference:"%~dp0elin_link\Elin_Data\Managed\UnityEngine.UIModule.dll" ^
+    /reference:"%~dp0elin_link\Elin_Data\Managed\UnityEngine.InputLegacyModule.dll" ^
     /reference:"%~dp0elin_link\Elin_Data\Managed\Plugins.dll" ^
     /reference:"%~dp0elin_link\Elin_Data\Managed\Plugins.BaseCore.dll" ^
     /reference:"%~dp0elin_link\Elin_Data\Managed\Plugins.UI.dll" ^
@@ -39,7 +40,9 @@ echo Compiling...
     "%~dp0src\LayerItemRelocator.cs" ^
     "%~dp0src\RelocationProfile.cs" ^
     "%~dp0src\RelocatorManager.cs" ^
-    "%~dp0src\Singleton.cs"
+    "%~dp0src\Singleton.cs" ^
+    "%~dp0src\RelocatorLang.cs" ^
+    "%~dp0src\RelocatorPickers.cs"
 
 if %ERRORLEVEL% NEQ 0 (
     echo Build Failed!

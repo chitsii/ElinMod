@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using System;
+using System.IO;
 using System.Linq;
 using BepInEx;
 using BepInEx.Logging;
@@ -23,8 +24,10 @@ namespace Elin_ItemRelocator
         {
             Instance = this;
             Logger = base.Logger;
+            Logger.LogInfo("[Elin_ItemRelocator] Awake Called");
             var harmony = new Harmony(ID);
             harmony.PatchAll();
+            Logger.LogInfo("[Elin_ItemRelocator] Harmony Patched");
         }
 
         [HarmonyPatch(typeof(Game), "OnLoad")]
@@ -32,6 +35,7 @@ namespace Elin_ItemRelocator
         {
             static void Postfix()
             {
+                Logger.LogInfo("[Elin_ItemRelocator] Game Loaded");
                 RelocatorManager.Instance.Init();
             }
         }
@@ -50,76 +54,265 @@ namespace Elin_ItemRelocator
         {
             static void Postfix(UIInventory __instance)
             {
+                // Logger.LogInfo("[Elin_ItemRelocator] Postfix Start");
                 if (__instance.window == null) return;
-
-                // Allow injection on player containers too (IsPlayerContainer returns true for held chests)
-
                 var owner = __instance.owner;
-                if (owner == null) return;
-                if (owner.Container == null) return;
+                if (owner == null) { return; } // Reduced noise
+                if (owner.Container == null) { return; }
 
                 Thing containerThing = owner.Container.Thing;
                 if (containerThing == null)
                 {
-                    // Skip Chara containers (main backpack)
                     if (owner.Container.isChara) return;
                     return;
                 }
-
                 if (!containerThing.trait.IsContainer) return;
 
-                // Use buttonShared (Lock) as per user screenshot (Lock button exists)
-                // If buttonShared is null, fallback to buttonSort
-                UIButton anchorBtn = __instance.window.buttonShared;
-
+                // Enforce using buttonSort as the source
+                UIButton anchorBtn = __instance.window.buttonSort;
                 if (anchorBtn == null)
                 {
-                    anchorBtn = __instance.window.buttonSort;
+                    Logger.LogInfo("[Elin_ItemRelocator] ButtonSort not found, aborting.");
+                    return;
                 }
-
-                if (anchorBtn == null) return;
 
                 Transform parent = anchorBtn.transform.parent;
                 Transform existing = parent.Find("ButtonRelocate");
-                if (existing != null) return;
+                UIButton btnRelocate;
 
-                UIButton btnRelocate = UnityEngine.Object.Instantiate(anchorBtn, parent);
-                btnRelocate.gameObject.name = "ButtonRelocate";
-                btnRelocate.transform.SetAsLastSibling();
+                if (existing != null)
+                {
+                    btnRelocate = existing.GetComponent<UIButton>();
+                }
+                else
+                {
+                    btnRelocate = UnityEngine.Object.Instantiate(anchorBtn, parent);
+                    btnRelocate.gameObject.name = "ButtonRelocate";
+                    btnRelocate.transform.SetAsLastSibling();
+                    Logger.LogInfo("[Elin_ItemRelocator] Created New Button for: " + containerThing.Name);
+                }
 
+                if (btnRelocate == null) return;
+
+                Logger.LogInfo("[Elin_ItemRelocator] Customizing Button: " + btnRelocate.name);
+
+                // Aggressively Hide Icon
+                // The Sort button uses the root Image as the icon (e.g. pipo-emotion_122)
+                // We must make it transparent but keep it enabled for Raycast (Clicks)
+                if (btnRelocate.image != null)
+                {
+                    // Check if it looks like an icon (not a generic background)
+                    // Or just force it clear since we are adding text
+                    btnRelocate.image.sprite = null;
+                    btnRelocate.image.color = Color.clear;
+                    Logger.LogInfo("[Elin_ItemRelocator] Cleared root image (Icon) to transparent.");
+                }
+
+                // Also hide any child images that might be overlays
+                foreach(var img in btnRelocate.GetComponentsInChildren<Image>(true))
+                {
+                    if (img.gameObject == btnRelocate.gameObject) continue; // Already handled above
+
+                    img.enabled = false;
+                    img.gameObject.SetActive(false);
+                    Logger.LogInfo("[Elin_ItemRelocator] Hidden Child Image: " + img.name);
+                }
+
+                // Compatibility with previous dedicated icon logic
+                if (btnRelocate.icon != null)
+                {
+                    btnRelocate.icon.enabled = false;
+                    btnRelocate.icon.sprite = null;
+                    btnRelocate.icon.color = Color.clear;
+                    btnRelocate.icon.gameObject.SetActive(false);
+                }
+
+                if (btnRelocate.mainText != null)
+                {
+                   btnRelocate.mainText.SetActive(true);
+                   btnRelocate.mainText.SetText("★");
+                }
+                else
+                {
+                    var t = btnRelocate.GetComponentInChildren<UIText>(true);
+                    if (t != null)
+                    {
+                        t.SetActive(true);
+                        t.SetText("★");
+                    }
+                    else
+                    {
+                        Logger.LogInfo("[Elin_ItemRelocator] No Text Component Found! Creating one...");
+                        // Find a source text to clone (e.g. from Window Caption or any sibling)
+                        UIText sourceText = __instance.window.GetComponentInChildren<UIText>(true);
+                        if (sourceText != null)
+                        {
+                             // Instantiate copy of the GAME OBJECT, then get component
+                             GameObject newObj = UnityEngine.Object.Instantiate(sourceText.gameObject, btnRelocate.transform);
+                             UIText newText = newObj.GetComponent<UIText>();
+                             if (newText != null)
+                             {
+                                 newObj.name = "Text_Relocate";
+                                 newText.text = "★";
+                                 // "Matcha" Color (Muted Green) ~ #025952ff
+                                 // R=2, G=89, B=82 => 0.02, 0.35, 0.32
+                                 newText.color = new Color(0.02f, 0.35f, 0.32f);
+                                 newText.alignment = TextAnchor.MiddleCenter;
+                                 newText.resizeTextForBestFit = true;
+                                 newText.resizeTextMinSize = 10;
+                                 newText.resizeTextMaxSize = 20;
+
+                                 // Reset Rect logic
+                                 RectTransform rt = newText.rectTransform;
+                                 rt.anchorMin = Vector2.zero;
+                                 rt.anchorMax = Vector2.one;
+                                 rt.sizeDelta = Vector2.zero;
+                                 rt.anchoredPosition = Vector2.zero;
+
+                                 newObj.SetActive(true);
+                                 btnRelocate.mainText = newText; // Correctly assign Component
+                             }
+                        }
+                        else
+                        {
+                             Logger.LogInfo("[Elin_ItemRelocator] Failed to find source text to clone.");
+                        }
+                    }
+                }
+
+                btnRelocate.refObj = null;
                 btnRelocate.onClick.RemoveAllListeners();
                 btnRelocate.onClick.AddListener(() =>
                 {
                     RelocatorUI.Open(containerThing);
                 });
 
-                // Customize Appearance
-                if (btnRelocate.icon != null)
-                {
-                    btnRelocate.icon.color = new Color(0.6f, 0.5f, 1f); // Purple tint
-                }
+                // --- Icon Customization (Optional) ---
+                // If you want to use an Icon instead of Text, set this to true
+                bool useIcon = false;
 
-                if (btnRelocate.mainText != null)
+                if (useIcon)
                 {
-                   btnRelocate.mainText.SetActive(true);
-                   btnRelocate.mainText.SetText(RelocatorLang.GetText(RelocatorLang.LangKey.Execute));
-                }
-                else
-                {
-                    // Fallback: Try to find text component
-                    var t = btnRelocate.GetComponentInChildren<UIText>(true);
-                    if (t != null)
+                    // Enable Icon Caption (found in dump)
+                    Transform iconTrans = btnRelocate.transform.Find("icon caption");
+                    if (iconTrans != null)
                     {
-                        t.SetActive(true);
-                        t.SetText(RelocatorLang.GetText(RelocatorLang.LangKey.Execute));
+                         Image iconImg = iconTrans.GetComponent<Image>();
+                         if (iconImg != null)
+                         {
+                             iconImg.enabled = true;
+                             iconImg.gameObject.SetActive(true);
+                             // You can change sprite here: iconImg.sprite = ...
+                             Logger.LogInfo("[Elin_ItemRelocator] Enabled Icon.");
+                         }
                     }
+                    if (btnRelocate.mainText != null) btnRelocate.mainText.SetActive(false);
                 }
 
-                // Set tooltip if possible (UIButton might have tooltip property or Component)
-                // btnRelocate.Tooltip = RelocatorUI.GetText(RelocatorUI.LangKey.Title);
+                // --- Tooltip Fix ---
+                try
+                {
+                    string finalTooltip = RelocatorLang.GetText(RelocatorLang.LangKey.Execute);
+                    var fieldInfo = typeof(UIButton).GetField("tooltip", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+
+                    if (fieldInfo != null)
+                    {
+                        // Create fresh instance
+                        var newTooltip = Activator.CreateInstance(fieldInfo.FieldType);
+                        fieldInfo.SetValue(btnRelocate, newTooltip);
+
+                        // Set 'text' field directly
+                        var textField = newTooltip.GetType().GetField("text", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+                        if (textField != null)
+                        {
+                            textField.SetValue(newTooltip, finalTooltip);
+                        }
+
+                         // Set 'enable' field directly (optional but safer)
+                        var enableField = newTooltip.GetType().GetField("enable", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+                        if (enableField != null)
+                        {
+                            enableField.SetValue(newTooltip, true);
+                        }
+                    }
+                    // Redundant saftey call
+                    btnRelocate.SetTooltip(finalTooltip);
+                }
+                catch (Exception ex)
+                {
+                     // Silent failure or min log
+                }
 
                 btnRelocate.gameObject.SetActive(true);
-                LayoutRebuilder.ForceRebuildLayoutImmediate(parent as RectTransform);
+
+                // Fix Layout Overlap
+                // Move to the very end of the list
+                btnRelocate.transform.SetAsLastSibling();
+
+                 // Check for LayoutGroup
+                 LayoutGroup group = parent.GetComponent<LayoutGroup>();
+                 if (group == null)
+                 {
+                     // Manual Positioning (Simplified)
+                     float lowestY = float.MaxValue;
+                     float height = 32f;
+                     float spacing = 5f;
+
+                     RectTransform myRect = btnRelocate.GetComponent<RectTransform>();
+                     RectTransform anchorRect = anchorBtn.GetComponent<RectTransform>();
+                     if (anchorRect != null) {
+                         height = anchorRect.rect.height;
+                     }
+
+                     foreach(RectTransform child in parent)
+                     {
+                         if (child == myRect) continue;
+                         if (!child.gameObject.activeSelf) continue;
+
+                         if (child.anchoredPosition.y < lowestY)
+                         {
+                             lowestY = child.anchoredPosition.y;
+                         }
+                     }
+
+                     if (lowestY == float.MaxValue) lowestY = 0;
+
+                     // Place below the lowest item
+                     myRect.anchoredPosition = new Vector2(anchorRect.anchoredPosition.x, lowestY - height - spacing);
+                 }
+                 else
+                 {
+                     // Use LayoutElement logic for LayoutGroups
+                     LayoutElement le = btnRelocate.GetComponent<LayoutElement>();
+                     if (le == null) le = btnRelocate.gameObject.AddComponent<LayoutElement>();
+
+                     // Get width from anchor button
+                     float targetWidth = 32f;
+                     float targetHeight = 32f;
+                     RectTransform anchorRect = anchorBtn.GetComponent<RectTransform>();
+                     if (anchorRect != null)
+                     {
+                         targetWidth = anchorRect.rect.width;
+                         targetHeight = anchorRect.rect.height;
+                         if (targetWidth < 10) targetWidth = 32f;
+                     }
+
+                     le.ignoreLayout = false;
+                     le.minWidth = targetWidth;
+                     le.preferredWidth = targetWidth;
+                     le.minHeight = targetHeight;
+                     le.preferredHeight = targetHeight;
+                     le.flexibleWidth = 0;
+                     le.flexibleHeight = 0;
+
+                    // Force Rebuilds
+                    LayoutRebuilder.ForceRebuildLayoutImmediate(btnRelocate.transform as RectTransform);
+                    LayoutRebuilder.ForceRebuildLayoutImmediate(parent as RectTransform);
+                    if (__instance.window != null && __instance.window.GetComponent<RectTransform>() != null)
+                    {
+                        LayoutRebuilder.ForceRebuildLayoutImmediate(__instance.window.GetComponent<RectTransform>());
+                    }
+                }
             }
         }
     }

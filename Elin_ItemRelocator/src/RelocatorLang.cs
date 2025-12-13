@@ -15,7 +15,7 @@ namespace Elin_ItemRelocator
             { LangKey.Settings, new[] { "Settings", "設定" } },
             { LangKey.AddFilter, new[] { "Add Filter", "フィルタ追加" } },
             { LangKey.Preview, new[] { "Preview", "プレビュー" } },
-            { LangKey.Execute, new[] { "Relocate", "実行" } },
+            { LangKey.Execute, new[] { "Relocate", "再配置" } },
             { LangKey.Scope, new[] { "Scope", "範囲" } },
             { LangKey.ExcludeHotbar, new[] { "Exclude Hotbar", "ツールベルト除外" } },
             { LangKey.Rarity, new[] { "Rarity", "レアリティ" } },
