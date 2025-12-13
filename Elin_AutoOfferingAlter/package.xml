@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Meta>
+  <title>Elin_AutoOfferingAlter</title>
+  <id>tishi.elin.auto_offering_alter</id>
+  <author>tishi</author>
+  <builtin>false</builtin>
+  <loadPriority>100</loadPriority>
+  <version>1.0.0.0</version>
+  <tags>General,QoL</tags>
+  <description>
+■概要
+自動的に祭壇に捧げ物をするModです。
+  </description>
+</Meta>
