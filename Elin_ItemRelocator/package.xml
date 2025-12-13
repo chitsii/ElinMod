@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Meta>
+  <title>Elin_ItemRelocator</title>
+  <id>tishi.elin.item_relocator</id>
+  <author>tishi</author>
+  <builtin>false</builtin>
+  <loadPriority>100</loadPriority>
+  <version>1.0.0.0</version>
+  <tags>General,QoL</tags>
+  <description>
+■概要
+アイテムの種類やレアリティをフィルタして、対象のコンテナに集約するModです。
+  </description>
+</Meta>
