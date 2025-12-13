@@ -91,6 +91,8 @@ namespace Elin_AutoEatSleep
                 var pc = EClass.pc;
                 if (pc == null || pc.hunger == null) return;
 
+                if (!Plugin.Instance.MyConfig.AutoEatEnabled.Value) return;
+
                 if (pc.hunger.GetPhase() < Plugin.Instance.MyConfig.HungerThreshold.Value)
                     return;
 
@@ -154,6 +156,8 @@ namespace Elin_AutoEatSleep
              {
                 var pc = EClass.pc;
                 if (pc == null) return;
+
+                if (!Plugin.Instance.MyConfig.AutoSleepEnabled.Value) return;
 
                 var config = Plugin.Instance.MyConfig;
 

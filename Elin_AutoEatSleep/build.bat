@@ -37,12 +37,14 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 echo Build Successful!
-echo Copying to plugins...
-xcopy "%~dp0_bin\Elin_AutoEatSleep.dll" "%~dp0elin_link\BepInEx\plugins\Elin_AutoEatSleep\" /Y
+echo Copying to Package folder...
+xcopy "%~dp0_bin\Elin_AutoEatSleep.dll" "%~dp0elin_link\Package\Elin_AutoEatSleep\" /Y
+xcopy "%~dp0package.xml" "%~dp0elin_link\Package\Elin_AutoEatSleep\" /Y
 
 echo Copying to Steam game folder...
-set STEAM_PLUGIN_DIR="C:\Program Files (x86)\Steam\steamapps\common\Elin\BepInEx\plugins\Elin_AutoEatSleep"
-if not exist %STEAM_PLUGIN_DIR% mkdir %STEAM_PLUGIN_DIR%
-xcopy "%~dp0_bin\Elin_AutoEatSleep.dll" %STEAM_PLUGIN_DIR% /Y
+set STEAM_PACKAGE_DIR="C:\Program Files (x86)\Steam\steamapps\common\Elin\Package\Elin_AutoEatSleep"
+if not exist %STEAM_PACKAGE_DIR% mkdir %STEAM_PACKAGE_DIR%
+xcopy "%~dp0_bin\Elin_AutoEatSleep.dll" %STEAM_PACKAGE_DIR% /Y
+xcopy "%~dp0package.xml" %STEAM_PACKAGE_DIR% /Y
 
 endlocal
