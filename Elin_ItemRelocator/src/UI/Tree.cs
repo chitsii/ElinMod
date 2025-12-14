@@ -20,6 +20,9 @@ namespace Elin_ItemRelocator
         private HashSet<T> expanded = new HashSet<T>();
         private List<BottomButtonDef> bottomButtons = new List<BottomButtonDef>();
 
+        // Cache the content transform to avoid accessing destroyed components
+        private Transform _contentTrans;
+
         // Font customization
         private Font uiFont;
 
@@ -97,37 +100,63 @@ namespace Elin_ItemRelocator
         public LayerList Show()
         {
             bool isNew = false;
+            // Robust Layer Creation
             if (_layer == null || _layer.gameObject == null) {
                 _layer = EClass.ui.AddLayer<LayerList>();
+                if (_layer == null) {
+                    Debug.LogError("[RelocatorTree] Failed to create LayerList!");
+                    return null;
+                }
                 isNew = true;
             }
             var layer = _layer;
 
             if (isNew) {
-                layer.windows[0].SetCaption(caption);
-                layer.windows[0].setting.allowResize = true;
+                if (layer.windows.Count > 0)
+                {
+                    layer.windows[0].SetCaption(caption ?? "Tree");
+                    layer.windows[0].setting.allowResize = true;
+                }
+                else
+                {
+                    Debug.LogWarning("[RelocatorTree] LayerList has no windows!");
+                }
+
                 try { layer.SetSize(500, 700); } catch {}
 
                 // --- MANUAL SETUP ---
-                // 1. Destroy native UIList
-                var nativeList = layer.list.GetComponent<UIList>();
-                if (nativeList) UnityEngine.Object.DestroyImmediate(nativeList);
+                if (layer.list != null)
+                {
+                    // Cache Transform BEFORE destroying the UIList component
+                    _contentTrans = layer.list.transform;
+                    var contentTrans = _contentTrans;
 
-                // 2. Setup VLG
-                var contentTrans = layer.list.transform;
-                var vlg = contentTrans.GetComponent<VerticalLayoutGroup>();
-                if (!vlg) vlg = contentTrans.gameObject.AddComponent<VerticalLayoutGroup>();
-                vlg.childControlWidth = true;
-                vlg.childControlHeight = true;
-                vlg.childForceExpandWidth = true;
-                vlg.childForceExpandHeight = false;
-                vlg.spacing = 0;
-                vlg.padding = new RectOffset(0,0,0,0);
+                    // 1. Destroy native UIList (if exists)
+                    var nativeList = layer.list.GetComponent<UIList>();
+                    if (nativeList) UnityEngine.Object.DestroyImmediate(nativeList);
 
-                var csf = contentTrans.GetComponent<ContentSizeFitter>();
-                if (!csf) csf = contentTrans.gameObject.AddComponent<ContentSizeFitter>();
-                csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-                csf.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+                    // 2. Setup VLG
+                    if (contentTrans != null)
+                    {
+                        var vlg = contentTrans.GetComponent<VerticalLayoutGroup>();
+                        if (!vlg) vlg = contentTrans.gameObject.AddComponent<VerticalLayoutGroup>();
+                        vlg.childControlWidth = true;
+                        vlg.childControlHeight = true;
+                        vlg.childForceExpandWidth = true;
+                        vlg.childForceExpandHeight = false;
+                        vlg.spacing = 0;
+                        vlg.padding = new RectOffset(0,0,0,0);
+
+                        var csf = contentTrans.GetComponent<ContentSizeFitter>();
+                        if (!csf) csf = contentTrans.gameObject.AddComponent<ContentSizeFitter>();
+                        csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+                        csf.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+                    }
+                }
+                else
+                {
+                     Debug.LogError("[RelocatorTree] layer.list is NULL!");
+                }
             }
 
             Refresh();
@@ -137,8 +166,9 @@ namespace Elin_ItemRelocator
         public void Refresh()
         {
             if (_layer == null || _layer.gameObject == null) return;
+            if (_contentTrans == null) return;
 
-            var contentTrans = _layer.list.transform;
+            var contentTrans = _contentTrans;
 
             // 1. Flatten Data
             var flattened = new List<Tuple<T, int>>(); // Item, Depth
@@ -231,7 +261,8 @@ namespace Elin_ItemRelocator
             txtExpand.raycastTarget = false;
 
             var imgExpand = expandGO.AddComponent<Image>();
-            imgExpand.color = new Color(0.9f, 0.9f, 0.9f, 0.5f);
+            // Transparent
+            imgExpand.color = Color.clear;
             var btnExpand = expandGO.AddComponent<Button>();
             btnExpand.targetGraphic = imgExpand;
 
@@ -301,7 +332,7 @@ namespace Elin_ItemRelocator
             le.minHeight = 40; le.preferredHeight = 40; le.flexibleHeight = 0;
 
             var bg = btnGO.AddComponent<Image>();
-            bg.color = new Color(0.9f, 0.9f, 0.9f); // Default button bg
+            bg.color = Color.clear; // Default button bg
 
             var btn = btnGO.AddComponent<Button>();
             btn.targetGraphic = bg;

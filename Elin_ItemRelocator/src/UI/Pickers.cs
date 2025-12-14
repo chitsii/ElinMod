@@ -42,7 +42,7 @@ namespace Elin_ItemRelocator
             tree.AddBottomButton("[ OK ]", () => {
                 onConfirm(selected.ToList());
                 tree.Close();
-            }, new Color(0, 0.5f, 0));
+            }, new Color(0.3f, 0.5f, 0));
 
             tree.Show();
         }

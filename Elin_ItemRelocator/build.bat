@@ -36,16 +36,16 @@ echo Compiling...
     /reference:"%~dp0elin_link\BepInEx\core\BepInEx.Unity.dll" ^
     /reference:"%~dp0elin_link\BepInEx\core\0Harmony.dll" ^
     /reference:"System.Core.dll" ^
-    "%~dp0src\Elin_ItemRelocator.cs" ^
-    "%~dp0src\LayerItemRelocator.cs" ^
-    "%~dp0src\RelocationProfile.cs" ^
-    "%~dp0src\RelocatorManager.cs" ^
+    "%~dp0src\Mod.cs" ^
+    "%~dp0src\MainLayer.cs" ^
+    "%~dp0src\Profile.cs" ^
+    "%~dp0src\Manager.cs" ^
     "%~dp0src\Singleton.cs" ^
-    "%~dp0src\RelocatorLang.cs" ^
-    "%~dp0src\RelocatorPickers.cs" ^
-    "%~dp0src\RelocatorMenu.cs" ^
-    "%~dp0src\RelocatorTable.cs" ^
-    "%~dp0src\RelocatorTree.cs"
+    "%~dp0src\Lang.cs" ^
+    "%~dp0src\UI\Menu.cs" ^
+    "%~dp0src\UI\Table.cs" ^
+    "%~dp0src\UI\Tree.cs" ^
+    "%~dp0src\UI\Pickers.cs"
 
 if %ERRORLEVEL% NEQ 0 (
     echo Build Failed!
