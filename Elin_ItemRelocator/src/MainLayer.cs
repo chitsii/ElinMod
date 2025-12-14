@@ -19,8 +19,9 @@ namespace Elin_ItemRelocator
             public string DisplayText;
 
             public bool IsRule { get { return Rule != null && CondType == ConditionType.None; } }
-            public bool IsCondition { get { return CondType != ConditionType.None && CondType != ConditionType.AddButton; } }
+            public bool IsCondition { get { return CondType != ConditionType.None && CondType != ConditionType.AddButton && CondType != ConditionType.Settings; } }
             public bool IsAddButton { get { return CondType == ConditionType.AddButton; } }
+            public bool IsSettings { get { return CondType == ConditionType.Settings; } }
 
             // Override Equals/GetHashCode for Persistence (Expansion State)
             public override bool Equals(object obj)
@@ -37,7 +38,7 @@ namespace Elin_ItemRelocator
             }
         }
 
-        private enum ConditionType { None, Category, Rarity, Quality, Text, Id, AddButton }
+        private enum ConditionType { None, Category, Rarity, Quality, Text, Id, AddButton, Settings, Weight }
 
         // ====================================================================
         // Fields
@@ -67,6 +68,8 @@ namespace Elin_ItemRelocator
              refresh = () => {
                  // Rebuild Data
                  List<FilterNode> roots = new List<FilterNode>();
+
+
                  if (profile.Rules != null) {
                      foreach(var r in profile.Rules) {
                          var node = new FilterNode { Rule = r, CondType = ConditionType.None };
@@ -91,11 +94,16 @@ namespace Elin_ItemRelocator
                  mainAccordion.SetRoots(roots);
                  mainAccordion.Refresh();
 
-                 RefreshPreview(null, container);
+                 RefreshPreview(null, container, profile);
              };
 
              // Configure Accordion
              mainAccordion.SetCaption(RelocatorLang.GetText(RelocatorLang.LangKey.Title));
+
+              mainAccordion.SetOnBuildRow((trans, node) => {
+                  // Settings row logic removed
+              });
+
              mainAccordion.SetChildren((node) => {
                  if (node.IsRule) {
                      var list = new List<FilterNode>();
@@ -120,6 +128,9 @@ namespace Elin_ItemRelocator
                      if (!string.IsNullOrEmpty(r.Text)) {
                          list.Add(new FilterNode { Rule = r, CondType = ConditionType.Text, DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Text) + ": " + r.Text });
                      }
+                     if (r.Weight.HasValue) {
+                         list.Add(new FilterNode { Rule = r, CondType = ConditionType.Weight, CondValue = r.Weight.Value.ToString(), DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Weight) + " " + (string.IsNullOrEmpty(r.WeightOp) ? ">=" : r.WeightOp) + " " + r.Weight });
+                     }
 
                      // ADD BUTTON
                      list.Add(new FilterNode { Rule = r, CondType = ConditionType.AddButton, DisplayText = " + " });
@@ -142,7 +153,7 @@ namespace Elin_ItemRelocator
                      return new Color(0.85f, 0.82f, 0.75f, 1f);
                  }
                  if (node.IsAddButton) {
-                     return new Color(0.9f, 0.9f, 0.9f, 0.5f);
+                     return Color.clear;
                  }
                  return Color.clear;
              });
@@ -172,9 +183,56 @@ namespace Elin_ItemRelocator
                  }
              });
 
-             mainAccordion.SetOnBuildRowExtra((node, rowGO) => {
-                 if (node.IsCondition) {
-                     // Remove Button (Updated Signature)
+
+
+              mainAccordion.SetOnBuildRowExtra((node, rowGO) => {
+                  if (node.IsCondition) {
+                      // Negation Button
+                      bool isNegated = false;
+                      Action toggleNegation = null;
+
+                      switch(node.CondType) {
+                          case ConditionType.Category:
+                              isNegated = node.Rule.NegatedCategoryIds != null && node.Rule.NegatedCategoryIds.Contains(node.CondValue);
+                              toggleNegation = () => {
+                                  if (node.Rule.NegatedCategoryIds == null) node.Rule.NegatedCategoryIds = new HashSet<string>();
+                                  if (node.Rule.NegatedCategoryIds.Contains(node.CondValue)) node.Rule.NegatedCategoryIds.Remove(node.CondValue);
+                                  else node.Rule.NegatedCategoryIds.Add(node.CondValue);
+                                  refresh();
+                              };
+                              break;
+                          case ConditionType.Rarity:
+                              isNegated = node.Rule.NotRarity;
+                              toggleNegation = () => { node.Rule.NotRarity = !node.Rule.NotRarity; refresh(); };
+                              break;
+                          case ConditionType.Quality:
+                              isNegated = node.Rule.NotQuality;
+                              toggleNegation = () => { node.Rule.NotQuality = !node.Rule.NotQuality; refresh(); };
+                              break;
+                          case ConditionType.Text:
+                              isNegated = node.Rule.NotText;
+                              toggleNegation = () => { node.Rule.NotText = !node.Rule.NotText; refresh(); };
+                              break;
+                          case ConditionType.Weight:
+                              isNegated = node.Rule.NotWeight;
+                              toggleNegation = () => { node.Rule.NotWeight = !node.Rule.NotWeight; refresh(); };
+                              break;
+                      }
+
+                      if (toggleNegation != null) {
+                          var btnNeg = CreateTinyButton(rowGO.transform, RelocatorLang.GetText(RelocatorLang.LangKey.Not), toggleNegation);
+                          var txtNeg = btnNeg.GetComponentInChildren<Text>();
+                          var imgNeg = btnNeg.GetComponent<Image>();
+                          if (isNegated) {
+                              if(txtNeg) txtNeg.color = Color.red; /*Red for Negated*/
+                              if(imgNeg) imgNeg.color = new Color(1f, 0.8f, 0.8f);
+                          } else {
+                              if(txtNeg) txtNeg.color = SkinManager.CurrentColors.textDefault;
+                              if(imgNeg) imgNeg.color = new Color(0.9f, 0.9f, 0.9f);
+                          }
+                      }
+
+                      // Remove Button (Updated Signature)
                      var btnRemove = CreateTinyButton(rowGO.transform, "x", () => {
                           Dialog.YesNo(RelocatorLang.GetText(RelocatorLang.LangKey.Delete) + "?", () => {
                                  switch(node.CondType) {
@@ -189,6 +247,9 @@ namespace Elin_ItemRelocator
                                          break;
                                      case ConditionType.Text:
                                          node.Rule.Text = null;
+                                         break;
+                                     case ConditionType.Weight:
+                                         node.Rule.Weight = null;
                                          break;
                                  }
                                  refresh();
@@ -233,6 +294,11 @@ namespace Elin_ItemRelocator
              // 1. Create Main Layer via Accordion
              var _main = mainAccordion.Show();
              var winMain = _main.windows[0];
+
+             // Add Help Button to Footer (Requested by User)
+             winMain.AddBottomButton(" [ ? ] ", () => {
+                  Dialog.Ok("<b>" + RelocatorLang.GetText(RelocatorLang.LangKey.HelpTitle) + "</b>\n\n" + RelocatorLang.GetText(RelocatorLang.LangKey.HelpText));
+             });
 
              // 2. Create Preview Table
              previewTable = RelocatorTable<Thing>.Create()
@@ -347,10 +413,38 @@ namespace Elin_ItemRelocator
         // ====================================================================
         // Refresh Logic
         // ====================================================================
-        private static void RefreshPreview(LayerList layer, Thing container)
+        private static void RefreshPreview(LayerList layer, Thing container, RelocationProfile profile)
         {
                 List<Thing> matches = RelocatorManager.Instance.GetMatches(container).ToList();
-                int count = matches.Count;
+                 // Sort Matches
+                 // profile is not passed here... wait, RelocatorManager has no reference to profile?
+                 // RefreshPreview is used inside Show which has 'profile' variable in closure.
+                 // But RefreshPreview below is static and takes (layer, container).
+                 // Ah, 'profile' is NOT available here statically unless passed or accessed via closure if not static.
+                 // This method is 'private static'!
+                 // I need to change signature to accept profile or access it.
+                 // Actually, it is called from 'InitLayers' or 'refresh' lambda?
+                 // 'InitLayers' is called from Show(profile).
+                 // 'refresh' lambda captures 'profile'.
+                 // So I should pass 'profile' to RefreshPreview.
+                 // 'RefreshPreview' is defined at line 435.
+                 // I'll update the signature.
+
+                 if (profile != null) // Add check
+                 {
+                     switch(profile.SortMode) {
+                        case RelocationProfile.ResultSortMode.PriceAsc: matches.Sort((a,b) => a.GetPrice(CurrencyType.Money) - b.GetPrice(CurrencyType.Money)); break;
+                        case RelocationProfile.ResultSortMode.PriceDesc: matches.Sort((a,b) => b.GetPrice(CurrencyType.Money) - a.GetPrice(CurrencyType.Money)); break;
+                        case RelocationProfile.ResultSortMode.EnchantMagAsc: matches.Sort((a,b) => a.encLV - b.encLV); break;
+                        case RelocationProfile.ResultSortMode.EnchantMagDesc: matches.Sort((a,b) => b.encLV - a.encLV); break;
+                        case RelocationProfile.ResultSortMode.TotalWeightAsc: matches.Sort((a,b) => (a.SelfWeight * a.Num) - (b.SelfWeight * b.Num)); break;
+                        case RelocationProfile.ResultSortMode.TotalWeightDesc: matches.Sort((a,b) => (b.SelfWeight * b.Num) - (a.SelfWeight * a.Num)); break;
+                        case RelocationProfile.ResultSortMode.UnitWeightAsc: matches.Sort((a,b) => a.SelfWeight - b.SelfWeight); break;
+                        case RelocationProfile.ResultSortMode.UnitWeightDesc: matches.Sort((a,b) => b.SelfWeight - a.SelfWeight); break;
+                     }
+                 }
+
+                 int count = matches.Count;
                 string countStr = count >= 100 ? "100+" : count.ToString();
 
                 if (previewTable != null)
@@ -434,7 +528,30 @@ namespace Elin_ItemRelocator
                           }
                       }, (Dialog.InputType)0);
                   })
-                 .Show();
+                  .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Weight), () => {
+                       Dialog.InputName("Enter Weight (e.g. >=10)", "", (c, text) => {
+                           if (!c && !string.IsNullOrEmpty(text)) {
+                               if (char.IsDigit(text[0])) text = ">=" + text;
+
+                               // Parse operator and value
+                               string op = ">=";
+                               string valStr = text;
+                               if (text.StartsWith(">=") || text.StartsWith("<=") || text.StartsWith("==") || text.StartsWith("!=")) {
+                                   op = text.Substring(0, 2); valStr = text.Substring(2);
+                               } else if (text.StartsWith(">") || text.StartsWith("<") || text.StartsWith("=")) {
+                                   op = text.Substring(0, 1); valStr = text.Substring(1);
+                               }
+
+                               int w;
+                               if(int.TryParse(valStr, out w)) {
+                                   rule.Weight = w;
+                                   rule.WeightOp = op;
+                                   refresh();
+                               }
+                           }
+                       }, (Dialog.InputType)0);
+                   })
+                  .Show();
         }
 
         private static void ShowSettingsMenu(RelocationProfile profile, Action refresh)
@@ -528,9 +645,20 @@ namespace Elin_ItemRelocator
              var txtGO = new GameObject("Text");
              txtGO.transform.SetParent(btnGO.transform, false);
              var txt = txtGO.AddComponent<Text>();
-             txt.font = SkinManager.Instance.fontSet.ui.source.font; txt.fontSize = 12; txt.text = label; txt.alignment = TextAnchor.MiddleCenter;
-             txt.color = SkinManager.CurrentColors.textDefault;
+             Font f = null;
+             if (SkinManager.Instance != null && SkinManager.Instance.fontSet != null && SkinManager.Instance.fontSet.ui != null && SkinManager.Instance.fontSet.ui.source != null) {
+                 f = SkinManager.Instance.fontSet.ui.source.font;
+             }
+             if (f == null) f = UnityEngine.Resources.GetBuiltinResource<Font>("Arial.ttf"); // Fallback
+
+             txt.font = f; txt.fontSize = 12; txt.text = label; txt.alignment = TextAnchor.MiddleCenter;
+
+             Color c = Color.black;
+             if (SkinManager.CurrentColors != null) c = SkinManager.CurrentColors.textDefault;
+             txt.color = c;
              txt.rectTransform.anchorMin = Vector2.zero; txt.rectTransform.anchorMax = Vector2.one;
+             txt.rectTransform.sizeDelta = Vector2.zero;
+             txt.rectTransform.offsetMin = Vector2.zero; txt.rectTransform.offsetMax = Vector2.zero;
 
              return btn;
         }
@@ -575,6 +703,10 @@ namespace Elin_ItemRelocator
                 case RelocationProfile.ResultSortMode.PriceDesc: return RelocatorLang.GetText(RelocatorLang.LangKey.SortPriceDesc);
                 case RelocationProfile.ResultSortMode.EnchantMagAsc: return RelocatorLang.GetText(RelocatorLang.LangKey.SortMagAsc);
                 case RelocationProfile.ResultSortMode.EnchantMagDesc: return RelocatorLang.GetText(RelocatorLang.LangKey.SortMagDesc);
+                case RelocationProfile.ResultSortMode.TotalWeightAsc: return RelocatorLang.GetText(RelocatorLang.LangKey.SortWeightAsc);
+                case RelocationProfile.ResultSortMode.TotalWeightDesc: return RelocatorLang.GetText(RelocatorLang.LangKey.SortWeightDesc);
+                case RelocationProfile.ResultSortMode.UnitWeightAsc: return RelocatorLang.GetText(RelocatorLang.LangKey.SortUnitWeightAsc);
+                case RelocationProfile.ResultSortMode.UnitWeightDesc: return RelocatorLang.GetText(RelocatorLang.LangKey.SortUnitWeightDesc);
                 default: return mode.ToString();
             }
         }

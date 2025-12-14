@@ -23,6 +23,7 @@ namespace Elin_ItemRelocator
         // New Callbacks
         private Action<T> onRightClick;
         private Action<T, GameObject> onBuildRowExtra;
+        private Action<Transform, T> onBuildRow; // Custom Builder
         private Func<T, Color> getBackgroundColor;
 
         private Transform _contentTrans;
@@ -102,6 +103,12 @@ namespace Elin_ItemRelocator
         public RelocatorAccordion<T> SetOnBuildRowExtra(Action<T, GameObject> action)
         {
             this.onBuildRowExtra = action;
+            return this;
+        }
+
+        public RelocatorAccordion<T> SetOnBuildRow(Action<Transform, T> action)
+        {
+            this.onBuildRow = action;
             return this;
         }
 
@@ -230,6 +237,18 @@ namespace Elin_ItemRelocator
 
         private void BuildRow(Transform parent, T item, int depth)
         {
+            if (onBuildRow != null) {
+                 var cRow = new GameObject("CustomRow");
+                 cRow.transform.SetParent(parent, false);
+                 try {
+                     onBuildRow(cRow.transform, item);
+                 } catch (Exception ex) {
+                     Debug.LogError("[RelocatorAccordion] Custom Row Build Error: " + ex.ToString());
+                 }
+                 if (cRow.transform.childCount > 0) return;
+                 UnityEngine.Object.DestroyImmediate(cRow);
+            }
+
             var rowGO = new GameObject("Row");
             rowGO.transform.SetParent(parent, false);
 
@@ -260,10 +279,20 @@ namespace Elin_ItemRelocator
             leLbl.flexibleWidth = 1;
             var lbl = lblGO.AddComponent<Text>();
             // Use Game Default Font
-            lbl.font = SkinManager.Instance.fontSet.ui.source.font;
+            // Use Game Default Font
+            Font f = null;
+            if (SkinManager.Instance != null && SkinManager.Instance.fontSet != null && SkinManager.Instance.fontSet.ui != null && SkinManager.Instance.fontSet.ui.source != null) {
+                 f = SkinManager.Instance.fontSet.ui.source.font;
+            }
+            if (f == null) f = UnityEngine.Resources.GetBuiltinResource<Font>("Arial.ttf");
+
+            lbl.font = f;
             lbl.fontSize = 14; lbl.alignment = TextAnchor.MiddleLeft;
             lbl.text = name;
-            lbl.color = SkinManager.CurrentColors.textDefault;
+
+            Color c = Color.black;
+            if (SkinManager.CurrentColors != null) c = SkinManager.CurrentColors.textDefault;
+            lbl.color = c;
             lbl.raycastTarget = false;
 
             // Interaction logic
@@ -288,7 +317,10 @@ namespace Elin_ItemRelocator
             var trigger = rowGO.AddComponent<UnityEngine.EventSystems.EventTrigger>();
             var entryEnter = new UnityEngine.EventSystems.EventTrigger.Entry();
             entryEnter.eventID = UnityEngine.EventSystems.EventTriggerType.PointerEnter;
-            entryEnter.callback.AddListener((data) => { imgRow.color = baseColor + new Color(0.05f, 0.05f, 0.05f, 0.5f); });
+            entryEnter.callback.AddListener((data) => {
+                 if (baseColor.a < 0.1f) imgRow.color = new Color(1f, 1f, 1f, 0.2f); // Light highlight for transparent
+                 else imgRow.color = baseColor + new Color(0.1f, 0.1f, 0.1f, 0f); // Lighten opque
+            });
             trigger.triggers.Add(entryEnter);
 
             var entryExit = new UnityEngine.EventSystems.EventTrigger.Entry();

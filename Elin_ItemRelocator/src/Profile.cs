@@ -54,7 +54,11 @@ namespace Elin_ItemRelocator
             PriceAsc,
             PriceDesc,
             EnchantMagAsc,
-            EnchantMagDesc
+            EnchantMagDesc,
+            TotalWeightAsc,
+            TotalWeightDesc,
+            UnitWeightAsc,
+            UnitWeightDesc
         }
     }
 
@@ -64,12 +68,20 @@ namespace Elin_ItemRelocator
         public string Name = "New Rule";
         public bool Enabled = true;
 
-        // Conditions
         public List<string> CategoryIds = new List<string>();
         public int? Rarity;
         public string RarityOp = ">=";
         public string Quality;
         public string Text;
+        public int? Weight;
+        public string WeightOp = ">=";
+
+        // Negation Flags
+        public HashSet<string> NegatedCategoryIds = new HashSet<string>();
+        public bool NotRarity;
+        public bool NotQuality;
+        public bool NotText;
+        public bool NotWeight;
 
         // Matching Logic (AND within Rule)
         public bool IsMatch(Thing t)
@@ -80,7 +92,8 @@ namespace Elin_ItemRelocator
             if ((CategoryIds == null || CategoryIds.Count == 0) &&
                 !Rarity.HasValue &&
                 string.IsNullOrEmpty(Quality) &&
-                string.IsNullOrEmpty(Text))
+                string.IsNullOrEmpty(Text) &&
+                !Weight.HasValue)
             {
                 return false;
             }
@@ -88,33 +101,67 @@ namespace Elin_ItemRelocator
             // Check Category (Multi-match: OR logic within CategoryIds)
             if (CategoryIds != null && CategoryIds.Count > 0)
             {
-                bool catMatch = false;
+                // Determine if this specific category condition is negated
+                // NOTE: The current data structure stores negated IDs in a separate set.
+                // But the logic "Is Match" iterates "CategoryIds".
+                // If an ID is in "CategoryIds", it's a condition.
+                // If it is ALSO in "NegatedCategoryIds", it means "NOT (IsChildOf(id))".
+                // BUT, usually "CategoryIds" is treated as an OR group.
+                // If we have Mixed (Positive and Negated)...
+                // Interpret as: (Positive1 OR Positive2) AND (NOT Negative1) AND (NOT Negative2).
+                // "CategoryIds" contains ALL IDs (both positive and negative ones).
+                // So we separate them.
+
+                bool hasPositive = false;
+                bool positiveMatch = false;
+
                 foreach(var id in CategoryIds) {
-                    if (t.category.IsChildOf(id)) {
-                        catMatch = true;
-                        break;
+                    bool isNeg = NegatedCategoryIds != null && NegatedCategoryIds.Contains(id);
+                    if (isNeg) {
+                         // Negative Condition: Must NOT be match
+                         if (t.category.IsChildOf(id)) return false;
+                    } else {
+                         hasPositive = true;
+                         if (t.category.IsChildOf(id)) positiveMatch = true;
                     }
                 }
-                if (!catMatch) return false;
+
+                if (hasPositive && !positiveMatch) return false;
             }
 
             // Check Rarity
             if (Rarity.HasValue)
             {
                 string op = string.IsNullOrEmpty(RarityOp) ? ">=" : RarityOp;
-                if (!EvaluateCondition((int)t.rarity, op + Rarity.Value)) return false;
+                bool match = EvaluateCondition((int)t.rarity, op + Rarity.Value);
+                if (NotRarity) match = !match;
+                if (!match) return false;
             }
 
             // Check Quality (String Logic)
             if (!string.IsNullOrEmpty(Quality))
             {
-                 if (!EvaluateCondition((int)t.encLV, Quality)) return false;
+                  bool match = EvaluateCondition((int)t.encLV, Quality);
+                  if (NotQuality) match = !match;
+                  if (!match) return false;
             }
 
             // Check Text
             if (!string.IsNullOrEmpty(Text))
             {
-                if (!IsTextMatch(t, Text)) return false;
+                 bool match = IsTextMatch(t, Text);
+                 if (NotText) match = !match;
+                 if (!match) return false;
+            }
+
+            // Check Weight (Unit Weight)
+            if (Weight.HasValue)
+            {
+                 string op = string.IsNullOrEmpty(WeightOp) ? ">=" : WeightOp;
+                 // SelfWeight returns unit weight in Elin
+                 bool match = EvaluateCondition(t.SelfWeight, op + Weight.Value);
+                 if (NotWeight) match = !match;
+                 if (!match) return false;
             }
 
             return true;
@@ -125,16 +172,31 @@ namespace Elin_ItemRelocator
         {
              List<string> parts = new List<string>();
              // Categories
-             if (CategoryIds != null && CategoryIds.Count > 0) {
-                 foreach(var id in CategoryIds) {
-                      var source = EClass.sources.categories.map.TryGetValue(id);
-                      string name = source != null ? source.GetName() : id;
-                      parts.Add(RelocatorLang.GetText(RelocatorLang.LangKey.Category) + ": " + name);
-                 }
-             }
-             if (Rarity.HasValue) parts.Add(RelocatorLang.GetText(RelocatorLang.LangKey.Rarity) + " " + (string.IsNullOrEmpty(RarityOp) ? ">=" : RarityOp) + " " + Rarity.Value);
-             if (!string.IsNullOrEmpty(Quality)) parts.Add(RelocatorLang.GetText(RelocatorLang.LangKey.Quality) + " " + Quality);
-             if (!string.IsNullOrEmpty(Text)) parts.Add(RelocatorLang.GetText(RelocatorLang.LangKey.Text) + ": " + Text);
+              if (CategoryIds != null && CategoryIds.Count > 0) {
+                  foreach(var id in CategoryIds) {
+                       var source = EClass.sources.categories.map.TryGetValue(id);
+                       string name = source != null ? source.GetName() : id;
+                       bool isNeg = NegatedCategoryIds != null && NegatedCategoryIds.Contains(id);
+                       string prefix = isNeg ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                       parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Category) + ": " + name);
+                  }
+              }
+              if (Rarity.HasValue) {
+                  string prefix = NotRarity ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                  parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Rarity) + " " + (string.IsNullOrEmpty(RarityOp) ? ">=" : RarityOp) + " " + Rarity.Value);
+              }
+              if (!string.IsNullOrEmpty(Quality)) {
+                  string prefix = NotQuality ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                  parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Quality) + " " + Quality);
+              }
+              if (!string.IsNullOrEmpty(Text)) {
+                  string prefix = NotText ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                  parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Text) + ": " + Text);
+              }
+              if (Weight.HasValue) {
+                  string prefix = NotWeight ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                  parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Weight) + " " + (string.IsNullOrEmpty(WeightOp) ? ">=" : WeightOp) + " " + Weight.Value);
+              }
              return parts;
         }
 

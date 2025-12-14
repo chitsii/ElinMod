@@ -74,8 +74,10 @@ namespace Elin_ItemRelocator
                  var t = cell.GetComponent<Text>();
                  if (!t) {
                      t = cell.AddComponent<Text>();
-                     t.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-                     t.color = new Color(0.1f, 0.1f, 0.1f);
+                     t.font = SkinManager.Instance.fontSet.ui.source.font;
+                     Color c = Color.black;
+                     if (SkinManager.CurrentColors != null) c = SkinManager.CurrentColors.textDefault;
+                     t.color = c;
                      t.alignment = TextAnchor.MiddleLeft;
                      t.resizeTextForBestFit = true;
                      t.resizeTextMinSize = 8;
@@ -150,9 +152,11 @@ namespace Elin_ItemRelocator
 
                          // Add Text
                          var t = cell.AddComponent<Text>();
-                         t.text = col.Header;
-                         t.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-                         t.color = new Color(0.1f, 0.1f, 0.2f);
+                          t.text = col.Header;
+                          t.font = SkinManager.Instance.fontSet.ui.source.font;
+                          Color hc = Color.black;
+                          if (SkinManager.CurrentColors != null) hc = SkinManager.CurrentColors.textDefault;
+                          t.color = hc;
                          t.fontStyle = FontStyle.Bold;
                          t.alignment = TextAnchor.MiddleLeft;
                          t.resizeTextForBestFit = true;

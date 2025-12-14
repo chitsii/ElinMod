@@ -14,6 +14,7 @@ namespace Elin_ItemRelocator
         private Func<T, string> getDebugText;
         private Func<T, Color> getBackgroundColor;
         private Action<T> onSelect;
+        private Action<Transform, T> onBuildRow;
         private Func<T, bool> isSelected;
         private Func<T, bool> isDisabled; // e.g., if parent is selected
         private string caption = "Tree";
@@ -77,6 +78,12 @@ namespace Elin_ItemRelocator
         public RelocatorTree<T> SetGetBackgroundColor(Func<T, Color> selector)
         {
             this.getBackgroundColor = selector;
+            return this;
+        }
+
+        public RelocatorTree<T> SetOnBuildRow(Action<Transform, T> builder)
+        {
+            this.onBuildRow = builder;
             return this;
         }
 
@@ -220,6 +227,23 @@ namespace Elin_ItemRelocator
 
         private void BuildRow(Transform parent, T item, int depth)
         {
+            if (onBuildRow != null) {
+                 // Create a container for the row but let the user populate it?
+                 // Or let user take the parent and do whatever?
+                 // Ideally, we want a row object.
+                 var cRow = new GameObject("CustomRow");
+                 cRow.transform.SetParent(parent, false);
+                 onBuildRow(cRow.transform, item);
+                 // If the builder populated it, great.
+                 // We need to check if we should proceed with default building?
+                 // Let's assume onBuildRow handles EVERYTHING for this item if it does anything?
+                 // No, we need a way to say "Skip Default".
+                 // Let's check child count.
+                 if (cRow.transform.childCount > 0) return;
+                 // If empty, destroy and continue default?
+                 UnityEngine.Object.DestroyImmediate(cRow);
+            }
+
             var rowGO = new GameObject("Row");
             rowGO.transform.SetParent(parent, false);
 
