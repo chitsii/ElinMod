@@ -373,15 +373,37 @@ namespace Elin_ItemRelocator
                          }
                      }, (Dialog.InputType)0);
                  })
-                 .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Enchant), () => {
-                     RelocatorPickers.ShowEnchantPicker((ele) => {
-                         AddEnchantFilterDialog(ele, (text) => {
-                             if(string.IsNullOrEmpty(rule.Text)) rule.Text = text;
-                             else rule.Text += " " + text;
-                             refresh();
-                         });
-                     });
-                 })
+                  .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Enchant), () => {
+                      RelocatorMenu.Create()
+                          .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.CatAll), () => {
+                              RelocatorPickers.ShowEnchantPicker(0, (ele) => {
+                                  AddEnchantFilterDialog(ele, (text) => {
+                                      if(string.IsNullOrEmpty(rule.Text)) rule.Text = text;
+                                      else rule.Text += " " + text;
+                                      refresh();
+                                  });
+                              });
+                          })
+                          .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.CatWeapon), () => {
+                              RelocatorPickers.ShowEnchantPicker(1, (ele) => {
+                                  AddEnchantFilterDialog(ele, (text) => {
+                                      if(string.IsNullOrEmpty(rule.Text)) rule.Text = text;
+                                      else rule.Text += " " + text;
+                                      refresh();
+                                  });
+                              });
+                          })
+                          .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.CatArmor), () => {
+                              RelocatorPickers.ShowEnchantPicker(2, (ele) => {
+                                  AddEnchantFilterDialog(ele, (text) => {
+                                      if(string.IsNullOrEmpty(rule.Text)) rule.Text = text;
+                                      else rule.Text += " " + text;
+                                      refresh();
+                                  });
+                              });
+                          })
+                          .Show();
+                  })
                  .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Category), () => {
                       RelocatorPickers.ShowCategoryPicker(new List<string>(), (selectedIds) => {
                           if (selectedIds.Count > 0) {

@@ -12,6 +12,7 @@ namespace Elin_ItemRelocator
         private Func<T, IEnumerable<T>> getChildren;
         private Func<T, string> getText;
         private Func<T, string> getDebugText;
+        private Func<T, Color> getBackgroundColor;
         private Action<T> onSelect;
         private Func<T, bool> isSelected;
         private Func<T, bool> isDisabled; // e.g., if parent is selected
@@ -70,6 +71,12 @@ namespace Elin_ItemRelocator
         public RelocatorTree<T> SetDebugText(Func<T, string> selector)
         {
             this.getDebugText = selector;
+            return this;
+        }
+
+        public RelocatorTree<T> SetGetBackgroundColor(Func<T, Color> selector)
+        {
+            this.getBackgroundColor = selector;
             return this;
         }
 
@@ -221,6 +228,9 @@ namespace Elin_ItemRelocator
             hlg.childForceExpandWidth = false; hlg.childForceExpandHeight = true;
             hlg.spacing = 0; hlg.padding = new RectOffset(5, 5, 0, 0);
 
+            var imgRow = rowGO.AddComponent<Image>();
+            imgRow.color = Color.clear;
+
             var leRow = rowGO.AddComponent<LayoutElement>();
             leRow.minHeight = 28; leRow.preferredHeight = 28; leRow.flexibleHeight = 0;
 
@@ -300,6 +310,10 @@ namespace Elin_ItemRelocator
 
             string extra = (getDebugText != null) ? getDebugText(item) : "";
             string name = (getText != null) ? getText(item) : item.ToString();
+
+            if (getBackgroundColor != null) {
+                imgRow.color = getBackgroundColor(item);
+            }
 
             if (disabled) {
                 lbl.text = "[P] " + name + extra;

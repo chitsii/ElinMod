@@ -8,6 +8,8 @@ namespace Elin_ItemRelocator
 {
     public static class RelocatorPickers
     {
+
+
         public static void ShowCategoryPicker(List<string> initialSelection, Action<List<string>> onConfirm)
         {
             HashSet<string> selected = new HashSet<string>();
@@ -16,7 +18,6 @@ namespace Elin_ItemRelocator
             var allCats = EClass.sources.categories.rows;
             var roots = allCats.Where(r => r.parent == null).OrderBy(r => r.id).ToList();
 
-            // Using direct class name now that build.bat is fixed
             var tree = RelocatorTree<SourceCategory.Row>.Create();
 
             tree.SetCaption(RelocatorLang.GetText(RelocatorLang.LangKey.Category));
@@ -47,12 +48,22 @@ namespace Elin_ItemRelocator
             tree.Show();
         }
 
-        public static void ShowEnchantPicker(Action<SourceElement.Row> onConfirm)
+        public static void ShowEnchantPicker(int filterMode, Action<SourceElement.Row> onConfirm)
         {
             var layer = EClass.ui.AddLayer<LayerList>();
-            layer.windows[0].SetCaption(RelocatorLang.GetText(RelocatorLang.LangKey.SelectEnchant));
+
+            // Caption
+            string caption = "";
+            switch(filterMode) {
+                case 1: caption = RelocatorLang.GetText(RelocatorLang.LangKey.SelectEnchant) + " (" + RelocatorLang.GetText(RelocatorLang.LangKey.CatWeapon) + ")"; break;
+                case 2: caption = RelocatorLang.GetText(RelocatorLang.LangKey.SelectEnchant) + " (" + RelocatorLang.GetText(RelocatorLang.LangKey.CatArmor) + ")"; break;
+                default: caption = RelocatorLang.GetText(RelocatorLang.LangKey.SelectEnchant); break;
+            }
+            layer.windows[0].SetCaption(caption);
             layer.windows[0].setting.allowResize = true;
             try { layer.SetSize(900, 800); } catch {}
+
+            // 1. Gather Valid Enchants & Sort
             var sources = new List<SourceElement.Row>();
             foreach(var row in EClass.sources.elements.rows) {
                 if (string.IsNullOrEmpty(row.alias)) continue;
@@ -64,13 +75,42 @@ namespace Elin_ItemRelocator
                 if (row.category != "attribute" && row.category != "resist" && row.category != "skill" && row.category != "enchant") continue;
                 if (row.isSpell) continue;
                 if (row.isTrait) continue;
+
+                // --- Filter Logic ---
+                if (filterMode == 1) { // Weapon
+                     if (!(row.IsWeaponEnc || row.encSlot == "weapon")) continue;
+                }
+                else if (filterMode == 2) { // Armor
+                     bool isWeapon = (row.IsWeaponEnc || row.encSlot == "weapon");
+                     if (isWeapon) continue;
+                     if (row.encSlot == "all") continue; // Exclude 'all' from armor specific list? Or include? User said "Split", usually implies exclusive or focused.
+                     // But "All" category usually contains general stuff.
+                     // Let's adhere to previous logic:
+                     // Group 0=All, 1=Weapon, 2=Armor.
+                     // If filterMode==0 (All in general), show everything (or just 'all' category?)
+                     // User said "All", "Weapon", "Armor".
+                     // Most likely:
+                     // - Button All: Show General/Common enchants (encSlot == "all" etc).
+                     // - Button Weapon: Weapon specific.
+                     // - Button Armor: Armor specific.
+                } else {
+                     // Mode 0: General/All
+                     if (row.encSlot != "all") continue;
+                }
+
                 sources.Add(row);
             }
+
+            // Sort: ID
             sources.Sort((a,b) => a.id - b.id);
+
+            // 2. Display List (3-column grid)
             layer.SetList(sources, (row) => row.GetName() + " (" + row.alias + ")", (idx, val) => {
                 onConfirm(sources[idx]);
                 layer.Close();
             }, true);
+
+            // Apply Grid Layout
             try {
                 LayoutGroup targetLayout = null;
                 targetLayout = layer.list.GetComponent<LayoutGroup>();
@@ -114,7 +154,7 @@ namespace Elin_ItemRelocator
                                  var txt = go.AddComponent<Text>();
                                  txt.text = "[▼More]";
                                  if (sourceText != null) { txt.font = sourceText.font; txt.fontSize = sourceText.fontSize; }
-                                 else { txt.font = Resources.GetBuiltinResource<Font>("Arial.ttf"); txt.fontSize = 14; }
+                                 else { txt.font = SkinManager.Instance.fontSet.ui.source.font; txt.fontSize = 14; } // Updated Font
                                  txt.alignment = TextAnchor.MiddleCenter;
                                  txt.color = Color.white;
                                  var rt = go.GetComponent<RectTransform>();

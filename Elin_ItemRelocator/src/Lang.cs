@@ -9,6 +9,7 @@ namespace Elin_ItemRelocator
         {
             Settings, AddFilter, Preview, Execute, Scope, ExcludeHotbar, Rarity, Quality, Category, Text, Enchant, Remove, Edit, Enable, Disable, Title, Operator, Msg_Relocated, Inventory, Zone, ON, OFF, NoMatches, SelectEnchant, RelocatorCaption, DisabledSuffix, All, EditSearchText, EditCategoryID, EditQuality, Msg_ContainerFull, Msg_RelocatedResult, Msg_NoMatchLog,
             SortLabel, SortDefault, SortPriceAsc, SortPriceDesc, SortMagAsc, SortMagDesc,
+            CatAll, CatWeapon, CatArmor,
             SavePreset, LoadPreset, PresetName, Msg_Saved, Msg_Loaded,
             Presets, Rename, Delete, Msg_Renamed, Msg_Deleted, Msg_FileExists, Msg_RenamePrompt,
             Parent, Move, Msg_Moved, AddRule, NewRuleName
@@ -55,6 +56,9 @@ namespace Elin_ItemRelocator
             { LangKey.SortPriceDesc, new[] { "Price (High to Low)", "価格 (高い順)" } },
             { LangKey.SortMagAsc, new[] { "Enchant (Weak to Strong)", "エンチャント強度 (弱い順)" } },
             { LangKey.SortMagDesc, new[] { "Enchant (Strong to Weak)", "エンチャント強度 (強い順)" } },
+            { LangKey.CatAll, new[] { "General", "汎用" } },
+            { LangKey.CatWeapon, new[] { "Weapon Specific", "武器特有" } },
+            { LangKey.CatArmor, new[] { "Armor Specific", "防具特有" } },
             { LangKey.SavePreset, new[] { "Save Preset", "プリセット保存" } },
             { LangKey.LoadPreset, new[] { "Load Preset", "プリセット読込" } },
             { LangKey.PresetName, new[] { "Preset Name", "プリセット名" } },
