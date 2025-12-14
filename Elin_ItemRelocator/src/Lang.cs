@@ -19,7 +19,8 @@ namespace Elin_ItemRelocator
             Weight,
             SavePreset, LoadPreset, PresetName, Msg_Saved, Msg_Loaded,
             Presets, Rename, Delete, Msg_Renamed, Msg_Deleted, Msg_FileExists, Msg_RenamePrompt,
-            Parent, Move, Msg_Moved, AddRule, NewRuleName
+            Parent, Move, Msg_Moved, AddRule, NewRuleName,
+            Material, Bless, Stolen, StateNormal, StateBlessed, StateCursed, StateDoomed, ScopeBoth
         }
 
         private static Dictionary<LangKey, string[]> _dict = new Dictionary<LangKey, string[]>
@@ -33,7 +34,7 @@ namespace Elin_ItemRelocator
             { LangKey.Rarity, new[] { "Rarity", "レアリティ" } },
             { LangKey.Quality, new[] { "Quality", "品質" } },
             { LangKey.Category, new[] { "Category", "カテゴリ" } },
-            { LangKey.Text, new[] { "Text (Name/Tag)", "テキスト (名前/タグ)" } },
+            { LangKey.Text, new[] { "Text (Name/Tag)", "自由検索 (名前/タグ)" } },
             { LangKey.Enchant, new[] { "Enchant", "エンチャント" } },
             { LangKey.Remove, new[] { "Remove", "削除" } },
             { LangKey.Edit, new[] { "Edit", "編集" } },
@@ -42,8 +43,9 @@ namespace Elin_ItemRelocator
             { LangKey.Title, new[] { "Item Relocator", "アイテムリロケータ" } },
             { LangKey.Operator, new[] { "Operator", "演算子" } },
             { LangKey.Msg_Relocated, new[] { "Relocated {0} items.", "{0}個のアイテムを移動しました。" } },
-            { LangKey.Inventory, new[] { "Inventory", "インベントリ" } },
-            { LangKey.Zone, new[] { "Zone", "ゾーン" } },
+            { LangKey.Inventory, new[] { "Inventory", "持ち物" } },
+            { LangKey.Zone, new[] { "Zone", "地面" } },
+            { LangKey.ScopeBoth, new[] { "Inventory+Zone", "持ち物+地面" } },
             { LangKey.ON, new[] { "ON", "ON" } },
             { LangKey.OFF, new[] { "OFF", "OFF" } },
             { LangKey.NoMatches, new[] { "No matches found.", "該当なし" } },
@@ -93,7 +95,14 @@ namespace Elin_ItemRelocator
             { LangKey.Move, new[] { "Move", "転送" } },
             { LangKey.Msg_Moved, new[] { "Moved {0}.", "{0}を転送しました。" } },
             { LangKey.AddRule, new[] { "Add Rule", "ルール追加" } },
-            { LangKey.NewRuleName, new[] { "Rule Name", "ルール名" } }
+            { LangKey.NewRuleName, new[] { "Rule Name", "ルール名" } },
+            { LangKey.Material, new[] { "Material", "素材" } },
+            { LangKey.Bless, new[] { "State (Bless)", "祝福状態" } },
+            { LangKey.Stolen, new[] { "Stolen", "盗品" } },
+            { LangKey.StateNormal, new[] { "Normal", "通常" } },
+            { LangKey.StateBlessed, new[] { "Blessed", "祝福" } },
+            { LangKey.StateCursed, new[] { "Cursed", "呪い" } },
+            { LangKey.StateDoomed, new[] { "Doomed", "堕落" } }
         };
 
         public static string GetText(LangKey key)

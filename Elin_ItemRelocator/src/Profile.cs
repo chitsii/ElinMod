@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
+using System.Reflection;
 
 namespace Elin_ItemRelocator
 {
@@ -11,7 +12,7 @@ namespace Elin_ItemRelocator
     {
         public string ContainerName; // For display/debug
         public bool Enabled = true;
-        public FilterScope Scope = FilterScope.Inventory;
+        public FilterScope Scope = FilterScope.Both;
         public bool ExcludeHotbar = true; // Default to exclude
 
         // Main Data
@@ -45,7 +46,9 @@ namespace Elin_ItemRelocator
         public enum FilterScope
         {
             Inventory,
-            Zone
+            [Obsolete("Use Both")]
+            Both, // Was Zone (1)
+            ZoneOnly // New (2)
         }
 
         public enum ResultSortMode
@@ -82,8 +85,26 @@ namespace Elin_ItemRelocator
         public bool NotQuality;
         public bool NotText;
         public bool NotWeight;
+        public bool NotMaterial;
+        public bool NotBless;
+        public bool NotStolen;
+
+        // New Condition Fields
+        // New Condition Fields
+        [JsonProperty("MaterialId")]
+        private string LegacyMaterialId { set { if (!string.IsNullOrEmpty(value)) MaterialIds.Add(value); } }
+        public HashSet<string> MaterialIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase); // Multi-select
+
+        [JsonProperty("Bless")]
+        private int? LegacyBless { set { if (value.HasValue) BlessStates.Add(value.Value); } }
+        public HashSet<int> BlessStates = new HashSet<int>(); // Multi-select
+
+        // Removed BlessOp as it is incompatible with Multi-select set logic.
+        // Note: Legacy Bless operators (>=) are not preserved, only the specific value is migrated.
+        public bool? IsStolen;
 
         // Matching Logic (AND within Rule)
+        private static FieldInfo _fiBless;
         public bool IsMatch(Thing t)
         {
             if (!Enabled) return false;
@@ -93,7 +114,11 @@ namespace Elin_ItemRelocator
                 !Rarity.HasValue &&
                 string.IsNullOrEmpty(Quality) &&
                 string.IsNullOrEmpty(Text) &&
-                !Weight.HasValue)
+                string.IsNullOrEmpty(Text) &&
+                !Weight.HasValue &&
+                (MaterialIds == null || MaterialIds.Count == 0) &&
+                (BlessStates == null || BlessStates.Count == 0) &&
+                !IsStolen.HasValue)
             {
                 return false;
             }
@@ -160,8 +185,55 @@ namespace Elin_ItemRelocator
                  string op = string.IsNullOrEmpty(WeightOp) ? ">=" : WeightOp;
                  // SelfWeight returns unit weight in Elin
                  bool match = EvaluateCondition(t.SelfWeight, op + Weight.Value);
-                 if (NotWeight) match = !match;
-                 if (!match) return false;
+                  if (NotWeight) match = !match;
+                  if (!match) return false;
+            }
+
+            // Material Check
+            if (MaterialIds != null && MaterialIds.Count > 0) {
+                bool match = false;
+                if (t.material != null) {
+                    string alias = t.material.alias;
+                    string idStr = t.material.id.ToString();
+                    if (MaterialIds.Any(m => m.Equals(alias, StringComparison.OrdinalIgnoreCase)) || MaterialIds.Any(m => m.Equals(idStr, StringComparison.OrdinalIgnoreCase))) match = true;
+                }
+                if (NotMaterial) match = !match;
+                if (!match) return false;
+            }
+
+            // Bless State (State)
+            if (BlessStates != null && BlessStates.Count > 0) {
+                int bState = 0;
+                // Use Reflection to access 'bless' field which might be internal/protected
+                if (_fiBless == null) _fiBless = typeof(Thing).GetField("bless", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+                if (_fiBless != null) {
+                    try {
+                        bState = Convert.ToInt32(_fiBless.GetValue(t));
+                    } catch {
+                         // Fallback
+                         if (t.IsBlessed) bState = 1;
+                         else if (t.IsCursed) bState = -1;
+                    }
+                } else {
+                     // Fallback if field not found
+                     if (t.IsBlessed) bState = 1;
+                     else if (t.IsCursed) bState = -1;
+                }
+
+                bool match = false;
+                if (BlessStates.Contains(bState)) match = true;
+
+                if (NotBless) match = !match;
+                if (!match) return false;
+            }
+
+            // Stolen Flag
+            if (IsStolen.HasValue) {
+                // t.isStolen is likely the field
+                bool match = t.isStolen == IsStolen.Value;
+                if (NotStolen) match = !match;
+                if (!match) return false;
             }
 
             return true;

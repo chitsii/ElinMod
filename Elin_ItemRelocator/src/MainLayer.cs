@@ -38,7 +38,7 @@ namespace Elin_ItemRelocator
             }
         }
 
-        private enum ConditionType { None, Category, Rarity, Quality, Text, Id, AddButton, Settings, Weight }
+        private enum ConditionType { None, Category, Rarity, Quality, Text, Id, AddButton, Settings, Weight, Material, Bless, Stolen }
 
         // ====================================================================
         // Fields
@@ -130,6 +130,46 @@ namespace Elin_ItemRelocator
                      }
                      if (r.Weight.HasValue) {
                          list.Add(new FilterNode { Rule = r, CondType = ConditionType.Weight, CondValue = r.Weight.Value.ToString(), DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Weight) + " " + (string.IsNullOrEmpty(r.WeightOp) ? ">=" : r.WeightOp) + " " + r.Weight });
+                     }
+
+                     // ADD BUTTON
+                     // Material
+                     if (r.MaterialIds != null && r.MaterialIds.Count > 0) {
+                          string prefix = r.NotMaterial ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                          HashSet<string> allMats = r.MaterialIds;
+                          string displayMat = "";
+                          if (allMats.Count <= 3) {
+                               List<string> names = new List<string>();
+                               foreach(var mid in allMats) {
+                                    var ms = EClass.sources.materials.rows.FirstOrDefault(m => m.alias.Equals(mid, StringComparison.OrdinalIgnoreCase) || m.id.ToString() == mid);
+                                    names.Add(ms != null ? ms.GetName() : mid);
+                               }
+                               displayMat = string.Join(", ", names.ToArray());
+                          } else {
+                               displayMat = "(" + allMats.Count + ")";
+                          }
+                          list.Add(new FilterNode { Rule = r, CondType = ConditionType.Material, CondValue = "Multi", DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Material) + ": " + displayMat });
+                     }
+
+                     // Bless
+                     if (r.BlessStates != null && r.BlessStates.Count > 0) {
+                           string prefix = r.NotBless ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                           HashSet<int> allStates = r.BlessStates;
+
+                           List<string> names = new List<string>();
+                           foreach(var b in allStates) {
+                               if (b==1) names.Add(RelocatorLang.GetText(RelocatorLang.LangKey.StateBlessed));
+                               else if (b==-1) names.Add(RelocatorLang.GetText(RelocatorLang.LangKey.StateCursed));
+                               else if (b==0) names.Add(RelocatorLang.GetText(RelocatorLang.LangKey.StateNormal));
+                               else names.Add(RelocatorLang.GetText(RelocatorLang.LangKey.StateDoomed));
+                           }
+                           list.Add(new FilterNode { Rule = r, CondType = ConditionType.Bless, DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Bless) + ": " + string.Join(", ", names.ToArray()) });
+                     }
+
+                     // Stolen
+                     if (r.IsStolen.HasValue) {
+                          string prefix = r.NotStolen ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                          list.Add(new FilterNode { Rule = r, CondType = ConditionType.Stolen, DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Stolen) + ": " + (r.IsStolen.Value ? "Yes" : "No") });
                      }
 
                      // ADD BUTTON
@@ -250,6 +290,15 @@ namespace Elin_ItemRelocator
                                          break;
                                      case ConditionType.Weight:
                                          node.Rule.Weight = null;
+                                         break;
+                                     case ConditionType.Material:
+                                         node.Rule.MaterialIds = null;
+                                         break;
+                                     case ConditionType.Bless:
+                                         node.Rule.BlessStates = null;
+                                         break;
+                                     case ConditionType.Stolen:
+                                         node.Rule.IsStolen = null;
                                          break;
                                  }
                                  refresh();
@@ -551,18 +600,47 @@ namespace Elin_ItemRelocator
                            }
                        }, (Dialog.InputType)0);
                    })
-                  .Show();
+                   .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Material), () => {
+                        RelocatorPickers.ShowMaterialPicker(rule.MaterialIds != null ? rule.MaterialIds.ToList() : null, (aliases) => {
+                             rule.MaterialIds = new HashSet<string>(aliases);
+                             refresh();
+                        });
+                   })
+                   .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Bless), () => {
+                        RelocatorPickers.ShowBlessPicker(rule.BlessStates != null ? rule.BlessStates.ToList() : null, (states) => {
+                             rule.BlessStates = new HashSet<int>(states);
+                             refresh();
+                        });
+                   })
+                   .AddChild(RelocatorLang.GetText(RelocatorLang.LangKey.Stolen), (child) => {
+                        child
+                            .AddButton("Yes (Is Stolen)", () => { rule.IsStolen = true; refresh(); })
+                            .AddButton("No (Not Stolen)", () => { rule.IsStolen = false; refresh(); });
+                   })
+                   .Show();
         }
 
         private static void ShowSettingsMenu(RelocationProfile profile, Action refresh)
         {
+             string currentScope = RelocatorLang.GetText(RelocatorLang.LangKey.Inventory); // Default
+             if (profile.Scope == RelocationProfile.FilterScope.Both) currentScope = RelocatorLang.GetText(RelocatorLang.LangKey.ScopeBoth);
+             else if (profile.Scope == RelocationProfile.FilterScope.ZoneOnly) currentScope = RelocatorLang.GetText(RelocatorLang.LangKey.Zone);
+
              RelocatorMenu.Create()
-                 .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Scope) + ": " + (profile.Scope == RelocationProfile.FilterScope.Inventory ? RelocatorLang.GetText(RelocatorLang.LangKey.Inventory) : RelocatorLang.GetText(RelocatorLang.LangKey.Inventory)), () => {
-                     if (profile.Scope == RelocationProfile.FilterScope.Inventory)
-                         profile.Scope = RelocationProfile.FilterScope.Zone;
-                     else
-                         profile.Scope = RelocationProfile.FilterScope.Inventory;
-                     refresh();
+                 .AddChild(RelocatorLang.GetText(RelocatorLang.LangKey.Scope) + ": " + currentScope, (child) => {
+                      child
+                          .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Inventory), () => {
+                              profile.Scope = RelocationProfile.FilterScope.Inventory;
+                              refresh();
+                          })
+                          .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Zone), () => { // Zone Only
+                              profile.Scope = RelocationProfile.FilterScope.ZoneOnly;
+                              refresh();
+                          })
+                          .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.ScopeBoth), () => { // Both
+                              profile.Scope = RelocationProfile.FilterScope.Both;
+                              refresh();
+                          });
                  })
                  .AddCheck(RelocatorLang.GetText(RelocatorLang.LangKey.ExcludeHotbar), profile.ExcludeHotbar, (isOn) => {
                      profile.ExcludeHotbar = isOn;
@@ -693,6 +771,44 @@ namespace Elin_ItemRelocator
                      foreach(var id in ids) if(!rule.CategoryIds.Contains(id)) rule.CategoryIds.Add(id);
                      refresh();
                  });
+             }
+             else if (node.CondType == ConditionType.Weight) {
+                  Dialog.InputName("Edit Weight", rule.Weight.ToString(), (c, val) => {
+                      if(!c && !string.IsNullOrEmpty(val)) {
+                           if (char.IsDigit(val[0])) val = ">=" + val;
+                           string op = ">=";
+                           string valStr = val;
+                           if (val.StartsWith(">=") || val.StartsWith("<=") || val.StartsWith("==") || val.StartsWith("!=")) {
+                               op = val.Substring(0, 2); valStr = val.Substring(2);
+                           } else if (val.StartsWith(">") || val.StartsWith("<") || val.StartsWith("=")) {
+                               op = val.Substring(0, 1); valStr = val.Substring(1);
+                           }
+                           int w;
+                           if(int.TryParse(valStr, out w)) {
+                               rule.Weight = w;
+                               rule.WeightOp = op;
+                               refresh();
+                           }
+                      }
+                  }, (Dialog.InputType)0);
+             }
+             else if (node.CondType == ConditionType.Material) {
+                  RelocatorPickers.ShowMaterialPicker(rule.MaterialIds != null ? rule.MaterialIds.ToList() : null, (aliases) => {
+                       rule.MaterialIds = new HashSet<string>(aliases);
+                       refresh();
+                  });
+             }
+             else if (node.CondType == ConditionType.Bless) {
+                  RelocatorPickers.ShowBlessPicker(rule.BlessStates != null ? rule.BlessStates.ToList() : null, (states) => {
+                       rule.BlessStates = new HashSet<int>(states);
+                       refresh();
+                  });
+             }
+             else if (node.CondType == ConditionType.Stolen) {
+                   RelocatorMenu.Create()
+                        .AddButton("Yes (Is Stolen)", () => { rule.IsStolen = true; refresh(); })
+                        .AddButton("No (Not Stolen)", () => { rule.IsStolen = false; refresh(); })
+                        .Show();
              }
         }
 

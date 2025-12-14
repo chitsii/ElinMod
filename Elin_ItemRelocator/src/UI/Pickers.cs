@@ -191,5 +191,71 @@ namespace Elin_ItemRelocator
             };
             refresh();
         }
+
+        public static void ShowMaterialPicker(List<string> initialSelection, Action<List<string>> onConfirm)
+        {
+            HashSet<string> selected = new HashSet<string>();
+            if (initialSelection != null) foreach(var s in initialSelection) selected.Add(s);
+
+            // Access materials
+            var sources = EClass.sources.materials.rows.Where(r => !string.IsNullOrEmpty(r.alias)).OrderBy(r => r.id).ToList();
+
+            var tree = RelocatorTree<SourceMaterial.Row>.Create();
+            tree.SetCaption(RelocatorLang.GetText(RelocatorLang.LangKey.Material));
+            tree.SetRoots(sources);
+
+            tree.SetText((SourceMaterial.Row m) => m.GetName() + " (" + m.alias + ")");
+            tree.SetIsSelected((SourceMaterial.Row m) => {
+                 return selected.Contains(m.alias) || selected.Contains(m.id.ToString());
+            });
+
+            tree.SetOnSelect((SourceMaterial.Row m) => {
+                string key = m.alias; // Use alias as primary key
+                if (selected.Contains(key)) selected.Remove(key);
+                else selected.Add(key);
+            });
+
+            tree.AddBottomButton("[ OK ]", () => {
+                onConfirm(selected.ToList());
+                tree.Close();
+            }, new Color(0.3f, 0.5f, 0));
+
+            tree.Show();
+        }
+
+        public static void ShowBlessPicker(List<int> initialSelection, Action<List<int>> onConfirm)
+        {
+            HashSet<int> selected = new HashSet<int>();
+            if (initialSelection != null) foreach(var s in initialSelection) selected.Add(s);
+
+            // Hardcoded sources
+            var sources = new List<int> { 0, 1, -1, -2 }; // Normal, Blessed, Cursed, Doomed
+
+            var tree = RelocatorTree<int>.Create();
+            tree.SetCaption(RelocatorLang.GetText(RelocatorLang.LangKey.Bless));
+            tree.SetRoots(sources);
+
+            tree.SetText((int b) => {
+                 if (b==1) return RelocatorLang.GetText(RelocatorLang.LangKey.StateBlessed);
+                 if (b==-1) return RelocatorLang.GetText(RelocatorLang.LangKey.StateCursed);
+                 if (b==0) return RelocatorLang.GetText(RelocatorLang.LangKey.StateNormal);
+                 if (b==-2) return RelocatorLang.GetText(RelocatorLang.LangKey.StateDoomed);
+                 return b.ToString();
+            });
+
+            tree.SetIsSelected((int b) => selected.Contains(b));
+
+            tree.SetOnSelect((int b) => {
+                if (selected.Contains(b)) selected.Remove(b);
+                else selected.Add(b);
+            });
+
+            tree.AddBottomButton("[ OK ]", () => {
+                onConfirm(selected.ToList());
+                tree.Close();
+            }, new Color(0.3f, 0.5f, 0));
+
+            tree.Show();
+        }
     }
 }

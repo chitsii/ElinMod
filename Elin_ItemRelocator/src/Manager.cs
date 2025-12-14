@@ -221,54 +221,70 @@ namespace Elin_ItemRelocator
                 matches.Add(t);
             };
 
-            // Layer 1: PC Inventory (Recursive Layer 2)
-            foreach(var t in EClass.pc.things)
+            // Inventory Scope (Include if Scope is Inventory OR Both)
+            if (profile.Scope != RelocationProfile.FilterScope.ZoneOnly)
             {
-                checkAndAdd(t);
-
-                // Layer 2: Inside Containers
-                if (t.IsContainer && t.things != null && t.things.Count > 0)
+                // Layer 1: PC Inventory (Recursive Layer 2)
+                foreach(var t in EClass.pc.things)
                 {
-                    foreach(var child in t.things)
+                    checkAndAdd(t);
+
+                    // Layer 2: Inside Containers
+                    if (t.IsContainer && t.things != null && t.things.Count > 0)
                     {
-                        checkAndAdd(child);
+                        foreach(var child in t.things)
+                        {
+                            checkAndAdd(child);
+                        }
                     }
                 }
-            }
 
-            // Layer : Equipped Containers (Toolbelt, Backpack, etc)
-            // Items in equipped containers are NOT in pc.things, so we must scan body slots.
-            // User requested "Toolbelt Exclusion" to mean "Body Slot Exclusion".
-            // So if ExcludeHotbar is ON, we skip this entirely.
-            if (!profile.ExcludeHotbar)
-            {
-                foreach(var slot in EClass.pc.body.slots)
+                // Layer : Equipped Containers (Toolbelt, Backpack, etc)
+                // Items in equipped containers are NOT in pc.things, so we must scan body slots.
+                // User requested "Toolbelt Exclusion" to mean "Body Slot Exclusion".
+                // So if ExcludeHotbar is ON, we skip this entirely.
+                if (!profile.ExcludeHotbar)
                 {
-                    if (slot.thing == null || !slot.thing.IsContainer || slot.thing.things.Count == 0) continue;
-
-                    // Scan contents of equipped container
-                    foreach(var t in slot.thing.things)
+                    foreach(var slot in EClass.pc.body.slots)
                     {
-                         checkAndAdd(t);
+                        if (slot.thing == null || !slot.thing.IsContainer || slot.thing.things.Count == 0) continue;
 
-                         // Recurse one level deep (e.g. Bag inside Toolbelt)
-                         if (t.IsContainer && t.things != null && t.things.Count > 0)
-                         {
-                             foreach(var child in t.things)
+                        // Scan contents of equipped container
+                        foreach(var t in slot.thing.things)
+                        {
+                             checkAndAdd(t);
+
+                             // Recurse one level deep (e.g. Bag inside Toolbelt)
+                             if (t.IsContainer && t.things != null && t.things.Count > 0)
                              {
-                                 checkAndAdd(child);
+                                 foreach(var child in t.things)
+                                 {
+                                     checkAndAdd(child);
+                                 }
                              }
-                         }
+                        }
                     }
                 }
             }
 
-            // Zone Scope
-            if (profile.Scope == RelocationProfile.FilterScope.Zone)
+            // Zone Scope (Include if Scope is ZoneOnly OR Both)
+            if (profile.Scope == RelocationProfile.FilterScope.Both || profile.Scope == RelocationProfile.FilterScope.ZoneOnly)
             {
                 foreach(var t in EClass._map.things)
                 {
                     checkAndAdd(t);
+
+                    // Recurse into installed containers
+                    // t.placeState == PlaceState.installed check is implicit because 't' is in _map.things (usually installed or roaming)
+                    // checkAndAdd(t) already filtered 't' if it was installed.
+                    // Now we explicitly look inside if it IS installed and IS a container.
+                    if (t.placeState == PlaceState.installed && t.IsContainer && t.things != null && t.things.Count > 0)
+                    {
+                        foreach(var child in t.things)
+                        {
+                            checkAndAdd(child);
+                        }
+                    }
                 }
             }
 
