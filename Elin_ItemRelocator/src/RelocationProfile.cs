@@ -40,7 +40,12 @@ namespace Elin_ItemRelocator
         public bool Enabled = true;
 
         // Basic filters
-        public string CategoryId;
+        public List<string> CategoryIds = new List<string>();
+
+        // Legacy Support for JSON Loading
+        [JsonProperty]
+        private string CategoryId { set { if(!string.IsNullOrEmpty(value) && !CategoryIds.Contains(value)) CategoryIds.Add(value); } }
+
         public int? Rarity;
         public string RarityOp = ">="; // Default operator
         public string Quality; // Changed from int? to string for inequalities e.g. ">=2"
@@ -53,10 +58,17 @@ namespace Elin_ItemRelocator
         {
             if (!Enabled) return true; // Fix: If disabled, it should not fail the AND check
 
-            // Check Category
-            if (!string.IsNullOrEmpty(CategoryId))
+            // Check Category (Multi-match: OR logic within CategoryIds)
+            if (CategoryIds != null && CategoryIds.Count > 0)
             {
-                if (!t.category.IsChildOf(CategoryId)) return false;
+                bool catMatch = false;
+                foreach(var id in CategoryIds) {
+                    if (t.category.IsChildOf(id)) {
+                        catMatch = true;
+                        break;
+                    }
+                }
+                if (!catMatch) return false;
             }
 
             // Check Rarity
@@ -91,14 +103,18 @@ namespace Elin_ItemRelocator
         public string GetDescription()
         {
              List<string> parts = new List<string>();
-             if (!string.IsNullOrEmpty(CategoryId)) parts.Add("Category: " + GetCategoryName(CategoryId));
+             if (CategoryIds != null && CategoryIds.Count > 0) {
+                 List<string> catNames = new List<string>();
+                 foreach(var id in CategoryIds) catNames.Add(GetCategoryName(id));
+                 parts.Add(RelocatorLang.GetText(RelocatorLang.LangKey.Category) + ": " + string.Join(", ", catNames.ToArray()));
+             }
              if (Rarity.HasValue) parts.Add("Rarity " + (string.IsNullOrEmpty(RarityOp) ? ">=" : RarityOp) + " " + Rarity.Value);
              if (!string.IsNullOrEmpty(Quality)) parts.Add("Quality " + Quality);
              if (!string.IsNullOrEmpty(IdThing)) parts.Add("ID: " + IdThing);
              if (!string.IsNullOrEmpty(Text)) parts.Add("Text: " + Text);
 
              if (parts.Count == 0) return "Empty Filter";
-             return string.Join(", ", parts);
+             return string.Join(",", parts.ToArray());
         }
 
         private string GetCategoryName(string id)

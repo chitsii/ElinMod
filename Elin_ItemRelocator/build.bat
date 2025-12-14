@@ -42,7 +42,10 @@ echo Compiling...
     "%~dp0src\RelocatorManager.cs" ^
     "%~dp0src\Singleton.cs" ^
     "%~dp0src\RelocatorLang.cs" ^
-    "%~dp0src\RelocatorPickers.cs"
+    "%~dp0src\RelocatorPickers.cs" ^
+    "%~dp0src\RelocatorMenu.cs" ^
+    "%~dp0src\RelocatorTable.cs" ^
+    "%~dp0src\RelocatorTree.cs"
 
 if %ERRORLEVEL% NEQ 0 (
     echo Build Failed!

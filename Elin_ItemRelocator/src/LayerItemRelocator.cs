@@ -240,10 +240,19 @@ namespace Elin_ItemRelocator
                      });
                  })
                  .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Category), () => {
-                     RelocatorPickers.ShowCategoryPicker((id) => {
-                         profile.Filters.Add(new RelocationFilter { CategoryId = id });
-                         refresh();
-                     });
+                     // Singleton Check
+                     var existing = profile.Filters.FirstOrDefault(f => f.CategoryIds != null && f.CategoryIds.Count > 0);
+                     if (existing != null) {
+                         EditFilter(existing, profile, refresh);
+                     } else {
+                         RelocatorPickers.ShowCategoryPicker(new List<string>(), (selectedIds) => {
+                             if (selectedIds.Count > 0) {
+                                 var f = new RelocationFilter { CategoryIds = selectedIds };
+                                 profile.Filters.Add(f);
+                                 refresh();
+                             }
+                         });
+                    }
                  })
                  .AddChild(RelocatorLang.GetText(RelocatorLang.LangKey.Rarity), (child) => {
                       var updateList = Lang.GetList("quality");
@@ -339,12 +348,16 @@ namespace Elin_ItemRelocator
                      });
                  }
             }
-            else if (!string.IsNullOrEmpty(filter.CategoryId))
+            else if (filter.CategoryIds != null && filter.CategoryIds.Count > 0)
             {
-                 RelocatorPickers.ShowCategoryPicker((id) => {
-                     filter.CategoryId = id;
-                     refresh();
-                 });
+                 RelocatorPickers.ShowCategoryPicker(filter.CategoryIds, (selectedIds) => {
+                    filter.CategoryIds = selectedIds;
+                    // The original RefreshPreview() call here is missing context (LayerList, Thing).
+                    // Assuming it should be `refresh()` as per other filter edits.
+                    // If RefreshPreview() was intended, it needs to be called with appropriate arguments.
+                    // For now, adhering to the provided snippet's `refresh()` placement.
+                    refresh();
+                });
             }
             else if (filter.Rarity.HasValue)
             {

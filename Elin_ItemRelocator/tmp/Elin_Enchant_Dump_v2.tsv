@@ -1,0 +1,1087 @@
+ID	Alias	Name	Category	Chance	Val	Weapon	Shield	Slot	Skill	Spell	Trait	Tag
+0	_void	無		1000	0	False	False		False	False	False
+1	lv	レベル		1000	0	False	False		False	False	False	hidden
+2	quality	品質		1000	0	False	False		False	False	True	trait
+3	d	d		1000	0	False	False		False	False	False
+5	socket	ソケット		1000	0	False	False		False	False	False
+10	nutrition	栄養		0	0	False	False	global	False	False	False	common,hidden
+11	weight	重さ		1000	0	False	False		False	False	False
+12	size	大きさ		1000	0	False	False		False	False	False
+13	hardness	硬さ		1000	0	False	False		False	False	False
+14	growth	成長		1000	0	False	False		False	False	False
+15	water	水分		1000	0	False	False		False	False	False
+16	heat	熱		1000	0	False	False		False	False	False
+17	decay	腐敗		1000	0	False	False		False	False	False
+18	taste	味		1000	0	False	False		False	False	False	hidden
+20	poison	毒		1000	0	False	False		False	False	False
+21	fire	火炎		1000	0	False	False		False	False	False
+22	cut	鋭利		1000	0	False	False		False	False	False
+23	old_detox	解毒		1000	0	False	False		False	False	False
+24	old_heal	治癒		1000	0	False	False		False	False	False
+25	old_antidote	解毒		1000	0	False	False		False	False	False
+26	cure	キュア		1000	0	False	False		False	False	False
+29	race	種族の特徴		1000	0	False	False		False	False	False
+30	head	頭	slot	1000	0	False	False		False	False	False
+31	neck	首	slot	1000	0	False	False		False	False	False
+32	torso	胴体	slot	1000	0	False	False		False	False	False
+33	back	背中	slot	1000	0	False	False		False	False	False
+34	arm	腕	slot	1000	0	False	False		False	False	False
+35	hand	手	slot	1000	0	False	False		False	False	False
+36	finger	指	slot	1000	0	False	False		False	False	False
+37	waist	腰	slot	1000	0	False	False		False	False	False
+38	leg	脚	slot	1000	0	False	False		False	False	False
+39	foot	足	slot	1000	0	False	False		False	False	False
+40	tool	道具	slot	1000	0	False	False		False	False	False
+41	range	射撃	slot	1000	0	False	False		False	False	False
+42	ammo	矢弾	slot	1000	0	False	False		False	False	False
+43	token	トークン	slot	1000	0	False	False		False	False	False
+44	toolbelt	ツールベルト	slot	1000	0	False	False		False	False	False
+45	lightsource	光源	slot	1000	0	False	False		False	False	False
+50	fireproof	耐熱		1000	0	False	False		False	False	False	flag
+51	acidproof	耐酸		1000	0	False	False		False	False	False	flag
+55	PDR	物理軽減	attribute	0	0	False	False		False	False	False	ratio
+56	EDR	属性軽減	attribute	0	0	False	False		False	False	False	ratio
+57	evasionPerfect	完全回避	attribute	0	0	False	False		False	False	False	ratio
+60	life	生命力	attribute	0	0	False	False		False	False	False
+61	mana	マナ	attribute	0	0	False	False		False	False	False
+62	vigor	活力	attribute	0	0	False	False		False	False	False
+64	DV	DV	attribute	1000	0	False	False		False	False	False
+65	PV	PV	attribute	1000	0	False	False		False	False	False
+66	HIT	命中修正	attribute	500	20	False	False		False	False	False	modRanged,modCane,modMelee
+67	DMG	ダメージ修正	attribute	500	20	False	False		False	False	False	modRanged,modCane,modMelee
+68	FPV	致命傷防御	attribute	0	150	False	False		False	False	False
+70	STR	筋力	attribute	1000	30	False	False	all	False	False	False	primary
+71	END	耐久	attribute	1000	30	False	False	all	False	False	False	primary
+72	DEX	器用	attribute	1000	30	False	False	all	False	False	False	primary
+73	PER	感覚	attribute	1000	30	False	False	all	False	False	False	primary
+74	LER	学習	attribute	1000	30	False	False	all	False	False	False	primary
+75	WIL	意志	attribute	1000	30	False	False	all	False	False	False	primary
+76	MAG	魔力	attribute	1000	30	False	False	all	False	False	False	primary
+77	CHA	魅力	attribute	1000	30	False	False	all	False	False	False	primary
+78	LUC	運	attribute	0	50	False	False	all	False	False	False
+79	SPD	速度	attribute	0	200	False	False	all	False	False	False	noRune
+80	INT	知力	attribute	0	30	False	False		False	False	False
+85	piety	信仰心	attribute	0	30	False	False		False	False	False
+90	critical	クリティカル	enchant	100	100	True	False	weapon	False	False	False	weaponEnc,modRanged,modCane,modMelee
+91	vopal	ヴォーパル	enchant	50	100	True	False	weapon	False	False	False	weaponEnc,modRanged,modCane,modMelee
+92	penetration	貫通	attribute	0	100	False	False	all	False	False	False
+93	antiMagic	反魔法	attribute	200	100	False	False	all	False	False	False	modMelee
+100	martial	格闘	skill	200	20	False	False	all	True	False	False
+101	weaponSword	長剣	skill	200	20	False	False	all	True	False	False
+102	weaponAxe	斧	skill	200	20	False	False	all	True	False	False
+103	weaponStaff	杖	skill	200	20	False	False	all	True	False	False
+104	weaponBow	弓	skill	200	20	False	False	all	True	False	False	ranged
+105	weaponGun	銃	skill	200	20	False	False	all	True	False	False	ranged,guild,thief
+106	weaponPolearm	槍	skill	200	20	False	False	all	True	False	False
+107	weaponDagger	短剣	skill	200	20	False	False	all	True	False	False
+108	throwing	投擲	skill	200	20	False	False	all	True	False	False
+109	weaponCrossbow	クロスボウ	skill	200	20	False	False	all	True	False	False	ranged
+110	weaponScythe	鎌	skill	200	20	False	False	all	True	False	False
+111	weaponBlunt	鈍器	skill	200	20	False	False	all	True	False	False
+120	armorLight	軽装備	skill	200	20	False	False	all	True	False	False
+122	armorHeavy	重装備	skill	200	20	False	False	all	True	False	False
+123	shield	盾	skill	200	20	False	False	all	True	False	False
+130	twohand	両手持ち	skill	200	20	False	False	all	True	False	False
+131	twowield	二刀流	skill	200	20	False	False	all	True	False	False	guild,fighter
+132	tactics	戦術	skill	200	20	False	False	all	True	False	False	guild,fighter
+133	marksman	射撃	skill	200	20	False	False	all	True	False	False	guild,thief
+134	eyeofmind	心眼	skill	200	20	False	False	all	True	False	False	guild,fighter
+135	strategy	戦略	skill	200	20	False	False	all	True	False	False	noPet
+150	evasion	回避	skill	200	20	False	False	all	True	False	False
+151	evasionPlus	見切り	skill	200	20	False	False	all	True	False	False	guild,thief
+152	stealth	隠密	skill	200	20	False	False	all	True	False	False
+200	swimming	水泳	skill	200	20	False	False	all	True	False	False
+207	weightlifting	重量上げ	skill	200	20	False	False	all	True	False	False
+210	spotting	探索	skill	200	20	False	False	all	True	False	False
+220	mining	採掘	skill	20	20	False	False	all	True	False	False	noPet
+225	lumberjack	木こり	skill	20	20	False	False	all	True	False	False	noPet
+226	riding	乗馬	skill	200	20	False	False	all	True	False	False	noPet
+227	parasite	共生	skill	200	20	False	False	all	True	False	False	noPet
+230	digging	穴掘り	skill	20	20	False	False	all	True	False	False	noPet
+235	milking	乳搾り	skill	20	20	False	False		True	False	False	unused,noPet
+237	taming	調教	skill	20	20	False	False	all	True	False	False	noPet
+240	travel	旅歩き	skill	200	20	False	False	all	True	False	False	guild,merchant,noPet
+241	music	演奏	skill	20	20	False	False	all	True	False	False	noPet
+242	climbing	クライミング	skill	20	20	False	False		True	False	False	unused,noPet
+245	fishing	釣り	skill	20	20	False	False	all	True	False	False
+250	gathering	採取	skill	20	20	False	False	all	True	False	False	noPet
+255	carpentry	木工	skill	20	20	False	False	all	True	False	False	noPet
+256	blacksmith	鍛冶	skill	20	20	False	False	all	True	False	False	noPet
+257	alchemy	錬金	skill	20	20	False	False	all	True	False	False	noPet
+258	sculpture	彫刻	skill	20	20	False	False	all	True	False	False	noPet
+259	jewelry	宝石細工	skill	20	20	False	False	all	True	False	False	noPet
+260	weaving	裁縫	skill	20	20	False	False	all	True	False	False	noPet
+261	handicraft	製作	skill	20	20	False	False	all	True	False	False	noPet
+280	lockpicking	鍵開け	skill	200	20	False	False	all	True	False	False	noPet
+281	stealing	窃盗	skill	200	20	False	False	all	True	False	False	guild,thief,noPet
+285	reading	読書	skill	200	20	False	False	all	True	False	False
+286	farming	農業	skill	20	20	False	False	all	True	False	False	noPet
+287	cooking	料理	skill	20	20	False	False	all	True	False	False	noPet
+288	building	建築	skill	200	20	False	False		True	False	False	unused,noPet
+289	appraising	鑑定	skill	200	20	False	False	all	True	False	False	merchant,noPet
+290	anatomy	解剖学	skill	200	20	False	False	all	True	False	False
+291	negotiation	交渉術	skill	20	20	False	False	all	True	False	False	guild,merchant
+292	investing	投資	skill	20	20	False	False	all	True	False	False	noPet
+293	disarmTrap	罠解体	skill	200	20	False	False	all	True	False	False
+300	regeneration	自然治癒	skill	200	20	False	False	all	True	False	False
+301	meditation	瞑想	skill	200	20	False	False	all	True	False	False
+302	controlmana	魔力制御	skill	200	20	False	False	all	True	False	False	guild,mage
+303	manaCapacity	魔力の限界	skill	200	20	False	False	all	True	False	False	guild,mage
+304	casting	詠唱	skill	200	20	False	False	all	True	False	False
+305	magicDevice	魔道具	skill	200	20	False	False	all	True	False	False
+306	faith	信仰	skill	50	20	False	False	all	True	False	False
+307	memorization	暗記	skill	200	20	False	False	all	True	False	False	guild,mage,noPet
+310	hygine	衛生		1000	0	False	False		False	False	False
+311	bladder	トイレ		1000	0	False	False		False	False	False
+312	fun	楽しさ		1000	0	False	False		False	False	False
+313	env	環境		1000	0	False	False		False	False	False
+380	counter	カウンター	enchant	300	40	False	True	shield	False	False	False	flag
+381	basher	盾の暴君	enchant	300	30	False	True	shield	False	False	False
+382	rusher	突撃者	enchant	500	20	False	True	shield	False	False	False
+383	redirect_blaser	エネルギー反射	enchant	20	30	False	True	shield	False	False	False	flag
+400	negateTeleport	テレポート妨害	enchant	200	50	False	False	all	False	False	False	flag
+401	levitation	浮遊	enchant	200	50	False	False	all	False	False	False	flag
+402	searchRange	探知距離	enchant	1000	0	False	False		False	False	False
+403	expMod	早覚え	enchant	1000	0	False	False		False	False	False
+404	weightMod	重量軽減	enchant	1000	0	False	False		False	False	False
+405	slowDecay	腐敗防止	enchant	1000	0	False	False		False	False	False	foodEnc
+406	resMutation	変異耐性	enchant	200	100	False	False	all	False	False	False	flag
+407	travelSpeed	旅速度上昇	enchant	0	200	False	False	foot	False	False	False
+408	resWeather	悪天候耐性	enchant	0	200	False	False	back,finger	False	False	False	flag
+409	corruption	エーテル活性化	enchant	0	0	False	False	all	False	False	False	neg
+410	throwReturn	ブーメラン	enchant	0	0	True	False	all	False	False	False	flag,weaponEnc
+411	encSpell	魔法強化	enchant	150	150	False	False	all	False	False	False
+412	slowCorruption	エーテル鈍化	enchant	0	0	False	False		False	False	False
+414	encHit	慧眼	enchant	150	150	False	False	all	False	False	False
+415	invisibility	透明化	enchant	0	0	False	False	all	False	False	False	flag
+416	seeInvisible	透明可視	enchant	100	100	False	False	head	False	False	False	flag
+417	loving	愛情促進	enchant	10	100	False	False	all	False	False	False	flag
+418	innocence	純潔	enchant	10	100	False	False	all	False	False	False	flag
+419	encTail	動く尻尾	enchant	0	100	False	False	waist	False	False	False	flag,noRune
+420	negatePoison	毒無効	enchant	1000	50	False	False	all	False	False	False	flag
+421	negateBlind	盲目無効	enchant	1000	50	False	False	all	False	False	False	flag
+422	negateParalysis	麻痺無効	enchant	1000	50	False	False	all	False	False	False	flag
+423	negateFear	恐怖無効	enchant	1000	50	False	False	all	False	False	False	flag
+424	negateSleep	睡眠無効	enchant	1000	50	False	False	all	False	False	False	flag
+425	negateConfusion	混乱無効	enchant	1000	50	False	False	all	False	False	False	flag
+426	negateSteal	盗難無効	enchant	500	50	False	False	all	False	False	False	flag
+427	negateNeckHunt	首切り無効	enchant	1000	50	False	False	head,neck	False	False	False	flag
+428	allNeckHunt	収穫する者	enchant	0	50	False	False	head,neck	False	False	False
+429	breathing	水中呼吸	enchant	200	50	False	False	all	False	False	False	flag
+430	negateShockwave	衝撃波無効	enchant	50	100	False	False	foot	False	False	False	flag
+431	negateSunburn	日焼け無効	enchant	30	150	False	False	head	False	False	False	flag
+435	defense_range	射撃防御	enchant	200	30	False	True	shield	False	False	False
+436	guts	不屈	enchant	200	100	False	True	shield	False	False	False
+437	parry	パリィ	enchant	200	40	False	True	shield	False	False	False
+438	knightly	騎士道精神	enchant	200	50	False	True	shield	False	False	False	flag
+439	negateParry	影抜き	enchant	50	100	False	False	arm	False	False	False	flag
+440	sustain_STR	筋力維持	enchant	1000	20	False	False	all	False	False	False	flag,foodpot
+441	sustain_END	耐久維持	enchant	1000	20	False	False	all	False	False	False	flag,foodpot
+442	sustain_DEX	器用維持	enchant	1000	20	False	False	all	False	False	False	flag,foodpot
+443	sustain_PER	感覚維持	enchant	1000	20	False	False	all	False	False	False	flag,foodpot
+444	sustain_LER	学習維持	enchant	1000	20	False	False	all	False	False	False	flag,foodpot
+445	sustain_WIL	意志維持	enchant	1000	20	False	False	all	False	False	False	flag,foodpot
+446	sustain_MAG	魔力維持	enchant	1000	20	False	False	all	False	False	False	flag,foodpot
+447	sustain_CHA	魅力維持	enchant	1000	20	False	False	all	False	False	False	flag,foodpot
+450	sustain_figure	体型維持	enchant	100	20	False	False	all	False	False	False	flag,freeRune
+460	bane_dragon	竜特攻	enchant	200	100	True	False	weapon	False	False	False	weaponEnc,modRanged,modCane
+461	bane_undead	アンデッド特攻	enchant	400	50	True	False	weapon	False	False	False	weaponEnc,modRanged,modCane
+462	bane_fairy	妖精特攻	enchant	200	50	True	False	weapon	False	False	False	weaponEnc,modRanged,modCane
+463	bane_animal	動物特攻	enchant	800	50	True	False	weapon	False	False	False	weaponEnc,modRanged,modCane
+464	bane_man	人間特攻	enchant	600	50	True	False	weapon	False	False	False	weaponEnc,modRanged,modCane
+465	bane_machine	機械特攻	enchant	500	50	True	False	weapon	False	False	False	weaponEnc,modRanged,modCane
+466	bane_god	神特攻	enchant	50	200	True	False	weapon	False	False	False	weaponEnc,modRanged,modCane
+467	bane_fish	魚特攻	enchant	50	100	True	False	weapon	False	False	False	weaponEnc,modRanged,modCane
+468	bane_all	全特攻	enchant	30	200	True	False	weapon	False	False	False	weaponEnc,modRanged,modCane
+480	strongStomach	鉄の胃袋	enchant	1000	20	False	False	all	False	False	False	flag
+481	revealFaith	信仰感知	enchant	1000	20	False	False	head	False	False	False	flag
+482	force_weapon	理力	enchant	100	100	True	False	weapon	False	False	False	flag,weaponEnc
+483	optimizeMana	マナ運用	enchant	100	100	False	False	all	False	False	False
+484	slot_rune	ルーンの器	enchant	0	150	False	False	all	False	False	False	noRune
+485	nonLethal	慈悲の重み	enchant	0	100	True	False	weapon	False	False	False	flag,weaponEnc,noRune
+486	safetyMeasure	事故防止	enchant	0	100	False	False	weapon	False	False	False	flag,noRune
+487	creativeChef	創作料理家	enchant	0	100	False	False	head	False	False	False	flag,noRune
+488	deathagony	断末魔の叫び	enchant	0	100	False	False		False	False	False
+489	music_drunk	魂の旋律	enchant	0	100	False	False		False	False	False
+600	mod_ammo	弾倉追加	enchant	1000	20	True	False		False	False	False	weaponEnc,modRanged
+601	mod_reload	リロード加速	enchant	1000	30	True	False		False	False	False	weaponEnc,modRanged
+602	mod_rapid	速射	enchant	200	100	True	False		False	False	False	weaponEnc,modRanged,modCane
+603	mod_ammo_knockback	ノックバック	enchant	300	50	True	False		False	False	False	weaponEnc,modRanged,modCane
+604	mod_ammo_recover	弾回収	enchant	500	40	True	False		False	False	False	weaponEnc,modRanged,modCane
+605	mod_precision	精密射撃	enchant	300	60	True	False		False	False	False	weaponEnc,modRanged,modCane
+606	mod_drill	突貫	enchant	0	50	True	False		False	False	False	weaponEnc,modRanged,modCane
+607	mod_scatter	拡散	enchant	0	50	True	False		False	False	False	weaponEnc,modRanged,modCane
+608	mod_splash	衝撃波	enchant	300	50	True	False	weapon	False	False	False	weaponEnc
+609	mod_talisman	護符節約	enchant	300	50	True	False	weapon	False	False	False	weaponEnc,modRanged,modCane
+620	mod_chaser	追尾	enchant	300	50	True	False	weapon	False	False	False	weaponEnc
+621	mod_flurry	連撃	enchant	300	50	True	False	weapon	False	False	False	weaponEnc
+622	mod_cleave	旋風	enchant	300	50	True	False	weapon	False	False	False	weaponEnc
+623	mod_feint	牽制	enchant	300	50	True	False	weapon	False	False	False	weaponEnc
+624	mod_frustration	逆襲	enchant	300	50	True	False	weapon	False	False	False	weaponEnc
+640	r_life	生命力倍率	enchant	0	0	False	False		False	False	False	multiplier,ratio
+641	r_mana	マナ倍率	enchant	0	0	False	False		False	False	False	multiplier,ratio
+650	r_DV	DV倍率	enchant	0	0	False	False		False	False	False	multiplier,ratio
+651	r_PV	PV倍率	enchant	0	0	False	False		False	False	False	multiplier,ratio
+652	eco	エコ	enchant	0	0	False	False	all	False	False	True	trait
+653	living	生きている	enchant	0	200	False	False	all	False	False	False	noRune
+654	noDamage	暴力禁止	enchant	0	10	False	False	all	False	False	False	flag
+655	onlyPet	仲間強化	enchant	0	10	False	False	all	False	False	False	flag
+656	permaCurse	呪いの再帰	enchant	0	10	False	False	all	False	False	False	flag,neg
+660	absorbHP	生命吸収	enchant	0	100	True	False	weapon	False	False	False	weaponEnc
+661	absorbMP	マナ吸収	enchant	0	100	True	False	weapon	False	False	False	weaponEnc
+662	absorbSP	スタミナ吸収	enchant	0	100	True	False	weapon	False	False	False	weaponEnc
+663	eheluck	毎日が幸運の日	enchant	0	100	False	False	weapon	False	False	False	flag
+664	boostMachine	アップグレード	enchant	0	100	False	False	all	False	False	False
+665	planter	命を蒔く者	enchant	0	100	False	False	all	False	False	False	flag
+666	meleeDistance	物理攻撃距離	enchant	0	100	True	False	all	False	False	False	weaponEnc,noRune
+667	encRagnarok	終末の宴	enchant	0	100	True	False	weapon	False	False	False	weaponEnc,noRune
+700	food_CHA	コラーゲン豊富	food	1000	0	False	False		False	False	False
+701	food_cat	猫	food	1000	0	False	False		False	False	False
+702	food_poison	劇毒	food	1000	0	False	False		False	False	False
+703	food_love	媚薬	food	1000	0	False	False		False	False	False
+704	food_bug	虫	food	1000	0	False	False		False	False	False
+705	gainWeight	増量	food	1000	0	False	False		False	False	False
+706	loseWeight	減量	food	1000	0	False	False		False	False	False
+707	kirimi	切り身	food	1000	0	False	False		False	False	False
+708	food_human	人肉	food	1000	0	False	False		False	False	False
+709	food_undead	不浄	food	1000	0	False	False		False	False	False
+710	food_blood	血の糧	food	0	0	False	False		False	False	False
+750	comfort	癒し		1000	0	False	False		False	False	True	trait
+751	rare	珍しさ		1000	0	False	False		False	False	True	trait
+752	cute	見た目		1000	0	False	False		False	False	True	trait
+753	antidote	毒消し		1000	0	False	False		False	False	True	trait
+754	nerve	安定作用		1000	0	False	False		False	False	True	trait
+755	blood	止血		1000	0	False	False		False	False	True	trait
+756	hotspring	温泉の香り		1000	0	False	False		False	False	True	trait
+757	justcooked	できたて料理	food	1000	0	False	False		False	False	True	trait,noInherit
+758	food_god	神肉	food	0	0	False	False		False	False	True	trait
+759	purity	純度		1000	0	False	False		False	False	True	trait
+760	stimulant	刺激		1000	0	False	False		False	False	True	trait
+761	recharge	疲労回復		1000	0	False	False		False	False	True	trait
+762	roasted	焼き加減		1000	0	False	False		False	False	True	trait
+763	air	空気		1000	0	False	False		False	False	True	trait
+764	creativeDish	創作料理	food	1000	0	False	False		False	False	True	trait,noInherit
+765	difficulty	難易度		1000	0	False	False		False	False	True	trait
+800	domTest	ドメイン		1000	0	False	False		False	False	False
+801	domSurvival	生存		1000	0	False	False		False	False	False
+802	domFaith	信仰		1000	0	False	False		False	False	False
+803	domMiracle	奇跡		1000	0	False	False		False	False	False
+804	domArcane	アーケン		1000	0	False	False		False	False	False
+805	domComm	コム		1000	0	False	False		False	False	False
+806	domElement	元素		1000	0	False	False		False	False	False
+807	domWind	風		1000	0	False	False		False	False	False
+808	domHarvest	収穫		1000	0	False	False		False	False	False
+809	domMachine	機械		1000	0	False	False		False	False	False
+810	domLuck	幸運		1000	0	False	False		False	False	False
+811	domHealing	癒し		1000	0	False	False		False	False	False
+812	domEarth	大地		1000	0	False	False		False	False	False
+813	domOblivion	忘却		1000	0	False	False		False	False	False
+814	domEyth	無		1000	0	False	False		False	False	False
+815	domHarmony	調和		1000	0	False	False		False	False	False
+850	convertFire	火炎変換	enchant	0	50	True	False	weapon	False	False	False
+851	convertCold	冷気変換	enchant	0	50	True	False	weapon	False	False	False
+852	convertLightning	電撃変換	enchant	0	50	True	False	weapon	False	False	False
+865	convertImpact	衝撃変換	enchant	0	50	True	False	weapon	False	False	False
+910	eleFire	火炎	enchant	150	50	True	False	weapon	False	False	False	hand,bolt,ball,weapon,sword,flare
+911	eleCold	冷気	enchant	150	50	True	False	weapon	False	False	False	hand,arrow,bolt,ball,funnel,weapon
+912	eleLightning	電撃	enchant	150	50	True	False	weapon	False	False	False	bolt,ball,funnel,weapon
+913	eleDarkness	暗黒	enchant	100	75	True	False	weapon	False	False	False	arrow,bolt,miasma,weapon,sword
+914	eleMind	幻惑	enchant	100	75	True	False	weapon	False	False	False	hand,bolt,funnel
+915	elePoison	毒	enchant	100	75	True	False	weapon	False	False	False	arrow,ball,miasma,sword
+916	eleNether	地獄	enchant	100	100	True	False	weapon	False	False	False	hand,bolt,funnel,weapon
+917	eleSound	轟音	enchant	100	100	True	False	weapon	False	False	False	bolt,ball,funnel
+918	eleNerve	神経	enchant	150	75	True	False	weapon	False	False	False	arrow,bolt,miasma
+919	eleHoly	神聖	enchant	50	125	True	False	weapon	False	False	False	high,hand,bolt,funnel,weapon
+920	eleChaos	混沌	enchant	50	125	True	False	weapon	False	False	False	bolt,ball,funnel,weapon
+921	eleMagic	魔法	enchant	50	125	True	False	weapon	False	False	False	arrow,ball,funnel,sword
+922	eleEther	エーテル	enchant	25	125	True	False	weapon	False	False	False	high,bolt,ball,funnel
+923	eleAcid	酸	enchant	25	125	True	False	weapon	False	False	False	high,arrow,bolt,ball
+924	eleCut	出血	enchant	10	150	True	False	weapon	False	False	False	high,hand,bolt,miasma
+925	eleImpact	衝撃	enchant	10	150	True	False	weapon	False	False	False	high
+926	eleVoid	無	enchant	0	150	True	False		False	False	False	high,bit
+950	resFire	火炎耐性	resist	200	50	False	False	all	False	False	False
+951	resCold	冷気耐性	resist	200	50	False	False	all	False	False	False
+952	resLightning	電撃耐性	resist	200	50	False	False	all	False	False	False
+953	resDarkness	暗黒耐性	resist	150	75	False	False	all	False	False	False
+954	resMind	幻惑耐性	resist	150	75	False	False	all	False	False	False
+955	resPoison	毒耐性	resist	150	75	False	False	all	False	False	False
+956	resNether	地獄耐性	resist	100	100	False	False	all	False	False	False
+957	resSound	轟音耐性	resist	100	100	False	False	all	False	False	False
+958	resNerve	神経耐性	resist	150	75	False	False	all	False	False	False
+959	resChaos	混沌耐性	resist	100	125	False	False	all	False	False	False
+960	resHoly	神聖耐性	resist	0	125	False	False	all	False	False	False	high
+961	resMagic	魔法耐性	resist	0	125	False	False	all	False	False	False	high
+962	resEther	エーテル耐性	resist	0	125	False	False	all	False	False	False	high
+963	resAcid	酸耐性	resist	0	0	False	False		False	False	False	high
+964	resCut	出血耐性	resist	0	0	False	False		False	False	False	high
+965	resImpact	衝撃耐性	resist	0	0	False	False		False	False	False	high
+970	resDecay	腐敗耐性	resist	0	0	False	False		False	False	False	hidden
+971	resDamage	ダメージ耐性	resist	0	0	False	False		False	False	False	hidden
+972	resCurse	呪い耐性	resist	0	0	False	False		False	False	False	hidden
+1200	featSlowFood	栄養満点	feat	1000	0	False	False		False	False	False	innate
+1201	featManaBond	マナとの絆	feat	1000	0	False	False		False	False	False	innate
+1202	featFastLearner	習得上手	feat	1000	0	False	False		False	False	False	innate
+1203	featGrowParts	変容する体	feat	1000	0	False	False		False	False	False	innate
+1204	featFairyWeak	小さい体	feat	1000	0	False	False		False	False	False	innate
+1205	featCannibalism	カンニバリズム	feat	1000	0	False	False		False	False	False	innate,neg
+1206	featMelilithCurse	館の呪い	feat	1000	0	False	False		False	False	False	innate,neg
+1207	featFoxBless	狐守	feat	1000	0	False	False		False	False	False	innate
+1208	featFoxLearn	古き狐の血統	feat	1000	0	False	False		False	False	False	innate
+1209	featFluffyTail	ふさふさの尻尾	feat	1000	0	False	False		False	False	False	innate
+1210	featUndead	アンデッド	feat	1000	0	False	False		False	False	False	innate
+1211	featSnail	かたつむり	feat	1000	0	False	False		False	False	False	innate
+1212	featFairyResist	精霊の鱗粉	feat	1000	0	False	False		False	False	False	innate
+1213	featElea	古き森の民	feat	1000	0	False	False		False	False	False	innate
+1214	featManaPrecision	魔法の精度	feat	1000	0	False	False		False	False	False	innate
+1215	featDwarf	蜜酒の虜	feat	1000	0	False	False		False	False	False	innate
+1216	featSuccubus	月夜の眷属	feat	1000	0	False	False		False	False	False	innate
+1217	featGolem	魔導生命体	feat	1000	0	False	False		False	False	False	innate
+1218	featMetal	メタル	feat	1000	0	False	False		False	False	False	innate
+1219	featElderCrab	カニバサミ	feat	1000	0	False	False		False	False	False	innate
+1220	featFate	運命	feat	1000	0	False	False		False	False	False	innate
+1221	featSpike	トゲトゲ	feat	1000	0	False	False		False	False	False	innate
+1222	featSplit	分裂生物	feat	1000	0	False	False		False	False	False	innate
+1223	featAcidBody	酸の身体	feat	1000	0	False	False		False	False	False	innate
+1224	featShiva	シヴァの加護	feat	1000	0	False	False		False	False	False	innate
+1225	featLoyal	忠誠心	feat	1000	0	False	False		False	False	False	innate
+1226	featUnderground	地底の住人	feat	1000	0	False	False		False	False	False	innate
+1227	featServant	使徒	feat	1000	0	False	False		False	False	False	innate
+1228	featDemigod	神秘の残光	feat	1000	0	False	False		False	False	False	innate
+1229	featLittleOne	リトルワン	feat	1000	0	False	False		False	False	False	innate,foodEnc
+1230	featAdam	アダム	feat	1000	0	False	False		False	False	False	innate
+1231	featNirvana	悟り	feat	1000	0	False	False		False	False	False	innate
+1232	featBaby	赤ちゃん	feat	1000	0	False	False		False	False	False	innate
+1233	featCosmicHorror	星界からの恐怖	feat	1000	0	False	False		False	False	False	innate
+1234	featHeavyEater	大食い	feat	1000	0	False	False		False	False	False	innate
+1235	featLightEater	少食	feat	1000	0	False	False		False	False	False	innate
+1236	featNorland	北の国から	feat	1000	0	False	False		False	False	False	innate
+1237	featRoran	希少種	feat	1000	0	False	False		False	False	False	innate
+1238	featElder	古代種	feat	1000	0	False	False		False	False	False	innate
+1239	featDemon	悪魔	feat	1000	0	False	False		False	False	False	innate
+1240	featMassSummoner	群れの主	feat	1000	0	False	False		False	False	False	innate
+1241	featMeatCushion	肉の壁	feat	1000	0	False	False		False	False	False	innate
+1242	featGeneSlot	可能性の獣	feat	1000	0	False	False		False	False	False	innate
+1243	featEternalYouth	永遠の若さ	feat	1000	0	False	False		False	False	False	innate
+1244	featCentaur	射手座	feat	1000	0	False	False		False	False	False	innate
+1245	featSevenSense	セブンセンシズ	feat	1000	0	False	False		False	False	False	innate
+1246	featPegasus	ペガサス座	feat	1000	0	False	False		False	False	False	innate
+1247	featLibra	天秤座	feat	1000	0	False	False		False	False	False	innate
+1248	featMiscreation	できそこない	feat	1000	0	False	False		False	False	False	innate
+1249	featBloodBond	血の絆	feat	1000	0	False	False		False	False	False	innate
+1250	featVampire	夜の支配者	feat	1000	0	False	False		False	False	False	innate
+1251	featAshborn	灰化体質	feat	1000	0	False	False		False	False	False	innate
+1270	featGoodKarma	善人	feat	1000	0	False	False		False	False	False	innate
+1271	featBadKarma	悪人	feat	1000	0	False	False		False	False	False	innate
+1272	featPeacemaker	仲裁者	feat	1000	0	False	False		False	False	False	innate
+1273	featBloom	絆の覚醒	feat	1000	0	False	False		False	False	False	innate
+1290	featGoddess	女神性	feat	1000	0	False	False		False	False	False	innate
+1300	featGod_element1	元素の加護	feat	1000	0	False	False		False	False	False	innate
+1305	featGod_earth1	大地の加護	feat	1000	0	False	False		False	False	False	innate
+1310	featGod_wind1	風の加護	feat	1000	0	False	False		False	False	False	innate
+1315	featGod_machine1	機械の加護	feat	1000	0	False	False		False	False	False	innate
+1320	featGod_healing1	癒しの加護	feat	1000	0	False	False		False	False	False	innate
+1325	featGod_harvest1	収穫の加護	feat	1000	0	False	False		False	False	False	innate
+1330	featGod_luck1	幸運の加護	feat	1000	0	False	False		False	False	False	innate
+1335	featGod_harmony1	調和の加護	feat	1000	0	False	False		False	False	False	innate
+1340	featGod_oblivion1	忘却の加護	feat	1000	0	False	False		False	False	False	innate
+1345	featGod_trickery1	悪戯の加護	feat	1000	0	False	False		False	False	False	innate
+1350	featGod_moonshadow1	月影の加護	feat	1000	0	False	False		False	False	False	innate
+1355	featGod_strife1	戦禍の加護	feat	1000	0	False	False		False	False	False	innate
+1400	featWarrior	武器の知識	feat	1000	0	False	False		False	False	False	class
+1401	featThief	盗賊の幸運	feat	1000	0	False	False		False	False	False	class
+1402	featWizard	魔術の心得	feat	1000	0	False	False		False	False	False	class
+1403	featFarmer	農夫の足腰	feat	1000	0	False	False		False	False	False	class
+1404	featArcher	射撃の名手	feat	1000	0	False	False		False	False	False	class
+1405	featPianist	音楽家	feat	1000	0	False	False		False	False	False	class
+1406	featTourist	観光気分	feat	1000	0	False	False		False	False	False	class
+1407	featPaladin	敬虔	feat	1000	0	False	False		False	False	False	class
+1408	featPaladin2	防衛本能	feat	1000	0	False	False		False	False	False	class
+1409	featBoost	ブースト	feat	1000	0	False	False		False	False	False	class
+1410	featReboot	リブート	feat	1000	0	False	False		False	False	False	class
+1411	featEarthStrength	大地の力	feat	1000	0	False	False		False	False	False	class
+1412	featLuckyCat	エヘカトルの祝福	feat	1000	0	False	False		False	False	False	class
+1413	featFairysan	妖精のお腹	feat	1000	0	False	False		False	False	False	class
+1414	featWhiteVixen	巫女	feat	1000	0	False	False		False	False	False	class
+1415	featFoxMaid	妖狐	feat	1000	0	False	False		False	False	False	class
+1416	featInquisitor	異端尋問	feat	1000	0	False	False		False	False	False	class
+1417	featWitch	魔女の生き方	feat	1000	0	False	False		False	False	False	class
+1418	featSwordsage	霊符の知識	feat	1000	0	False	False		False	False	False	class
+1419	featMilitant	前線指揮	feat	1000	0	False	False		False	False	False	class
+1420	featExecutioner	死の神髄	feat	1000	0	False	False		False	False	False	class
+1421	featManaMeat	マナの体	feat	1000	0	False	False		False	False	False	class
+1422	featHealer	癒やし本能	feat	1000	0	False	False		False	False	False	class
+1510	mutationSkin	鉄の皮膚	mutation	1000	0	False	False		False	False	False
+1511	mutationSkinN	アルビノ	mutation	1000	0	False	False		False	False	False	neg
+1512	mutationEye	鋭い目	mutation	1000	0	False	False		False	False	False
+1513	mutationEyeN	色弱	mutation	1000	0	False	False		False	False	False	neg
+1514	mutationDex	しなやかな関節	mutation	1000	0	False	False		False	False	False
+1515	mutationDexN	きしむ関節	mutation	1000	0	False	False		False	False	False	neg
+1516	mutationRegen	トロールの血	mutation	1000	0	False	False		False	False	False
+1517	mutationRegenN	貧血	mutation	1000	0	False	False		False	False	False	neg
+1518	mutationSpeed	しなやかな脚	mutation	1000	0	False	False		False	False	False
+1519	mutationSpeedN	ねじれた脚	mutation	1000	0	False	False		False	False	False	neg
+1520	mutationStr	強い腕	mutation	1000	0	False	False		False	False	False
+1521	mutationStrN	弱い腕	mutation	1000	0	False	False		False	False	False	neg
+1522	mutationCha	美声	mutation	1000	0	False	False		False	False	False
+1523	mutationChaN	かれた声	mutation	1000	0	False	False		False	False	False	neg
+1524	mutationBrain	脳内コンピュータ	mutation	1000	0	False	False		False	False	False
+1525	mutationBrainN	痴呆	mutation	1000	0	False	False		False	False	False	neg
+1526	mutationCold	熱がり	mutation	1000	0	False	False		False	False	False
+1527	mutationColdN	寒がり	mutation	1000	0	False	False		False	False	False	neg
+1528	mutationLightning	非伝導体	mutation	1000	0	False	False		False	False	False
+1529	mutationLightningN	伝導体	mutation	1000	0	False	False		False	False	False	neg
+1530	mutationBody	清らかな体	mutation	1000	0	False	False		False	False	False
+1531	mutationBodyN	穢れた体	mutation	1000	0	False	False		False	False	False	neg
+1532	mutationHair	フサフサ	mutation	1000	0	False	False		False	False	False	noRandomMutation
+1533	mutationHairN	ツルツル	mutation	1000	0	False	False		False	False	False	neg,noRandomMutation
+1550	etherGravity	重力発生
+大きな重力
+とてつもない重力	ether	1000	0	False	False		False	False	False	neg
+1551	etherUgly	顔のただれ
+顔中の蕁麻疹
+崩れかけの顔	ether	1000	0	False	False		False	False	False	neg
+1552	etherFeet	蹄変化	ether	1000	0	False	False		False	False	False	neg
+1553	etherEye	第三の眼
+第四の眼	ether	1000	0	False	False		False	False	False	neg
+1554	etherWing	エーテルの片翼
+エーテルの両翼	ether	1000	0	False	False		False	False	False	neg
+1555	etherNeck	太い首	ether	1000	0	False	False		False	False	False	neg
+1556	etherViolence	殺戮への餓え	ether	1000	0	False	False		False	False	False	neg
+1557	etherHead	頭部の巨大化	ether	1000	0	False	False		False	False	False	neg
+1558	etherRain	生きた加湿器	ether	1000	0	False	False		False	False	False	neg
+1559	etherAddict	ポーション中毒	ether	1000	0	False	False		False	False	False	neg
+1560	etherWeak	衰弱	ether	1000	0	False	False		False	False	False	neg
+1561	etherStupid	痴呆	ether	1000	0	False	False		False	False	False	neg
+1562	etherArmor	重い甲殻	ether	1000	0	False	False		False	False	False	neg
+1563	etherProvoke	生きとし生けるものの敵	ether	1000	0	False	False		False	False	False	neg
+1564	etherManaBattery	マナバッテリー	ether	1000	0	False	False		False	False	False	neg
+1565	etherPoisonHand	エーテルの滴る手	ether	1000	0	False	False		False	False	False	neg
+1610	featLife	苦行者見習い
+苦行者
+熟練の苦行者
+苦行の達人
+伝説的苦行者	feat	1000	0	False	False		False	False	False
+1611	featMana	魔力の遺伝子
+魔力の細胞
+魔力の血液
+魔力の肉体
+魔力の支配	feat	1000	0	False	False		False	False	False
+1612	featStamina	短距離走者
+中距離走者
+長距離走者	feat	1000	0	False	False		False	False	False
+1620	featSTR	腕相撲の初心者
+腕相撲の達人
+腕相撲のチャンピオン	feat	1000	0	False	False		False	False	False
+1621	featDEX	器用な指
+職人の指
+自在の指	feat	1000	0	False	False		False	False	False
+1622	featEND	我慢強い
+とても我慢強い
+恐ろしく我慢強い	feat	1000	0	False	False		False	False	False
+1623	featPER	見張りの目
+泥棒の目
+慧眼	feat	1000	0	False	False		False	False	False
+1624	featLER	好奇心
+勉強熱心
+本の虫	feat	1000	0	False	False		False	False	False
+1625	featMAG	スピリチュアル
+霊感
+第六感	feat	1000	0	False	False		False	False	False
+1626	featWIL	強い意志
+鉄の意志
+不屈の意志	feat	1000	0	False	False		False	False	False
+1627	featCHA	セクシー
+ロマンチスト
+色魔	feat	1000	0	False	False		False	False	False
+1628	featLuck	幸運の持ち主
+類稀な幸運
+幸運の女神の寵愛	feat	1000	0	False	False		False	False	False
+1629	featSPD	俊足
+韋駄天	feat	1000	0	False	False		False	False	False
+1630	featHardy	石の守備
+鉄の守備
+鋼の守備	feat	1000	0	False	False		False	False	False
+1631	featDefense	見極め
+見極めの熟練者
+見極めの達人	feat	1000	0	False	False		False	False	False
+1632	featEvade	回避の修練者
+回避の熟練者
+回避の達人	feat	1000	0	False	False		False	False	False
+1633	featSpotting	発見者
+熟練発見者
+伝説の発見者	feat	1000	0	False	False		False	False	False
+1634	featNegotiate	交渉上手
+交渉の神	feat	1000	0	False	False		False	False	False
+1635	featMartial	格闘家
+拳聖	feat	1000	0	False	False		False	False	False
+1636	featFaith	信者
+狂信者	feat	1000	0	False	False		False	False	False
+1640	featAnimalLover	動物好き	feat	1000	0	False	False		False	False	False	noPet
+1641	featResCurse	祈祷師	feat	1000	0	False	False		False	False	False
+1642	featSleeper	眠り上手
+眠りの熟練者
+眠りの達人	feat	1000	0	False	False		False	False	False
+1643	featSorter	A型
+情熱的なA型
+偏執的なA型	feat	1000	0	False	False		False	False	False	hidden
+1644	featBodyParts	肉体の変容	feat	1000	0	False	False		False	False	False	noPet
+1645	featParty	人気者	feat	1000	0	False	False		False	False	False	noPet
+1646	featLonelySoul	孤独な魂	feat	1000	0	False	False		False	False	False	noPet
+1647	featSummoner	羊飼い	feat	1000	0	False	False		False	False	False	noPet
+1648	featRapidMagic	連続魔法	feat	1000	0	False	False		False	False	False
+1649	featDefender	ディフェンダー	feat	1000	0	False	False		False	False	False
+1650	featGourmet	美食家	feat	1000	0	False	False		False	False	False	noPet
+1651	featMagicManner	魔法のマナー	feat	1000	0	False	False		False	False	False
+1652	featRapidArrow	連続射撃	feat	1000	0	False	False		False	False	False
+1653	featDreamWaker	覚醒夢	feat	1000	0	False	False		False	False	False	noPet
+1654	featHeavyCasting	初級重装詠唱
+中級重装詠唱
+上級重装詠唱	feat	1000	0	False	False		False	False	False
+1655	featModelBeliever	模範信者	feat	1000	0	False	False		False	False	False	noPet
+1656	featScavenger	廃品回収	feat	1000	0	False	False		False	False	False	noPet
+1657	featManaCost	節魔術	feat	1000	0	False	False		False	False	False	noPet
+1658	featChef	旅するシェフ	feat	1000	0	False	False		False	False	False	noPet
+1659	featFisher	初釣り	feat	1000	0	False	False		False	False	False	noPet
+1660	featLooter	略奪者	feat	1000	0	False	False		False	False	False	noPet
+1661	featDismantler	解体屋	feat	1000	0	False	False		False	False	False	noPet
+1662	featGoldenFinger	黄金の指	feat	1000	0	False	False		False	False	False	noPet
+2003	fConstruction	建築	tech	1000	0	False	False		False	False	False
+2115	fAdmin	運営	tech	1000	0	False	False		False	False	False
+2116	fEducation	勤勉	tech	1000	0	False	False		False	False	False
+2117	fLoyal	地元愛	tech	1000	0	False	False		False	False	False
+2118	fLuck	幸運	tech	1000	0	False	False		False	False	False
+2119	fTaxEvasion	脱税	tech	1000	0	False	False		False	False	False
+2120	fHeirloom	遺産管理	tech	1000	0	False	False		False	False	False
+2200	fSoil	土壌	tech	1000	0	False	False		False	False	False
+2201	fElec	自然発電	tech	1000	0	False	False		False	False	False
+2202	fPromo	宣伝	tech	1000	0	False	False		False	False	False
+2203	fMoral	公共精神	tech	1000	0	False	False		False	False	False
+2204	fFood	食料供給	tech	1000	0	False	False		False	False	False
+2205	fSafety	治安	tech	1000	0	False	False		False	False	False
+2206	fAttraction	魅力	tech	1000	0	False	False		False	False	False
+2207	fRation	非常食	tech	1000	0	False	False		False	False	False
+2500	wealth_tax	富裕税	policy	1000	0	False	False		False	False	False
+2501	faith_tax	信仰税	policy	1000	0	False	False		False	False	False
+2502	food_for_people	食料配給	policy	0	0	False	False		False	False	False	hidden
+2503	prohibition	禁酒法	policy	1000	0	False	False		False	False	False
+2504	impressment	強制徴募	policy	0	0	False	False		False	False	False	hidden
+2505	legal_drug	合法ドラッグ	policy	1000	0	False	False		False	False	False
+2506	human_right	人権	policy	1000	0	False	False		False	False	False
+2507	inquisition	異端審問会	policy	0	0	False	False		False	False	False	hidden
+2508	nocturnal_life	夜型生活条令	policy	1000	0	False	False		False	False	False
+2509	vaccination	強制予防接種	policy	0	0	False	False		False	False	False
+2510	ban_radio	電波規制	policy	0	0	False	False		False	False	False
+2511	self_sufficient	自給自足	policy	0	0	False	False		False	False	False	hidden
+2512	resident_tax	住民税	policy	1000	0	False	False		False	False	False
+2513	resident_wanted	住人誘致運動	policy	1000	0	False	False		False	False	False
+2514	taxfree	免税地	policy	0	0	False	False		False	False	False
+2515	stop_growth	成長抑止	policy	0	0	False	False		False	False	False
+2516	speed_growth	成長促進	policy	0	0	False	False		False	False	False
+2700	energy_conservation	節電運動	policy	1000	0	False	False		False	False	False
+2701	trash_sort	ゴミ分別条令	policy	1000	0	False	False		False	False	False
+2702	trash_no	ポイ捨て厳罰法	policy	0	0	False	False		False	False	False
+2703	weed_no	草むしり条令	policy	0	0	False	False		False	False	False
+2704	border_watch	境界の見張り	policy	1000	0	False	False		False	False	False
+2705	taxTransfer	振替納税	policy	0	0	False	False		False	False	False
+2706	demon_invocation	悪魔呼び	policy	1000	0	False	False		False	False	False
+2707	auto_farm	お任せ農業	policy	0	0	False	False		False	False	False
+2708	noDM	迷惑メールお断り	policy	0	0	False	False		False	False	False
+2709	noAnimal	動物禁止区	policy	0	0	False	False		False	False	False
+2710	noMother	マザー禁止区	policy	0	0	False	False		False	False	False	globalPolicy
+2711	incomeTransfer	給与振込	policy	0	0	False	False		False	False	False	globalPolicy
+2712	forcePanty	おもいやりﾊﾟﾝﾃｨｰ着用条例	policy	0	0	False	False		False	False	False	globalPolicy
+2715	livestock_priv	家畜の優遇	policy	0	0	False	False		False	False	False
+2800	home_discount	ふるさと割引	policy	1000	0	False	False		False	False	False
+2810	open_business	開店	policy	1000	0	False	False		False	False	False
+2811	tourist_safety	観光客保護条例	policy	1000	0	False	False		False	False	False
+2812	bed_quality	旅人の宿	policy	1000	0	False	False		False	False	False
+2813	suite_room	スイートルーム	policy	1000	0	False	False		False	False	False
+2814	mass_exhibition	大量展示	policy	1000	0	False	False		False	False	False
+2815	platinum_ticket	プラチナチケット	policy	1000	0	False	False		False	False	False
+2816	store_ripoff	ぼったくり店	policy	1000	0	False	False		False	False	False
+2817	store_premium	プレミアム店	policy	1000	0	False	False		False	False	False
+2818	license_food	飲食店ライセンス	policy	1000	0	False	False		False	False	False
+2819	license_furniture	家具店ライセンス	policy	1000	0	False	False		False	False	False
+2820	license_general	雑貨店ライセンス	policy	1000	0	False	False		False	False	False
+2821	legendary_heirloom	伝説の家宝	policy	1000	0	False	False		False	False	False
+2822	celeb	セレブ天国	policy	1000	0	False	False		False	False	False
+2823	legendary_exhibition	個展	policy	1000	0	False	False		False	False	False
+2824	license_stolen	盗品取扱ライセンス	policy	1000	0	False	False		False	False	False
+2825	milk_fan	乳派	policy	1000	0	False	False		False	False	False	hidden
+2826	egg_fan	卵派	policy	1000	0	False	False		False	False	False	hidden
+2827	breed_season	繁殖期	policy	1000	0	False	False		False	False	False	hidden
+2828	license_slaver	奴隷販売ライセンス	policy	1000	0	False	False		False	False	False
+3500	bfCave	洞窟	landfeat	0	0	False	False		False	False	False
+3600	bfPlain	平野	landfeat	0	0	False	False		False	False	False
+3601	bfForest	森	landfeat	0	0	False	False		False	False	False
+3602	bfSnow	雪原	landfeat	0	0	False	False		False	False	False
+3603	bfHill	丘	landfeat	0	0	False	False		False	False	False
+3604	bfBeach	ビーチ	landfeat	0	0	False	False		False	False	False
+3605	bfSea	海	landfeat	0	0	False	False		False	False	False
+3606	bfUndersea	海底	landfeat	0	0	False	False		False	False	False
+3700	bfFertile	肥沃	landfeat	1000	0	False	False		False	False	False
+3701	bfGeyser	間欠泉	landfeat	1000	0	False	False		False	False	False
+3702	bfRuin	古代遺跡	landfeat	1000	0	False	False		False	False	False
+3703	bfTranquil	安穏	landfeat	0	0	False	False		False	False	False
+3704	bfVolcano	火山	landfeat	1000	0	False	False		False	False	False	bfHill
+3705	bfHunt	狩場	landfeat	1000	0	False	False		False	False	False
+3706	bfFish	釣場	landfeat	1000	0	False	False		False	False	False
+3707	bfMonster	魔物の巣	landfeat	1000	0	False	False		False	False	False
+3708	bfFreshAir	新鮮な空気	landfeat	1000	0	False	False		False	False	False
+3709	bfBasin	盆地	landfeat	1000	0	False	False		False	False	False
+3710	bfBreed	繁殖地	landfeat	1000	0	False	False		False	False	False
+3780	bfLandmark1	巨像	landfeat	1000	0	False	False		False	False	False
+3781	bfLandmark2	恐竜の化石	landfeat	1000	0	False	False		False	False	False
+3782	bfLandmark3	謎の石碑	landfeat	1000	0	False	False		False	False	False
+3783	bfLandmark4	モノリス	landfeat	1000	0	False	False		False	False	False
+3784	bfLandmark5	怪鳥	landfeat	1000	0	False	False		False	False	False
+3800	bfCoal	石炭	landfeat	1000	0	False	False		False	False	False	network,bfHill
+3801	bfMushroom	特産きのこ	landfeat	1000	0	False	False		False	False	False	network,bfForest
+3802	bfSilica	シリカ真珠	landfeat	1000	0	False	False		False	False	False	network,bfBeach
+3803	bfGum	ゴム	landfeat	1000	0	False	False		False	False	False	network,bfForest
+3804	bfIce	氷塊	landfeat	1000	0	False	False		False	False	False	network,bfSnow
+3805	bfChitin	キチン	landfeat	1000	0	False	False		False	False	False	network,bfPlain
+3900	bfStart	エリンの加護	landfeat	0	0	False	False		False	False	False	network
+4000	actBuildCut	伐採モード	tech	1000	0	False	False		False	False	False	hidden
+4001	actBuildMine	採掘モード	tech	1000	0	False	False		False	False	False	hidden
+4002	actBuildTerrain	地形隆起	tech	1000	0	False	False		False	False	False	hidden
+4003	actBuildAnywhere	どこでもビルド	tech	1000	0	False	False		False	False	False	hidden
+4004	actBuildCollect	回収	tech	1000	0	False	False		False	False	False	hidden
+4005	actBuildRecipe	レシピモード	tech	1000	0	False	False		False	False	False	hidden
+4006	actBuildInspect	配置モード	tech	1000	0	False	False		False	False	False	hidden
+5000	ActWait	待機		1000	0	False	False		False	False	False
+5001	ActMelee	攻撃		1000	0	False	False		False	False	False	before_move
+5002	Melee	攻撃		1000	0	False	False		False	False	False
+5003	Ranged	射撃		1000	0	False	False		False	False	False
+5004	Sleep	寝る		1000	0	False	False		False	False	False
+5005	Wait	待機		1000	0	False	False		False	False	False
+5006	Shoot	射撃		1000	0	False	False		False	False	False
+5007	Use	Use		1000	0	False	False		False	False	False
+5008	General	general		1000	0	False	False		False	False	False
+5009	TaskMine	掘る		1000	0	False	False		False	False	False
+5010	TaskDig	地面を掘る		1000	0	False	False		False	False	False
+5011	TaskCut	伐採		1000	0	False	False		False	False	False
+5012	AI_Goto	移動		1000	0	False	False		False	False	False
+5013	ActAttack	攻撃		1000	0	False	False		False	False	False
+5014	TaskPlow	耕す		1000	0	False	False		False	False	False
+5015	TaskAttack	眠る		1000	0	False	False		False	False	False
+5016	TaskTame	射撃		1000	0	False	False		False	False	False
+5017	TaskTalk	使う		1000	0	False	False		False	False	False
+5018	TaskPick	5		1000	0	False	False		False	False	False
+5019	TaskReadBoard	6		1000	0	False	False		False	False	False
+5020	TaskFarm	農作業		1000	0	False	False		False	False	False
+5021	TaskTrain	訓練		1000	0	False	False		False	False	False
+5022	TaskSleepOnBed	訓練		1000	0	False	False		False	False	False
+5023	TaskGoOut	訓練		1000	0	False	False		False	False	False
+5024	AI_Eat	食べる		1000	0	False	False		False	False	False
+5025	AI_Grab	7		1000	0	False	False		False	False	False
+5026	AI_Haul	運搬		1000	0	False	False		False	False	False
+5027	GoalSleep	睡眠		1000	0	False	False		False	False	False
+5028	ActReleaseHeld	8		1000	0	False	False		False	False	False
+5029	AI_Offer	9		1000	0	False	False		False	False	False
+5030	AI_ReleaseHeld	10		1000	0	False	False		False	False	False
+5031	AI_Deconstruct	11		1000	0	False	False		False	False	False
+5032	AI_Equip	12		1000	0	False	False		False	False	False
+5033	ActCancelTask	13		1000	0	False	False		False	False	False
+5034	GoalIdle	暇つぶし		1000	0	False	False		False	False	False
+5035	TaskBuild	設置		1000	0	False	False		False	False	False
+5036	TaskMoveInstalled	オブジェ移動		1000	0	False	False		False	False	False
+5037	ActNoItem	no item		1000	0	False	False		False	False	False
+5038	ActThrow	投擲		1000	0	False	False		False	False	False
+5039	AI_Fish	釣る		1000	0	False	False		False	False	False
+5040	ActRanged	射撃		1000	0	False	False		False	False	False
+5041	AI_Read	読む		1000	0	False	False		False	False	False
+5042	ActKick	蹴る		1000	0	False	False		False	False	False
+5043	AI_TendAnimal	ブラシをかける		1000	0	False	False		False	False	False
+5044	ActChat	話す		1000	0	False	False		False	False	False
+5045	AI_Drink	飲む		1000	0	False	False		False	False	False
+5046	ActInstall	設置		1000	0	False	False		False	False	False
+5047	ActPick	拾う		1000	0	False	False		False	False	False
+5048	ActItem	アイテム		1000	0	False	False		False	False	False
+5049	AI_OpenLock	解錠		1000	0	False	False		False	False	False
+5050	AI_Sleep	寝る		1000	0	False	False		False	False	False
+5051	ActZap	振る		1000	0	False	False		False	False	False
+5052	ActBash	体当たり		1000	0	False	False		False	False	False	neg
+5053	TaskHarvest	採取		1000	0	False	False		False	False	False
+5054	AI_Bladder	用を足す		1000	0	False	False		False	False	False
+5055	ActRestrain	拘束		1000	0	False	False		False	False	False
+6001	AI_PlayMusic	演奏		1000	0	False	False		False	False	False
+6003	AI_Meditate	休憩	ability	1000	0	True	False		False	False	False
+6011	AI_Steal	スリの手	ability	1000	0	True	False		False	False	False	neg
+6012	ActQuickCraft	簡易製作	ability	1000	0	True	False		False	False	False
+6013	AI_PassTime	時間をつぶす		1000	0	False	False		False	False	False
+6015	AI_SelfHarm	自傷	ability	1000	0	True	False		False	False	False
+6018	ActRide	騎乗	ability	1000	0	True	False		False	False	False
+6019	ActParasite	寄生	ability	1000	0	True	False		False	False	False
+6020	ActDreamBug	夢蟲	ability	1000	0	True	False		False	False	False
+6050	ActPray	祈る	ability	1000	0	True	False		False	False	False
+6400	ActEscape	逃走	ability	1000	0	True	False		False	False	False
+6410	ActSuicide	自爆	ability	1000	0	True	False		False	False	False
+6420	ActDuplicate	増殖	ability	1000	0	True	False		False	False	False
+6450	ActRush	突進	ability	1000	0	True	False		False	False	False	before_move,neg
+6500	ActCrabBreathe	泡ブレス	ability	0	0	True	False		False	False	False	neg
+6600	ActCurse	呪い	ability	1000	250	True	False		False	False	False	neg
+6601	ActEntangle	拘束	ability	1000	0	True	False		False	False	False	neg
+6602	ActDraw	牽引	ability	1000	0	True	False		False	False	False	neg
+6603	ActNTR	イタズラ	ability	1000	0	True	False		False	False	False	neg
+6604	ActCryRage	嘆きの慟哭	ability	1000	0	True	False		False	False	False	neg
+6605	ActCrySad	物悲しい慟哭	ability	1000	0	True	False		False	False	False	neg
+6606	ActBurnMana	マナの燃焼	ability	1000	0	True	False		False	False	False	neg
+6607	ActBloodsuck	吸血	ability	1000	0	True	False		False	False	False	neg
+6610	ActWeaken	弱体化の手	ability	1000	0	True	False		False	False	False	neg,useHand
+6611	ActFear	恐怖の手	ability	1000	0	True	False		False	False	False	neg,useHand
+6612	ActTouchSleep	眠りの手	ability	1000	0	True	False		False	False	False	neg,useHand
+6613	ActTouchDrown	窒息の手	ability	1000	0	True	False		False	False	False	neg,useHand
+6620	ActGazeDim	朦朧の眼差し	ability	1000	0	True	False		False	False	False	neg,reqSight
+6621	ActGazeInsane	狂気の眼差し	ability	1000	0	True	False		False	False	False	neg,reqSight
+6622	ActGazeMutation	変容の眼差し	ability	1000	0	True	False		False	False	False	neg,reqSight
+6623	ActGazeMana	マナの眼差し	ability	1000	0	True	False		False	False	False	neg,reqSight
+6626	ActDrainBlood	吸収	ability	1000	0	True	False		False	False	False	neg
+6627	ActCatHuffing	猫吸い	ability	1000	0	True	False		False	False	False	neg
+6630	ActInsult	罵倒	ability	1000	0	True	False		False	False	False	neg
+6631	ActScream	絶叫	ability	1000	0	True	False		False	False	False	neg
+6640	ActSteal	窃盗	ability	1000	0	True	False		False	False	False	neg
+6641	ActStealFood	食べ物漁り	ability	1000	0	True	False		False	False	False	neg
+6642	ActStealMoney	金品窃盗	ability	1000	0	True	False		False	False	False	neg
+6650	ActNeckHunt	首狩り	ability	1000	0	True	False		False	False	False
+6660	ActDropMine	地雷設置	ability	1000	0	True	False		False	False	False	neg
+6661	ActThrowPotion	ポーション投げ	ability	1000	0	True	False		False	False	False	neg
+6662	ActSwarm	スウォーム	ability	1000	0	True	False		False	False	False	neg,CD_npc
+6663	ActMultiHit	乱れ打ち	ability	1000	0	True	False		False	False	False	neg,CD_npc
+6664	ActBladeStorm	斬撃無双	ability	1000	0	True	False		False	False	False	neg,CD_npc
+6665	ActBladeStorm2	千切り	ability	1000	0	True	False		False	False	False	neg,CD_npc
+6666	ActWhirlwind	大回転	ability	1000	0	True	False		False	False	False	neg,CD_npc
+6667	ActMissileBarrage	バレージ	ability	1000	0	True	False		False	False	False	neg,CD_npc,noRandomAbility
+6800	ActSummonSpecial	援軍	ability	1000	0	True	False		False	False	False	neg
+6700	StTaunt	挑発	ability	1000	0	True	False		False	False	False
+6720	StManaCost	節魔	ability	1000	0	True	False		False	False	False
+6750	SongSleep	子守唄	ability	1000	0	True	False		False	False	False
+6751	SongTulip	チューリップの歌	ability	1000	0	True	False		False	False	False
+6752	SongValor	勇気の歌	ability	1000	0	True	False		False	False	False
+6900	ActManaAbsorb	魔力の抽出	ability	400	1200	True	False		False	False	False	godAbility,CD_npc,noRandomAbility
+6901	ActJureHeal	《ジュア》の祈り	ability	1000	0	True	False		False	False	False	godAbility,noRandomAbility
+6902	ActLulwyTrick	《ルルウィ》の憑依	ability	1000	0	True	False		False	False	False	godAbility,noRandomAbility
+6903	ActKizuamiTrick	《キズアミ》の悪戯	ability	1000	0	True	False		False	False	False	godAbility,CD_npc,noRandomAbility
+6904	ActHeadpat	頭撫で	ability	1000	0	True	False		False	False	False	godAbility
+7000	breathe_	吐息	ability	500	330	True	False		False	False	False	neg,domain
+7001	ball_	渦	ability	500	450	True	False		False	False	False	neg,repeat,domain
+7002	bolt_	光線	ability	500	350	True	False		False	False	False	neg,repeat,domain
+7003	hand_	手	ability	600	240	True	False		False	False	False	neg,useHand,repeat,domain
+7004	arrow_	矢	ability	1500	180	True	False		False	False	False	neg,repeat,domain
+7005	funnel_	具象	ability	150	950	True	False		False	False	False	neg,keepInvisi,domain
+7006	miasma_	瘴気	ability	400	420	True	False		False	False	False	neg,domain
+7007	weapon_	唄	ability	200	640	True	False		False	False	False	domain
+7008	sword_	剣	ability	700	550	True	False		False	False	False	neg,useHand,repeat,domain,noRandomAbility
+7009	bit_	ビット	ability	150	950	True	False		False	False	False	neg,keepInvisi,domain
+7010	flare_	フレア	ability	150	540	True	False		False	False	False	neg,repeat,domain
+7800	puddle_	海	ability	0	500	True	False		False	False	False	neg,domain
+8200	SpTeleport	テレポート	ability	1000	320	True	False		False	False	False	noCostInc,keepInvisi
+8201	SpTeleportShort	ショートテレポート	ability	1000	280	True	False		False	False	False	noCostInc,keepInvisi
+8202	SpGate	マステレポート	ability	1000	550	True	False		False	False	False	noCostInc,keepInvisi
+8220	SpReturn	帰還	ability	1000	820	True	False		False	False	False	noCostInc
+8221	SpEvac	脱出	ability	1000	480	True	False		False	False	False	noCostInc
+8230	SpIdentify	鑑定	ability	500	750	True	False		False	False	False	noCostInc,keepInvisi
+8232	SpIdentifyG	*鑑定*	ability	100	3500	True	False		False	False	False	noCostInc
+8240	SpUncurse	解呪	ability	1000	840	True	False		False	False	False	noCostInc
+8241	SpUncurseG	*解呪*	ability	100	4500	True	False		False	False	False	noCostInc
+8250	SpEnchantWeapon	武器強化	ability	200	5000	True	False		False	False	False	noCostInc
+8251	SpEnchantWeaponGreat	*武器強化*	ability	50	11000	True	False		False	False	False	noCostInc
+8255	SpEnchantArmor	防具強化	ability	200	4800	True	False		False	False	False	noCostInc
+8256	SpEnchantArmorGreat	*防具強化*	ability	50	10000	True	False		False	False	False	noCostInc
+8260	SpMagicMap	魔法の地図	ability	1000	750	True	False		False	False	False	keepInvisi
+8280	SpLighten	軽量化	ability	50	25000	True	False		False	False	False	noCostInc
+8281	SpFaith	信仰	ability	100	6500	True	False		False	False	False	noCostInc
+8284	SpChangeMaterialLesser	劣悪素材	ability	1000	300	True	False		False	False	False	noCostInc
+8285	SpChangeMaterial	素材変化	ability	100	5000	True	False		False	False	False	noCostInc
+8286	SpChangeMaterialG	*素材変化*	ability	50	12000	True	False		False	False	False	noCostInc
+8288	SpReconstruction	再構築	ability	100	30000	True	False		False	False	False	noCostInc,noShop
+8300	SpLevitate	浮遊	ability	1000	630	True	False		False	False	False	noCostInc,keepInvisi
+8380	SpMutation	自己変容	ability	1000	2200	True	False		False	False	False
+8390	SpWish	願い	ability	1	50000	True	False		False	False	False	noShop,noCopy,noRandomAbility
+8400	SpHealLight	軽傷治癒	ability	1000	200	True	False		False	False	False	syncRide
+8401	SpHealHeavy	重傷治癒	ability	1000	650	True	False		False	False	False	syncRide
+8402	SpHealCritical	致命傷治癒	ability	1000	1500	True	False		False	False	False	syncRide
+8403	SpHeal	体力回復	ability	300	3600	True	False		False	False	False	syncRide
+8404	SpHealEris	《エリス》の癒し	ability	200	8000	True	False		False	False	False	syncRide,noRandomAbility
+8405	SpHealOdina	《オディナ》の癒し	ability	100	12000	True	False		False	False	False	syncRide,noRandomAbility
+8406	SpHealJure	《ジュア》の癒し	ability	50	16000	True	False		False	False	False	syncRide,noRandomAbility,noShop,noCopy,noCostInc
+8430	SpRevive	復活	ability	500	8800	True	False		False	False	False	noRandomAbility,CD_npc
+8450	SpHOT	自然の抱擁	ability	1000	580	True	False		False	False	False
+8470	SpRestoreBody	肉体復活	ability	1000	360	True	False		False	False	False	syncRide
+8471	SpRestoreMind	精神復活	ability	1000	380	True	False		False	False	False	syncRide
+8480	SpCureMutation	変異治癒	ability	1000	1300	True	False		False	False	False
+8490	SpRemoveHex	清浄なる光	ability	1000	320	True	False		False	False	False
+8491	SpVanishHex	全浄化	ability	50	9500	True	False		False	False	False
+8500	SpHolyVeil	ホーリーヴェイル	ability	1000	720	True	False		False	False	False
+8501	SpCatsEye	猫の目	ability	1000	300	True	False		False	False	False
+8502	SpHolyShield	聖なる盾	ability	1000	390	True	False		False	False	False
+8503	SpWisdom	知者	ability	1000	430	True	False		False	False	False
+8504	SpHero	英雄	ability	1000	410	True	False		False	False	False
+8506	SpResEle	元素保護	ability	1000	750	True	False		False	False	False
+8507	SpBreath	水中呼吸	ability	1000	550	True	False		False	False	False
+8510	SpSpeedUp	加速	ability	1000	1800	True	False		False	False	False
+8550	SpRebirth	不死鳥	ability	50	25000	True	False		False	False	False	noShop,noCopy,loytelMart,noRandomAbility
+8555	SpBrightnessOfLife	いのちの輝き	ability	200	2500	True	False		False	False	False	noShop,noCopy,noRandomAbility
+8700	SpSilence	沈黙	ability	1000	850	True	False		False	False	False	neg
+8702	SpWeakness	脆弱	ability	1000	550	True	False		False	False	False	neg
+8704	SpWeakResEle	元素の傷跡	ability	1000	700	True	False		False	False	False	neg
+8705	SpNightmare	ナイトメア	ability	1000	1300	True	False		False	False	False	neg
+8706	SpBane	災い	ability	1000	650	True	False		False	False	False	neg
+8707	SpBerserk	狂戦士	ability	1000	700	True	False		False	False	False
+8708	SpGravity	グラビティ	ability	1000	950	True	False		False	False	False	neg
+8710	SpSpeedDown	鈍足	ability	1000	920	True	False		False	False	False	neg
+8770	SpTelepathy	テレパシー	ability	1000	850	True	False		False	False	False	keepInvisi
+8775	SpInvisibility	透明化	ability	500	1100	True	False		False	False	False	keepInvisi,syncRide
+8776	SpSeeInvisible	透明可視	ability	1000	650	True	False		False	False	False	keepInvisi,syncRide
+8780	SpIncognito	インコグニート	ability	1000	1300	True	False		False	False	False	keepInvisi
+8790	SpTransmuteBroom	ホウキ変容	ability	0	2500	True	False		False	False	False	keepInvisi
+8791	SpTransmutePutit	プチ変容	ability	100	1200	True	False		False	False	False	keepInvisi
+8792	SpTransmuteCat	猫変容	ability	100	1200	True	False		False	False	False	keepInvisi
+8793	SpTransmuteBat	コウモリ変容	ability	0	1200	True	False		False	False	False	keepInvisi,noShop,noCopy,noRandomAbility
+8800	SpDarkness	闇の霧	ability	1000	560	True	False		False	False	False	keepInvisi
+8801	SpWeb	蜘蛛の巣	ability	1000	400	True	False		False	False	False	neg,keepInvisi
+9000	SpSummon	動物召喚	ability	1000	640	True	False		False	False	False	keepInvisi
+9001	SpSummonUndeadSister	アンデッド妹召喚	ability	1000	850	True	False		False	False	False	keepInvisi
+9002	SpSummonFire	炎召喚	ability	1000	750	True	False		False	False	False
+9003	SpSummonTentacle	触手召喚	ability	50	750	True	False		False	False	False
+9004	SpSummonMonster	モンスター召喚	ability	1000	640	True	False		False	False	False	keepInvisi,noShop,noCopy,loytelMart
+9005	SpSummonPawn	駒召喚	ability	200	1000	True	False		False	False	False	keepInvisi,noShop,noCopy,loytelMart
+9006	SpSummonYeek	イーク召喚	ability	1000	400	True	False		False	False	False	keepInvisi
+9007	SpSummonOrc	オーク召喚	ability	1000	500	True	False		False	False	False	keepInvisi
+9008	SpSummonFish	魚召喚	ability	1000	350	True	False		False	False	False	keepInvisi,noShop,noCopy,loytelMart
+9009	SpSummonTako	タコ召喚	ability	1000	700	True	False		False	False	False	keepInvisi,noShop,noCopy,loytelMart
+9010	SpSummonShubKid	落とし子召喚	ability	1000	700	True	False		False	False	False	keepInvisi,noShop,noCopy,loytelMart
+9050	SpSummonShadow	影召喚	ability	1000	890	True	False		False	False	False
+9051	SpSummonTidalWave	大海嘯	ability	1000	1600	True	False		False	False	False
+9052	SpSummonTrooper	トルーパー召喚	ability	200	1000	True	False		False	False	False	keepInvisi,noShop,noCopy,loytelMart
+9053	SpSummonMachine	機械召喚	ability	200	1000	True	False		False	False	False	keepInvisi,noShop,noCopy,loytelMart
+9054	SpSummonDragon	竜召喚	ability	200	3000	True	False		False	False	False	keepInvisi,noShop,noCopy,loytelMart,noRandomAbility
+9055	SpSummonUndead	アンデッド召喚	ability	1000	500	True	False		False	False	False	keepInvisi
+9150	SpMeteor	メテオ	ability	200	5000	True	False		False	False	False	neg,noRandomAbility
+9151	SpEarthquake	地震	ability	300	4000	True	False		False	False	False	neg,noRandomAbility
+9155	SpMoonSpear	月夜の槍	ability	500	7500	True	False		False	False	False	neg,repeat,noRandomAbility,noShop,noCopy
+9156	SpMoonArrow	月夜の矢	ability	1000	2500	True	False		False	False	False	neg,repeat
+9160	SpExterminate	害虫駆除	ability	150	1500	True	False		False	False	False	noRandomAbility
+9200	SpShutterHex	破呪	ability	500	720	True	False		False	False	False	neg,repeat
+9210	SpStripBlessing	聖壊	ability	500	720	True	False		False	False	False	neg,noRandomAbility
+9500	SpWardMonster	魔除け	ability	1000	500	True	False		False	False	False
+9501	SpDrawMonster	魔寄せ	ability	1000	500	True	False		False	False	False
+9502	SpDrawMetal	メタル寄せ	ability	50	2000	True	False		False	False	False
+9503	SpDrawBacker	出会い	ability	1000	1000	True	False		False	False	False
+50100	ball_Fire	炎の球	ability	750	450	True	False		False	False	False	neg,repeat,domain
+50200	breathe_Fire	炎の吐息	ability	750	330	True	False		False	False	False	neg,domain
+50300	bolt_Fire	炎の光線	ability	750	350	True	False		False	False	False	neg,repeat,domain
+50400	hand_Fire	炎の手	ability	900	240	True	False		False	False	False	neg,useHand,repeat,domain
+50500	arrow_Fire	炎の矢	ability	2250	180	True	False		False	False	False	neg,repeat,domain
+50600	funnel_Fire	炎の具象	ability	225	950	True	False		False	False	False	neg,keepInvisi,domain
+50700	miasma_Fire	炎の瘴気	ability	600	420	True	False		False	False	False	neg,domain
+50800	weapon_Fire	炎の唄	ability	300	640	True	False		False	False	False	domain
+50900	puddle_Fire	炎の海	ability	0	500	True	False		False	False	False	neg,domain
+51000	sword_Fire	炎の剣	ability	1050	550	True	False		False	False	False	neg,useHand,repeat,domain,noRandomAbility
+51100	bit_Fire	炎のビット	ability	225	950	True	False		False	False	False	neg,keepInvisi,domain
+51200	flare_Fire	炎のフレア	ability	225	540	True	False		False	False	False	neg,repeat,domain
+50101	ball_Cold	氷の球	ability	750	450	True	False		False	False	False	neg,repeat,domain
+50201	breathe_Cold	氷の吐息	ability	750	330	True	False		False	False	False	neg,domain
+50301	bolt_Cold	氷の光線	ability	750	350	True	False		False	False	False	neg,repeat,domain
+50401	hand_Cold	氷の手	ability	900	240	True	False		False	False	False	neg,useHand,repeat,domain
+50501	arrow_Cold	氷の矢	ability	2250	180	True	False		False	False	False	neg,repeat,domain
+50601	funnel_Cold	氷の具象	ability	225	950	True	False		False	False	False	neg,keepInvisi,domain
+50701	miasma_Cold	氷の瘴気	ability	600	420	True	False		False	False	False	neg,domain
+50801	weapon_Cold	氷の唄	ability	300	640	True	False		False	False	False	domain
+50901	puddle_Cold	氷の海	ability	0	500	True	False		False	False	False	neg,domain
+51001	sword_Cold	氷の剣	ability	1050	550	True	False		False	False	False	neg,useHand,repeat,domain,noRandomAbility
+51101	bit_Cold	氷のビット	ability	225	950	True	False		False	False	False	neg,keepInvisi,domain
+51201	flare_Cold	氷のフレア	ability	225	540	True	False		False	False	False	neg,repeat,domain
+50102	ball_Lightning	雷の球	ability	750	450	True	False		False	False	False	neg,repeat,domain
+50202	breathe_Lightning	雷の吐息	ability	750	330	True	False		False	False	False	neg,domain
+50302	bolt_Lightning	雷の光線	ability	750	350	True	False		False	False	False	neg,repeat,domain
+50402	hand_Lightning	雷の手	ability	900	240	True	False		False	False	False	neg,useHand,repeat,domain
+50502	arrow_Lightning	雷の矢	ability	2250	180	True	False		False	False	False	neg,repeat,domain
+50602	funnel_Lightning	雷の具象	ability	225	950	True	False		False	False	False	neg,keepInvisi,domain
+50702	miasma_Lightning	雷の瘴気	ability	600	420	True	False		False	False	False	neg,domain
+50802	weapon_Lightning	雷の唄	ability	300	640	True	False		False	False	False	domain
+50902	puddle_Lightning	雷の海	ability	0	500	True	False		False	False	False	neg,domain
+51002	sword_Lightning	雷の剣	ability	1050	550	True	False		False	False	False	neg,useHand,repeat,domain,noRandomAbility
+51102	bit_Lightning	雷のビット	ability	225	950	True	False		False	False	False	neg,keepInvisi,domain
+51202	flare_Lightning	雷のフレア	ability	225	540	True	False		False	False	False	neg,repeat,domain
+50103	ball_Darkness	闇の球	ability	500	450	True	False		False	False	False	neg,repeat,domain
+50203	breathe_Darkness	闇の吐息	ability	500	330	True	False		False	False	False	neg,domain
+50303	bolt_Darkness	闇の光線	ability	500	350	True	False		False	False	False	neg,repeat,domain
+50403	hand_Darkness	闇の手	ability	600	240	True	False		False	False	False	neg,useHand,repeat,domain
+50503	arrow_Darkness	闇の矢	ability	1500	180	True	False		False	False	False	neg,repeat,domain
+50603	funnel_Darkness	闇の具象	ability	150	950	True	False		False	False	False	neg,keepInvisi,domain
+50703	miasma_Darkness	闇の瘴気	ability	400	420	True	False		False	False	False	neg,domain
+50803	weapon_Darkness	闇の唄	ability	200	640	True	False		False	False	False	domain
+50903	puddle_Darkness	闇の海	ability	0	500	True	False		False	False	False	neg,domain
+51003	sword_Darkness	闇の剣	ability	700	550	True	False		False	False	False	neg,useHand,repeat,domain,noRandomAbility
+51103	bit_Darkness	闇のビット	ability	150	950	True	False		False	False	False	neg,keepInvisi,domain
+51203	flare_Darkness	闇のフレア	ability	150	540	True	False		False	False	False	neg,repeat,domain
+50104	ball_Mind	狂気の球	ability	500	450	True	False		False	False	False	neg,repeat,domain
+50204	breathe_Mind	狂気の吐息	ability	500	330	True	False		False	False	False	neg,domain
+50304	bolt_Mind	狂気の光線	ability	500	350	True	False		False	False	False	neg,repeat,domain
+50404	hand_Mind	狂気の手	ability	600	240	True	False		False	False	False	neg,useHand,repeat,domain
+50504	arrow_Mind	狂気の矢	ability	1500	180	True	False		False	False	False	neg,repeat,domain
+50604	funnel_Mind	狂気の具象	ability	150	950	True	False		False	False	False	neg,keepInvisi,domain
+50704	miasma_Mind	狂気の瘴気	ability	400	420	True	False		False	False	False	neg,domain
+50804	weapon_Mind	狂気の唄	ability	200	640	True	False		False	False	False	domain
+50904	puddle_Mind	狂気の海	ability	0	500	True	False		False	False	False	neg,domain
+51004	sword_Mind	狂気の剣	ability	700	550	True	False		False	False	False	neg,useHand,repeat,domain,noRandomAbility
+51104	bit_Mind	狂気のビット	ability	150	950	True	False		False	False	False	neg,keepInvisi,domain
+51204	flare_Mind	狂気のフレア	ability	150	540	True	False		False	False	False	neg,repeat,domain
+50105	ball_Poison	毒の球	ability	500	450	True	False		False	False	False	neg,repeat,domain
+50205	breathe_Poison	毒の吐息	ability	500	330	True	False		False	False	False	neg,domain
+50305	bolt_Poison	毒の光線	ability	500	350	True	False		False	False	False	neg,repeat,domain
+50405	hand_Poison	毒の手	ability	600	240	True	False		False	False	False	neg,useHand,repeat,domain
+50505	arrow_Poison	毒の矢	ability	1500	180	True	False		False	False	False	neg,repeat,domain
+50605	funnel_Poison	毒の具象	ability	150	950	True	False		False	False	False	neg,keepInvisi,domain
+50705	miasma_Poison	毒の瘴気	ability	400	420	True	False		False	False	False	neg,domain
+50805	weapon_Poison	毒の唄	ability	200	640	True	False		False	False	False	domain
+50905	puddle_Poison	毒の海	ability	0	500	True	False		False	False	False	neg,domain
+51005	sword_Poison	毒の剣	ability	700	550	True	False		False	False	False	neg,useHand,repeat,domain,noRandomAbility
+51105	bit_Poison	毒のビット	ability	150	950	True	False		False	False	False	neg,keepInvisi,domain
+51205	flare_Poison	毒のフレア	ability	150	540	True	False		False	False	False	neg,repeat,domain
+50106	ball_Nether	死の球	ability	500	450	True	False		False	False	False	neg,repeat,domain
+50206	breathe_Nether	死の吐息	ability	500	330	True	False		False	False	False	neg,domain
+50306	bolt_Nether	死の光線	ability	500	350	True	False		False	False	False	neg,repeat,domain
+50406	hand_Nether	死の手	ability	600	240	True	False		False	False	False	neg,useHand,repeat,domain
+50506	arrow_Nether	死の矢	ability	1500	180	True	False		False	False	False	neg,repeat,domain
+50606	funnel_Nether	死の具象	ability	150	950	True	False		False	False	False	neg,keepInvisi,domain
+50706	miasma_Nether	死の瘴気	ability	400	420	True	False		False	False	False	neg,domain
+50806	weapon_Nether	死の唄	ability	200	640	True	False		False	False	False	domain
+50906	puddle_Nether	死の海	ability	0	500	True	False		False	False	False	neg,domain
+51006	sword_Nether	死の剣	ability	700	550	True	False		False	False	False	neg,useHand,repeat,domain,noRandomAbility
+51106	bit_Nether	死のビット	ability	150	950	True	False		False	False	False	neg,keepInvisi,domain
+51206	flare_Nether	死のフレア	ability	150	540	True	False		False	False	False	neg,repeat,domain
+50107	ball_Sound	轟音の球	ability	500	450	True	False		False	False	False	neg,repeat,domain
+50207	breathe_Sound	轟音の吐息	ability	500	330	True	False		False	False	False	neg,domain
+50307	bolt_Sound	轟音の光線	ability	500	350	True	False		False	False	False	neg,repeat,domain
+50407	hand_Sound	轟音の手	ability	600	240	True	False		False	False	False	neg,useHand,repeat,domain
+50507	arrow_Sound	轟音の矢	ability	1500	180	True	False		False	False	False	neg,repeat,domain
+50607	funnel_Sound	轟音の具象	ability	150	950	True	False		False	False	False	neg,keepInvisi,domain
+50707	miasma_Sound	轟音の瘴気	ability	400	420	True	False		False	False	False	neg,domain
+50807	weapon_Sound	轟音の唄	ability	200	640	True	False		False	False	False	domain
+50907	puddle_Sound	轟音の海	ability	0	500	True	False		False	False	False	neg,domain
+51007	sword_Sound	轟音の剣	ability	700	550	True	False		False	False	False	neg,useHand,repeat,domain,noRandomAbility
+51107	bit_Sound	轟音のビット	ability	150	950	True	False		False	False	False	neg,keepInvisi,domain
+51207	flare_Sound	轟音のフレア	ability	150	540	True	False		False	False	False	neg,repeat,domain
+50108	ball_Nerve	神経の球	ability	750	450	True	False		False	False	False	neg,repeat,domain
+50208	breathe_Nerve	神経の吐息	ability	750	330	True	False		False	False	False	neg,domain
+50308	bolt_Nerve	神経の光線	ability	750	350	True	False		False	False	False	neg,repeat,domain
+50408	hand_Nerve	神経の手	ability	900	240	True	False		False	False	False	neg,useHand,repeat,domain
+50508	arrow_Nerve	神経の矢	ability	2250	180	True	False		False	False	False	neg,repeat,domain
+50608	funnel_Nerve	神経の具象	ability	225	950	True	False		False	False	False	neg,keepInvisi,domain
+50708	miasma_Nerve	神経の瘴気	ability	600	420	True	False		False	False	False	neg,domain
+50808	weapon_Nerve	神経の唄	ability	300	640	True	False		False	False	False	domain
+50908	puddle_Nerve	神経の海	ability	0	500	True	False		False	False	False	neg,domain
+51008	sword_Nerve	神経の剣	ability	1050	550	True	False		False	False	False	neg,useHand,repeat,domain,noRandomAbility
+51108	bit_Nerve	神経のビット	ability	225	950	True	False		False	False	False	neg,keepInvisi,domain
+51208	flare_Nerve	神経のフレア	ability	225	540	True	False		False	False	False	neg,repeat,domain
+50109	ball_Holy	光の球	ability	250	450	True	False		False	False	False	neg,repeat,domain
+50209	breathe_Holy	光の吐息	ability	250	330	True	False		False	False	False	neg,domain
+50309	bolt_Holy	光の光線	ability	250	350	True	False		False	False	False	neg,repeat,domain
+50409	hand_Holy	光の手	ability	300	240	True	False		False	False	False	neg,useHand,repeat,domain
+50509	arrow_Holy	光の矢	ability	750	180	True	False		False	False	False	neg,repeat,domain
+50609	funnel_Holy	光の具象	ability	75	950	True	False		False	False	False	neg,keepInvisi,domain
+50709	miasma_Holy	光の瘴気	ability	200	420	True	False		False	False	False	neg,domain
+50809	weapon_Holy	光の唄	ability	100	640	True	False		False	False	False	domain
+50909	puddle_Holy	光の海	ability	0	500	True	False		False	False	False	neg,domain
+51009	sword_Holy	光の剣	ability	350	550	True	False		False	False	False	neg,useHand,repeat,domain,noRandomAbility
+51109	bit_Holy	光のビット	ability	75	950	True	False		False	False	False	neg,keepInvisi,domain
+51209	flare_Holy	光のフレア	ability	75	540	True	False		False	False	False	neg,repeat,domain
+50110	ball_Chaos	混沌の球	ability	250	450	True	False		False	False	False	neg,repeat,domain
+50210	breathe_Chaos	混沌の吐息	ability	250	330	True	False		False	False	False	neg,domain
+50310	bolt_Chaos	混沌の光線	ability	250	350	True	False		False	False	False	neg,repeat,domain
+50410	hand_Chaos	混沌の手	ability	300	240	True	False		False	False	False	neg,useHand,repeat,domain
+50510	arrow_Chaos	混沌の矢	ability	750	180	True	False		False	False	False	neg,repeat,domain
+50610	funnel_Chaos	混沌の具象	ability	75	950	True	False		False	False	False	neg,keepInvisi,domain
+50710	miasma_Chaos	混沌の瘴気	ability	200	420	True	False		False	False	False	neg,domain
+50810	weapon_Chaos	混沌の唄	ability	100	640	True	False		False	False	False	domain
+50910	puddle_Chaos	混沌の海	ability	0	500	True	False		False	False	False	neg,domain
+51010	sword_Chaos	混沌の剣	ability	350	550	True	False		False	False	False	neg,useHand,repeat,domain,noRandomAbility
+51110	bit_Chaos	混沌のビット	ability	75	950	True	False		False	False	False	neg,keepInvisi,domain
+51210	flare_Chaos	混沌のフレア	ability	75	540	True	False		False	False	False	neg,repeat,domain
+50111	ball_Magic	魔力の球	ability	250	450	True	False		False	False	False	neg,repeat,domain
+50211	breathe_Magic	魔力の吐息	ability	250	330	True	False		False	False	False	neg,domain
+50311	bolt_Magic	魔力の光線	ability	250	350	True	False		False	False	False	neg,repeat,domain
+50411	hand_Magic	魔力の手	ability	300	240	True	False		False	False	False	neg,useHand,repeat,domain
+50511	arrow_Magic	魔力の矢	ability	750	180	True	False		False	False	False	neg,repeat,domain
+50611	funnel_Magic	魔力の具象	ability	75	950	True	False		False	False	False	neg,keepInvisi,domain
+50711	miasma_Magic	魔力の瘴気	ability	200	420	True	False		False	False	False	neg,domain
+50811	weapon_Magic	魔力の唄	ability	100	640	True	False		False	False	False	domain
+50911	puddle_Magic	魔力の海	ability	0	500	True	False		False	False	False	neg,domain
+51011	sword_Magic	魔力の剣	ability	350	550	True	False		False	False	False	neg,useHand,repeat,domain,noRandomAbility
+51111	bit_Magic	魔力のビット	ability	75	950	True	False		False	False	False	neg,keepInvisi,domain
+51211	flare_Magic	魔力のフレア	ability	75	540	True	False		False	False	False	neg,repeat,domain
+50112	ball_Ether	エーテルの球	ability	125	450	True	False		False	False	False	neg,repeat,domain
+50212	breathe_Ether	エーテルの吐息	ability	125	330	True	False		False	False	False	neg,domain
+50312	bolt_Ether	エーテルの光線	ability	125	350	True	False		False	False	False	neg,repeat,domain
+50412	hand_Ether	エーテルの手	ability	150	240	True	False		False	False	False	neg,useHand,repeat,domain
+50512	arrow_Ether	エーテルの矢	ability	375	180	True	False		False	False	False	neg,repeat,domain
+50612	funnel_Ether	エーテルの具象	ability	37	950	True	False		False	False	False	neg,keepInvisi,domain
+50712	miasma_Ether	エーテルの瘴気	ability	100	420	True	False		False	False	False	neg,domain
+50812	weapon_Ether	エーテルの唄	ability	50	640	True	False		False	False	False	domain
+50912	puddle_Ether	エーテルの海	ability	0	500	True	False		False	False	False	neg,domain
+51012	sword_Ether	エーテルの剣	ability	175	550	True	False		False	False	False	neg,useHand,repeat,domain,noRandomAbility
+51112	bit_Ether	エーテルのビット	ability	37	950	True	False		False	False	False	neg,keepInvisi,domain
+51212	flare_Ether	エーテルのフレア	ability	37	540	True	False		False	False	False	neg,repeat,domain
+50113	ball_Acid	酸の球	ability	125	450	True	False		False	False	False	neg,repeat,domain
+50213	breathe_Acid	酸の吐息	ability	125	330	True	False		False	False	False	neg,domain
+50313	bolt_Acid	酸の光線	ability	125	350	True	False		False	False	False	neg,repeat,domain
+50413	hand_Acid	酸の手	ability	150	240	True	False		False	False	False	neg,useHand,repeat,domain
+50513	arrow_Acid	酸の矢	ability	375	180	True	False		False	False	False	neg,repeat,domain
+50613	funnel_Acid	酸の具象	ability	37	950	True	False		False	False	False	neg,keepInvisi,domain
+50713	miasma_Acid	酸の瘴気	ability	100	420	True	False		False	False	False	neg,domain
+50813	weapon_Acid	酸の唄	ability	50	640	True	False		False	False	False	domain
+50913	puddle_Acid	酸の海	ability	0	500	True	False		False	False	False	neg,domain
+51013	sword_Acid	酸の剣	ability	175	550	True	False		False	False	False	neg,useHand,repeat,domain,noRandomAbility
+51113	bit_Acid	酸のビット	ability	37	950	True	False		False	False	False	neg,keepInvisi,domain
+51213	flare_Acid	酸のフレア	ability	37	540	True	False		False	False	False	neg,repeat,domain
+50114	ball_Cut	血の球	ability	50	450	True	False		False	False	False	neg,repeat,domain
+50214	breathe_Cut	血の吐息	ability	50	330	True	False		False	False	False	neg,domain
+50314	bolt_Cut	血の光線	ability	50	350	True	False		False	False	False	neg,repeat,domain
+50414	hand_Cut	血の手	ability	60	240	True	False		False	False	False	neg,useHand,repeat,domain
+50514	arrow_Cut	血の矢	ability	150	180	True	False		False	False	False	neg,repeat,domain
+50614	funnel_Cut	血の具象	ability	15	950	True	False		False	False	False	neg,keepInvisi,domain
+50714	miasma_Cut	血の瘴気	ability	40	420	True	False		False	False	False	neg,domain
+50814	weapon_Cut	血の唄	ability	20	640	True	False		False	False	False	domain
+50914	puddle_Cut	血の海	ability	0	500	True	False		False	False	False	neg,domain
+51014	sword_Cut	血の剣	ability	70	550	True	False		False	False	False	neg,useHand,repeat,domain,noRandomAbility
+51114	bit_Cut	血のビット	ability	15	950	True	False		False	False	False	neg,keepInvisi,domain
+51214	flare_Cut	血のフレア	ability	15	540	True	False		False	False	False	neg,repeat,domain
+50115	ball_Impact	衝撃の球	ability	50	450	True	False		False	False	False	neg,repeat,domain
+50215	breathe_Impact	衝撃の吐息	ability	50	330	True	False		False	False	False	neg,domain
+50315	bolt_Impact	衝撃の光線	ability	50	350	True	False		False	False	False	neg,repeat,domain
+50415	hand_Impact	衝撃の手	ability	60	240	True	False		False	False	False	neg,useHand,repeat,domain
+50515	arrow_Impact	衝撃の矢	ability	150	180	True	False		False	False	False	neg,repeat,domain
+50615	funnel_Impact	衝撃の具象	ability	15	950	True	False		False	False	False	neg,keepInvisi,domain
+50715	miasma_Impact	衝撃の瘴気	ability	40	420	True	False		False	False	False	neg,domain
+50815	weapon_Impact	衝撃の唄	ability	20	640	True	False		False	False	False	domain
+50915	puddle_Impact	衝撃の海	ability	0	500	True	False		False	False	False	neg,domain
+51015	sword_Impact	衝撃の剣	ability	70	550	True	False		False	False	False	neg,useHand,repeat,domain,noRandomAbility
+51115	bit_Impact	衝撃のビット	ability	15	950	True	False		False	False	False	neg,keepInvisi,domain
+51215	flare_Impact	衝撃のフレア	ability	15	540	True	False		False	False	False	neg,repeat,domain
+50116	ball_Void	無の球	ability	0	450	True	False		False	False	False	neg,repeat,domain
+50216	breathe_Void	無の吐息	ability	0	330	True	False		False	False	False	neg,domain
+50316	bolt_Void	無の光線	ability	0	350	True	False		False	False	False	neg,repeat,domain
+50416	hand_Void	無の手	ability	0	240	True	False		False	False	False	neg,useHand,repeat,domain
+50516	arrow_Void	無の矢	ability	0	180	True	False		False	False	False	neg,repeat,domain
+50616	funnel_Void	無の具象	ability	0	950	True	False		False	False	False	neg,keepInvisi,domain
+50716	miasma_Void	無の瘴気	ability	0	420	True	False		False	False	False	neg,domain
+50816	weapon_Void	無の唄	ability	0	640	True	False		False	False	False	domain
+50916	puddle_Void	無の海	ability	0	500	True	False		False	False	False	neg,domain
+51016	sword_Void	無の剣	ability	0	550	True	False		False	False	False	neg,useHand,repeat,domain,noRandomAbility
+51116	bit_Void	無のビット	ability	0	950	True	False		False	False	False	neg,keepInvisi,domain
+51216	flare_Void	無のフレア	ability	0	540	True	False		False	False	False	neg,repeat,domain
+33301	SpTimeDilute	時間希釈	ability	0	600	True	False		False	False	False	noShop,noCopy,noRandomAbility
+44401	SpMephistobewitch	メフィストの鼓動	ability	0	600	True	False		False	False	False	noShop,noCopy,noRandomAbility
+969500101	ActKKSmartHeal	スマートヒール	ABILITY	0	0	False	False		False	False	False	godAbility,noRandomAbility
+969500102	ActKKSmartBuff	スマートバフ	ABILITY	0	0	False	False		False	False	False	godAbility,noRandomAbility
+969500103	ActKKSmartDebuff	スマートデバフ	ABILITY	0	0	False	False		False	False	False	godAbility,noRandomAbility
+969500111	ActKKSmartBall	スマートボール	ABILITY	0	450	False	False		False	False	False	neg,repeat,domain
+969500113	ActKKSmartBolt	スマートボルト	ABILITY	0	350	False	False		False	False	False
+969500114	ActKKSmartHand	スマートハンド	ABILITY	0	240	False	False		False	False	False
+969500116	ActKKSmartFunnel	スマートファンネル	ABILITY	0	950	False	False		False	False	False
+969500117	ActKKSmartMiasma	スマートミアズマ	ABILITY	0	420	False	False		False	False	False
+969500118	ActKKSmartWeapon	スマートイントネーション	ABILITY	0	640	False	False		False	False	False
+969500115	ActKKSmartArrow	スマートアロー	ABILITY	0	180	False	False		False	False	False	neg,repeat,domain
+969500120	ActKKSmartSword	スマートソード	ABILITY	0	550	False	False		False	False	False
