@@ -45,7 +45,8 @@ namespace Elin_ItemRelocator
         {
             static void Postfix()
             {
-                RelocatorManager.Instance.Save();
+                // Persistence is now Manual (Presets)
+                // RelocatorManager.Instance.Save();
             }
         }
 
@@ -154,9 +155,9 @@ namespace Elin_ItemRelocator
                              {
                                  newObj.name = "Text_Relocate";
                                  newText.text = "★";
-                                 // "Matcha" Color (Muted Green) ~ #025952ff
+                                 // "Matcha" Color (Muted Green) ~ #398982ff
                                  // R=2, G=89, B=82 => 0.02, 0.35, 0.32
-                                 newText.color = new Color(0.02f, 0.35f, 0.32f);
+                                 newText.color = new Color(0.15f, 0.55f, 0.52f);
                                  newText.alignment = TextAnchor.MiddleCenter;
                                  newText.resizeTextForBestFit = true;
                                  newText.resizeTextMinSize = 10;
@@ -184,7 +185,7 @@ namespace Elin_ItemRelocator
                 btnRelocate.onClick.RemoveAllListeners();
                 btnRelocate.onClick.AddListener(() =>
                 {
-                    RelocatorUI.Open(containerThing);
+                    LayerItemRelocator.Open(containerThing);
                 });
 
                 // --- Icon Customization (Optional) ---

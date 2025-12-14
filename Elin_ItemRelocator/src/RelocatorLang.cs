@@ -7,7 +7,11 @@ namespace Elin_ItemRelocator
     {
         public enum LangKey
         {
-            Settings, AddFilter, Preview, Execute, Scope, ExcludeHotbar, Rarity, Quality, Category, Text, Enchant, Remove, Edit, Enable, Disable, Title, Operator, Msg_Relocated, Inventory, Zone, ON, OFF, NoMatches, SelectEnchant, RelocatorCaption, DisabledSuffix, All, EditSearchText, EditCategoryID, EditQuality, Msg_ContainerFull, Msg_RelocatedResult, Msg_NoMatchLog
+            Settings, AddFilter, Preview, Execute, Scope, ExcludeHotbar, Rarity, Quality, Category, Text, Enchant, Remove, Edit, Enable, Disable, Title, Operator, Msg_Relocated, Inventory, Zone, ON, OFF, NoMatches, SelectEnchant, RelocatorCaption, DisabledSuffix, All, EditSearchText, EditCategoryID, EditQuality, Msg_ContainerFull, Msg_RelocatedResult, Msg_NoMatchLog,
+            SortLabel, SortDefault, SortPriceAsc, SortPriceDesc, SortMagAsc, SortMagDesc,
+            SavePreset, LoadPreset, PresetName, Msg_Saved, Msg_Loaded,
+            Presets, Rename, Delete, Msg_Renamed, Msg_Deleted, Msg_FileExists, Msg_RenamePrompt,
+            Parent, Move, Msg_Moved
         }
 
         private static Dictionary<LangKey, string[]> _dict = new Dictionary<LangKey, string[]>
@@ -44,7 +48,28 @@ namespace Elin_ItemRelocator
             { LangKey.EditQuality, new[] { "Edit Quality (e.g. >=2)", "品質設定 (例: >=2)" } },
             { LangKey.Msg_ContainerFull, new[] { "Container is full.", "コンテナが一杯です。" } },
             { LangKey.Msg_RelocatedResult, new[] { "Relocated {0} stacks to {1}.", "{0}個のスタックを{1}に移動した。" } },
-            { LangKey.Msg_NoMatchLog, new[] { "No matching items found.", "条件に合うアイテムが見つからない。" } }
+            { LangKey.Msg_NoMatchLog, new[] { "No matching items found.", "条件に合うアイテムが見つからない。" } },
+            { LangKey.SortLabel, new[] { "Sort: ", "並び替え: " } },
+            { LangKey.SortDefault, new[] { "Default", "初期設定" } },
+            { LangKey.SortPriceAsc, new[] { "Price (Low to High)", "価格 (安い順)" } },
+            { LangKey.SortPriceDesc, new[] { "Price (High to Low)", "価格 (高い順)" } },
+            { LangKey.SortMagAsc, new[] { "Enchant (Weak to Strong)", "エンチャント強度 (弱い順)" } },
+            { LangKey.SortMagDesc, new[] { "Enchant (Strong to Weak)", "エンチャント強度 (強い順)" } },
+            { LangKey.SavePreset, new[] { "Save Preset", "プリセット保存" } },
+            { LangKey.LoadPreset, new[] { "Load Preset", "プリセット読込" } },
+            { LangKey.PresetName, new[] { "Preset Name", "プリセット名" } },
+            { LangKey.Msg_Saved, new[] { "Preset saved: {0}", "プリセットを保存しました: {0}" } },
+            { LangKey.Msg_Loaded, new[] { "Preset loaded.", "プリセットを読み込みました。" } },
+            { LangKey.Presets, new[] { "Presets", "プリセット" } },
+            { LangKey.Rename, new[] { "Rename", "名前変更" } },
+            { LangKey.Delete, new[] { "Delete", "削除" } },
+            { LangKey.Msg_Renamed, new[] { "Renamed preset to {0}.", "プリセット名を {0} に変更しました。" } },
+            { LangKey.Msg_Deleted, new[] { "Deleted preset: {0}", "プリセット {0} を削除しました。" } },
+            { LangKey.Msg_FileExists, new[] { "Preset already exists.", "同名のプリセットが既に存在します。" } },
+            { LangKey.Msg_RenamePrompt, new[] { "Enter new name", "新しい名前を入力" } },
+            { LangKey.Parent, new[] { "Location", "場所" } },
+            { LangKey.Move, new[] { "Move", "転送" } },
+            { LangKey.Msg_Moved, new[] { "Moved {0}.", "{0}を転送しました。" } }
         };
 
         public static string GetText(LangKey key)

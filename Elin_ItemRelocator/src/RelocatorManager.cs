@@ -10,52 +10,34 @@ namespace Elin_ItemRelocator
     public class RelocatorManager : Singleton<RelocatorManager>
     {
         public Dictionary<string, RelocationProfile> Profiles = new Dictionary<string, RelocationProfile>();
-        private string SavePath { get { return Path.Combine(CorePath.RootSave, "Elin_ItemRelocator_Data.json"); } }
+
+        // Path to Presets folder inside the Mod's folder
+        private string PresetPath
+        {
+            get
+            {
+                 // Assuming DLL is in plugins/Elin_ItemRelocator/
+                 // We want plugins/Elin_ItemRelocator/Presets/
+                 string pluginPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                 // If the DLL is in _bin or similar during dev, adjust. But usually safe to use relative.
+                 // Let's ensure directory exists.
+                 string dir = Path.Combine(pluginPath, "Presets");
+                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+                 return dir;
+            }
+        }
 
         public void Init()
         {
-            Load();
+            // No persistent load on init anymore
         }
 
-        public void Load()
-        {
-            if (File.Exists(SavePath))
-            {
-                try
-                {
-                    string json = File.ReadAllText(SavePath);
-                    Profiles = JsonConvert.DeserializeObject<Dictionary<string, RelocationProfile>>(json) ?? new Dictionary<string, RelocationProfile>();
-                }
-                catch (System.Exception e)
-                {
-                    Debug.LogError("[Elin_ItemRelocator] Failed to load profiles: " + e);
-                }
-            }
-        }
-
-        public void Save()
-        {
-            try
-            {
-                string json = JsonConvert.SerializeObject(Profiles, Formatting.Indented);
-                File.WriteAllText(SavePath, json);
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogError("[Elin_ItemRelocator] Failed to save profiles: " + e);
-            }
-        }
-
-        public string GetProfileKey(Thing container)
-        {
-            if (container == null) return null;
-            return string.Format("{0}_{1}", Game.id, container.uid);
-        }
-
+        // Runtime-only profile retrieval
         public RelocationProfile GetProfile(Thing container)
         {
+            if (container == null) return new RelocationProfile(); // Safe fallback
+
             string key = GetProfileKey(container);
-            if (key == null) return null;
 
             RelocationProfile profile;
             if (Profiles.TryGetValue(key, out profile))
@@ -66,6 +48,105 @@ namespace Elin_ItemRelocator
             var newProfile = new RelocationProfile { ContainerName = container.Name };
             Profiles[key] = newProfile;
             return newProfile;
+        }
+
+        public void SavePreset(string name, RelocationProfile profile)
+        {
+            try
+            {
+                string path = Path.Combine(PresetPath, name + ".json");
+                string json = JsonConvert.SerializeObject(profile, Formatting.Indented);
+                File.WriteAllText(path, json);
+                Msg.Say(string.Format(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_Saved), name));
+            }
+            catch (Exception e)
+            {
+                 Debug.LogError("[Elin_ItemRelocator] Failed to save preset: " + e);
+                 Msg.Say("Error saving preset.");
+            }
+        }
+
+        public RelocationProfile LoadPreset(string name)
+        {
+             try
+             {
+                 string path = Path.Combine(PresetPath, name + ".json");
+                 if (File.Exists(path))
+                 {
+                     string json = File.ReadAllText(path);
+                     return JsonConvert.DeserializeObject<RelocationProfile>(json);
+                 }
+             }
+             catch (Exception e)
+             {
+                 Debug.LogError("[Elin_ItemRelocator] Failed to load preset: " + e);
+                 Msg.Say("Error loading preset.");
+             }
+             return null;
+        }
+
+        public List<string> GetPresetList()
+        {
+            List<string> list = new List<string>();
+            try
+            {
+                if (Directory.Exists(PresetPath))
+                {
+                    foreach (string file in Directory.GetFiles(PresetPath, "*.json"))
+                    {
+                        list.Add(Path.GetFileNameWithoutExtension(file));
+                    }
+                }
+            }
+            catch { }
+            return list;
+        }
+
+        public void RenamePreset(string oldName, string newName)
+        {
+            try
+            {
+                string oldPath = Path.Combine(PresetPath, oldName + ".json");
+                string newPath = Path.Combine(PresetPath, newName + ".json");
+
+                if (!File.Exists(oldPath)) return;
+
+                if (File.Exists(newPath))
+                {
+                    Msg.Say(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_FileExists));
+                    return;
+                }
+
+                File.Move(oldPath, newPath);
+                Msg.Say(string.Format(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_Renamed), newName));
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("[Elin_ItemRelocator] Failed to rename: " + e);
+            }
+        }
+
+        public void DeletePreset(string name)
+        {
+            try
+            {
+                string path = Path.Combine(PresetPath, name + ".json");
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                    Msg.Say(string.Format(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_Deleted), name));
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("[Elin_ItemRelocator] Failed to delete: " + e);
+            }
+        }
+
+        public string GetProfileKey(Thing container)
+        {
+            if (container == null) return null;
+            return string.Format("{0}_{1}", Game.id, container.uid);
         }
 
         public IEnumerable<Thing> GetMatches(Thing container)
@@ -194,6 +275,60 @@ namespace Elin_ItemRelocator
                 }
             }
 
+            // Apply Sorting
+            switch (profile.SortMode)
+            {
+                case RelocationProfile.ResultSortMode.PriceAsc:
+                    matches.Sort((a, b) => a.GetPrice() - b.GetPrice());
+                    break;
+                case RelocationProfile.ResultSortMode.PriceDesc:
+                    matches.Sort((a, b) => b.GetPrice() - a.GetPrice());
+                    break;
+                case RelocationProfile.ResultSortMode.EnchantMagAsc:
+                case RelocationProfile.ResultSortMode.EnchantMagDesc:
+                    // Identify target element IDs from filters
+                    List<int> targetEleIds = new List<int>();
+                    foreach(var f in profile.Filters) {
+                        if (f.Enabled && !string.IsNullOrEmpty(f.Text)) {
+                            string[] searchTerms = f.Text.Split(new char[]{' ', '　'}, StringSplitOptions.RemoveEmptyEntries);
+                            foreach(var term in searchTerms) {
+                                if (term.StartsWith("@")) {
+                                    // Parse term: @Mining>=10 -> Mining
+                                    // Handle logic similar to EvaluateAttribute
+                                    string key = term.Substring(1);
+                                    // Strip operators
+                                    string[] ops = new string[]{ ">=", "<=", "!=", ">", "<", "=" };
+                                    foreach(var o in ops) {
+                                        int idx = key.IndexOf(o);
+                                        if (idx > 0) { key = key.Substring(0, idx).Trim(); break; }
+                                    }
+
+                                    var sourceEle = EClass.sources.elements.map.Values.FirstOrDefault(e =>
+                                        (e.alias != null && e.alias.Equals(key, StringComparison.OrdinalIgnoreCase)) ||
+                                        (e.GetName().Equals(key, StringComparison.OrdinalIgnoreCase))
+                                    );
+                                    if(sourceEle != null) targetEleIds.Add(sourceEle.id);
+                                }
+                            }
+                        }
+                    }
+
+                    // Sort Function
+                    matches.Sort((a, b) => {
+                        int valA = 0;
+                        int valB = 0;
+                        foreach(int id in targetEleIds) {
+                            valA += a.elements.Value(id);
+                            valB += b.elements.Value(id);
+                        }
+                        if (profile.SortMode == RelocationProfile.ResultSortMode.EnchantMagDesc)
+                            return valB - valA;
+                        else
+                            return valA - valB;
+                    });
+                    break;
+            }
+
             return matches;
         }
 
@@ -226,6 +361,19 @@ namespace Elin_ItemRelocator
              {
                  Msg.Say(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_NoMatchLog));
              }
+        }
+
+        public void RelocateSingleThing(Thing t, Thing container)
+        {
+             if (t.isDestroyed || t.c_isImportant) return;
+             if (container.things.IsFull()) {
+                 Msg.Say(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_ContainerFull));
+                 return;
+             }
+
+             container.AddThing(t);
+             EClass.pc.PlaySound("grab");
+             Msg.Say(string.Format(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_Moved), t.Name));
         }
     }
 }

@@ -15,11 +15,22 @@ namespace Elin_ItemRelocator
         public bool ExcludeHotbar = true; // Default to exclude
         public List<RelocationFilter> Filters = new List<RelocationFilter>();
 
+        public ResultSortMode SortMode = ResultSortMode.Default;
+
         // Scope definition
         public enum FilterScope
         {
             Inventory,
             Zone
+        }
+
+        public enum ResultSortMode
+        {
+            Default,
+            PriceAsc,
+            PriceDesc,
+            EnchantMagAsc,
+            EnchantMagDesc
         }
     }
 
