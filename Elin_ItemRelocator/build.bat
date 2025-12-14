@@ -42,6 +42,7 @@ echo Compiling...
     "%~dp0src\Manager.cs" ^
     "%~dp0src\Singleton.cs" ^
     "%~dp0src\Lang.cs" ^
+    "%~dp0src\UI\Accordion.cs" ^
     "%~dp0src\UI\Menu.cs" ^
     "%~dp0src\UI\Table.cs" ^
     "%~dp0src\UI\Tree.cs" ^

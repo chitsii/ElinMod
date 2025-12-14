@@ -11,7 +11,7 @@ namespace Elin_ItemRelocator
             SortLabel, SortDefault, SortPriceAsc, SortPriceDesc, SortMagAsc, SortMagDesc,
             SavePreset, LoadPreset, PresetName, Msg_Saved, Msg_Loaded,
             Presets, Rename, Delete, Msg_Renamed, Msg_Deleted, Msg_FileExists, Msg_RenamePrompt,
-            Parent, Move, Msg_Moved
+            Parent, Move, Msg_Moved, AddRule, NewRuleName
         }
 
         private static Dictionary<LangKey, string[]> _dict = new Dictionary<LangKey, string[]>
@@ -69,7 +69,9 @@ namespace Elin_ItemRelocator
             { LangKey.Msg_RenamePrompt, new[] { "Enter new name", "新しい名前を入力" } },
             { LangKey.Parent, new[] { "Location", "場所" } },
             { LangKey.Move, new[] { "Move", "転送" } },
-            { LangKey.Msg_Moved, new[] { "Moved {0}.", "{0}を転送しました。" } }
+            { LangKey.Msg_Moved, new[] { "Moved {0}.", "{0}を転送しました。" } },
+            { LangKey.AddRule, new[] { "Add Rule", "ルール追加" } },
+            { LangKey.NewRuleName, new[] { "Rule Name", "ルール名" } }
         };
 
         public static string GetText(LangKey key)

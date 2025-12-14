@@ -13,7 +13,31 @@ namespace Elin_ItemRelocator
         public bool Enabled = true;
         public FilterScope Scope = FilterScope.Inventory;
         public bool ExcludeHotbar = true; // Default to exclude
-        public List<RelocationFilter> Filters = new List<RelocationFilter>();
+
+        // Main Data
+        public List<RelocationRule> Rules = new List<RelocationRule>();
+
+        // Legacy Support
+        [JsonProperty]
+        private List<RelocationFilter> Filters
+        {
+            set
+            {
+                if(value != null && value.Count > 0) {
+                    // Migration: Convert legacy Filters to Rules
+                    foreach(var f in value) {
+                        var r = new RelocationRule();
+                        r.Name = "Imported Rule";
+                        if(f.CategoryIds != null) r.CategoryIds = f.CategoryIds;
+                        r.Rarity = f.Rarity;
+                        r.RarityOp = f.RarityOp;
+                        r.Quality = f.Quality;
+                        r.Text = f.Text;
+                        Rules.Add(r);
+                    }
+                }
+            }
+        }
 
         public ResultSortMode SortMode = ResultSortMode.Default;
 
@@ -35,28 +59,31 @@ namespace Elin_ItemRelocator
     }
 
     [Serializable]
-    public class RelocationFilter
+    public class RelocationRule
     {
+        public string Name = "New Rule";
         public bool Enabled = true;
 
-        // Basic filters
+        // Conditions
         public List<string> CategoryIds = new List<string>();
-
-        // Legacy Support for JSON Loading
-        [JsonProperty]
-        private string CategoryId { set { if(!string.IsNullOrEmpty(value) && !CategoryIds.Contains(value)) CategoryIds.Add(value); } }
-
         public int? Rarity;
-        public string RarityOp = ">="; // Default operator
-        public string Quality; // Changed from int? to string for inequalities e.g. ">=2"
-        public string IdThing;
+        public string RarityOp = ">=";
+        public string Quality;
+        public string Text;
 
-        // Advanced Text Filter
-        public string Text; // e.g. "bread", ":fire>=10"
-
+        // Matching Logic (AND within Rule)
         public bool IsMatch(Thing t)
         {
-            if (!Enabled) return true; // Fix: If disabled, it should not fail the AND check
+            if (!Enabled) return false;
+
+            // Safe Default: If no conditions are set, match nothing.
+            if ((CategoryIds == null || CategoryIds.Count == 0) &&
+                !Rarity.HasValue &&
+                string.IsNullOrEmpty(Quality) &&
+                string.IsNullOrEmpty(Text))
+            {
+                return false;
+            }
 
             // Check Category (Multi-match: OR logic within CategoryIds)
             if (CategoryIds != null && CategoryIds.Count > 0)
@@ -84,12 +111,6 @@ namespace Elin_ItemRelocator
                  if (!EvaluateCondition((int)t.encLV, Quality)) return false;
             }
 
-            // Check ID
-            if (!string.IsNullOrEmpty(IdThing))
-            {
-                if (t.id != IdThing) return false;
-            }
-
             // Check Text
             if (!string.IsNullOrEmpty(Text))
             {
@@ -99,46 +120,36 @@ namespace Elin_ItemRelocator
             return true;
         }
 
-        // Helper for UI display
-        public string GetDescription()
+        // Helper to get active conditions for UI
+        public List<string> GetConditionList()
         {
              List<string> parts = new List<string>();
+             // Categories
              if (CategoryIds != null && CategoryIds.Count > 0) {
-                 List<string> catNames = new List<string>();
-                 foreach(var id in CategoryIds) catNames.Add(GetCategoryName(id));
-                 parts.Add(RelocatorLang.GetText(RelocatorLang.LangKey.Category) + ": " + string.Join(", ", catNames.ToArray()));
+                 foreach(var id in CategoryIds) {
+                      var source = EClass.sources.categories.map.TryGetValue(id);
+                      string name = source != null ? source.GetName() : id;
+                      parts.Add(RelocatorLang.GetText(RelocatorLang.LangKey.Category) + ": " + name);
+                 }
              }
-             if (Rarity.HasValue) parts.Add("Rarity " + (string.IsNullOrEmpty(RarityOp) ? ">=" : RarityOp) + " " + Rarity.Value);
-             if (!string.IsNullOrEmpty(Quality)) parts.Add("Quality " + Quality);
-             if (!string.IsNullOrEmpty(IdThing)) parts.Add("ID: " + IdThing);
-             if (!string.IsNullOrEmpty(Text)) parts.Add("Text: " + Text);
-
-             if (parts.Count == 0) return "Empty Filter";
-             return string.Join(",", parts.ToArray());
-        }
-
-        private string GetCategoryName(string id)
-        {
-             var source = EClass.sources.categories.map.TryGetValue(id);
-             return source != null ? source.GetName() : id;
+             if (Rarity.HasValue) parts.Add(RelocatorLang.GetText(RelocatorLang.LangKey.Rarity) + " " + (string.IsNullOrEmpty(RarityOp) ? ">=" : RarityOp) + " " + Rarity.Value);
+             if (!string.IsNullOrEmpty(Quality)) parts.Add(RelocatorLang.GetText(RelocatorLang.LangKey.Quality) + " " + Quality);
+             if (!string.IsNullOrEmpty(Text)) parts.Add(RelocatorLang.GetText(RelocatorLang.LangKey.Text) + ": " + Text);
+             return parts;
         }
 
         private bool IsTextMatch(Thing t, string query)
         {
-            // Split by space for AND condition
             string[] parts = query.Split(new char[]{' ', '　'}, StringSplitOptions.RemoveEmptyEntries);
-
             foreach(var part in parts)
             {
                 string term = part.Trim();
                 if (term.StartsWith("@"))
                 {
-                    // Native-style Attribute search
                     if (!EvaluateAttribute(t, term.Substring(1))) return false;
                 }
                 else
                 {
-                    // Name search
                     if (!MatchesName(t, term)) return false;
                 }
             }
@@ -150,13 +161,9 @@ namespace Elin_ItemRelocator
             string name = t.Name.ToLower();
             string rawName = t.source.GetName().ToLower();
             string q = term.ToLower();
-
-            if (name.Contains(q)) return true;
-            if (rawName.Contains(q)) return true;
-            return false;
+            return name.Contains(q) || rawName.Contains(q);
         }
 
-        // Generic evaluator for ">=10", "=5", etc.
         private bool EvaluateCondition(int value, string condition)
         {
             string[] ops = new string[]{ ">=", "<=", "!=", ">", "<", "=" };
@@ -173,14 +180,7 @@ namespace Elin_ItemRelocator
                     break;
                 }
             }
-
-            // Defaults
-            if (op == null)
-            {
-                // If just number, assume >=
-                op = ">=";
-            }
-
+            if (op == null) op = ">=";
             int.TryParse(valStr, out targetVal);
 
             switch(op)
@@ -197,7 +197,6 @@ namespace Elin_ItemRelocator
 
         private bool EvaluateAttribute(Thing t, string query)
         {
-            // Parse operator: >=, <=, !=, >, <, =
             string[] ops = new string[]{ ">=", "<=", "!=", ">", "<", "=" };
             string op = null;
             string key = query;
@@ -215,13 +214,7 @@ namespace Elin_ItemRelocator
                     break;
                 }
             }
-
-            // If no operator found, check if it just exists (value > 0)
-            if (op == null)
-            {
-                op = ">";
-                val = 0;
-            }
+            if (op == null) { op = ">"; val = 0; }
 
             int eleId = 0;
             var sourceEle = EClass.sources.elements.map.Values.FirstOrDefault(e =>
@@ -229,18 +222,11 @@ namespace Elin_ItemRelocator
                 (e.GetName().Equals(key, StringComparison.OrdinalIgnoreCase))
             );
 
-            if (sourceEle != null)
-            {
-                eleId = sourceEle.id;
-            }
-            else
-            {
-               if (!int.TryParse(key, out eleId)) return false;
-            }
+            if (sourceEle != null) eleId = sourceEle.id;
+            else if (!int.TryParse(key, out eleId)) return false;
 
             int currentVal = t.elements.Value(eleId);
 
-            // Reuse generic evaluator logic? Or just switch here.
             switch(op)
             {
                 case ">=": return currentVal >= val;
@@ -252,5 +238,16 @@ namespace Elin_ItemRelocator
                 default: return false;
             }
         }
+    }
+
+    // Stub for Legacy JSON
+    [Serializable]
+    public class RelocationFilter
+    {
+        public List<string> CategoryIds;
+        public int? Rarity;
+        public string RarityOp;
+        public string Quality;
+        public string Text;
     }
 }

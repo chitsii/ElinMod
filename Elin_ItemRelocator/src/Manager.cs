@@ -204,22 +204,19 @@ namespace Elin_ItemRelocator
                 // Important Logic: If destroyed, skip
                 if (t.isDestroyed) return;
 
-                // Check Filters
-                if (profile.Filters.Count == 0) return; // Safe: Do not relocate anything if no conditions are set
+                // Check Rules
+                if (profile.Rules.Count == 0) return;
 
-                if (profile.Filters.Count > 0)
+                bool match = false;
+                foreach(var rule in profile.Rules)
                 {
-                    bool match = true; // Default to true for AND logic
-                    foreach(var filter in profile.Filters)
+                    if (rule.IsMatch(t))
                     {
-                        if (!filter.IsMatch(t)) // If ANY filter fails, reject
-                        {
-                            match = false;
-                            break;
-                        }
+                        match = true;
+                        break;
                     }
-                    if (!match) return; // Skip if didn't match all
                 }
+                if (!match) return;
 
                 matches.Add(t);
             };
@@ -286,15 +283,14 @@ namespace Elin_ItemRelocator
                     break;
                 case RelocationProfile.ResultSortMode.EnchantMagAsc:
                 case RelocationProfile.ResultSortMode.EnchantMagDesc:
-                    // Identify target element IDs from filters
+                    // Identify target element IDs from rules
                     List<int> targetEleIds = new List<int>();
-                    foreach(var f in profile.Filters) {
-                        if (f.Enabled && !string.IsNullOrEmpty(f.Text)) {
-                            string[] searchTerms = f.Text.Split(new char[]{' ', '　'}, StringSplitOptions.RemoveEmptyEntries);
+                    foreach(var r in profile.Rules) {
+                        if (r.Enabled && !string.IsNullOrEmpty(r.Text)) {
+                            string[] searchTerms = r.Text.Split(new char[]{' ', '　'}, StringSplitOptions.RemoveEmptyEntries);
                             foreach(var term in searchTerms) {
                                 if (term.StartsWith("@")) {
                                     // Parse term: @Mining>=10 -> Mining
-                                    // Handle logic similar to EvaluateAttribute
                                     string key = term.Substring(1);
                                     // Strip operators
                                     string[] ops = new string[]{ ">=", "<=", "!=", ">", "<", "=" };

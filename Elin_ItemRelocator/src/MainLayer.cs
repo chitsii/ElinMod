@@ -3,18 +3,48 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
-using System.Reflection;
-using System.IO;
-using System.Text;
 
 namespace Elin_ItemRelocator
 {
     public class LayerItemRelocator : ELayer
     {
+        // Tree Node Wrapper
+        private class FilterNode
+        {
+            public RelocationRule Rule;     // Level 1: Rule
+
+            // Level 2: Condition Details
+            public ConditionType CondType;
+            public string CondValue; // ID or Text
+            public string DisplayText;
+
+            public bool IsRule { get { return Rule != null && CondType == ConditionType.None; } }
+            public bool IsCondition { get { return CondType != ConditionType.None && CondType != ConditionType.AddButton; } }
+            public bool IsAddButton { get { return CondType == ConditionType.AddButton; } }
+
+            // Override Equals/GetHashCode for Persistence (Expansion State)
+            public override bool Equals(object obj)
+            {
+                var other = obj as FilterNode;
+                if (other == null) return false;
+                if (IsRule && other.IsRule) return Rule == other.Rule; // Identity based on Rule instance
+                return base.Equals(obj);
+            }
+            public override int GetHashCode()
+            {
+                if (IsRule) return Rule.GetHashCode();
+                return base.GetHashCode();
+            }
+        }
+
+        private enum ConditionType { None, Category, Rarity, Quality, Text, Id, AddButton }
+
+        // ====================================================================
+        // Fields
         // ====================================================================
         private static RelocatorTable<Thing> previewTable;
+        private static RelocatorAccordion<FilterNode> mainAccordion;
         private static Thing currentContainer;
-        // ====================================================================
 
         // ====================================================================
         // Main Entry Point
@@ -22,24 +52,174 @@ namespace Elin_ItemRelocator
         public static void Open(Thing container)
         {
              currentContainer = container;
+
+             // Setup Accordion Logic FIRST
+             mainAccordion = RelocatorAccordion<FilterNode>.Create();
+             var profile = RelocatorManager.Instance.GetProfile(container);
+
+             // UX: Default Empty Rule for new/empty profiles
+             if (profile.Rules.Count == 0) {
+                 profile.Rules.Add(new RelocationRule { Name = RelocatorLang.GetText(RelocatorLang.LangKey.NewRuleName) + " 1" });
+             }
+
+             Action refresh = null;
+             // Define Refresh Logic
+             refresh = () => {
+                 // Rebuild Data
+                 List<FilterNode> roots = new List<FilterNode>();
+                 if (profile.Rules != null) {
+                     foreach(var r in profile.Rules) {
+                         var node = new FilterNode { Rule = r, CondType = ConditionType.None };
+                         roots.Add(node);
+                         // Default Open: Ensure rule is expanded regardless of state
+                         // But we want persistence. Since we override Equals based on Rule,
+                         // previously expanded rules remain expanded.
+                         // But for FIRST load or New Rule, we should expand it.
+                         // 'Expand' method relies on 'Equals'.
+                         // If we call Expand(node) it will add it to the set.
+                         // Persistence is handled by SetRoots not clearing 'expanded'.
+                         // WE WANT TO FORCE EXPAND ALWAYS according to user request?
+                         // "Default to open" implies new ones open.
+                         // User said: "Adding condition closes rule is bad". Override Equals fixes that.
+                         // "Rule default open" -> Let's force expand all on refresh? No, that prevents closing.
+                         // But for UX, let's Expand if not already tracked (aka new).
+                         // However, since we recreate nodes, we can't easily distinguish 'new' from 'closed'.
+                         // Use 'mainAccordion.Expand(node)' which checks 'contains'.
+                         mainAccordion.Expand(node);
+                     }
+                 }
+                 mainAccordion.SetRoots(roots);
+                 mainAccordion.Refresh();
+
+                 RefreshPreview(null, container);
+             };
+
+             // Configure Accordion
+             mainAccordion.SetCaption(RelocatorLang.GetText(RelocatorLang.LangKey.Title));
+             mainAccordion.SetChildren((node) => {
+                 if (node.IsRule) {
+                     var list = new List<FilterNode>();
+                     var r = node.Rule;
+
+                     // Deconstruct Rule into Nodes
+                     if (r.CategoryIds.Count > 0) {
+                        foreach(var id in r.CategoryIds) {
+                            string name = id;
+                            var source = EClass.sources.categories.map.TryGetValue(id);
+                            if (source != null) name = source.GetName();
+                            list.Add(new FilterNode { Rule = r, CondType = ConditionType.Category, CondValue = id, DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Category) + ": " + name });
+                        }
+                     }
+                     if (r.Rarity.HasValue) {
+                         string op = string.IsNullOrEmpty(r.RarityOp) ? ">=" : r.RarityOp;
+                         list.Add(new FilterNode { Rule = r, CondType = ConditionType.Rarity, DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Rarity) + " " + op + " " + r.Rarity });
+                     }
+                     if (!string.IsNullOrEmpty(r.Quality)) {
+                         list.Add(new FilterNode { Rule = r, CondType = ConditionType.Quality, DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Quality) + " " + r.Quality });
+                     }
+                     if (!string.IsNullOrEmpty(r.Text)) {
+                         list.Add(new FilterNode { Rule = r, CondType = ConditionType.Text, DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Text) + ": " + r.Text });
+                     }
+
+                     // ADD BUTTON
+                     list.Add(new FilterNode { Rule = r, CondType = ConditionType.AddButton, DisplayText = " + " });
+
+                     return list;
+                 }
+                 return null;
+             });
+
+             mainAccordion.SetText((node) => {
+                 if (node.IsRule) {
+                     string status = node.Rule.Enabled ? "" : " (Disabled)";
+                     return node.Rule.Name + " (" + node.Rule.GetConditionList().Count + ")" + status;
+                 }
+                 return node.DisplayText;
+             });
+
+             mainAccordion.SetGetBackgroundColor((node) => {
+                 if (node.IsRule) {
+                     return new Color(0.85f, 0.82f, 0.75f, 1f);
+                 }
+                 if (node.IsAddButton) {
+                     return new Color(0.9f, 0.9f, 0.9f, 0.5f);
+                 }
+                 return Color.clear;
+             });
+
+             mainAccordion.SetOnSelect((node) => {
+                 if (node.IsAddButton) {
+                     ShowAddConditionMenu(node.Rule, refresh);
+                 }
+                 else if (node.IsCondition) {
+                     EditRuleCondition(node, refresh);
+                 }
+             });
+
+             mainAccordion.SetOnRightClick((node) => {
+                 if (node.IsRule) {
+                     var menu = RelocatorMenu.Create();
+                     menu.AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Rename), () => {
+                             Dialog.InputName(RelocatorLang.GetText(RelocatorLang.LangKey.NewRuleName), node.Rule.Name, (c, text) => {
+                                 if(!c && !string.IsNullOrEmpty(text)) { node.Rule.Name = text; refresh(); }
+                             }, (Dialog.InputType)0);
+                         })
+                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Remove), () => {
+                             Dialog.YesNo(RelocatorLang.GetText(RelocatorLang.LangKey.Delete) + "?", () => { profile.Rules.Remove(node.Rule); refresh(); });
+                         })
+                         .AddButton(node.Rule.Enabled ? RelocatorLang.GetText(RelocatorLang.LangKey.Disable) : RelocatorLang.GetText(RelocatorLang.LangKey.Enable), () => { node.Rule.Enabled = !node.Rule.Enabled; refresh(); })
+                         .Show();
+                 }
+             });
+
+             mainAccordion.SetOnBuildRowExtra((node, rowGO) => {
+                 if (node.IsCondition) {
+                     // Remove Button (Updated Signature)
+                     var btnRemove = CreateTinyButton(rowGO.transform, "x", () => {
+                          Dialog.YesNo(RelocatorLang.GetText(RelocatorLang.LangKey.Delete) + "?", () => {
+                                 switch(node.CondType) {
+                                     case ConditionType.Category:
+                                         node.Rule.CategoryIds.Remove(node.CondValue);
+                                         break;
+                                     case ConditionType.Rarity:
+                                         node.Rule.Rarity = null;
+                                         break;
+                                     case ConditionType.Quality:
+                                         node.Rule.Quality = null;
+                                         break;
+                                     case ConditionType.Text:
+                                         node.Rule.Text = null;
+                                         break;
+                                 }
+                                 refresh();
+                          });
+                     });
+                 }
+             });
+
              // Initialize Layers (Main and Preview)
              LayerList layerMain, layerPreview;
              InitLayers(out layerMain, out layerPreview);
 
-             var profile = RelocatorManager.Instance.GetProfile(container);
-
-             // Define Refresh Logic
-             Action refresh = null;
-             refresh = () => {
-                 RefreshSettings(layerMain, profile, refresh);
-                 RefreshPreview(layerPreview, container);
-             };
-
-             // Setup Bottom Buttons (Once)
-             AddMainButtons(layerMain, profile, container, refresh);
-
-             // Show Layers
-             layerMain.Show(false);
+             // Restore Footer Buttons ("Settings", "Execute", "Add Rule")
+             // "Add Rule" stays in Accordion? No, user said "Except Add Filter".
+             // "Add Filter" is gone. We have "Add Rule".
+             // Let's put ALL main actions in Footer for consistency.
+             var win = layerMain.windows[0];
+             win.AddBottomButton(RelocatorLang.GetText(RelocatorLang.LangKey.AddRule), () => {
+                 Dialog.InputName(RelocatorLang.GetText(RelocatorLang.LangKey.NewRuleName), RelocatorLang.GetText(RelocatorLang.LangKey.NewRuleName), (c, text) => {
+                     if (!c && !string.IsNullOrEmpty(text)) {
+                         profile.Rules.Add(new RelocationRule { Name = text });
+                         refresh();
+                     }
+                 }, (Dialog.InputType)0);
+             });
+             win.AddBottomButton(RelocatorLang.GetText(RelocatorLang.LangKey.Settings), () => ShowSettingsMenu(profile, refresh));
+             win.AddBottomButton(RelocatorLang.GetText(RelocatorLang.LangKey.Execute), () => {
+                 RelocatorManager.Instance.ExecuteRelocation(container);
+                 Msg.Say(string.Format(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_Relocated), ""));
+                 if (mainAccordion != null) mainAccordion.Close();
+             });
 
              // Initial Data Load
              refresh();
@@ -50,10 +230,9 @@ namespace Elin_ItemRelocator
         // ====================================================================
         private static void InitLayers(out LayerList main, out LayerList preview)
         {
-             // 1. Create Main Layer
-             var _main = EClass.ui.AddLayer<LayerList>();
+             // 1. Create Main Layer via Accordion
+             var _main = mainAccordion.Show();
              var winMain = _main.windows[0];
-             winMain.SetCaption(RelocatorLang.GetText(RelocatorLang.LangKey.Title));
 
              // 2. Create Preview Table
              previewTable = RelocatorTable<Thing>.Create()
@@ -76,15 +255,16 @@ namespace Elin_ItemRelocator
                           var g = new GameObject("Text");
                           g.transform.SetParent(cell.transform, false);
                           txt = g.AddComponent<Text>();
-                          txt.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-                          txt.color = new Color(0.1f, 0.1f, 0.1f);
+                          // Default Font & Dark Brown Color
+                          txt.font = SkinManager.Instance.fontSet.ui.source.font;
+                          txt.color = SkinManager.CurrentColors.textDefault;
                           txt.alignment = TextAnchor.MiddleLeft;
                           txt.resizeTextForBestFit = true;
                           txt.resizeTextMinSize = 10;
                           txt.resizeTextMaxSize = 13;
                           txt.horizontalOverflow = HorizontalWrapMode.Wrap;
                           txt.verticalOverflow = VerticalWrapMode.Truncate;
-                          txt.raycastTarget = false; // Prevent blocking interactions
+                          txt.raycastTarget = false;
                            var rt = txt.rectTransform;
                            rt.anchorMin = Vector2.zero;
                            rt.anchorMax = Vector2.one;
@@ -95,20 +275,14 @@ namespace Elin_ItemRelocator
                           txt.text = t.Name;
                       } else { txt.text = ""; }
 
-                       // Find the row button (parent's sibling child)
+                       // Find the row button
                        var rowBtn = cell.transform.parent.GetComponentInChildren<UIButton>();
-
                        if (rowBtn) {
-                            // Clear internal cached tooltip to force update
                             var field = typeof(UIButton).GetField("tooltip", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
                             if (field != null) field.SetValue(rowBtn, null);
-
                             rowBtn.SetTooltip((tooltip) => {
                                 if (t != null && tooltip.note != null) t.WriteNote(tooltip.note);
                             }, true);
-                       } else {
-                           // Failure to find button is rare but handled
-                           // Debug.LogWarning("[Relocator] Tooltip setup failed: Row Button not found for " + t.Name);
                        }
                  })
                  .AddTextColumn(RelocatorLang.GetText(RelocatorLang.LangKey.Category), 100, t => t != null && t.category != null ? t.category.GetName() : "")
@@ -123,7 +297,7 @@ namespace Elin_ItemRelocator
              var _preview = previewTable.Show();
              var winPreview = _preview.windows[0];
 
-             // Ensure Preview Window is on top and non-blocking background
+             // Ensure Preview Window is on top
              _preview.transform.SetAsLastSibling();
              foreach (var g in _preview.GetComponentsInChildren<Graphic>(true))
              {
@@ -134,9 +308,9 @@ namespace Elin_ItemRelocator
 
              // Resize Configuration
              winMain.setting.allowResize = true;
+
              winPreview.setting.allowResize = true;
              _main.SetSize(700, 800);
-             // _preview size handled by Table API
 
              // Position Configuration
              var rectMain = winMain.GetComponent<RectTransform>();
@@ -149,6 +323,7 @@ namespace Elin_ItemRelocator
              OnKill(_main, () => {
                 if (closing) return;
                 closing = true;
+                if (mainAccordion != null) mainAccordion.Close();
                 if (_preview != null) _preview.Close();
              });
              OnKill(_preview, () => {
@@ -157,7 +332,6 @@ namespace Elin_ItemRelocator
                  if (_main != null) _main.Close();
              });
 
-             // Assign to out parameters
              main = _main;
              preview = _preview;
         }
@@ -166,93 +340,55 @@ namespace Elin_ItemRelocator
              layer.onKill.AddListener(() => action());
         }
 
-        // ====================================================================
-        // List Refresh Logic
-        // ====================================================================
-        private static void RefreshSettings(LayerList layer, RelocationProfile profile, Action onRefresh)
-        {
-             layer.customItems.Clear();
-
-             foreach(var filter in profile.Filters)
-             {
-                 var currentFilter = filter;
-                 string desc = currentFilter.GetDescription();
-                  if (!currentFilter.Enabled)
-                      desc = "<color=#888888>" + desc + RelocatorLang.GetText(RelocatorLang.LangKey.DisabledSuffix) + "</color>";
-
-                  layer.Add(desc, (idx) => {
-                      RelocatorMenu.Create()
-                          .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Edit), () => EditFilter(currentFilter, profile, onRefresh))
-                          .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Remove), () => { profile.Filters.Remove(currentFilter); onRefresh(); })
-                        //   .AddButton(currentFilter.Enabled ? RelocatorLang.GetText(RelocatorLang.LangKey.Disable) : RelocatorLang.GetText(RelocatorLang.LangKey.Enable), () => { currentFilter.Enabled = !currentFilter.Enabled; onRefresh(); })
-                          .Show();
-                  });
-             }
-             // Standard LayerList refresh
-             layer.list.List();
+        public override void OnRightClick() {
+            // Disable default close
         }
 
+        // ====================================================================
+        // Refresh Logic
+        // ====================================================================
         private static void RefreshPreview(LayerList layer, Thing container)
         {
-               List<Thing> matches = RelocatorManager.Instance.GetMatches(container).ToList();
-               int count = matches.Count;
-               string countStr = count >= 100 ? "100+" : count.ToString();
+                List<Thing> matches = RelocatorManager.Instance.GetMatches(container).ToList();
+                int count = matches.Count;
+                string countStr = count >= 100 ? "100+" : count.ToString();
 
-               if (previewTable != null)
-               {
-                   previewTable.SetCaption(RelocatorLang.GetText(RelocatorLang.LangKey.Preview) + " (" + countStr + ")");
-                   previewTable.SetDataSource(matches);
-                   previewTable.Refresh();
-               }
+                if (previewTable != null)
+                {
+                    previewTable.SetCaption(RelocatorLang.GetText(RelocatorLang.LangKey.Preview) + " (" + countStr + ")");
+                    previewTable.SetDataSource(matches);
+                    previewTable.Refresh();
+                }
         }
 
-        // ====================================================================
-        // Interaction Logic (Buttons & Menus)
-        // ====================================================================
-        private static void AddMainButtons(LayerList layer, RelocationProfile profile, Thing container, Action refresh)
-        {
-             layer.windows[0].AddBottomButton(RelocatorLang.GetText(RelocatorLang.LangKey.AddFilter), () => ShowAddFilterMenu(profile, refresh));
-             layer.windows[0].AddBottomButton(RelocatorLang.GetText(RelocatorLang.LangKey.Settings), () => ShowSettingsMenu(profile, refresh));
-             layer.windows[0].AddBottomButton(RelocatorLang.GetText(RelocatorLang.LangKey.Execute), () => {
-                 RelocatorManager.Instance.ExecuteRelocation(container);
-                 Msg.Say(string.Format(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_Relocated), ""));
-                 layer.Close();
-             });
-        }
-
-        private static void ShowAddFilterMenu(RelocationProfile profile, Action refresh)
+        private static void ShowAddConditionMenu(RelocationRule rule, Action refresh)
         {
              RelocatorMenu.Create()
                  .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Text), () => {
-                     Dialog.InputName("Enter Text/Tag", "", (cancel, text) => {
-                         if (!cancel && !string.IsNullOrEmpty(text)) {
-                             profile.Filters.Add(new RelocationFilter { Text = text });
+                     Dialog.InputName("Enter Text/Tag", "", (c, text) => {
+                         if (!c && !string.IsNullOrEmpty(text)) {
+                             if(string.IsNullOrEmpty(rule.Text)) rule.Text = text;
+                             else rule.Text += " " + text;
                              refresh();
                          }
-                     });
+                     }, (Dialog.InputType)0);
                  })
                  .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Enchant), () => {
                      RelocatorPickers.ShowEnchantPicker((ele) => {
                          AddEnchantFilterDialog(ele, (text) => {
-                             profile.Filters.Add(new RelocationFilter { Text = text });
+                             if(string.IsNullOrEmpty(rule.Text)) rule.Text = text;
+                             else rule.Text += " " + text;
                              refresh();
                          });
                      });
                  })
                  .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Category), () => {
-                     // Singleton Check
-                     var existing = profile.Filters.FirstOrDefault(f => f.CategoryIds != null && f.CategoryIds.Count > 0);
-                     if (existing != null) {
-                         EditFilter(existing, profile, refresh);
-                     } else {
-                         RelocatorPickers.ShowCategoryPicker(new List<string>(), (selectedIds) => {
-                             if (selectedIds.Count > 0) {
-                                 var f = new RelocationFilter { CategoryIds = selectedIds };
-                                 profile.Filters.Add(f);
-                                 refresh();
-                             }
-                         });
-                    }
+                      RelocatorPickers.ShowCategoryPicker(new List<string>(), (selectedIds) => {
+                          if (selectedIds.Count > 0) {
+                              foreach(var id in selectedIds) if(!rule.CategoryIds.Contains(id)) rule.CategoryIds.Add(id);
+                              refresh();
+                          }
+                      });
                  })
                  .AddChild(RelocatorLang.GetText(RelocatorLang.LangKey.Rarity), (child) => {
                       var updateList = Lang.GetList("quality");
@@ -261,19 +397,20 @@ namespace Elin_ItemRelocator
                           string text = updateList[i] + " (" + r + ")";
                           child.AddButton(text, () => {
                               ShowOperatorMenu(op => {
-                                  profile.Filters.Add(new RelocationFilter { Rarity = r, RarityOp = op });
+                                  rule.Rarity = r;
+                                  rule.RarityOp = op;
                                   refresh();
                               });
                           });
                       }
                  })
                  .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Quality), () => {
-                      Dialog.InputName("Enter Quality (e.g. >=2)\nSupported: ==, >=, <=, <, >, !=", "", (cancel, text) => {
-                          if (!cancel && !string.IsNullOrEmpty(text)) {
-                              profile.Filters.Add(new RelocationFilter { Quality = text });
+                      Dialog.InputName("Enter Quality (e.g. >=2)\nSupported: ==, >=, <=, <, >, !=", "", (c, text) => {
+                          if (!c && !string.IsNullOrEmpty(text)) {
+                              rule.Quality = text;
                               refresh();
                           }
-                      });
+                      }, (Dialog.InputType)0);
                   })
                  .Show();
         }
@@ -281,7 +418,7 @@ namespace Elin_ItemRelocator
         private static void ShowSettingsMenu(RelocationProfile profile, Action refresh)
         {
              RelocatorMenu.Create()
-                 .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Scope) + ": " + (profile.Scope == RelocationProfile.FilterScope.Inventory ? RelocatorLang.GetText(RelocatorLang.LangKey.Inventory) : RelocatorLang.GetText(RelocatorLang.LangKey.Zone)), () => {
+                 .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Scope) + ": " + (profile.Scope == RelocationProfile.FilterScope.Inventory ? RelocatorLang.GetText(RelocatorLang.LangKey.Inventory) : RelocatorLang.GetText(RelocatorLang.LangKey.Inventory)), () => {
                      if (profile.Scope == RelocationProfile.FilterScope.Inventory)
                          profile.Scope = RelocationProfile.FilterScope.Zone;
                      else
@@ -304,17 +441,17 @@ namespace Elin_ItemRelocator
                  .AddChild(RelocatorLang.GetText(RelocatorLang.LangKey.Presets), (child) => {
                      child
                          .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SavePreset), () => {
-                             Dialog.InputName(RelocatorLang.GetText(RelocatorLang.LangKey.PresetName), "", (cancel, text) => {
-                                 if (!cancel && !string.IsNullOrEmpty(text)) {
+                             Dialog.InputName(RelocatorLang.GetText(RelocatorLang.LangKey.PresetName), "", (c, text) => {
+                                 if (!c && !string.IsNullOrEmpty(text)) {
                                      RelocatorManager.Instance.SavePreset(text, profile);
                                  }
-                             });
+                             }, (Dialog.InputType)0);
                          })
                          .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.LoadPreset), () => {
                              RelocatorPickers.ShowPresetPicker((name) => {
                                  var loaded = RelocatorManager.Instance.LoadPreset(name);
                                  if (loaded != null) {
-                                     profile.Filters = loaded.Filters;
+                                     profile.Rules = loaded.Rules;
                                      profile.Scope = loaded.Scope;
                                      profile.ExcludeHotbar = loaded.ExcludeHotbar;
                                      profile.SortMode = loaded.SortMode;
@@ -325,66 +462,6 @@ namespace Elin_ItemRelocator
                          });
                  })
                  .Show();
-        }
-
-        private static void EditFilter(RelocationFilter filter, RelocationProfile profile, Action refresh)
-        {
-            if (!string.IsNullOrEmpty(filter.Text))
-            {
-                 // Check if it is an Enchant filter (starts with @)
-                 if (filter.Text.StartsWith("@")) {
-                      RelocatorPickers.ShowEnchantPicker((ele) => {
-                          AddEnchantFilterDialog(ele, (text) => {
-                              filter.Text = text;
-                              refresh();
-                          });
-                      });
-                 } else {
-                     Dialog.InputName(RelocatorLang.GetText(RelocatorLang.LangKey.EditSearchText), filter.Text, (cancel, text) => {
-                          if (!cancel) {
-                              filter.Text = text;
-                              refresh();
-                          }
-                     });
-                 }
-            }
-            else if (filter.CategoryIds != null && filter.CategoryIds.Count > 0)
-            {
-                 RelocatorPickers.ShowCategoryPicker(filter.CategoryIds, (selectedIds) => {
-                    filter.CategoryIds = selectedIds;
-                    // The original RefreshPreview() call here is missing context (LayerList, Thing).
-                    // Assuming it should be `refresh()` as per other filter edits.
-                    // If RefreshPreview() was intended, it needs to be called with appropriate arguments.
-                    // For now, adhering to the provided snippet's `refresh()` placement.
-                    refresh();
-                });
-            }
-            else if (filter.Rarity.HasValue)
-            {
-                 var rareMenu = RelocatorMenu.Create();
-                 var updateList = Lang.GetList("quality");
-                 for(int i=0; i<updateList.Length; i++) {
-                      int r = i - 1;
-                      string text = updateList[i] + " (" + r + ")";
-                      rareMenu.AddButton(text, () => {
-                          ShowOperatorMenu(op => {
-                              filter.Rarity = r;
-                              filter.RarityOp = op;
-                              refresh();
-                          });
-                      });
-                  }
-                  rareMenu.Show();
-            }
-            else if (!string.IsNullOrEmpty(filter.Quality))
-            {
-                 Dialog.InputName(RelocatorLang.GetText(RelocatorLang.LangKey.EditQuality), filter.Quality, (cancel, text) => {
-                      if (!cancel) {
-                          filter.Quality = text;
-                          refresh();
-                      }
-                 });
-            }
         }
 
         private static void ShowOperatorMenu(Action<string> onSelect)
@@ -410,13 +487,67 @@ namespace Elin_ItemRelocator
 
                       onConfirm(filterText);
                   }
-              });
+              }, (Dialog.InputType)0);
         }
 
-        private static string GetSortText(RelocationProfile.ResultSortMode mode)
-        {
-            switch(mode)
-            {
+        private static Button CreateTinyButton(Transform parent, string label, Action onClick) {
+             var btnGO = new GameObject("Btn_" + label);
+             btnGO.transform.SetParent(parent, false);
+             var le = btnGO.AddComponent<LayoutElement>();
+             le.minWidth = 24; le.preferredWidth = 24; le.minHeight = 24; le.preferredHeight = 24;
+
+             var img = btnGO.AddComponent<Image>();
+             img.color = new Color(0.8f, 0.8f, 0.8f);
+
+             var btn = btnGO.AddComponent<Button>();
+             btn.targetGraphic = img;
+             btn.onClick.AddListener(() => onClick());
+
+             var txtGO = new GameObject("Text");
+             txtGO.transform.SetParent(btnGO.transform, false);
+             var txt = txtGO.AddComponent<Text>();
+             txt.font = SkinManager.Instance.fontSet.ui.source.font; txt.fontSize = 12; txt.text = label; txt.alignment = TextAnchor.MiddleCenter;
+             txt.color = SkinManager.CurrentColors.textDefault;
+             txt.rectTransform.anchorMin = Vector2.zero; txt.rectTransform.anchorMax = Vector2.one;
+
+             return btn;
+        }
+
+        private static void EditRuleCondition(FilterNode node, Action refresh) {
+             var rule = node.Rule;
+             if (node.CondType == ConditionType.Text) {
+                 Dialog.InputName("Edit Text", rule.Text, (c, val) => { if(!c) { rule.Text = val; refresh(); } }, (Dialog.InputType)0);
+             }
+             else if (node.CondType == ConditionType.Rarity) {
+                 var updateList = Lang.GetList("quality");
+                 var menu = RelocatorMenu.Create();
+                 for(int i=0; i<updateList.Length; i++) {
+                       int r = i - 1;
+                       string text = updateList[i] + " (" + r + ")";
+                       menu.AddButton(text, () => {
+                           ShowOperatorMenu(op => {
+                               rule.Rarity = r;
+                               rule.RarityOp = op;
+                               refresh();
+                           });
+                       });
+                 }
+                 menu.Show();
+             }
+             else if (node.CondType == ConditionType.Quality) {
+                  Dialog.InputName("Edit Quality", rule.Quality, (c, val) => { if(!c) { rule.Quality = val; refresh(); } }, (Dialog.InputType)0);
+             }
+             else if (node.CondType == ConditionType.Category) {
+                 RelocatorPickers.ShowCategoryPicker(new List<string>{node.CondValue}, (ids) => {
+                     rule.CategoryIds.Remove(node.CondValue);
+                     foreach(var id in ids) if(!rule.CategoryIds.Contains(id)) rule.CategoryIds.Add(id);
+                     refresh();
+                 });
+             }
+        }
+
+        private static string GetSortText(RelocationProfile.ResultSortMode mode) {
+            switch(mode) {
                 case RelocationProfile.ResultSortMode.Default: return RelocatorLang.GetText(RelocatorLang.LangKey.SortDefault);
                 case RelocationProfile.ResultSortMode.PriceAsc: return RelocatorLang.GetText(RelocatorLang.LangKey.SortPriceAsc);
                 case RelocationProfile.ResultSortMode.PriceDesc: return RelocatorLang.GetText(RelocatorLang.LangKey.SortPriceDesc);
