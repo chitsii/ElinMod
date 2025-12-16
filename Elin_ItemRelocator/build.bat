@@ -3,52 +3,9 @@ setlocal
 
 call "%~dp0config.bat"
 
-set CSC_PATH="C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
-if not exist %CSC_PATH% (
-    set CSC_PATH="C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe"
-)
+echo Compiling with dotnet...
+dotnet build Elin_ItemRelocator.csproj -c Release
 
-if not exist %CSC_PATH% (
-    echo csc.exe not found!
-    exit /b 1
-)
-
-echo Using csc at %CSC_PATH%
-
-if not exist "%~dp0_bin" mkdir "%~dp0_bin"
-
-echo Compiling...
-%CSC_PATH% /target:library /out:"%~dp0_bin\Elin_ItemRelocator.dll" ^
-    /reference:"%~dp0elin_link\Elin_Data\Managed\Elin.dll" ^
-    /reference:"%~dp0elin_link\Elin_Data\Managed\UnityEngine.dll" ^
-    /reference:"%~dp0elin_link\Elin_Data\Managed\UnityEngine.CoreModule.dll" ^
-    /reference:"%~dp0elin_link\Elin_Data\Managed\UnityEngine.UI.dll" ^
-    /reference:"%~dp0elin_link\Elin_Data\Managed\UnityEngine.TextRenderingModule.dll" ^
-    /reference:"%~dp0elin_link\Elin_Data\Managed\UnityEngine.UIModule.dll" ^
-    /reference:"%~dp0elin_link\Elin_Data\Managed\UnityEngine.InputLegacyModule.dll" ^
-    /reference:"%~dp0elin_link\Elin_Data\Managed\Plugins.dll" ^
-    /reference:"%~dp0elin_link\Elin_Data\Managed\Plugins.BaseCore.dll" ^
-    /reference:"%~dp0elin_link\Elin_Data\Managed\Plugins.UI.dll" ^
-    /reference:"%~dp0elin_link\Elin_Data\Managed\Plugins.Sound.dll" ^
-    /reference:"%~dp0elin_link\Elin_Data\Managed\Newtonsoft.Json.dll" ^
-    /reference:"%~dp0elin_link\Elin_Data\Managed\DOTween.dll" ^
-    /reference:"%~dp0elin_link\BepInEx\core\BepInEx.Core.dll" ^
-    /reference:"%~dp0elin_link\BepInEx\core\BepInEx.Unity.dll" ^
-    /reference:"%~dp0elin_link\BepInEx\core\0Harmony.dll" ^
-    /reference:"System.Core.dll" ^
-    "%~dp0src\Mod.cs" ^
-    "%~dp0src\MainLayer.cs" ^
-    "%~dp0src\Profile.cs" ^
-    "%~dp0src\Manager.cs" ^
-    "%~dp0src\Singleton.cs" ^
-    "%~dp0src\Lang.cs" ^
-    "%~dp0src\UI\Components\Accordion.cs" ^
-    "%~dp0src\UI\Components\Menu.cs" ^
-    "%~dp0src\UI\Components\Table.cs" ^
-    "%~dp0src\UI\Components\Tree.cs" ^
-    "%~dp0src\UI\Components\Pickers.cs" ^
-    "%~dp0src\UI\FilterNode.cs" ^
-    "%~dp0src\UI\RuleEditor.cs"
 
 if %ERRORLEVEL% NEQ 0 (
     echo Build Failed!
