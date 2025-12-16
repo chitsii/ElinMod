@@ -527,7 +527,13 @@ namespace Elin_ItemRelocator {
                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortPriceAsc), () => { profile.SortMode = RelocationProfile.ResultSortMode.PriceAsc; refresh(); })
                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortPriceDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.PriceDesc; refresh(); })
                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortMagAsc), () => { profile.SortMode = RelocationProfile.ResultSortMode.EnchantMagAsc; refresh(); })
-                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortMagDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.EnchantMagDesc; refresh(); });
+                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortMagDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.EnchantMagDesc; refresh(); })
+                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortWeightAsc), () => { profile.SortMode = RelocationProfile.ResultSortMode.TotalWeightAsc; refresh(); })
+                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortWeightDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.TotalWeightDesc; refresh(); })
+                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortUnitWeightAsc), () => { profile.SortMode = RelocationProfile.ResultSortMode.UnitWeightAsc; refresh(); })
+                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortUnitWeightDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.UnitWeightDesc; refresh(); })
+                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortUidAsc), () => { profile.SortMode = RelocationProfile.ResultSortMode.UidAsc; refresh(); })
+                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortUidDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.UidDesc; refresh(); });
                 })
                 .AddSeparator()
                 .AddChild(RelocatorLang.GetText(RelocatorLang.LangKey.Presets), (child) => {
@@ -622,6 +628,8 @@ namespace Elin_ItemRelocator {
             RelocationProfile.ResultSortMode.TotalWeightDesc => RelocatorLang.GetText(RelocatorLang.LangKey.SortWeightDesc),
             RelocationProfile.ResultSortMode.UnitWeightAsc => RelocatorLang.GetText(RelocatorLang.LangKey.SortUnitWeightAsc),
             RelocationProfile.ResultSortMode.UnitWeightDesc => RelocatorLang.GetText(RelocatorLang.LangKey.SortUnitWeightDesc),
+            RelocationProfile.ResultSortMode.UidAsc => RelocatorLang.GetText(RelocatorLang.LangKey.SortUidAsc),
+            RelocationProfile.ResultSortMode.UidDesc => RelocatorLang.GetText(RelocatorLang.LangKey.SortUidDesc),
             _ => mode.ToString()
         };
     }

@@ -57,7 +57,9 @@ namespace Elin_ItemRelocator {
             TotalWeightAsc,
             TotalWeightDesc,
             UnitWeightAsc,
-            UnitWeightDesc
+            UnitWeightDesc,
+            UidAsc,
+            UidDesc
         }
 
         public enum RelocatorOp { Ge, Le, Eq, Ne, Gt, Lt }

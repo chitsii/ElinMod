@@ -316,6 +316,12 @@ namespace Elin_ItemRelocator {
             case RelocationProfile.ResultSortMode.UnitWeightDesc:
                 matches.Sort((a, b) => b.SelfWeight - a.SelfWeight);
                 break;
+            case RelocationProfile.ResultSortMode.UidAsc:
+                matches.Sort((a, b) => a.uid - b.uid);
+                break;
+            case RelocationProfile.ResultSortMode.UidDesc:
+                matches.Sort((a, b) => b.uid - a.uid);
+                break;
             }
 
             return matches;
