@@ -5,7 +5,7 @@
 
         public static T Instance {
             get {
-                if (s_Instance == null) {
+                if (s_Instance is null) {
                     CreateInstance();
                 }
                 return s_Instance;
@@ -13,8 +13,8 @@
         }
 
         public static void CreateInstance() {
-            if (s_Instance == null) {
-                s_Instance = new T();
+            if (s_Instance is null) {
+                s_Instance = new();
             }
         }
 

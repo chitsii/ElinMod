@@ -13,15 +13,14 @@ namespace Elin_ItemRelocator {
         public string CondValue; // ID or Text
         public string DisplayText;
 
-        public bool IsRule { get { return Rule != null && CondType == ConditionType.None; } }
-        public bool IsCondition { get { return CondType != ConditionType.None && CondType != ConditionType.AddButton && CondType != ConditionType.Settings; } }
-        public bool IsAddButton { get { return CondType == ConditionType.AddButton; } }
-        public bool IsSettings { get { return CondType == ConditionType.Settings; } }
+        public bool IsRule => Rule is not null && CondType is ConditionType.None;
+        public bool IsCondition => CondType is not ConditionType.None and not ConditionType.AddButton and not ConditionType.Settings;
+        public bool IsAddButton => CondType is ConditionType.AddButton;
+        public bool IsSettings => CondType is ConditionType.Settings;
 
         // Override Equals/GetHashCode for Persistence (Expansion State)
         public override bool Equals(object obj) {
-            var other = obj as FilterNode;
-            if (other == null)
+            if (obj is not FilterNode other)
                 return false;
             if (IsRule && other.IsRule)
                 return Rule == other.Rule; // Identity based on Rule instance

@@ -38,9 +38,9 @@ namespace Elin_ItemRelocator {
                 List<FilterNode> roots = new List<FilterNode>();
 
 
-                if (profile.Rules != null) {
+                if (profile.Rules is not null) {
                     foreach (var r in profile.Rules) {
-                        var node = new FilterNode { Rule = r, CondType = ConditionType.None };
+                        FilterNode node = new() { Rule = r, CondType = ConditionType.None };
                         roots.Add(node);
                         // Default Open: Ensure rule is expanded regardless of state
                         // But we want persistence. Since we override Equals based on Rule,
@@ -74,7 +74,7 @@ namespace Elin_ItemRelocator {
 
             mainAccordion.SetChildren((node) => {
                 if (node.IsRule) {
-                    var list = new List<FilterNode>();
+                    List<FilterNode> list = [];
                     var r = node.Rule;
 
                     // Deconstruct Rule into Nodes
@@ -82,14 +82,14 @@ namespace Elin_ItemRelocator {
                         foreach (var id in r.CategoryIds) {
                             string name = id;
                             var source = EClass.sources.categories.map.TryGetValue(id);
-                            if (source != null)
+                            if (source is not null)
                                 name = source.GetName();
-                            list.Add(new FilterNode { Rule = r, CondType = ConditionType.Category, CondValue = id, DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Category) + ": " + name });
+                            list.Add(new() { Rule = r, CondType = ConditionType.Category, CondValue = id, DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Category) + ": " + name });
                         }
                     }
-                    if (r.Rarities != null && r.Rarities.Count > 0) {
+                    if (r.Rarities is { Count: > 0 }) {
                         var qualityNames = Lang.GetList("quality");
-                        List<string> display = new List<string>();
+                        List<string> display = [];
                         // Sort for nicer display
                         var sorted = r.Rarities.ToList();
                         sorted.Sort();
@@ -100,48 +100,48 @@ namespace Elin_ItemRelocator {
                             else
                                 display.Add(rar.ToString());
                         }
-                        list.Add(new FilterNode { Rule = r, CondType = ConditionType.Rarity, DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Rarity) + ": " + string.Join(", ", display.ToArray()) });
+                        list.Add(new() { Rule = r, CondType = ConditionType.Rarity, DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Rarity) + ": " + string.Join(", ", display.ToArray()) });
                     }
                     if (!string.IsNullOrEmpty(r.Quality)) {
-                        list.Add(new FilterNode { Rule = r, CondType = ConditionType.Quality, DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Quality) + " " + r.Quality });
+                        list.Add(new() { Rule = r, CondType = ConditionType.Quality, DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Quality) + " " + r.Quality });
                     }
                     if (!string.IsNullOrEmpty(r.Text)) {
-                        list.Add(new FilterNode { Rule = r, CondType = ConditionType.Text, DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Text) + ": " + r.Text });
+                        list.Add(new() { Rule = r, CondType = ConditionType.Text, DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Text) + ": " + r.Text });
                     }
                     if (r.Enchants != null && r.Enchants.Count > 0) {
                         foreach (var e in r.Enchants) {
-                            list.Add(new FilterNode { Rule = r, CondType = ConditionType.Enchant, CondValue = e, DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Enchant) + ": " + e });
+                            list.Add(new() { Rule = r, CondType = ConditionType.Enchant, CondValue = e, DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Enchant) + ": " + e });
                         }
                     }
                     if (r.Weight.HasValue) {
-                        list.Add(new FilterNode { Rule = r, CondType = ConditionType.Weight, CondValue = r.Weight.Value.ToString(), DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Weight) + " " + (string.IsNullOrEmpty(r.WeightOp) ? ">=" : r.WeightOp) + " " + r.Weight });
+                        list.Add(new() { Rule = r, CondType = ConditionType.Weight, CondValue = r.Weight.Value.ToString(), DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Weight) + " " + (string.IsNullOrEmpty(r.WeightOp) ? ">=" : r.WeightOp) + " " + r.Weight });
                     }
 
                     // ADD BUTTON
                     // Material
-                    if (r.MaterialIds != null && r.MaterialIds.Count > 0) {
+                    if (r.MaterialIds is { Count: > 0 }) {
                         string prefix = r.NotMaterial ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
                         HashSet<string> allMats = r.MaterialIds;
                         string displayMat = "";
                         if (allMats.Count <= 3) {
-                            List<string> names = new List<string>();
+                            List<string> names = [];
                             foreach (var mid in allMats) {
                                 var ms = EClass.sources.materials.rows.FirstOrDefault(m => m.alias.Equals(mid, StringComparison.OrdinalIgnoreCase) || m.id.ToString() == mid);
-                                names.Add(ms != null ? ms.GetName() : mid);
+                                names.Add(ms is not null ? ms.GetName() : mid);
                             }
                             displayMat = string.Join(", ", names.ToArray());
                         } else {
                             displayMat = "(" + allMats.Count + ")";
                         }
-                        list.Add(new FilterNode { Rule = r, CondType = ConditionType.Material, CondValue = "Multi", DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Material) + ": " + displayMat });
+                        list.Add(new() { Rule = r, CondType = ConditionType.Material, CondValue = "Multi", DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Material) + ": " + displayMat });
                     }
 
                     // Bless
-                    if (r.BlessStates != null && r.BlessStates.Count > 0) {
+                    if (r.BlessStates is { Count: > 0 }) {
                         string prefix = r.NotBless ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
                         HashSet<int> allStates = r.BlessStates;
 
-                        List<string> names = new List<string>();
+                        List<string> names = [];
                         foreach (var b in allStates) {
                             if (b == 1)
                                 names.Add(RelocatorLang.GetText(RelocatorLang.LangKey.StateBlessed));
@@ -152,17 +152,17 @@ namespace Elin_ItemRelocator {
                             else
                                 names.Add(RelocatorLang.GetText(RelocatorLang.LangKey.StateDoomed));
                         }
-                        list.Add(new FilterNode { Rule = r, CondType = ConditionType.Bless, DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Bless) + ": " + string.Join(", ", names.ToArray()) });
+                        list.Add(new() { Rule = r, CondType = ConditionType.Bless, DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Bless) + ": " + string.Join(", ", names.ToArray()) });
                     }
 
                     // Stolen
                     if (r.IsStolen.HasValue) {
                         string prefix = r.NotStolen ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
-                        list.Add(new FilterNode { Rule = r, CondType = ConditionType.Stolen, DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Stolen) + ": " + (r.IsStolen.Value ? "Yes" : "No") });
+                        list.Add(new() { Rule = r, CondType = ConditionType.Stolen, DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Stolen) + ": " + (r.IsStolen.Value ? "Yes" : "No") });
                     }
 
                     // ADD BUTTON
-                    list.Add(new FilterNode { Rule = r, CondType = ConditionType.AddButton, DisplayText = " + " });
+                    list.Add(new() { Rule = r, CondType = ConditionType.AddButton, DisplayText = " + " });
 
                     return list;
                 }
@@ -179,7 +179,7 @@ namespace Elin_ItemRelocator {
 
             mainAccordion.SetGetBackgroundColor((node) => {
                 if (node.IsRule) {
-                    return new Color(0.85f, 0.82f, 0.75f, 1f);
+                    return new(0.85f, 0.82f, 0.75f, 1f);
                 }
                 if (node.IsAddButton) {
                     return Color.clear;
@@ -221,10 +221,10 @@ namespace Elin_ItemRelocator {
 
                     switch (node.CondType) {
                     case ConditionType.Category:
-                        isNegated = node.Rule.NegatedCategoryIds != null && node.Rule.NegatedCategoryIds.Contains(node.CondValue);
+                        isNegated = node.Rule.NegatedCategoryIds is not null && node.Rule.NegatedCategoryIds.Contains(node.CondValue);
                         toggleNegation = () => {
-                            if (node.Rule.NegatedCategoryIds == null)
-                                node.Rule.NegatedCategoryIds = new HashSet<string>();
+                            if (node.Rule.NegatedCategoryIds is null)
+                                node.Rule.NegatedCategoryIds = [];
                             if (node.Rule.NegatedCategoryIds.Contains(node.CondValue))
                                 node.Rule.NegatedCategoryIds.Remove(node.CondValue);
                             else
@@ -272,7 +272,7 @@ namespace Elin_ItemRelocator {
                                 node.Rule.CategoryIds.Remove(node.CondValue);
                                 break;
                             case ConditionType.Rarity:
-                                node.Rule.Rarities = new HashSet<int>();
+                                node.Rule.Rarities = [];
                                 break;
                             case ConditionType.Quality:
                                 node.Rule.Quality = null;
@@ -314,7 +314,7 @@ namespace Elin_ItemRelocator {
             win.AddBottomButton(RelocatorLang.GetText(RelocatorLang.LangKey.AddRule), () => {
                 Dialog.InputName(RelocatorLang.GetText(RelocatorLang.LangKey.NewRuleName), RelocatorLang.GetText(RelocatorLang.LangKey.NewRuleName), (c, text) => {
                     if (!c && !string.IsNullOrEmpty(text)) {
-                        profile.Rules.Add(new RelocationRule { Name = text });
+                        profile.Rules.Add(new() { Name = text });
                         refresh();
                     }
                 }, (Dialog.InputType)0);
@@ -352,9 +352,9 @@ namespace Elin_ItemRelocator {
                 .SetOnSelect((t) => {
                     var menu = RelocatorMenu.Create();
                     menu.AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Move), () => {
-                        if (currentContainer != null) {
+                        if (currentContainer is not null) {
                             RelocatorManager.Instance.RelocateSingleThing(t, currentContainer);
-                            if (previewTable != null)
+                            if (previewTable is not null)
                                 previewTable.Refresh();
                         }
                     });
@@ -363,7 +363,7 @@ namespace Elin_ItemRelocator {
                 .AddColumn(RelocatorLang.GetText(RelocatorLang.LangKey.Text), 350, (t, cell) => {
                     var txt = cell.GetComponentInChildren<Text>();
                     if (!txt) {
-                        var g = new GameObject("Text");
+                        GameObject g = new("Text");
                         g.transform.SetParent(cell.transform, false);
                         txt = g.AddComponent<Text>();
                         // Default Font & Dark Brown Color
@@ -382,7 +382,7 @@ namespace Elin_ItemRelocator {
                         rt.sizeDelta = Vector2.zero;
                     }
 
-                    if (t != null) {
+                    if (t is not null) {
                         txt.text = t.Name;
                     } else { txt.text = ""; }
 
@@ -393,21 +393,21 @@ namespace Elin_ItemRelocator {
                         if (field != null)
                             field.SetValue(rowBtn, null);
                         rowBtn.SetTooltip((tooltip) => {
-                            if (t != null && tooltip.note != null)
+                            if (t is not null && tooltip.note is not null)
                                 t.WriteNote(tooltip.note);
                         }, true);
                     }
                 })
-                .AddTextColumn(RelocatorLang.GetText(RelocatorLang.LangKey.Category), 100, t => t != null && t.category != null ? t.category.GetName() : "")
+                .AddTextColumn(RelocatorLang.GetText(RelocatorLang.LangKey.Category), 100, t => t is { category: not null } ? t.category.GetName() : "")
                 .AddTextColumn(RelocatorLang.GetText(RelocatorLang.LangKey.Parent), 100, t => {
-                    if (t == null || t.parent == null)
+                    if (t is null || t.parent is null)
                         return "";
                     if (t.parent == EClass.pc.things)
                         return RelocatorLang.GetText(RelocatorLang.LangKey.Inventory);
                     if (t.parent == EClass._map.things)
                         return RelocatorLang.GetText(RelocatorLang.LangKey.Zone);
-                    if (t.parent is Card)
-                        return (t.parent as Card).Name;
+                    if (t.parent is Card c)
+                        return c.Name;
                     return t.parent.ToString();
                 });
 
@@ -542,7 +542,7 @@ namespace Elin_ItemRelocator {
                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.LoadPreset), () => {
                             RelocatorPickers.ShowPresetPicker((name) => {
                                 var loaded = RelocatorManager.Instance.LoadPreset(name);
-                                if (loaded != null) {
+                                if (loaded is not null) {
                                     profile.Rules = loaded.Rules;
                                     profile.Scope = loaded.Scope;
                                     profile.ExcludeHotbar = loaded.ExcludeHotbar;
@@ -558,7 +558,7 @@ namespace Elin_ItemRelocator {
 
         private static void ShowOperatorMenu(Action<string> onSelect) {
             var opMenu = RelocatorMenu.Create();
-            string[] ops = new string[] { ">=", "=", "<=", ">", "<", "!=" };
+            string[] ops = [">=", "=", "<=", ">", "<", "!="];
             foreach (var op in ops) {
                 opMenu.AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Operator) + ": " + op, () => onSelect(op));
             }
@@ -586,10 +586,10 @@ namespace Elin_ItemRelocator {
             txtGO.transform.SetParent(btnGO.transform, false);
             var txt = txtGO.AddComponent<Text>();
             Font f = null;
-            if (SkinManager.Instance != null && SkinManager.Instance.fontSet != null && SkinManager.Instance.fontSet.ui != null && SkinManager.Instance.fontSet.ui.source != null) {
+            if (SkinManager.Instance is { fontSet.ui.source: not null }) {
                 f = SkinManager.Instance.fontSet.ui.source.font;
             }
-            if (f == null)
+            if (f is null)
                 f = UnityEngine.Resources.GetBuiltinResource<Font>("Arial.ttf"); // Fallback
 
             txt.font = f;
@@ -598,7 +598,7 @@ namespace Elin_ItemRelocator {
             txt.alignment = TextAnchor.MiddleCenter;
 
             Color c = Color.black;
-            if (SkinManager.CurrentColors != null)
+            if (SkinManager.CurrentColors is not null)
                 c = SkinManager.CurrentColors.textDefault;
             txt.color = c;
             txt.rectTransform.anchorMin = Vector2.zero;
@@ -612,29 +612,17 @@ namespace Elin_ItemRelocator {
 
 
 
-        private static string GetSortText(RelocationProfile.ResultSortMode mode) {
-            switch (mode) {
-            case RelocationProfile.ResultSortMode.Default:
-                return RelocatorLang.GetText(RelocatorLang.LangKey.SortDefault);
-            case RelocationProfile.ResultSortMode.PriceAsc:
-                return RelocatorLang.GetText(RelocatorLang.LangKey.SortPriceAsc);
-            case RelocationProfile.ResultSortMode.PriceDesc:
-                return RelocatorLang.GetText(RelocatorLang.LangKey.SortPriceDesc);
-            case RelocationProfile.ResultSortMode.EnchantMagAsc:
-                return RelocatorLang.GetText(RelocatorLang.LangKey.SortMagAsc);
-            case RelocationProfile.ResultSortMode.EnchantMagDesc:
-                return RelocatorLang.GetText(RelocatorLang.LangKey.SortMagDesc);
-            case RelocationProfile.ResultSortMode.TotalWeightAsc:
-                return RelocatorLang.GetText(RelocatorLang.LangKey.SortWeightAsc);
-            case RelocationProfile.ResultSortMode.TotalWeightDesc:
-                return RelocatorLang.GetText(RelocatorLang.LangKey.SortWeightDesc);
-            case RelocationProfile.ResultSortMode.UnitWeightAsc:
-                return RelocatorLang.GetText(RelocatorLang.LangKey.SortUnitWeightAsc);
-            case RelocationProfile.ResultSortMode.UnitWeightDesc:
-                return RelocatorLang.GetText(RelocatorLang.LangKey.SortUnitWeightDesc);
-            default:
-                return mode.ToString();
-            }
-        }
+        private static string GetSortText(RelocationProfile.ResultSortMode mode) => mode switch {
+            RelocationProfile.ResultSortMode.Default => RelocatorLang.GetText(RelocatorLang.LangKey.SortDefault),
+            RelocationProfile.ResultSortMode.PriceAsc => RelocatorLang.GetText(RelocatorLang.LangKey.SortPriceAsc),
+            RelocationProfile.ResultSortMode.PriceDesc => RelocatorLang.GetText(RelocatorLang.LangKey.SortPriceDesc),
+            RelocationProfile.ResultSortMode.EnchantMagAsc => RelocatorLang.GetText(RelocatorLang.LangKey.SortMagAsc),
+            RelocationProfile.ResultSortMode.EnchantMagDesc => RelocatorLang.GetText(RelocatorLang.LangKey.SortMagDesc),
+            RelocationProfile.ResultSortMode.TotalWeightAsc => RelocatorLang.GetText(RelocatorLang.LangKey.SortWeightAsc),
+            RelocationProfile.ResultSortMode.TotalWeightDesc => RelocatorLang.GetText(RelocatorLang.LangKey.SortWeightDesc),
+            RelocationProfile.ResultSortMode.UnitWeightAsc => RelocatorLang.GetText(RelocatorLang.LangKey.SortUnitWeightAsc),
+            RelocationProfile.ResultSortMode.UnitWeightDesc => RelocatorLang.GetText(RelocatorLang.LangKey.SortUnitWeightDesc),
+            _ => mode.ToString()
+        };
     }
 }

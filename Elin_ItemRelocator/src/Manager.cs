@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Elin_ItemRelocator {
     public class RelocatorManager : Singleton<RelocatorManager> {
-        public Dictionary<string, RelocationProfile> Profiles = new Dictionary<string, RelocationProfile>();
+        public Dictionary<string, RelocationProfile> Profiles = [];
 
         // Path to Presets folder inside the Mod's folder
         private string PresetPath {
@@ -30,13 +30,12 @@ namespace Elin_ItemRelocator {
 
         // Runtime-only profile retrieval
         public RelocationProfile GetProfile(Thing container) {
-            if (container == null)
-                return new RelocationProfile(); // Safe fallback
+            if (container is null)
+                return new(); // Safe fallback
 
             string key = GetProfileKey(container);
 
-            RelocationProfile profile;
-            if (Profiles.TryGetValue(key, out profile)) {
+            if (Profiles.TryGetValue(key, out var profile)) {
                 return profile;
             }
 
@@ -72,7 +71,7 @@ namespace Elin_ItemRelocator {
         }
 
         public List<string> GetPresetList() {
-            List<string> list = new List<string>();
+            List<string> list = [];
             try {
                 if (Directory.Exists(PresetPath)) {
                     foreach (string file in Directory.GetFiles(PresetPath, "*.json")) {
@@ -116,34 +115,34 @@ namespace Elin_ItemRelocator {
         }
 
         public string GetProfileKey(Thing container) {
-            if (container == null)
+            if (container is null)
                 return null;
             return string.Format("{0}_{1}", Game.id, container.uid);
         }
 
         public IEnumerable<Thing> GetMatches(Thing container, int searchLimit = -1) {
             var profile = GetProfile(container);
-            if (profile == null || !profile.Enabled)
-                return new List<Thing>();
+            if (profile is null || !profile.Enabled)
+                return [];
 
             // Determine search scope and candidates
-            HashSet<Thing> hotbarItems = new HashSet<Thing>();
+            HashSet<Thing> hotbarItems = [];
             foreach (var bar in EClass.player.hotbars.bars) {
-                if (bar == null)
+                if (bar is null)
                     continue;
                 foreach (var page in bar.pages) {
                     foreach (var item in page.items) {
-                        if (item != null && item.Thing != null) {
+                        if (item is { Thing: not null }) {
                             hotbarItems.Add(item.Thing);
                         }
                     }
                 }
             }
 
-            List<Thing> matches = new List<Thing>();
+            List<Thing> matches = [];
 
             // Helper to check and add
-            Action<Thing> checkAndAdd = (t) => {
+            void CheckAndAdd(Thing t) {
                 // Performance Limit
                 if (searchLimit > 0 && matches.Count >= searchLimit)
                     return;
@@ -197,18 +196,18 @@ namespace Elin_ItemRelocator {
                     return;
 
                 matches.Add(t);
-            };
+            }
 
             // Inventory Scope (Include if Scope is Inventory OR Both)
             if (profile.Scope != RelocationProfile.FilterScope.ZoneOnly) {
                 // Layer 1: PC Inventory (Recursive Layer 2)
                 foreach (var t in EClass.pc.things) {
-                    checkAndAdd(t);
+                    CheckAndAdd(t);
 
                     // Layer 2: Inside Containers
-                    if (t.IsContainer && t.things != null && t.things.Count > 0) {
+                    if (t.IsContainer && t.things is { Count: > 0 }) {
                         foreach (var child in t.things) {
-                            checkAndAdd(child);
+                            CheckAndAdd(child);
                         }
                     }
                 }
@@ -219,17 +218,17 @@ namespace Elin_ItemRelocator {
                 // So if ExcludeHotbar is ON, we skip this entirely.
                 if (!profile.ExcludeHotbar) {
                     foreach (var slot in EClass.pc.body.slots) {
-                        if (slot.thing == null || !slot.thing.IsContainer || slot.thing.things.Count == 0)
+                        if (slot.thing is null || !slot.thing.IsContainer || slot.thing.things.Count == 0)
                             continue;
 
                         // Scan contents of equipped container
                         foreach (var t in slot.thing.things) {
-                            checkAndAdd(t);
+                            CheckAndAdd(t);
 
                             // Recurse one level deep (e.g. Bag inside Toolbelt)
-                            if (t.IsContainer && t.things != null && t.things.Count > 0) {
+                            if (t.IsContainer && t.things is { Count: > 0 }) {
                                 foreach (var child in t.things) {
-                                    checkAndAdd(child);
+                                    CheckAndAdd(child);
                                 }
                             }
                         }
@@ -240,15 +239,15 @@ namespace Elin_ItemRelocator {
             // Zone Scope (Include if Scope is ZoneOnly OR Both)
             if (profile.Scope == RelocationProfile.FilterScope.Both || profile.Scope == RelocationProfile.FilterScope.ZoneOnly) {
                 foreach (var t in EClass._map.things) {
-                    checkAndAdd(t);
+                    CheckAndAdd(t);
 
                     // Recurse into installed containers
                     // t.placeState == PlaceState.installed check is implicit because 't' is in _map.things (usually installed or roaming)
                     // checkAndAdd(t) already filtered 't' if it was installed.
                     // Now we explicitly look inside if it IS installed and IS a container.
-                    if (t.placeState == PlaceState.installed && t.IsContainer && t.things != null && t.things.Count > 0) {
+                    if (t.placeState == PlaceState.installed && t.IsContainer && t.things is { Count: > 0 }) {
                         foreach (var child in t.things) {
-                            checkAndAdd(child);
+                            CheckAndAdd(child);
                         }
                     }
                 }
@@ -265,26 +264,26 @@ namespace Elin_ItemRelocator {
             case RelocationProfile.ResultSortMode.EnchantMagAsc:
             case RelocationProfile.ResultSortMode.EnchantMagDesc:
                 // Identify target element IDs from rules
-                List<int> targetEleIds = new List<int>();
+                List<int> targetEleIds = [];
                 foreach (var r in profile.Rules) {
                     if (r.Enabled && !string.IsNullOrEmpty(r.Text)) {
-                        string[] searchTerms = r.Text.Split(new char[] { ' ', '　' }, StringSplitOptions.RemoveEmptyEntries);
+                        string[] searchTerms = r.Text.Split([' ', '　'], StringSplitOptions.RemoveEmptyEntries);
                         foreach (var term in searchTerms) {
                             if (term.StartsWith("@")) {
                                 // Parse term: @Mining>=10 -> Mining
                                 string key = term.Substring(1);
                                 // Strip operators
-                                string[] ops = new string[] { ">=", "<=", "!=", ">", "<", "=" };
+                                string[] ops = [">=", "<=", "!=", ">", "<", "="];
                                 foreach (var o in ops) {
                                     int idx = key.IndexOf(o);
                                     if (idx > 0) { key = key.Substring(0, idx).Trim(); break; }
                                 }
 
                                 var sourceEle = EClass.sources.elements.map.Values.FirstOrDefault(e =>
-                                    (e.alias != null && e.alias.Equals(key, StringComparison.OrdinalIgnoreCase)) ||
+                                    (e.alias is not null && e.alias.Equals(key, StringComparison.OrdinalIgnoreCase)) ||
                                     (e.GetName().Equals(key, StringComparison.OrdinalIgnoreCase))
                                 );
-                                if (sourceEle != null)
+                                if (sourceEle is not null)
                                     targetEleIds.Add(sourceEle.id);
                             }
                         }

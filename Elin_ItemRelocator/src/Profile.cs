@@ -14,18 +14,18 @@ namespace Elin_ItemRelocator {
         public bool ExcludeHotbar = true; // Default to exclude
 
         // Main Data
-        public List<RelocationRule> Rules = new List<RelocationRule>();
+        public List<RelocationRule> Rules = [];
 
         // Legacy Support
         [JsonProperty]
         private List<RelocationFilter> Filters {
             set {
-                if (value != null && value.Count > 0) {
+                if (value is { Count: > 0 }) {
                     // Migration: Convert legacy Filters to Rules
                     foreach (var f in value) {
-                        var r = new RelocationRule();
+                        RelocationRule r = new();
                         r.Name = "Imported Rule";
-                        if (f.CategoryIds != null)
+                        if (f.CategoryIds is not null)
                             r.CategoryIds = f.CategoryIds;
                         if (f.Rarity.HasValue) {
                             for (int i = f.Rarity.Value; i <= 4; i++)
@@ -44,7 +44,6 @@ namespace Elin_ItemRelocator {
         // Scope definition
         public enum FilterScope {
             Inventory,
-            [Obsolete("Use Both")]
             Both, // Was Zone (1)
             ZoneOnly // New (2)
         }
@@ -69,17 +68,17 @@ namespace Elin_ItemRelocator {
         public string Name = "New Rule";
         public bool Enabled = true;
 
-        public List<string> CategoryIds = new List<string>();
+        public List<string> CategoryIds = [];
         // public int? Rarity; // Removed
         // public string RarityOp; // Removed
         public string Quality;
         public string Text;
-        public List<string> Enchants = new List<string>();
+        public List<string> Enchants = [];
         public int? Weight;
         public string WeightOp = ">=";
 
         // Negation Flags
-        public HashSet<string> NegatedCategoryIds = new HashSet<string>();
+        public HashSet<string> NegatedCategoryIds = [];
         public bool NotQuality;
         public bool NotText;
         public bool NotWeight;
@@ -90,11 +89,11 @@ namespace Elin_ItemRelocator {
         // New Condition Fields
         [JsonProperty("MaterialId")]
         private string LegacyMaterialId { set { if (!string.IsNullOrEmpty(value)) MaterialIds.Add(value); } }
-        public HashSet<string> MaterialIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase); // Multi-select
+        public HashSet<string> MaterialIds = new(StringComparer.OrdinalIgnoreCase); // Multi-select
 
         [JsonProperty("Bless")]
         private int? LegacyBless { set { if (value.HasValue) BlessStates.Add(value.Value); } }
-        public HashSet<int> BlessStates = new HashSet<int>(); // Multi-select
+        public HashSet<int> BlessStates = []; // Multi-select
 
         [JsonProperty("Rarity")]
         private int? LegacyRarity {
@@ -110,7 +109,7 @@ namespace Elin_ItemRelocator {
                 }
             }
         }
-        public HashSet<int> Rarities = new HashSet<int>();
+        public HashSet<int> Rarities = [];
 
         public bool? IsStolen;
 
@@ -129,13 +128,13 @@ namespace Elin_ItemRelocator {
                 return false;
 
             // Migration: Move Enchants from Text to Enchants list
-            if (!string.IsNullOrEmpty(Text) && Text.Contains("@")) {
-                var parts = Text.Split(new char[] { ' ', '　' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            if (!string.IsNullOrEmpty(Text) && Text.Contains('@')) {
+                var parts = Text.Split([' ', '　'], StringSplitOptions.RemoveEmptyEntries).ToList();
                 var newText = new List<string>();
                 foreach (var p in parts) {
                     if (p.StartsWith("@")) {
-                        if (Enchants == null)
-                            Enchants = new List<string>();
+                        if (Enchants is null)
+                            Enchants = [];
                         Enchants.Add(p);
                     } else {
                         newText.Add(p);
@@ -162,12 +161,12 @@ namespace Elin_ItemRelocator {
             }
 
             // Check Category (Multi-match: OR logic within CategoryIds)
-            if (CategoryIds != null && CategoryIds.Count > 0) {
+            if (CategoryIds is { Count: > 0 }) {
                 bool hasPositive = false;
                 bool positiveMatch = false;
 
                 foreach (var id in CategoryIds) {
-                    bool isNeg = NegatedCategoryIds != null && NegatedCategoryIds.Contains(id);
+                    bool isNeg = NegatedCategoryIds is not null && NegatedCategoryIds.Contains(id);
                     if (isNeg) {
                         // Negative Condition: Must NOT be match
                         if (t.category.IsChildOf(id))
@@ -184,7 +183,7 @@ namespace Elin_ItemRelocator {
             }
 
             // Check Rarity (Multi-select)
-            if (Rarities != null && Rarities.Count > 0) {
+            if (Rarities is { Count: > 0 }) {
                 // Rarity is Rarity enum (int)
                 // However, t.rarity is Rarity enum.
                 if (!Rarities.Contains((int)t.rarity))
@@ -210,7 +209,7 @@ namespace Elin_ItemRelocator {
             }
 
             // Check Enchants (New)
-            if (Enchants != null && Enchants.Count > 0) {
+            if (Enchants is { Count: > 0 }) {
                 bool matchEnchant = true;
                 foreach (var e in Enchants) {
                     // Enchants are stored as "@Mining>=10" or just "@Mining"
@@ -232,9 +231,9 @@ namespace Elin_ItemRelocator {
             }
 
             // Check Material (Optimized HashSet Lookup)
-            if (MaterialIds != null && MaterialIds.Count > 0) {
+            if (MaterialIds is { Count: > 0 }) {
                 bool match = false;
-                if (t.material != null) {
+                if (t.material is not null) {
                     // O(1) Lookup
                     if (MaterialIds.Contains(t.material.alias) || MaterialIds.Contains(t.material.id.ToString()))
                         match = true;
@@ -246,17 +245,17 @@ namespace Elin_ItemRelocator {
             }
 
             // Check Bless State (Optimized Reflection)
-            if (BlessStates != null && BlessStates.Count > 0) {
+            if (BlessStates is { Count: > 0 }) {
                 int bState = 0;
 
                 // Fast Path: Compiled Delegate
-                if (_blessGetter != null) {
+                if (_blessGetter is not null) {
                     bState = _blessGetter(t);
                 } else {
                     // Slow Path: Reflection / Fallback
-                    if (_fiBless == null)
+                    if (_fiBless is null)
                         _fiBless = typeof(Thing).GetField("bless", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-                    if (_fiBless != null) {
+                    if (_fiBless is not null) {
                         try { bState = Convert.ToInt32(_fiBless.GetValue(t)); } catch { }
                     } else {
                         if (t.IsBlessed)
@@ -288,18 +287,18 @@ namespace Elin_ItemRelocator {
 
         // Helper to get active conditions for UI
         public List<string> GetConditionList() {
-            List<string> parts = new List<string>();
+            List<string> parts = [];
             // Categories
-            if (CategoryIds != null && CategoryIds.Count > 0) {
+            if (CategoryIds is { Count: > 0 }) {
                 foreach (var id in CategoryIds) {
                     var source = EClass.sources.categories.map.TryGetValue(id);
-                    string name = source != null ? source.GetName() : id;
-                    bool isNeg = NegatedCategoryIds != null && NegatedCategoryIds.Contains(id);
+                    string name = source is not null ? source.GetName() : id;
+                    bool isNeg = NegatedCategoryIds is not null && NegatedCategoryIds.Contains(id);
                     string prefix = isNeg ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
                     parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Category) + ": " + name);
                 }
             }
-            if (Rarities != null && Rarities.Count > 0) {
+            if (Rarities is { Count: > 0 }) {
                 parts.Add(RelocatorLang.GetText(RelocatorLang.LangKey.Rarity));
             }
             if (!string.IsNullOrEmpty(Quality)) {
@@ -318,7 +317,7 @@ namespace Elin_ItemRelocator {
         }
 
         private bool IsTextMatch(Thing t, string query) {
-            string[] parts = query.Split(new char[] { ' ', '　' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] parts = query.Split([' ', '　'], StringSplitOptions.RemoveEmptyEntries);
             foreach (var part in parts) {
                 string term = part.Trim();
                 // Legacy @ check removed (handled by migration)
@@ -363,7 +362,7 @@ namespace Elin_ItemRelocator {
             if (string.IsNullOrEmpty(condition))
                 return;
 
-            string[] ops = new string[] { ">=", "<=", "!=", ">", "<", "=" };
+            string[] ops = [">=", "<=", "!=", ">", "<", "="];
             string foundOp = null;
             string valStr = condition;
 
@@ -384,27 +383,16 @@ namespace Elin_ItemRelocator {
             // So int.TryParse fails. val remains defaultVal. Correct.
 
             // IF Valid Op found
-            if (foundOp != null) {
-                switch (foundOp) {
-                case ">=":
-                    op = RelocationProfile.RelocatorOp.Ge;
-                    break;
-                case "<=":
-                    op = RelocationProfile.RelocatorOp.Le;
-                    break;
-                case "!=":
-                    op = RelocationProfile.RelocatorOp.Ne;
-                    break;
-                case ">":
-                    op = RelocationProfile.RelocatorOp.Gt;
-                    break;
-                case "<":
-                    op = RelocationProfile.RelocatorOp.Lt;
-                    break;
-                case "=":
-                    op = RelocationProfile.RelocatorOp.Eq;
-                    break;
-                }
+            if (foundOp is not null) {
+                op = foundOp switch {
+                    ">=" => RelocationProfile.RelocatorOp.Ge,
+                    "<=" => RelocationProfile.RelocatorOp.Le,
+                    "!=" => RelocationProfile.RelocatorOp.Ne,
+                    ">" => RelocationProfile.RelocatorOp.Gt,
+                    "<" => RelocationProfile.RelocatorOp.Lt,
+                    "=" => RelocationProfile.RelocatorOp.Eq,
+                    _ => RelocationProfile.RelocatorOp.Ge
+                };
             }
 
             if (!string.IsNullOrEmpty(valStr)) {
@@ -412,27 +400,18 @@ namespace Elin_ItemRelocator {
             }
         }
 
-        private bool CheckOp(int value, RelocationProfile.RelocatorOp op, int target) {
-            switch (op) {
-            case RelocationProfile.RelocatorOp.Ge:
-                return value >= target;
-            case RelocationProfile.RelocatorOp.Gt:
-                return value > target;
-            case RelocationProfile.RelocatorOp.Le:
-                return value <= target;
-            case RelocationProfile.RelocatorOp.Lt:
-                return value < target;
-            case RelocationProfile.RelocatorOp.Eq:
-                return value == target;
-            case RelocationProfile.RelocatorOp.Ne:
-                return value != target;
-            default:
-                return false;
-            }
-        }
+        private bool CheckOp(int value, RelocationProfile.RelocatorOp op, int target) => op switch {
+            RelocationProfile.RelocatorOp.Ge => value >= target,
+            RelocationProfile.RelocatorOp.Gt => value > target,
+            RelocationProfile.RelocatorOp.Le => value <= target,
+            RelocationProfile.RelocatorOp.Lt => value < target,
+            RelocationProfile.RelocatorOp.Eq => value == target,
+            RelocationProfile.RelocatorOp.Ne => value != target,
+            _ => false
+        };
 
         private bool EvaluateAttribute(Thing t, string query) {
-            string[] ops = new string[] { ">=", "<=", "!=", ">", "<", "=" };
+            string[] ops = [">=", "<=", "!=", ">", "<", "="];
             string op = null;
             string key = query;
             int val = 0;
@@ -447,7 +426,7 @@ namespace Elin_ItemRelocator {
                     break;
                 }
             }
-            if (op == null) { op = ">"; val = 0; }
+            if (op is null) { op = ">"; val = 0; }
 
             int eleId = 0;
             var sourceEle = EClass.sources.elements.map.Values.FirstOrDefault(e =>
@@ -455,29 +434,22 @@ namespace Elin_ItemRelocator {
                 (e.GetName().Equals(key, StringComparison.OrdinalIgnoreCase))
             );
 
-            if (sourceEle != null)
+            if (sourceEle is not null)
                 eleId = sourceEle.id;
             else if (!int.TryParse(key, out eleId))
                 return false;
 
             int currentVal = t.elements.Value(eleId);
 
-            switch (op) {
-            case ">=":
-                return currentVal >= val;
-            case ">":
-                return currentVal > val;
-            case "<=":
-                return currentVal <= val;
-            case "<":
-                return currentVal < val;
-            case "=":
-                return currentVal == val;
-            case "!=":
-                return currentVal != val;
-            default:
-                return false;
-            }
+            return op switch {
+                ">=" => currentVal >= val,
+                ">" => currentVal > val,
+                "<=" => currentVal <= val,
+                "<" => currentVal < val,
+                "=" => currentVal == val,
+                "!=" => currentVal != val,
+                _ => false
+            };
         }
     }
 
