@@ -5,11 +5,9 @@ using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 using System.Reflection;
 
-namespace Elin_ItemRelocator
-{
+namespace Elin_ItemRelocator {
     [Serializable]
-    public class RelocationProfile
-    {
+    public class RelocationProfile {
         public string ContainerName; // For display/debug
         public bool Enabled = true;
         public FilterScope Scope = FilterScope.Both;
@@ -20,18 +18,19 @@ namespace Elin_ItemRelocator
 
         // Legacy Support
         [JsonProperty]
-        private List<RelocationFilter> Filters
-        {
-            set
-            {
-                if(value != null && value.Count > 0) {
+        private List<RelocationFilter> Filters {
+            set {
+                if (value != null && value.Count > 0) {
                     // Migration: Convert legacy Filters to Rules
-                    foreach(var f in value) {
+                    foreach (var f in value) {
                         var r = new RelocationRule();
                         r.Name = "Imported Rule";
-                        if(f.CategoryIds != null) r.CategoryIds = f.CategoryIds;
-                        r.Rarity = f.Rarity;
-                        r.RarityOp = f.RarityOp;
+                        if (f.CategoryIds != null)
+                            r.CategoryIds = f.CategoryIds;
+                        if (f.Rarity.HasValue) {
+                            for (int i = f.Rarity.Value; i <= 4; i++)
+                                r.Rarities.Add(i);
+                        }
                         r.Quality = f.Quality;
                         r.Text = f.Text;
                         Rules.Add(r);
@@ -43,16 +42,14 @@ namespace Elin_ItemRelocator
         public ResultSortMode SortMode = ResultSortMode.Default;
 
         // Scope definition
-        public enum FilterScope
-        {
+        public enum FilterScope {
             Inventory,
             [Obsolete("Use Both")]
             Both, // Was Zone (1)
             ZoneOnly // New (2)
         }
 
-        public enum ResultSortMode
-        {
+        public enum ResultSortMode {
             Default,
             PriceAsc,
             PriceDesc,
@@ -63,25 +60,26 @@ namespace Elin_ItemRelocator
             UnitWeightAsc,
             UnitWeightDesc
         }
+
+        public enum RelocatorOp { Ge, Le, Eq, Ne, Gt, Lt }
     }
 
     [Serializable]
-    public class RelocationRule
-    {
+    public class RelocationRule {
         public string Name = "New Rule";
         public bool Enabled = true;
 
         public List<string> CategoryIds = new List<string>();
-        public int? Rarity;
-        public string RarityOp = ">=";
+        // public int? Rarity; // Removed
+        // public string RarityOp; // Removed
         public string Quality;
         public string Text;
+        public List<string> Enchants = new List<string>();
         public int? Weight;
         public string WeightOp = ">=";
 
         // Negation Flags
         public HashSet<string> NegatedCategoryIds = new HashSet<string>();
-        public bool NotRarity;
         public bool NotQuality;
         public bool NotText;
         public bool NotWeight;
@@ -89,7 +87,6 @@ namespace Elin_ItemRelocator
         public bool NotBless;
         public bool NotStolen;
 
-        // New Condition Fields
         // New Condition Fields
         [JsonProperty("MaterialId")]
         private string LegacyMaterialId { set { if (!string.IsNullOrEmpty(value)) MaterialIds.Add(value); } }
@@ -99,248 +96,350 @@ namespace Elin_ItemRelocator
         private int? LegacyBless { set { if (value.HasValue) BlessStates.Add(value.Value); } }
         public HashSet<int> BlessStates = new HashSet<int>(); // Multi-select
 
-        // Removed BlessOp as it is incompatible with Multi-select set logic.
-        // Note: Legacy Bless operators (>=) are not preserved, only the specific value is migrated.
+        [JsonProperty("Rarity")]
+        private int? LegacyRarity {
+            set {
+                if (value.HasValue) {
+                    // Legacy migration: Rarity was >= Value.
+                    // Since we are switching to strict multi-select, we can't perfectly migrate ">=2" to {2,3,4} without knowing max rarity.
+                    // However, safe default: Add the value itself.
+                    // Or: Add all rarities >= value up to max (Mythical=4).
+                    // Existing: -1=Crude, 0=Normal, 1=High, 2=Superior, 3=Legendary, 4=Mythical
+                    for (int i = value.Value; i <= 4; i++)
+                        Rarities.Add(i);
+                }
+            }
+        }
+        public HashSet<int> Rarities = new HashSet<int>();
+
         public bool? IsStolen;
+
+        // --- Cache Fields (Optimization) ---
+        [JsonIgnore] private bool _cacheValid = false;
+        // [JsonIgnore] private int _cRarityVal; [JsonIgnore] private RelocationProfile.RelocatorOp _cRarityOp; // Removed
+        [JsonIgnore] private int _cQualityVal; [JsonIgnore] private RelocationProfile.RelocatorOp _cQualityOp;
+        [JsonIgnore] private int _cWeightVal; [JsonIgnore] private RelocationProfile.RelocatorOp _cWeightOp;
+        [JsonIgnore] private static Func<Thing, int> _blessGetter;
+        [JsonIgnore] private static bool _blessGetterInit = false;
 
         // Matching Logic (AND within Rule)
         private static FieldInfo _fiBless;
-        public bool IsMatch(Thing t)
-        {
-            if (!Enabled) return false;
+        public bool IsMatch(Thing t) {
+            if (!Enabled)
+                return false;
+
+            // Migration: Move Enchants from Text to Enchants list
+            if (!string.IsNullOrEmpty(Text) && Text.Contains("@")) {
+                var parts = Text.Split(new char[] { ' ', '　' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                var newText = new List<string>();
+                foreach (var p in parts) {
+                    if (p.StartsWith("@")) {
+                        if (Enchants == null)
+                            Enchants = new List<string>();
+                        Enchants.Add(p);
+                    } else {
+                        newText.Add(p);
+                    }
+                }
+                Text = String.Join(" ", newText.ToArray());
+                if (string.IsNullOrEmpty(Text))
+                    Text = null;
+            }
+
+            EnsureCache();
 
             // Safe Default: If no conditions are set, match nothing.
             if ((CategoryIds == null || CategoryIds.Count == 0) &&
-                !Rarity.HasValue &&
+                (Rarities == null || Rarities.Count == 0) &&
                 string.IsNullOrEmpty(Quality) &&
                 string.IsNullOrEmpty(Text) &&
-                string.IsNullOrEmpty(Text) &&
+                (Enchants == null || Enchants.Count == 0) &&
                 !Weight.HasValue &&
                 (MaterialIds == null || MaterialIds.Count == 0) &&
                 (BlessStates == null || BlessStates.Count == 0) &&
-                !IsStolen.HasValue)
-            {
+                !IsStolen.HasValue) {
                 return false;
             }
 
             // Check Category (Multi-match: OR logic within CategoryIds)
-            if (CategoryIds != null && CategoryIds.Count > 0)
-            {
-                // Determine if this specific category condition is negated
-                // NOTE: The current data structure stores negated IDs in a separate set.
-                // But the logic "Is Match" iterates "CategoryIds".
-                // If an ID is in "CategoryIds", it's a condition.
-                // If it is ALSO in "NegatedCategoryIds", it means "NOT (IsChildOf(id))".
-                // BUT, usually "CategoryIds" is treated as an OR group.
-                // If we have Mixed (Positive and Negated)...
-                // Interpret as: (Positive1 OR Positive2) AND (NOT Negative1) AND (NOT Negative2).
-                // "CategoryIds" contains ALL IDs (both positive and negative ones).
-                // So we separate them.
-
+            if (CategoryIds != null && CategoryIds.Count > 0) {
                 bool hasPositive = false;
                 bool positiveMatch = false;
 
-                foreach(var id in CategoryIds) {
+                foreach (var id in CategoryIds) {
                     bool isNeg = NegatedCategoryIds != null && NegatedCategoryIds.Contains(id);
                     if (isNeg) {
-                         // Negative Condition: Must NOT be match
-                         if (t.category.IsChildOf(id)) return false;
+                        // Negative Condition: Must NOT be match
+                        if (t.category.IsChildOf(id))
+                            return false;
                     } else {
-                         hasPositive = true;
-                         if (t.category.IsChildOf(id)) positiveMatch = true;
+                        hasPositive = true;
+                        if (t.category.IsChildOf(id))
+                            positiveMatch = true;
                     }
                 }
 
-                if (hasPositive && !positiveMatch) return false;
+                if (hasPositive && !positiveMatch)
+                    return false;
             }
 
-            // Check Rarity
-            if (Rarity.HasValue)
-            {
-                string op = string.IsNullOrEmpty(RarityOp) ? ">=" : RarityOp;
-                bool match = EvaluateCondition((int)t.rarity, op + Rarity.Value);
-                if (NotRarity) match = !match;
-                if (!match) return false;
+            // Check Rarity (Multi-select)
+            if (Rarities != null && Rarities.Count > 0) {
+                // Rarity is Rarity enum (int)
+                // However, t.rarity is Rarity enum.
+                if (!Rarities.Contains((int)t.rarity))
+                    return false;
             }
 
-            // Check Quality (String Logic)
-            if (!string.IsNullOrEmpty(Quality))
-            {
-                  bool match = EvaluateCondition((int)t.encLV, Quality);
-                  if (NotQuality) match = !match;
-                  if (!match) return false;
+            // Check Quality
+            if (!string.IsNullOrEmpty(Quality)) {
+                bool match = CheckOp((int)t.encLV, _cQualityOp, _cQualityVal);
+                if (NotQuality)
+                    match = !match;
+                if (!match)
+                    return false;
             }
 
             // Check Text
-            if (!string.IsNullOrEmpty(Text))
-            {
-                 bool match = IsTextMatch(t, Text);
-                 if (NotText) match = !match;
-                 if (!match) return false;
+            if (!string.IsNullOrEmpty(Text)) {
+                bool match = IsTextMatch(t, Text);
+                if (NotText)
+                    match = !match;
+                if (!match)
+                    return false;
+            }
+
+            // Check Enchants (New)
+            if (Enchants != null && Enchants.Count > 0) {
+                bool matchEnchant = true;
+                foreach (var e in Enchants) {
+                    // Enchants are stored as "@Mining>=10" or just "@Mining"
+                    string term = e.StartsWith("@") ? e.Substring(1) : e;
+                    if (!EvaluateAttribute(t, term)) { matchEnchant = false; break; }
+                }
+                // Note: No negation flag for Enchants currently (assumed positive requirement)
+                if (!matchEnchant)
+                    return false;
             }
 
             // Check Weight (Unit Weight)
-            if (Weight.HasValue)
-            {
-                 string op = string.IsNullOrEmpty(WeightOp) ? ">=" : WeightOp;
-                 // SelfWeight returns unit weight in Elin
-                 bool match = EvaluateCondition(t.SelfWeight, op + Weight.Value);
-                  if (NotWeight) match = !match;
-                  if (!match) return false;
+            if (Weight.HasValue) {
+                bool match = CheckOp(t.SelfWeight, _cWeightOp, _cWeightVal);
+                if (NotWeight)
+                    match = !match;
+                if (!match)
+                    return false;
             }
 
-            // Material Check
+            // Check Material (Optimized HashSet Lookup)
             if (MaterialIds != null && MaterialIds.Count > 0) {
                 bool match = false;
                 if (t.material != null) {
-                    string alias = t.material.alias;
-                    string idStr = t.material.id.ToString();
-                    if (MaterialIds.Any(m => m.Equals(alias, StringComparison.OrdinalIgnoreCase)) || MaterialIds.Any(m => m.Equals(idStr, StringComparison.OrdinalIgnoreCase))) match = true;
+                    // O(1) Lookup
+                    if (MaterialIds.Contains(t.material.alias) || MaterialIds.Contains(t.material.id.ToString()))
+                        match = true;
                 }
-                if (NotMaterial) match = !match;
-                if (!match) return false;
+                if (NotMaterial)
+                    match = !match;
+                if (!match)
+                    return false;
             }
 
-            // Bless State (State)
+            // Check Bless State (Optimized Reflection)
             if (BlessStates != null && BlessStates.Count > 0) {
                 int bState = 0;
-                // Use Reflection to access 'bless' field which might be internal/protected
-                if (_fiBless == null) _fiBless = typeof(Thing).GetField("bless", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
-                if (_fiBless != null) {
-                    try {
-                        bState = Convert.ToInt32(_fiBless.GetValue(t));
-                    } catch {
-                         // Fallback
-                         if (t.IsBlessed) bState = 1;
-                         else if (t.IsCursed) bState = -1;
-                    }
+                // Fast Path: Compiled Delegate
+                if (_blessGetter != null) {
+                    bState = _blessGetter(t);
                 } else {
-                     // Fallback if field not found
-                     if (t.IsBlessed) bState = 1;
-                     else if (t.IsCursed) bState = -1;
+                    // Slow Path: Reflection / Fallback
+                    if (_fiBless == null)
+                        _fiBless = typeof(Thing).GetField("bless", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                    if (_fiBless != null) {
+                        try { bState = Convert.ToInt32(_fiBless.GetValue(t)); } catch { }
+                    } else {
+                        if (t.IsBlessed)
+                            bState = 1;
+                        else if (t.IsCursed)
+                            bState = -1;
+                    }
                 }
 
-                bool match = false;
-                if (BlessStates.Contains(bState)) match = true;
+                bool match = BlessStates.Contains(bState);
 
-                if (NotBless) match = !match;
-                if (!match) return false;
+                if (NotBless)
+                    match = !match;
+                if (!match)
+                    return false;
             }
 
             // Stolen Flag
             if (IsStolen.HasValue) {
-                // t.isStolen is likely the field
                 bool match = t.isStolen == IsStolen.Value;
-                if (NotStolen) match = !match;
-                if (!match) return false;
+                if (NotStolen)
+                    match = !match;
+                if (!match)
+                    return false;
             }
 
             return true;
         }
 
         // Helper to get active conditions for UI
-        public List<string> GetConditionList()
-        {
-             List<string> parts = new List<string>();
-             // Categories
-              if (CategoryIds != null && CategoryIds.Count > 0) {
-                  foreach(var id in CategoryIds) {
-                       var source = EClass.sources.categories.map.TryGetValue(id);
-                       string name = source != null ? source.GetName() : id;
-                       bool isNeg = NegatedCategoryIds != null && NegatedCategoryIds.Contains(id);
-                       string prefix = isNeg ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
-                       parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Category) + ": " + name);
-                  }
-              }
-              if (Rarity.HasValue) {
-                  string prefix = NotRarity ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
-                  parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Rarity) + " " + (string.IsNullOrEmpty(RarityOp) ? ">=" : RarityOp) + " " + Rarity.Value);
-              }
-              if (!string.IsNullOrEmpty(Quality)) {
-                  string prefix = NotQuality ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
-                  parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Quality) + " " + Quality);
-              }
-              if (!string.IsNullOrEmpty(Text)) {
-                  string prefix = NotText ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
-                  parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Text) + ": " + Text);
-              }
-              if (Weight.HasValue) {
-                  string prefix = NotWeight ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
-                  parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Weight) + " " + (string.IsNullOrEmpty(WeightOp) ? ">=" : WeightOp) + " " + Weight.Value);
-              }
-             return parts;
+        public List<string> GetConditionList() {
+            List<string> parts = new List<string>();
+            // Categories
+            if (CategoryIds != null && CategoryIds.Count > 0) {
+                foreach (var id in CategoryIds) {
+                    var source = EClass.sources.categories.map.TryGetValue(id);
+                    string name = source != null ? source.GetName() : id;
+                    bool isNeg = NegatedCategoryIds != null && NegatedCategoryIds.Contains(id);
+                    string prefix = isNeg ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                    parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Category) + ": " + name);
+                }
+            }
+            if (Rarities != null && Rarities.Count > 0) {
+                parts.Add(RelocatorLang.GetText(RelocatorLang.LangKey.Rarity));
+            }
+            if (!string.IsNullOrEmpty(Quality)) {
+                string prefix = NotQuality ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Quality) + " " + Quality);
+            }
+            if (!string.IsNullOrEmpty(Text)) {
+                string prefix = NotText ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Text) + ": " + Text);
+            }
+            if (Weight.HasValue) {
+                string prefix = NotWeight ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Weight) + " " + (string.IsNullOrEmpty(WeightOp) ? ">=" : WeightOp) + " " + Weight.Value);
+            }
+            return parts;
         }
 
-        private bool IsTextMatch(Thing t, string query)
-        {
-            string[] parts = query.Split(new char[]{' ', '　'}, StringSplitOptions.RemoveEmptyEntries);
-            foreach(var part in parts)
-            {
+        private bool IsTextMatch(Thing t, string query) {
+            string[] parts = query.Split(new char[] { ' ', '　' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var part in parts) {
                 string term = part.Trim();
-                if (term.StartsWith("@"))
-                {
-                    if (!EvaluateAttribute(t, term.Substring(1))) return false;
-                }
-                else
-                {
-                    if (!MatchesName(t, term)) return false;
-                }
+                // Legacy @ check removed (handled by migration)
+                if (!MatchesName(t, term))
+                    return false;
             }
             return true;
         }
 
-        private bool MatchesName(Thing t, string term)
-        {
+        private bool MatchesName(Thing t, string term) {
             string name = t.Name.ToLower();
             string rawName = t.source.GetName().ToLower();
             string q = term.ToLower();
             return name.Contains(q) || rawName.Contains(q);
         }
 
-        private bool EvaluateCondition(int value, string condition)
-        {
-            string[] ops = new string[]{ ">=", "<=", "!=", ">", "<", "=" };
-            string op = null;
-            string valStr = condition;
-            int targetVal = 0;
+        private void EnsureCache() {
+            if (_cacheValid)
+                return;
 
-            foreach(var o in ops)
-            {
-                if (condition.StartsWith(o))
-                {
-                    op = o;
+            ParseOp(string.IsNullOrEmpty(WeightOp) ? ">=" : WeightOp, Weight.HasValue ? Weight.Value : 0, out _cWeightOp, out _cWeightVal);
+            ParseOp(Quality, 0, out _cQualityOp, out _cQualityVal); // Quality string contains both op and value
+
+            if (!_blessGetterInit) {
+                _blessGetterInit = true;
+                try {
+                    var param = System.Linq.Expressions.Expression.Parameter(typeof(Thing), "t");
+                    var field = System.Linq.Expressions.Expression.Field(param, "bless");
+                    var conv = System.Linq.Expressions.Expression.Convert(field, typeof(int));
+                    _blessGetter = System.Linq.Expressions.Expression.Lambda<Func<Thing, int>>(conv, param).Compile();
+                } catch {
+                    // Reflection Fallback handled in IsMatch
+                }
+            }
+
+            _cacheValid = true;
+        }
+
+        private void ParseOp(string condition, int defaultVal, out RelocationProfile.RelocatorOp op, out int val) {
+            op = RelocationProfile.RelocatorOp.Ge;
+            val = defaultVal;
+            if (string.IsNullOrEmpty(condition))
+                return;
+
+            string[] ops = new string[] { ">=", "<=", "!=", ">", "<", "=" };
+            string foundOp = null;
+            string valStr = condition;
+
+            foreach (var o in ops) {
+                if (condition.StartsWith(o)) {
+                    foundOp = o;
                     valStr = condition.Substring(o.Length).Trim();
                     break;
                 }
             }
-            if (op == null) op = ">=";
-            int.TryParse(valStr, out targetVal);
+            // If condition was just a number (e.g. from Rarity property), op is default (>= usually)
+            // But wait, Rarity property is int?. RarityOp is string.
+            // If condition passed here is ">=10" (like from Quality), we parse it.
+            // If condition passed is RarityOp (e.g. ">=") and value is separate...
+            // Logic differs.
+            // My EnsureCache calls: ParseOp(RarityOp, RarityValue).
+            // RarityOp is just ">=". valStr becomes "".
+            // So int.TryParse fails. val remains defaultVal. Correct.
 
-            switch(op)
-            {
-                case ">=": return value >= targetVal;
-                case ">": return value > targetVal;
-                case "<=": return value <= targetVal;
-                case "<": return value < targetVal;
-                case "=": return value == targetVal;
-                case "!=": return value != targetVal;
-                default: return false;
+            // IF Valid Op found
+            if (foundOp != null) {
+                switch (foundOp) {
+                case ">=":
+                    op = RelocationProfile.RelocatorOp.Ge;
+                    break;
+                case "<=":
+                    op = RelocationProfile.RelocatorOp.Le;
+                    break;
+                case "!=":
+                    op = RelocationProfile.RelocatorOp.Ne;
+                    break;
+                case ">":
+                    op = RelocationProfile.RelocatorOp.Gt;
+                    break;
+                case "<":
+                    op = RelocationProfile.RelocatorOp.Lt;
+                    break;
+                case "=":
+                    op = RelocationProfile.RelocatorOp.Eq;
+                    break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(valStr)) {
+                int.TryParse(valStr, out val);
             }
         }
 
-        private bool EvaluateAttribute(Thing t, string query)
-        {
-            string[] ops = new string[]{ ">=", "<=", "!=", ">", "<", "=" };
+        private bool CheckOp(int value, RelocationProfile.RelocatorOp op, int target) {
+            switch (op) {
+            case RelocationProfile.RelocatorOp.Ge:
+                return value >= target;
+            case RelocationProfile.RelocatorOp.Gt:
+                return value > target;
+            case RelocationProfile.RelocatorOp.Le:
+                return value <= target;
+            case RelocationProfile.RelocatorOp.Lt:
+                return value < target;
+            case RelocationProfile.RelocatorOp.Eq:
+                return value == target;
+            case RelocationProfile.RelocatorOp.Ne:
+                return value != target;
+            default:
+                return false;
+            }
+        }
+
+        private bool EvaluateAttribute(Thing t, string query) {
+            string[] ops = new string[] { ">=", "<=", "!=", ">", "<", "=" };
             string op = null;
             string key = query;
             int val = 0;
 
-            foreach(var o in ops)
-            {
+            foreach (var o in ops) {
                 int idx = query.IndexOf(o);
-                if (idx > 0)
-                {
+                if (idx > 0) {
                     op = o;
                     key = query.Substring(0, idx).Trim();
                     string valStr = query.Substring(idx + o.Length).Trim();
@@ -356,28 +455,35 @@ namespace Elin_ItemRelocator
                 (e.GetName().Equals(key, StringComparison.OrdinalIgnoreCase))
             );
 
-            if (sourceEle != null) eleId = sourceEle.id;
-            else if (!int.TryParse(key, out eleId)) return false;
+            if (sourceEle != null)
+                eleId = sourceEle.id;
+            else if (!int.TryParse(key, out eleId))
+                return false;
 
             int currentVal = t.elements.Value(eleId);
 
-            switch(op)
-            {
-                case ">=": return currentVal >= val;
-                case ">": return currentVal > val;
-                case "<=": return currentVal <= val;
-                case "<": return currentVal < val;
-                case "=": return currentVal == val;
-                case "!=": return currentVal != val;
-                default: return false;
+            switch (op) {
+            case ">=":
+                return currentVal >= val;
+            case ">":
+                return currentVal > val;
+            case "<=":
+                return currentVal <= val;
+            case "<":
+                return currentVal < val;
+            case "=":
+                return currentVal == val;
+            case "!=":
+                return currentVal != val;
+            default:
+                return false;
             }
         }
     }
 
     // Stub for Legacy JSON
     [Serializable]
-    public class RelocationFilter
-    {
+    public class RelocationFilter {
         public List<string> CategoryIds;
         public int? Rarity;
         public string RarityOp;

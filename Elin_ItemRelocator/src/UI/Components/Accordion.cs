@@ -4,10 +4,8 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Elin_ItemRelocator
-{
-    public class RelocatorAccordion<T>
-    {
+namespace Elin_ItemRelocator {
+    public class RelocatorAccordion<T> {
         private List<T> roots = new List<T>();
         private Func<T, IEnumerable<T>> getChildren;
         private Func<T, string> getText;
@@ -29,108 +27,91 @@ namespace Elin_ItemRelocator
         private Transform _contentTrans;
         private Font uiFont;
 
-        public class BottomButtonDef
-        {
+        public class BottomButtonDef {
             public string Label;
             public Action OnClick;
             public Color? Color;
         }
 
-        private RelocatorAccordion()
-        {
+        private RelocatorAccordion() {
             uiFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
         }
 
-        public static RelocatorAccordion<T> Create()
-        {
+        public static RelocatorAccordion<T> Create() {
             return new RelocatorAccordion<T>();
         }
 
-        public RelocatorAccordion<T> SetCaption(string text)
-        {
+        public RelocatorAccordion<T> SetCaption(string text) {
             this.caption = text;
             return this;
         }
 
-        public RelocatorAccordion<T> SetRoots(IEnumerable<T> roots)
-        {
+        public RelocatorAccordion<T> SetRoots(IEnumerable<T> roots) {
             this.roots = roots.ToList();
             return this;
         }
 
-        public RelocatorAccordion<T> SetChildren(Func<T, IEnumerable<T>> accessor)
-        {
+        public RelocatorAccordion<T> SetChildren(Func<T, IEnumerable<T>> accessor) {
             this.getChildren = accessor;
             return this;
         }
 
-        public RelocatorAccordion<T> SetText(Func<T, string> selector)
-        {
+        public RelocatorAccordion<T> SetText(Func<T, string> selector) {
             this.getText = selector;
             return this;
         }
 
-        public RelocatorAccordion<T> SetDebugText(Func<T, string> selector)
-        {
+        public RelocatorAccordion<T> SetDebugText(Func<T, string> selector) {
             this.getDebugText = selector;
             return this;
         }
 
-        public RelocatorAccordion<T> SetOnSelect(Action<T> action)
-        {
+        public RelocatorAccordion<T> SetOnSelect(Action<T> action) {
             this.onSelect = action;
             return this;
         }
 
-        public RelocatorAccordion<T> SetIsSelected(Func<T, bool> predicate)
-        {
+        public RelocatorAccordion<T> SetIsSelected(Func<T, bool> predicate) {
             this.isSelected = predicate;
             return this;
         }
 
-        public RelocatorAccordion<T> SetIsDisabled(Func<T, bool> predicate)
-        {
+        public RelocatorAccordion<T> SetIsDisabled(Func<T, bool> predicate) {
             this.isDisabled = predicate;
             return this;
         }
 
-        public RelocatorAccordion<T> SetOnRightClick(Action<T> action)
-        {
+        public RelocatorAccordion<T> SetOnRightClick(Action<T> action) {
             this.onRightClick = action;
             return this;
         }
 
-        public RelocatorAccordion<T> SetOnBuildRowExtra(Action<T, GameObject> action)
-        {
+        public RelocatorAccordion<T> SetOnBuildRowExtra(Action<T, GameObject> action) {
             this.onBuildRowExtra = action;
             return this;
         }
 
-        public RelocatorAccordion<T> SetOnBuildRow(Action<Transform, T> action)
-        {
+        public RelocatorAccordion<T> SetOnBuildRow(Action<Transform, T> action) {
             this.onBuildRow = action;
             return this;
         }
 
-        public RelocatorAccordion<T> SetGetBackgroundColor(Func<T, Color> selector)
-        {
+        public RelocatorAccordion<T> SetGetBackgroundColor(Func<T, Color> selector) {
             this.getBackgroundColor = selector;
             return this;
         }
 
-        public void Expand(T item)
-        {
-            if (!expanded.Contains(item)) expanded.Add(item);
+        public void Expand(T item) {
+            if (!expanded.Contains(item))
+                expanded.Add(item);
         }
 
-        public RelocatorAccordion<T> AddBottomButton(string label, Action onClick, Color? color = null)
-        {
+        public RelocatorAccordion<T> AddBottomButton(string label, Action onClick, Color? color = null) {
             bottomButtons.Add(new BottomButtonDef { Label = label, OnClick = onClick, Color = color });
             return this;
         }
 
-        public LayerList Show()
-        {
+        public LayerList Show() {
             bool isNew = false;
             // Robust Layer Creation
             if (_layer == null || _layer.gameObject == null) {
@@ -144,36 +125,36 @@ namespace Elin_ItemRelocator
             var layer = _layer;
 
             if (isNew) {
-                if (layer.windows.Count > 0)
-                {
+                if (layer.windows.Count > 0) {
                     layer.windows[0].SetCaption(caption ?? "Tree");
                     layer.windows[0].setting.allowResize = true;
                 }
 
-                try { layer.SetSize(500, 700); } catch {}
+                try { layer.SetSize(500, 700); } catch { }
 
                 // --- MANUAL SETUP ---
-                if (layer.list != null)
-                {
+                if (layer.list != null) {
                     _contentTrans = layer.list.transform;
                     var contentTrans = _contentTrans;
 
                     var nativeList = layer.list.GetComponent<UIList>();
-                    if (nativeList) UnityEngine.Object.DestroyImmediate(nativeList);
+                    if (nativeList)
+                        UnityEngine.Object.DestroyImmediate(nativeList);
 
-                    if (contentTrans != null)
-                    {
+                    if (contentTrans != null) {
                         var vlg = contentTrans.GetComponent<VerticalLayoutGroup>();
-                        if (!vlg) vlg = contentTrans.gameObject.AddComponent<VerticalLayoutGroup>();
+                        if (!vlg)
+                            vlg = contentTrans.gameObject.AddComponent<VerticalLayoutGroup>();
                         vlg.childControlWidth = true;
                         vlg.childControlHeight = true;
                         vlg.childForceExpandWidth = true;
                         vlg.childForceExpandHeight = false;
                         vlg.spacing = 2;
-                        vlg.padding = new RectOffset(0,0,0,0);
+                        vlg.padding = new RectOffset(0, 0, 0, 0);
 
                         var csf = contentTrans.GetComponent<ContentSizeFitter>();
-                        if (!csf) csf = contentTrans.gameObject.AddComponent<ContentSizeFitter>();
+                        if (!csf)
+                            csf = contentTrans.gameObject.AddComponent<ContentSizeFitter>();
                         csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
                         csf.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
                     }
@@ -184,15 +165,16 @@ namespace Elin_ItemRelocator
             return layer;
         }
 
-        public void Close()
-        {
-            if (_layer != null) _layer.Close();
+        public void Close() {
+            if (_layer != null)
+                _layer.Close();
         }
 
-        public void Refresh()
-        {
-            if (_layer == null || _layer.gameObject == null) return;
-            if (_contentTrans == null) return;
+        public void Refresh() {
+            if (_layer == null || _layer.gameObject == null)
+                return;
+            if (_contentTrans == null)
+                return;
 
             var contentTrans = _contentTrans;
 
@@ -201,8 +183,9 @@ namespace Elin_ItemRelocator
 
             Action<IEnumerable<T>, int> traverse = null;
             traverse = (items, depth) => {
-                if (items == null) return;
-                foreach(var item in items) {
+                if (items == null)
+                    return;
+                foreach (var item in items) {
                     flattened.Add(Tuple.Create(item, depth));
                     if (expanded.Contains(item)) {
                         var kids = getChildren != null ? getChildren(item) : null;
@@ -215,38 +198,38 @@ namespace Elin_ItemRelocator
             traverse(roots, 0);
 
             // 2. Clear Visuals
-            foreach(Transform child in contentTrans) {
-                 UnityEngine.Object.Destroy(child.gameObject);
+            foreach (Transform child in contentTrans) {
+                UnityEngine.Object.Destroy(child.gameObject);
             }
             contentTrans.DetachChildren();
 
             // 3. Rebuild
-            foreach(var tuple in flattened) {
+            foreach (var tuple in flattened) {
                 T item = tuple.Item1;
                 int depth = tuple.Item2;
                 BuildRow(contentTrans, item, depth);
             }
 
             // 4. Bottom Buttons
-            foreach(var btnDef in bottomButtons) {
+            foreach (var btnDef in bottomButtons) {
                 BuildBottomButton(contentTrans, btnDef);
             }
 
             LayoutRebuilder.ForceRebuildLayoutImmediate(contentTrans as RectTransform);
         }
 
-        private void BuildRow(Transform parent, T item, int depth)
-        {
+        private void BuildRow(Transform parent, T item, int depth) {
             if (onBuildRow != null) {
-                 var cRow = new GameObject("CustomRow");
-                 cRow.transform.SetParent(parent, false);
-                 try {
-                     onBuildRow(cRow.transform, item);
-                 } catch (Exception ex) {
-                     Debug.LogError("[RelocatorAccordion] Custom Row Build Error: " + ex.ToString());
-                 }
-                 if (cRow.transform.childCount > 0) return;
-                 UnityEngine.Object.DestroyImmediate(cRow);
+                var cRow = new GameObject("CustomRow");
+                cRow.transform.SetParent(parent, false);
+                try {
+                    onBuildRow(cRow.transform, item);
+                } catch (Exception ex) {
+                    Debug.LogError("[RelocatorAccordion] Custom Row Build Error: " + ex.ToString());
+                }
+                if (cRow.transform.childCount > 0)
+                    return;
+                UnityEngine.Object.DestroyImmediate(cRow);
             }
 
             var rowGO = new GameObject("Row");
@@ -255,20 +238,25 @@ namespace Elin_ItemRelocator
             // Row Styling
             var imgRow = rowGO.AddComponent<Image>();
             Color baseColor = (getBackgroundColor != null) ? getBackgroundColor(item) : Color.clear;
-            if (baseColor == Color.clear && depth == 0) baseColor = new Color(0.9f, 0.9f, 0.9f, 0.1f);
+            if (baseColor == Color.clear && depth == 0)
+                baseColor = new Color(0.9f, 0.9f, 0.9f, 0.1f);
             imgRow.color = baseColor;
             imgRow.raycastTarget = true;
 
             // Layout
             var hlg = rowGO.AddComponent<HorizontalLayoutGroup>();
-            hlg.childControlWidth = true; hlg.childControlHeight = true;
-            hlg.childForceExpandWidth = false; hlg.childForceExpandHeight = true;
+            hlg.childControlWidth = true;
+            hlg.childControlHeight = true;
+            hlg.childForceExpandWidth = false;
+            hlg.childForceExpandHeight = true;
             hlg.childAlignment = TextAnchor.MiddleLeft; // Fix Vertical Alignment
             hlg.spacing = 5;
             hlg.padding = new RectOffset(5 + (depth * 20), 5, 2, 2);
 
             var leRow = rowGO.AddComponent<LayoutElement>();
-            leRow.minHeight = 32; leRow.preferredHeight = 32; leRow.flexibleHeight = 0;
+            leRow.minHeight = 32;
+            leRow.preferredHeight = 32;
+            leRow.flexibleHeight = 0;
 
             // Content
             string name = (getText != null) ? getText(item) : item.ToString();
@@ -282,16 +270,19 @@ namespace Elin_ItemRelocator
             // Use Game Default Font
             Font f = null;
             if (SkinManager.Instance != null && SkinManager.Instance.fontSet != null && SkinManager.Instance.fontSet.ui != null && SkinManager.Instance.fontSet.ui.source != null) {
-                 f = SkinManager.Instance.fontSet.ui.source.font;
+                f = SkinManager.Instance.fontSet.ui.source.font;
             }
-            if (f == null) f = UnityEngine.Resources.GetBuiltinResource<Font>("Arial.ttf");
+            if (f == null)
+                f = UnityEngine.Resources.GetBuiltinResource<Font>("Arial.ttf");
 
             lbl.font = f;
-            lbl.fontSize = 14; lbl.alignment = TextAnchor.MiddleLeft;
+            lbl.fontSize = 14;
+            lbl.alignment = TextAnchor.MiddleLeft;
             lbl.text = name;
 
             Color c = Color.black;
-            if (SkinManager.CurrentColors != null) c = SkinManager.CurrentColors.textDefault;
+            if (SkinManager.CurrentColors != null)
+                c = SkinManager.CurrentColors.textDefault;
             lbl.color = c;
             lbl.raycastTarget = false;
 
@@ -304,10 +295,13 @@ namespace Elin_ItemRelocator
             btnRow.targetGraphic = imgRow;
             btnRow.onClick.AddListener(() => {
                 if (hasKids) {
-                     if (expanded.Contains(item)) expanded.Remove(item);
-                     else expanded.Add(item);
+                    if (expanded.Contains(item))
+                        expanded.Remove(item);
+                    else
+                        expanded.Add(item);
                 } else {
-                     if (onSelect != null) onSelect(item);
+                    if (onSelect != null)
+                        onSelect(item);
                 }
                 EClass.Sound.Play("click");
                 Refresh();
@@ -318,8 +312,10 @@ namespace Elin_ItemRelocator
             var entryEnter = new UnityEngine.EventSystems.EventTrigger.Entry();
             entryEnter.eventID = UnityEngine.EventSystems.EventTriggerType.PointerEnter;
             entryEnter.callback.AddListener((data) => {
-                 if (baseColor.a < 0.1f) imgRow.color = new Color(1f, 1f, 1f, 0.2f); // Light highlight for transparent
-                 else imgRow.color = baseColor + new Color(0.1f, 0.1f, 0.1f, 0f); // Lighten opque
+                if (baseColor.a < 0.1f)
+                    imgRow.color = new Color(1f, 1f, 1f, 0.2f); // Light highlight for transparent
+                else
+                    imgRow.color = baseColor + new Color(0.1f, 0.1f, 0.1f, 0f); // Lighten opque
             });
             trigger.triggers.Add(entryEnter);
 
@@ -334,7 +330,8 @@ namespace Elin_ItemRelocator
             entryClick.callback.AddListener((data) => {
                 var pData = data as UnityEngine.EventSystems.PointerEventData;
                 if (pData != null && pData.button == UnityEngine.EventSystems.PointerEventData.InputButton.Right) {
-                    if (onRightClick != null) onRightClick(item);
+                    if (onRightClick != null)
+                        onRightClick(item);
                 }
             });
             trigger.triggers.Add(entryClick);
@@ -345,17 +342,19 @@ namespace Elin_ItemRelocator
             }
         }
 
-        private void BuildBottomButton(Transform parent, BottomButtonDef def)
-        {
+        private void BuildBottomButton(Transform parent, BottomButtonDef def) {
             var btnGO = new GameObject("Btn_" + def.Label);
             btnGO.transform.SetParent(parent, false);
 
             var hlg = btnGO.AddComponent<HorizontalLayoutGroup>();
-            hlg.childControlWidth = true; hlg.childControlHeight = true;
+            hlg.childControlWidth = true;
+            hlg.childControlHeight = true;
             hlg.padding = new RectOffset(10, 10, 5, 5);
 
             var le = btnGO.AddComponent<LayoutElement>();
-            le.minHeight = 40; le.preferredHeight = 40; le.flexibleHeight = 0;
+            le.minHeight = 40;
+            le.preferredHeight = 40;
+            le.flexibleHeight = 0;
 
             var bg = btnGO.AddComponent<Image>();
             bg.color = Color.clear;
@@ -363,7 +362,8 @@ namespace Elin_ItemRelocator
             var btn = btnGO.AddComponent<Button>();
             btn.targetGraphic = bg;
             btn.onClick.AddListener(() => {
-                if (def.OnClick != null) def.OnClick();
+                if (def.OnClick != null)
+                    def.OnClick();
             });
 
             var txtGO = new GameObject("Text");

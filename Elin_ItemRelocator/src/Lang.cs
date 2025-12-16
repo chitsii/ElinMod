@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace Elin_ItemRelocator
-{
-    public static class RelocatorLang
-    {
-        public enum LangKey
-        {
+namespace Elin_ItemRelocator {
+    public static class RelocatorLang {
+        public enum LangKey {
             Settings, AddFilter, Preview, Execute, Scope, ExcludeHotbar, Rarity, Quality, Category, Text, Enchant, Remove, Edit, Enable, Disable, Title, Operator, Msg_Relocated, Inventory, Zone, ON, OFF, NoMatches, SelectEnchant, RelocatorCaption, DisabledSuffix, All, EditSearchText, EditCategoryID, EditQuality, Msg_ContainerFull, Msg_RelocatedResult, Msg_NoMatchLog,
             SortLabel, SortDefault, SortPriceAsc, SortPriceDesc, SortMagAsc, SortMagDesc,
             SortWeightAsc, SortWeightDesc, SortUnitWeightAsc, SortUnitWeightDesc,
@@ -20,7 +17,7 @@ namespace Elin_ItemRelocator
             SavePreset, LoadPreset, PresetName, Msg_Saved, Msg_Loaded,
             Presets, Rename, Delete, Msg_Renamed, Msg_Deleted, Msg_FileExists, Msg_RenamePrompt,
             Parent, Move, Msg_Moved, AddRule, NewRuleName,
-            Material, Bless, Stolen, StateNormal, StateBlessed, StateCursed, StateDoomed, ScopeBoth
+            Material, Bless, Stolen, StateNormal, StateBlessed, StateCursed, StateDoomed, ScopeBoth, EditValue, ChangeEnchant
         }
 
         private static Dictionary<LangKey, string[]> _dict = new Dictionary<LangKey, string[]>
@@ -71,7 +68,7 @@ namespace Elin_ItemRelocator
             { LangKey.HelpTitle, new[] { "About Rules & Filters", "ルールとフィルタについて" } },
             { LangKey.HelpText, new[] {
                 "[Rule Evaluation]\nRules are checked from top to bottom. If an item matches ANY rule, it gets moved (OR logic).\n\n[Condition Logic]\nWithin a single rule, an item must meet ALL conditions/filters (AND logic).\n\n<Example>\nRule 1: Magic Strength >= 40 AND Weapon\nRule 2: Anti-Magic <= 0\n\nItems matching EITHER (Rule 1) OR (Rule 2) will be moved.",
-                "【ルールの判定】\nリストの上から順に判定され、どれか1つのルールに該当すれば移動します（OR条件）。\n\n【条件の判定】\n1つのルール内に複数の条件がある場合、すべて満たす必要があります（AND条件）。\n\n＜利用例＞\nルール1：[<条件1>魔法強度が40以上] かつ [<条件2>武器]\nルール2：[<条件3>反魔法強度が0以下] かつ [<条件4を否定>レアリティが高品質以下]\n\nこの場合、「魔法強化40以上の武器」と「反魔法強度が0以下の奇跡以上」のアイテムが対象になります。"
+                "【ルールの判定】\nリストの上から順に判定され、どれか1つのルールに該当すれば移動します（OR条件）。\n\n【条件の判定】\n1つのルール内に複数の条件がある場合、すべて満たす必要があります（AND条件）。\n\n＜利用例＞\nルール1：[<条件1>魔法強度が40以上] かつ [<条件2>武器]\nルール2：[<条件3>反魔法強度が0未満] かつ [<条件4>奇跡品以上]\n\nこの場合、「魔法強化40以上の武器」または「反魔法強度が0未満の奇跡以上」のアイテムが対象になります。"
             } },
             { LangKey.Not, new[] { "N", "否" } }, // Short for Negation button
             { LangKey.Weight, new[] { "Weight", "重量" } },
@@ -102,13 +99,15 @@ namespace Elin_ItemRelocator
             { LangKey.StateNormal, new[] { "Normal", "通常" } },
             { LangKey.StateBlessed, new[] { "Blessed", "祝福" } },
             { LangKey.StateCursed, new[] { "Cursed", "呪い" } },
-            { LangKey.StateDoomed, new[] { "Doomed", "堕落" } }
+            { LangKey.StateDoomed, new[] { "Doomed", "堕落" } },
+            { LangKey.EditValue, new[] { "Edit Value", "数値の編集" } },
+            { LangKey.ChangeEnchant, new[] { "Change Enchant", "エンチャント変更" } }
         };
 
-        public static string GetText(LangKey key)
-        {
+        public static string GetText(LangKey key) {
             int idx = (Lang.langCode == "JP") ? 1 : 0;
-            if (_dict.ContainsKey(key)) return _dict[key][idx];
+            if (_dict.ContainsKey(key))
+                return _dict[key][idx];
             return key.ToString();
         }
     }

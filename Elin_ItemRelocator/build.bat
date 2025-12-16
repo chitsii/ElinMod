@@ -42,11 +42,13 @@ echo Compiling...
     "%~dp0src\Manager.cs" ^
     "%~dp0src\Singleton.cs" ^
     "%~dp0src\Lang.cs" ^
-    "%~dp0src\UI\Accordion.cs" ^
-    "%~dp0src\UI\Menu.cs" ^
-    "%~dp0src\UI\Table.cs" ^
-    "%~dp0src\UI\Tree.cs" ^
-    "%~dp0src\UI\Pickers.cs"
+    "%~dp0src\UI\Components\Accordion.cs" ^
+    "%~dp0src\UI\Components\Menu.cs" ^
+    "%~dp0src\UI\Components\Table.cs" ^
+    "%~dp0src\UI\Components\Tree.cs" ^
+    "%~dp0src\UI\Components\Pickers.cs" ^
+    "%~dp0src\UI\FilterNode.cs" ^
+    "%~dp0src\UI\RuleEditor.cs"
 
 if %ERRORLEVEL% NEQ 0 (
     echo Build Failed!
