@@ -74,8 +74,10 @@ namespace Elin_ItemRelocator {
             List<string> list = [];
             try {
                 if (Directory.Exists(PresetPath)) {
-                    foreach (string file in Directory.GetFiles(PresetPath, "*.json")) {
-                        list.Add(Path.GetFileNameWithoutExtension(file));
+                    var files = new DirectoryInfo(PresetPath).GetFiles("*.json");
+                    // Sort by CreationTime ascending (Oldest first, newest last)
+                    foreach (var file in files.OrderBy(f => f.CreationTime)) {
+                        list.Add(Path.GetFileNameWithoutExtension(file.Name));
                     }
                 }
             } catch { }

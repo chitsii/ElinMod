@@ -17,6 +17,7 @@ namespace Elin_ItemRelocator {
         private LayerList _layer;
         private HashSet<T> expanded = new HashSet<T>();
         private List<BottomButtonDef> bottomButtons = new List<BottomButtonDef>();
+        public float? PreferredWidth;
 
         // New Callbacks
         private Action<T> onRightClick;
@@ -43,6 +44,11 @@ namespace Elin_ItemRelocator {
 
         public RelocatorAccordion<T> SetCaption(string text) {
             this.caption = text;
+            return this;
+        }
+
+        public RelocatorAccordion<T> SetPreferredWidth(float w) {
+            this.PreferredWidth = w;
             return this;
         }
 

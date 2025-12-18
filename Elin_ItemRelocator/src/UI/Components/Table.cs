@@ -12,6 +12,7 @@ namespace Elin_ItemRelocator {
         private Action<T> onSelectRow; // Optional row click handler
         private bool showHeader = true;
         private float preferredHeight = 800;
+        public float? PreferredWidth;
         private LayerList _layer; // Persistent layer reference
 
         public class ColumnDef {
@@ -48,6 +49,11 @@ namespace Elin_ItemRelocator {
 
         public RelocatorTable<T> SetPreferredHeight(float h) {
             this.preferredHeight = h;
+            return this;
+        }
+
+        public RelocatorTable<T> SetPreferredWidth(float w) {
+            this.PreferredWidth = w;
             return this;
         }
 
@@ -101,8 +107,11 @@ namespace Elin_ItemRelocator {
 
                 // 2. Calculate Window Size
                 float totalWidth = columns.Sum(c => c.Width) + 60; // Padding
-                if (totalWidth < 400)
+                if (PreferredWidth.HasValue)
+                    totalWidth = PreferredWidth.Value;
+                else if (totalWidth < 400)
                     totalWidth = 400; // Min width
+
                 try { layer.SetSize(totalWidth, preferredHeight); } catch { }
 
                 // 3. Headers

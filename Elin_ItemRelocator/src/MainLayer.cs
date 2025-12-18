@@ -5,6 +5,18 @@ using UnityEngine.UI;
 using System.Linq;
 
 namespace Elin_ItemRelocator {
+    // Helper component to make sidebar follow main window
+    public class RelocatorSidebarSync : MonoBehaviour {
+        public RectTransform target;
+        public RectTransform sidebar;
+        public Vector2 offset;
+
+        private void LateUpdate() {
+            if (target == null || sidebar == null)
+                return;
+            sidebar.anchoredPosition = target.anchoredPosition + offset;
+        }
+    }
     public class LayerItemRelocator : ELayer {
         // Wrappers Moved to UI/FilterNode.cs
         // FilterNode and ConditionType are now external
@@ -14,6 +26,7 @@ namespace Elin_ItemRelocator {
         // ====================================================================
         private static RelocatorTable<Thing> previewTable;
         private static RelocatorAccordion<FilterNode> mainAccordion;
+        private static RelocatorSidebar presetSidebar;
         private static Thing currentContainer;
 
         // ====================================================================
@@ -302,9 +315,118 @@ namespace Elin_ItemRelocator {
                 }
             });
 
+            // 1. Setup Sidebar
+            presetSidebar = RelocatorSidebar.Create()
+                .SetCaption(RelocatorLang.GetText(RelocatorLang.LangKey.Presets))
+                .SetOnSelect((name) => {
+                    var loaded = RelocatorManager.Instance.LoadPreset(name);
+                    if (loaded is not null) {
+                        profile.Rules = loaded.Rules;
+                        profile.Scope = loaded.Scope;
+                        profile.ExcludeHotbar = loaded.ExcludeHotbar;
+                        profile.SortMode = loaded.SortMode;
+                        refresh();
+                        Msg.Say(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_Loaded));
+                    }
+                })
+                .SetOnRightClick((name) => {
+                    RelocatorMenu.Create()
+                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Rename), () => {
+                            Dialog.InputName(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_RenamePrompt), name, (c, text) => {
+                                if (!c && !string.IsNullOrEmpty(text)) {
+                                    RelocatorManager.Instance.RenamePreset(name, text);
+                                    refresh();
+                                }
+                            }, (Dialog.InputType)0);
+                        })
+                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Delete), () => {
+                            Dialog.YesNo(RelocatorLang.GetText(RelocatorLang.LangKey.Delete) + "?", () => {
+                                RelocatorManager.Instance.DeletePreset(name);
+                                refresh();
+                            });
+                        })
+                        .Show();
+                })
+                .SetOnAdd(() => {
+                    Dialog.InputName(RelocatorLang.GetText(RelocatorLang.LangKey.PresetName), "", (c, text) => {
+                        if (!c && !string.IsNullOrEmpty(text)) {
+                            RelocatorManager.Instance.SavePreset(text, profile);
+                            refresh();
+                        }
+                    }, (Dialog.InputType)0);
+                });
+
+            // 2. Setup Preview Table
+            previewTable = RelocatorTable<Thing>.Create()
+                .SetShowHeader(true)
+                .SetPreferredHeight(800)
+                .SetOnSelect((t) => {
+                    var menu = RelocatorMenu.Create();
+                    menu.AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Move), () => {
+                        if (currentContainer is not null) {
+                            RelocatorManager.Instance.RelocateSingleThing(t, currentContainer);
+                            if (previewTable is not null)
+                                previewTable.Refresh();
+                        }
+                    });
+                    menu.Show();
+                })
+                .AddColumn(RelocatorLang.GetText(RelocatorLang.LangKey.Text), 350, (t, cell) => {
+                    var txt = cell.GetComponentInChildren<Text>();
+                    if (!txt) {
+                        GameObject g = new("Text");
+                        g.transform.SetParent(cell.transform, false);
+                        txt = g.AddComponent<Text>();
+                        txt.font = SkinManager.Instance.fontSet.ui.source.font;
+                        txt.color = SkinManager.CurrentColors.textDefault;
+                        txt.alignment = TextAnchor.MiddleLeft;
+                        txt.resizeTextForBestFit = true;
+                        txt.resizeTextMinSize = 10;
+                        txt.resizeTextMaxSize = 13;
+                        txt.horizontalOverflow = HorizontalWrapMode.Wrap;
+                        txt.verticalOverflow = VerticalWrapMode.Truncate;
+                        txt.raycastTarget = false;
+                        var rt = txt.rectTransform;
+                        rt.anchorMin = Vector2.zero;
+                        rt.anchorMax = Vector2.one;
+                        rt.sizeDelta = Vector2.zero;
+                    }
+                    txt.text = t?.Name ?? "";
+                    var rowBtn = cell.transform.parent.GetComponentInChildren<UIButton>();
+                    if (rowBtn) {
+                        var field = typeof(UIButton).GetField("tooltip", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                        if (field != null)
+                            field.SetValue(rowBtn, null);
+                        rowBtn.SetTooltip((tooltip) => {
+                            if (t is not null && tooltip.note is not null)
+                                t.WriteNote(tooltip.note);
+                        }, true);
+                    }
+                })
+                .AddTextColumn(RelocatorLang.GetText(RelocatorLang.LangKey.Category), 100, t => t is { category: not null } ? t.category.GetName() : "")
+                .AddTextColumn(RelocatorLang.GetText(RelocatorLang.LangKey.Parent), 100, t => {
+                    if (t is null || t.parent is null)
+                        return "";
+                    if (t.parent == EClass.pc.things)
+                        return RelocatorLang.GetText(RelocatorLang.LangKey.Inventory);
+                    if (t.parent == EClass._map.things)
+                        return RelocatorLang.GetText(RelocatorLang.LangKey.Zone);
+                    return t.parent is Card c ? c.Name : t.parent.ToString();
+                });
+
             // Initialize Layers (Main and Preview)
-            LayerList layerMain, layerPreview;
-            InitLayers(out layerMain, out layerPreview);
+            LayerList layerMain, layerPreview, layerSidebar;
+            InitLayers(out layerMain, out layerPreview, out layerSidebar);
+
+            // Refine refresh to update sidebar
+            var oldRefresh = refresh;
+            refresh = () => {
+                oldRefresh();
+                if (presetSidebar != null) {
+                    presetSidebar.SetItems(RelocatorManager.Instance.GetPresetList());
+                    presetSidebar.Refresh();
+                }
+            };
 
             // Restore Footer Buttons ("Settings", "Execute", "Add Rule")
             // "Add Rule" stays in Accordion? No, user said "Except Add Filter".
@@ -334,105 +456,72 @@ namespace Elin_ItemRelocator {
         // ====================================================================
         // Layer Initialization & Setup
         // ====================================================================
-        private static void InitLayers(out LayerList main, out LayerList preview) {
+        private static void InitLayers(out LayerList main, out LayerList preview, out LayerList sidebar) {
             // 1. Create Main Layer via Accordion
             var _main = mainAccordion.Show();
             var winMain = _main.windows[0];
 
-            // Add Help Button to Footer (Requested by User)
-            winMain.AddBottomButton(" [ ? ] ", () => {
-                Dialog.Ok("<b>" + RelocatorLang.GetText(RelocatorLang.LangKey.HelpTitle) + "</b>\n\n" + RelocatorLang.GetText(RelocatorLang.LangKey.HelpText));
-            });
-
-            // 2. Create Preview Table
-            previewTable = RelocatorTable<Thing>.Create()
-                .SetCaption(RelocatorLang.GetText(RelocatorLang.LangKey.Preview))
-                .SetShowHeader(true)
-                .SetPreferredHeight(800)
-                .SetOnSelect((t) => {
-                    var menu = RelocatorMenu.Create();
-                    menu.AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Move), () => {
-                        if (currentContainer is not null) {
-                            RelocatorManager.Instance.RelocateSingleThing(t, currentContainer);
-                            if (previewTable is not null)
-                                previewTable.Refresh();
-                        }
-                    });
-                    menu.Show();
-                })
-                .AddColumn(RelocatorLang.GetText(RelocatorLang.LangKey.Text), 350, (t, cell) => {
-                    var txt = cell.GetComponentInChildren<Text>();
-                    if (!txt) {
-                        GameObject g = new("Text");
-                        g.transform.SetParent(cell.transform, false);
-                        txt = g.AddComponent<Text>();
-                        // Default Font & Dark Brown Color
-                        txt.font = SkinManager.Instance.fontSet.ui.source.font;
-                        txt.color = SkinManager.CurrentColors.textDefault;
-                        txt.alignment = TextAnchor.MiddleLeft;
-                        txt.resizeTextForBestFit = true;
-                        txt.resizeTextMinSize = 10;
-                        txt.resizeTextMaxSize = 13;
-                        txt.horizontalOverflow = HorizontalWrapMode.Wrap;
-                        txt.verticalOverflow = VerticalWrapMode.Truncate;
-                        txt.raycastTarget = false;
-                        var rt = txt.rectTransform;
-                        rt.anchorMin = Vector2.zero;
-                        rt.anchorMax = Vector2.one;
-                        rt.sizeDelta = Vector2.zero;
-                    }
-
-                    if (t is not null) {
-                        txt.text = t.Name;
-                    } else { txt.text = ""; }
-
-                    // Find the row button
-                    var rowBtn = cell.transform.parent.GetComponentInChildren<UIButton>();
-                    if (rowBtn) {
-                        var field = typeof(UIButton).GetField("tooltip", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                        if (field != null)
-                            field.SetValue(rowBtn, null);
-                        rowBtn.SetTooltip((tooltip) => {
-                            if (t is not null && tooltip.note is not null)
-                                t.WriteNote(tooltip.note);
-                        }, true);
-                    }
-                })
-                .AddTextColumn(RelocatorLang.GetText(RelocatorLang.LangKey.Category), 100, t => t is { category: not null } ? t.category.GetName() : "")
-                .AddTextColumn(RelocatorLang.GetText(RelocatorLang.LangKey.Parent), 100, t => {
-                    if (t is null || t.parent is null)
-                        return "";
-                    if (t.parent == EClass.pc.things)
-                        return RelocatorLang.GetText(RelocatorLang.LangKey.Inventory);
-                    if (t.parent == EClass._map.things)
-                        return RelocatorLang.GetText(RelocatorLang.LangKey.Zone);
-                    if (t.parent is Card c)
-                        return c.Name;
-                    return t.parent.ToString();
-                });
-
+            // 2. Create Preview Layer (Table)
             var _preview = previewTable.Show();
             var winPreview = _preview.windows[0];
 
-            // Ensure Preview Window is on top
-            _preview.transform.SetAsLastSibling();
-            foreach (var g in _preview.GetComponentsInChildren<Graphic>(true)) {
-                if (g.transform.IsChildOf(winPreview.transform) || g.gameObject == winPreview.gameObject)
-                    continue;
-                g.raycastTarget = false;
-            }
+            // 3. Create Sidebar (Last = Topmost)
+            var _sidebar = presetSidebar.Show();
+            var winSidebar = _sidebar.windows[0];
 
-            // Resize Configuration
+            // Disable full-screen raycast blocking for all layers to allow clicking through to others
+            DisableLayerBlocker(_main, winMain);
+            DisableLayerBlocker(_preview, winPreview);
+            DisableLayerBlocker(_sidebar, winSidebar);
+
+            // =================================================================================
+            // DYNAMIC LAYOUT CALCULATION (Center Group)
+            // =================================================================================
+            // Define Component Widths
+            float widthSidebar = 200f; // Increased from 160f
+            float widthMain = 580f;
+            float widthPreview = 640f;
+            float gap = 10f;
+
+            // Calculate Total Width and Starting X for centering
+            // Group: [Sidebar] [Gap] [Main] [Gap] [Preview]
+            float totalWidth = widthSidebar + gap + widthMain + gap + widthPreview;
+            float startX = -(totalWidth / 2f); // Left edge of the group
+
+            // Calculate Center X for each component
+            // 1. Sidebar Center: StartX + (W/2)
+            float xSidebar = startX + (widthSidebar / 2f);
+
+            // 2. Main Center: StartX + SidebarW + Gap + (W/2)
+            float xMain = startX + widthSidebar + gap + (widthMain / 2f);
+
+            // 3. Preview Center: StartX + SidebarW + Gap + MainW + Gap + (W/2)
+            float xPreview = startX + widthSidebar + gap + widthMain + gap + (widthPreview / 2f);
+
+            // Apply Widths to Components (via new APIs)
+            presetSidebar.SetPreferredWidth(widthSidebar);
+            // mainAccordion.SetPreferredWidth(widthMain); // Accordion relies on MainLayer setting size below
+            previewTable.SetPreferredWidth(widthPreview);
+
+            // Apply Sizes & Positions
             winMain.setting.allowResize = true;
-
             winPreview.setting.allowResize = true;
-            _main.SetSize(700, 800);
 
-            // Position Configuration
+            _main.SetSize(widthMain, 800);
+
             var rectMain = winMain.GetComponent<RectTransform>();
             var rectPreview = winPreview.GetComponent<RectTransform>();
-            rectMain.anchoredPosition = new Vector2(-360, 0);
-            rectPreview.anchoredPosition = new Vector2(360, 0);
+            var rectSidebar = winSidebar.GetComponent<RectTransform>();
+
+            rectMain.anchoredPosition = new Vector2(xMain, 0);
+            rectPreview.anchoredPosition = new Vector2(xPreview, 0);
+            rectSidebar.anchoredPosition = new Vector2(xSidebar, 0);
+
+            // Implementation of Sidebar Following Main Window
+            var sync = _sidebar.gameObject.AddComponent<RelocatorSidebarSync>();
+            sync.target = winMain.GetComponent<RectTransform>();
+            sync.sidebar = winSidebar.GetComponent<RectTransform>();
+            sync.offset = rectSidebar.anchoredPosition - rectMain.anchoredPosition;
 
             // Synced Closing Logic
             bool closing = false;
@@ -444,6 +533,8 @@ namespace Elin_ItemRelocator {
                     mainAccordion.Close();
                 if (_preview != null)
                     _preview.Close();
+                if (_sidebar != null)
+                    _sidebar.Close();
             });
             OnKill(_preview, () => {
                 if (closing)
@@ -451,10 +542,30 @@ namespace Elin_ItemRelocator {
                 closing = true;
                 if (_main != null)
                     _main.Close();
+                if (_sidebar != null)
+                    _sidebar.Close();
+            });
+            OnKill(_sidebar, () => {
+                if (closing)
+                    return;
+                closing = true;
+                if (_main != null)
+                    _main.Close();
+                if (_preview != null)
+                    _preview.Close();
             });
 
             main = _main;
             preview = _preview;
+            sidebar = _sidebar;
+        }
+
+        private static void DisableLayerBlocker(ELayer layer, Window win) {
+            foreach (var g in layer.GetComponentsInChildren<Graphic>(true)) {
+                if (g.transform.IsChildOf(win.transform) || g.gameObject == win.gameObject)
+                    continue;
+                g.raycastTarget = false;
+            }
         }
 
         private static void OnKill(ELayer layer, Action action) {
