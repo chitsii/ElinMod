@@ -120,6 +120,7 @@ namespace Elin_ItemRelocator {
                     Debug.LogError("[RelocatorAccordion] Failed to create LayerList!");
                     return null;
                 }
+                _layer.gameObject.AddComponent<RelocatorLayerMarker>();
                 isNew = true;
             }
             var layer = _layer;
@@ -330,6 +331,7 @@ namespace Elin_ItemRelocator {
             entryClick.callback.AddListener((data) => {
                 var pData = data as UnityEngine.EventSystems.PointerEventData;
                 if (pData != null && pData.button == UnityEngine.EventSystems.PointerEventData.InputButton.Right) {
+                    EInput.rightMouse.Consume();
                     if (onRightClick != null)
                         onRightClick(item);
                 }

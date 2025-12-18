@@ -90,6 +90,7 @@ namespace Elin_ItemRelocator {
             bool isNew = false;
             if (_layer == null || _layer.gameObject == null) {
                 _layer = EClass.ui.AddLayer<LayerList>();
+                _layer.gameObject.AddComponent<RelocatorLayerMarker>();
                 isNew = true;
             }
             var layer = _layer;

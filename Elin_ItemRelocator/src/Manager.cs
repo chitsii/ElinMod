@@ -140,6 +140,7 @@ namespace Elin_ItemRelocator {
             }
 
             List<Thing> matches = [];
+            var candidates = GatherCandidates(profile, container);
 
             // Helper to check and add
             void CheckAndAdd(Thing t) {
@@ -147,14 +148,8 @@ namespace Elin_ItemRelocator {
                 if (searchLimit > 0 && matches.Count >= searchLimit)
                     return;
 
-                // 1. Exclude self and its contents
-                if (t == container)
-                    return;
-                if (t.parent == container.things)
-                    return;
-
-                // 2. Skip Player Important items
-                if (t.c_isImportant)
+                // Basic Exclusions
+                if (t.isDestroyed || t.c_isImportant || t.c_lockedHard)
                     return;
 
                 // 3. Exclude non-empty containers
@@ -177,10 +172,6 @@ namespace Elin_ItemRelocator {
                 if (profile.ExcludeHotbar && hotbarItems.Contains(t))
                     return;
 
-                // Important Logic: If destroyed, skip
-                if (t.isDestroyed)
-                    return;
-
                 // Check Rules
                 if (profile.Rules.Count == 0)
                     return;
@@ -192,65 +183,14 @@ namespace Elin_ItemRelocator {
                         break;
                     }
                 }
-                if (!match)
-                    return;
-
-                matches.Add(t);
+                if (match)
+                    matches.Add(t);
             }
 
-            // Inventory Scope (Include if Scope is Inventory OR Both)
-            if (profile.Scope != RelocationProfile.FilterScope.ZoneOnly) {
-                // Layer 1: PC Inventory (Recursive Layer 2)
-                foreach (var t in EClass.pc.things) {
-                    CheckAndAdd(t);
-
-                    // Layer 2: Inside Containers
-                    if (t.IsContainer && t.things is { Count: > 0 }) {
-                        foreach (var child in t.things) {
-                            CheckAndAdd(child);
-                        }
-                    }
-                }
-
-                // Layer : Equipped Containers (Toolbelt, Backpack, etc)
-                // Items in equipped containers are NOT in pc.things, so we must scan body slots.
-                // User requested "Toolbelt Exclusion" to mean "Body Slot Exclusion".
-                // So if ExcludeHotbar is ON, we skip this entirely.
-                if (!profile.ExcludeHotbar) {
-                    foreach (var slot in EClass.pc.body.slots) {
-                        if (slot.thing is null || !slot.thing.IsContainer || slot.thing.things.Count == 0)
-                            continue;
-
-                        // Scan contents of equipped container
-                        foreach (var t in slot.thing.things) {
-                            CheckAndAdd(t);
-
-                            // Recurse one level deep (e.g. Bag inside Toolbelt)
-                            if (t.IsContainer && t.things is { Count: > 0 }) {
-                                foreach (var child in t.things) {
-                                    CheckAndAdd(child);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Zone Scope (Include if Scope is ZoneOnly OR Both)
-            if (profile.Scope == RelocationProfile.FilterScope.Both || profile.Scope == RelocationProfile.FilterScope.ZoneOnly) {
-                foreach (var t in EClass._map.things) {
-                    CheckAndAdd(t);
-
-                    // Recurse into installed containers
-                    // t.placeState == PlaceState.installed check is implicit because 't' is in _map.things (usually installed or roaming)
-                    // checkAndAdd(t) already filtered 't' if it was installed.
-                    // Now we explicitly look inside if it IS installed and IS a container.
-                    if (t.placeState == PlaceState.installed && t.IsContainer && t.things is { Count: > 0 }) {
-                        foreach (var child in t.things) {
-                            CheckAndAdd(child);
-                        }
-                    }
-                }
+            foreach (var t in candidates) {
+                CheckAndAdd(t);
+                if (searchLimit > 0 && matches.Count >= searchLimit)
+                    break;
             }
 
             // Apply Sorting
@@ -365,6 +305,66 @@ namespace Elin_ItemRelocator {
             container.AddThing(t);
             EClass.pc.PlaySound("grab");
             Msg.Say(string.Format(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_Moved), t.Name));
+        }
+
+        private IEnumerable<Thing> GatherCandidates(RelocationProfile profile, Thing container) {
+            // Inventory Scope
+            if (profile.Scope != RelocationProfile.FilterScope.ZoneOnly) {
+                foreach (var t in EClass.pc.things) {
+                    if (t == container)
+                        continue;
+                    yield return t;
+
+                    if (t.IsContainer && t.things is { Count: > 0 }) {
+                        foreach (var child in t.things) {
+                            if (child == container)
+                                continue;
+                            yield return child;
+                        }
+                    }
+                }
+
+                if (!profile.ExcludeHotbar) {
+                    foreach (var slot in EClass.pc.body.slots) {
+                        if (slot.thing is null || !slot.thing.IsContainer || slot.thing.things.Count == 0)
+                            continue;
+                        if (slot.thing == container)
+                            continue;
+
+                        foreach (var t in slot.thing.things) {
+                            if (t == container)
+                                continue;
+                            yield return t;
+
+                            if (t.IsContainer && t.things is { Count: > 0 }) {
+                                foreach (var child in t.things) {
+                                    if (child == container)
+                                        continue;
+                                    yield return child;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Zone Scope
+            if (profile.Scope is RelocationProfile.FilterScope.Both or RelocationProfile.FilterScope.ZoneOnly) {
+                foreach (var t in EClass._map.things) {
+                    if (t == container)
+                        continue;
+                    yield return t;
+
+                    // Recurse into installed containers
+                    if (t.placeState == PlaceState.installed && t.IsContainer && t.things is { Count: > 0 }) {
+                        foreach (var child in t.things) {
+                            if (child == container)
+                                continue;
+                            yield return child;
+                        }
+                    }
+                }
+            }
         }
     }
 }

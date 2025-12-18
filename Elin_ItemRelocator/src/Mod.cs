@@ -9,6 +9,11 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace Elin_ItemRelocator {
+    /// <summary>
+    /// Marker component to identify layers belonging to this mod.
+    /// </summary>
+    public class RelocatorLayerMarker : MonoBehaviour { }
+
     [BepInPlugin(ID, TITLE, VERSION)]
     public class Elin_ItemRelocator : BaseUnityPlugin {
         public const string ID = "Elin_ItemRelocator";
@@ -185,7 +190,7 @@ namespace Elin_ItemRelocator {
 
                 // --- Tooltip Fix ---
                 try {
-                    string finalTooltip = RelocatorLang.GetText(RelocatorLang.LangKey.Execute);
+                    string finalTooltip = RelocatorLang.GetText(RelocatorLang.LangKey.Relocate);
                     var fieldInfo = typeof(UIButton).GetField("tooltip", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
 
                     if (fieldInfo is not null) {
@@ -279,6 +284,18 @@ namespace Elin_ItemRelocator {
                         LayoutRebuilder.ForceRebuildLayoutImmediate(__instance.window.GetComponent<RectTransform>());
                     }
                 }
+            }
+        }
+
+        [HarmonyPatch(typeof(Layer), "OnRightClick")]
+        class PatchLayerRightClick {
+            static bool Prefix(Layer __instance) {
+                // Determine if this is OUR layer based on the marker component
+                if (__instance.GetComponent<RelocatorLayerMarker>() != null) {
+                    // Skip default Close()
+                    return false;
+                }
+                return true;
             }
         }
     }

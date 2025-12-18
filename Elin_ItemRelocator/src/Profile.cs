@@ -34,6 +34,7 @@ namespace Elin_ItemRelocator {
                         r.Quality = f.Quality;
                         r.Text = f.Text;
                         Rules.Add(r);
+                        r.InvalidateCache(); // Invalidate cache for the newly created rule
                     }
                 }
             }
@@ -114,19 +115,16 @@ namespace Elin_ItemRelocator {
         public HashSet<int> Rarities = [];
 
         public bool? IsStolen;
+        public void InvalidateCache() => _cacheValid = false;
 
         // --- Cache Fields (Optimization) ---
         [JsonIgnore] private bool _cacheValid = false;
-        // [JsonIgnore] private int _cRarityVal; [JsonIgnore] private RelocationProfile.RelocatorOp _cRarityOp; // Removed
         [JsonIgnore] private int _cQualityVal; [JsonIgnore] private RelocationProfile.RelocatorOp _cQualityOp;
         [JsonIgnore] private int _cWeightVal; [JsonIgnore] private RelocationProfile.RelocatorOp _cWeightOp;
-        [JsonIgnore] private static Func<Thing, int> _blessGetter;
-        [JsonIgnore] private static bool _blessGetterInit = false;
 
         // Matching Logic (AND within Rule)
-        private static FieldInfo _fiBless;
         public bool IsMatch(Thing t) {
-            if (!Enabled)
+            if (!Enabled || t.c_lockedHard)
                 return false;
 
             // Migration: Move Enchants from Text to Enchants list
@@ -145,6 +143,7 @@ namespace Elin_ItemRelocator {
                 Text = String.Join(" ", newText.ToArray());
                 if (string.IsNullOrEmpty(Text))
                     Text = null;
+                InvalidateCache(); // Invalidate cache if Text or Enchants changed
             }
 
             EnsureCache();
@@ -246,26 +245,9 @@ namespace Elin_ItemRelocator {
                     return false;
             }
 
-            // Check Bless State (Optimized Reflection)
+            // Check Bless State
             if (BlessStates is { Count: > 0 }) {
-                int bState = 0;
-
-                // Fast Path: Compiled Delegate
-                if (_blessGetter is not null) {
-                    bState = _blessGetter(t);
-                } else {
-                    // Slow Path: Reflection / Fallback
-                    if (_fiBless is null)
-                        _fiBless = typeof(Thing).GetField("bless", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-                    if (_fiBless is not null) {
-                        try { bState = Convert.ToInt32(_fiBless.GetValue(t)); } catch { }
-                    } else {
-                        if (t.IsBlessed)
-                            bState = 1;
-                        else if (t.IsCursed)
-                            bState = -1;
-                    }
-                }
+                int bState = (int)t.blessedState;
 
                 bool match = BlessStates.Contains(bState);
 
@@ -305,7 +287,7 @@ namespace Elin_ItemRelocator {
             }
             if (!string.IsNullOrEmpty(Quality)) {
                 string prefix = NotQuality ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
-                parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Quality) + " " + Quality);
+                parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Enhancement) + " " + Quality);
             }
             if (!string.IsNullOrEmpty(Text)) {
                 string prefix = NotText ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
@@ -343,17 +325,6 @@ namespace Elin_ItemRelocator {
             ParseOp(string.IsNullOrEmpty(WeightOp) ? ">=" : WeightOp, Weight.HasValue ? Weight.Value : 0, out _cWeightOp, out _cWeightVal);
             ParseOp(Quality, 0, out _cQualityOp, out _cQualityVal); // Quality string contains both op and value
 
-            if (!_blessGetterInit) {
-                _blessGetterInit = true;
-                try {
-                    var param = System.Linq.Expressions.Expression.Parameter(typeof(Thing), "t");
-                    var field = System.Linq.Expressions.Expression.Field(param, "bless");
-                    var conv = System.Linq.Expressions.Expression.Convert(field, typeof(int));
-                    _blessGetter = System.Linq.Expressions.Expression.Lambda<Func<Thing, int>>(conv, param).Compile();
-                } catch {
-                    // Reflection Fallback handled in IsMatch
-                }
-            }
 
             _cacheValid = true;
         }

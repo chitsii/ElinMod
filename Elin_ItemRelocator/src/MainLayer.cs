@@ -462,7 +462,8 @@ namespace Elin_ItemRelocator {
         }
 
         public override void OnRightClick() {
-            // Disable default close
+            // This is actually not called since we use LayerList prefab
+            // Handled via Harmony patch in Mod.cs
         }
 
         // ====================================================================

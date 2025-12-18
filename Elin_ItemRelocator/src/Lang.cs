@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Elin_ItemRelocator {
     public static class RelocatorLang {
         public enum LangKey {
-            Settings, AddFilter, Preview, Execute, Scope, ExcludeHotbar, Rarity, Quality, Category, Text, Enchant, Remove, Edit, Enable, Disable, Title, Operator, Msg_Relocated, Inventory, Zone, ON, OFF, NoMatches, SelectEnchant, RelocatorCaption, DisabledSuffix, All, EditSearchText, EditCategoryID, EditQuality, Msg_ContainerFull, Msg_RelocatedResult, Msg_NoMatchLog,
+            Settings, AddFilter, Preview, Execute, Relocate, Scope, ExcludeHotbar, Rarity, Quality, Category, Text, Enchant, Remove, Edit, Enable, Disable, Title, Operator, Msg_Relocated, Inventory, Zone, ON, OFF, NoMatches, SelectEnchant, RelocatorCaption, DisabledSuffix, All, EditSearchText, EditCategoryID, EditQuality, Msg_ContainerFull, Msg_RelocatedResult, Msg_NoMatchLog,
             SortLabel, SortDefault, SortPriceAsc, SortPriceDesc, SortMagAsc, SortMagDesc,
             SortWeightAsc, SortWeightDesc, SortUnitWeightAsc, SortUnitWeightDesc,
             SortUidAsc, SortUidDesc,
@@ -18,14 +18,16 @@ namespace Elin_ItemRelocator {
             SavePreset, LoadPreset, PresetName, Msg_Saved, Msg_Loaded,
             Presets, Rename, Delete, Msg_Renamed, Msg_Deleted, Msg_FileExists, Msg_RenamePrompt,
             Parent, Move, Msg_Moved, AddRule, NewRuleName,
-            Material, Bless, Stolen, StateNormal, StateBlessed, StateCursed, StateDoomed, ScopeBoth, EditValue, ChangeEnchant
+            Material, Bless, Stolen, StateNormal, StateBlessed, StateCursed, StateDoomed, ScopeBoth, EditValue, ChangeEnchant,
+            Enhancement, EditEnhancement
         }
 
         private static Dictionary<LangKey, string[]> _dict = new() {
             [LangKey.Settings] = ["Settings", "設定"],
             [LangKey.AddFilter] = ["Add Filter", "フィルタ追加"],
             [LangKey.Preview] = ["Preview", "プレビュー"],
-            [LangKey.Execute] = ["Relocate", "全て転送"],
+            [LangKey.Relocate] = ["Relocate", "アイテム転送"],
+            [LangKey.Execute] = ["Relocate All", "全て転送"],
             [LangKey.Scope] = ["Scope", "範囲"],
             [LangKey.ExcludeHotbar] = ["Exclude Hotbar", "ツールベルト除外"],
             [LangKey.Rarity] = ["Rarity", "レアリティ"],
@@ -104,7 +106,9 @@ namespace Elin_ItemRelocator {
             [LangKey.StateDoomed] = ["Doomed", "堕落"],
             [LangKey.ScopeBoth] = ["Inventory+Zone", "持ち物+地面"],
             [LangKey.EditValue] = ["Edit Value", "数値の編集"],
-            [LangKey.ChangeEnchant] = ["Change Enchant", "エンチャント変更"]
+            [LangKey.ChangeEnchant] = ["Change Enchant", "エンチャント変更"],
+            [LangKey.Enhancement] = ["Enhancement", "品質"],
+            [LangKey.EditEnhancement] = ["Edit Enhancement (e.g. >=2)", "品質設定 (例: >=2)"]
         };
 
         public static string GetText(LangKey key) =>
