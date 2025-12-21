@@ -420,6 +420,61 @@ namespace Elin_ItemRelocator {
                     if (t.parent == EClass._map.things)
                         return RelocatorLang.GetText(RelocatorLang.LangKey.Zone);
                     return t.parent is Card c ? c.Name : t.parent.ToString();
+                })
+                .AddTextColumn(RelocatorLang.GetText(RelocatorLang.LangKey.Details), 250, t => {
+                    if (t == null)
+                        return "";
+
+                    // Show value based on current sort mode
+                    switch (profile.SortMode) {
+                    case RelocationProfile.ResultSortMode.PriceAsc:
+                    case RelocationProfile.ResultSortMode.PriceDesc:
+                        // Price
+                        return t.GetPrice().ToString() + " gp";
+
+                    case RelocationProfile.ResultSortMode.TotalWeightAsc:
+                    case RelocationProfile.ResultSortMode.TotalWeightDesc:
+                        // Total Weight
+                        return (t.ChildrenAndSelfWeight * t.Num * 0.001f).ToString("0.0") + "s";
+
+                    case RelocationProfile.ResultSortMode.UnitWeightAsc:
+                    case RelocationProfile.ResultSortMode.UnitWeightDesc:
+                        // Unit Weight
+                        return (t.SelfWeight * 0.001f).ToString("0.0") + "s";
+
+                    case RelocationProfile.ResultSortMode.TotalEnchantMagDesc:
+                        int totalMag = 0;
+                        if (t.elements != null && t.elements.dict != null) {
+                            foreach (var e in t.elements.dict.Values) {
+                                if (e.Value > 0)
+                                    totalMag += e.Value;
+                            }
+                        }
+                        return "Total Mag: " + totalMag;
+
+                    case RelocationProfile.ResultSortMode.EnchantMagAsc:
+                    case RelocationProfile.ResultSortMode.EnchantMagDesc:
+                        // Enchant Magnitude
+                        List<int> targetEleIds = RelocatorManager.Instance.GetTargetEnchantIDs(profile);
+                        int val = 0;
+                        foreach (int id in targetEleIds) {
+                            val += t.elements.Value(id);
+                        }
+                        return "Mag: " + val;
+
+                    case RelocationProfile.ResultSortMode.UidAsc:
+                    case RelocationProfile.ResultSortMode.UidDesc:
+                        return "UID: " + t.uid;
+
+                    default:
+                        // Default View: Show simplified info (Weight + ID status)
+                        string info = "";
+                        if (t.SelfWeight > 0)
+                            info += (t.SelfWeight * 0.001f).ToString("0.0") + "s ";
+                        if (!t.IsIdentified)
+                            info += "(UnID) ";
+                        return info;
+                    }
                 });
 
             // Initialize Layers (Main and Preview)
@@ -505,7 +560,7 @@ namespace Elin_ItemRelocator {
             // Define Component Widths
             float widthSidebar = 200f; // Increased from 160f
             float widthMain = 580f;
-            float widthPreview = 640f;
+            float widthPreview = 840f; // Increased to accommodate new columns (was 640f)
             float gap = 10f;
 
             // Calculate Total Width and Starting X for centering
@@ -619,10 +674,10 @@ namespace Elin_ItemRelocator {
 
             if (previewTable != null) {
                 string caption = RelocatorLang.GetText(RelocatorLang.LangKey.Preview) + " (" + countStr + ")";
-                // Limit display to 100 items to avoid UI lag
-                if (count > 100) {
-                    caption += " [Display Limit: 100]";
-                    previewTable.SetDataSource(matches.Take(100).ToList());
+                // Limit display to 200 items to avoid UI lag (Optimized: 100 -> 200)
+                if (count > 200) {
+                    caption += " [Display Limit: 200]";
+                    previewTable.SetDataSource(matches.Take(200).ToList());
                 } else {
                     previewTable.SetDataSource(matches);
                 }
@@ -665,6 +720,7 @@ namespace Elin_ItemRelocator {
                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortPriceDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.PriceDesc; refresh(); })
                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortMagAsc), () => { profile.SortMode = RelocationProfile.ResultSortMode.EnchantMagAsc; refresh(); })
                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortMagDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.EnchantMagDesc; refresh(); })
+                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortTotalEnchantMagDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.TotalEnchantMagDesc; refresh(); })
                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortWeightAsc), () => { profile.SortMode = RelocationProfile.ResultSortMode.TotalWeightAsc; refresh(); })
                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortWeightDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.TotalWeightDesc; refresh(); })
                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortUnitWeightAsc), () => { profile.SortMode = RelocationProfile.ResultSortMode.UnitWeightAsc; refresh(); })
@@ -761,6 +817,7 @@ namespace Elin_ItemRelocator {
             RelocationProfile.ResultSortMode.PriceDesc => RelocatorLang.GetText(RelocatorLang.LangKey.SortPriceDesc),
             RelocationProfile.ResultSortMode.EnchantMagAsc => RelocatorLang.GetText(RelocatorLang.LangKey.SortMagAsc),
             RelocationProfile.ResultSortMode.EnchantMagDesc => RelocatorLang.GetText(RelocatorLang.LangKey.SortMagDesc),
+            RelocationProfile.ResultSortMode.TotalEnchantMagDesc => RelocatorLang.GetText(RelocatorLang.LangKey.SortTotalEnchantMagDesc),
             RelocationProfile.ResultSortMode.TotalWeightAsc => RelocatorLang.GetText(RelocatorLang.LangKey.SortWeightAsc),
             RelocationProfile.ResultSortMode.TotalWeightDesc => RelocatorLang.GetText(RelocatorLang.LangKey.SortWeightDesc),
             RelocationProfile.ResultSortMode.UnitWeightAsc => RelocatorLang.GetText(RelocatorLang.LangKey.SortUnitWeightAsc),

@@ -214,36 +214,22 @@ namespace Elin_ItemRelocator {
                    le.preferredHeight = 24;
                    le.flexibleHeight = 0;
 
-                   // Destroy previous custom cells
-                   var toDestroy = new List<GameObject>();
-                   foreach (Transform child in b.transform) {
-                       if (child.name.StartsWith("Cell_"))
-                           toDestroy.Add(child.gameObject);
-                   }
-                   foreach (var g in toDestroy)
-                       UnityEngine.Object.DestroyImmediate(g);
-
-                   // --- Smart Hide & Button Setup ---
+                   // --- Smart Hide & Button Setup --- (Restored)
                    // Find the interactive button for this row
                    var btn = b.GetComponent<UIButton>() ?? b.GetComponentInChildren<UIButton>();
                    Graphic btnTarget = btn ? btn.targetGraphic : null;
 
                    if (btn) {
                        btn.enabled = true;
-                       // Ensure the hit target (background) is visible
                        if (btnTarget) {
                            btnTarget.enabled = true;
                            btnTarget.gameObject.SetActive(true);
                        }
-
-                       // If button is a child object, remove it from the HorizontalLayoutGroup flow
-                       // and stretch it to cover the entire row area.
                        if (btn.gameObject != b.gameObject) {
                            var leBtn = btn.GetComponent<LayoutElement>();
                            if (!leBtn)
                                leBtn = btn.gameObject.AddComponent<LayoutElement>();
                            leBtn.ignoreLayout = true;
-
                            var rtBtn = btn.transform as RectTransform;
                            if (rtBtn) {
                                rtBtn.anchorMin = Vector2.zero;
@@ -268,22 +254,35 @@ namespace Elin_ItemRelocator {
                        img.enabled = false;
                    }
 
-                   // Create Cells
-                   int i = 0;
-                   foreach (var col in columns) {
-                       var cell = new GameObject("Cell_" + i);
-                       cell.transform.SetParent(b.transform, false);
+                   // --- Optimization: Reuse Cells ---
+                   // Instead of destroying and recreating "Cell_X", reuse them.
+                   // The binders in main code handle initialization checks (GetComponent).
 
-                       var cellLe = cell.AddComponent<LayoutElement>();
-                       cellLe.preferredWidth = col.Width;
-                       cellLe.minWidth = col.Width;
-                       cellLe.flexibleWidth = 0;
+                   int colIdx = 0;
+                   foreach (var col in columns) {
+                       string cellName = "Cell_" + colIdx;
+                       Transform existing = b.transform.Find(cellName);
+                       GameObject cell;
+
+                       if (existing) {
+                           cell = existing.gameObject;
+                       } else {
+                           cell = new GameObject(cellName);
+                           cell.transform.SetParent(b.transform, false);
+
+                           var cellLe = cell.AddComponent<LayoutElement>();
+                           cellLe.preferredWidth = col.Width;
+                           cellLe.minWidth = col.Width;
+                           cellLe.flexibleWidth = 0;
+                       }
 
                        // Execute Binder
                        col.Binder(t, cell);
-
-                       i++;
+                       colIdx++;
                    }
+
+                   // Cleanup excess cells if any (rare case of changing columns)
+                   // Not strictly necessary if columns are static, but good for safety.
                },
                false // highlight
             );

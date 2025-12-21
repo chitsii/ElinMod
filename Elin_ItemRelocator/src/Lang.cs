@@ -5,7 +5,7 @@ namespace Elin_ItemRelocator {
     public static class RelocatorLang {
         public enum LangKey {
             Settings, AddFilter, Preview, Execute, Relocate, Scope, ExcludeHotbar, Rarity, Quality, Category, Text, Enchant, Remove, Edit, Enable, Disable, Title, Operator, Msg_Relocated, Inventory, Zone, ON, OFF, NoMatches, SelectEnchant, RelocatorCaption, DisabledSuffix, All, EditSearchText, EditCategoryID, EditQuality, Msg_ContainerFull, Msg_RelocatedResult, Msg_NoMatchLog,
-            SortLabel, SortDefault, SortPriceAsc, SortPriceDesc, SortMagAsc, SortMagDesc,
+            SortLabel, SortDefault, SortPriceAsc, SortPriceDesc, SortMagAsc, SortMagDesc, SortTotalEnchantMagDesc,
             SortWeightAsc, SortWeightDesc, SortUnitWeightAsc, SortUnitWeightDesc,
             SortUidAsc, SortUidDesc,
             CatAll,
@@ -20,7 +20,7 @@ namespace Elin_ItemRelocator {
             Parent, Move, Msg_Moved, AddRule, NewRuleName,
             Material, Bless, Stolen, StateNormal, StateBlessed, StateCursed, StateDoomed, ScopeBoth, EditValue, ChangeEnchant,
             Enhancement, EditEnhancement, Identified, StateIdentified, StateUnidentified,
-            ResetRules, ResetRulesConfirm, Msg_RulesCleared
+            ResetRules, ResetRulesConfirm, Msg_RulesCleared, Details
         }
 
         private static Dictionary<LangKey, string[]> _dict = new() {
@@ -65,6 +65,7 @@ namespace Elin_ItemRelocator {
             [LangKey.SortPriceDesc] = ["Price (High to Low)", "価格 (高い順)"],
             [LangKey.SortMagAsc] = ["Enchant (Weak to Strong)", "エンチャント強度 (弱い順)"],
             [LangKey.SortMagDesc] = ["Enchant (Strong to Weak)", "エンチャント強度 (強い順)"],
+            [LangKey.SortTotalEnchantMagDesc] = ["Sort: ALL Enchant (High to Low)", "総エンチャント強度 (降順)"],
             [LangKey.CatAll] = ["General", "汎用"],
             [LangKey.CatWeapon] = ["Weapon Specific", "武器特有"],
             [LangKey.CatArmor] = ["Armor Specific", "防具特有"],
@@ -115,7 +116,8 @@ namespace Elin_ItemRelocator {
             [LangKey.StateUnidentified] = ["No (Unidentified)", "未鑑定"],
             [LangKey.ResetRules] = ["Reset", "初期化"],
             [LangKey.ResetRulesConfirm] = ["Reset all filter conditions (clear text cache etc)?", "編集中の条件をすべて消去しますか？"],
-            [LangKey.Msg_RulesCleared] = ["Conditions cleared.", "条件を消去しました。"]
+            [LangKey.Msg_RulesCleared] = ["Conditions cleared.", "条件を消去しました。"],
+            [LangKey.Details] = ["Details", "詳細"]
         };
 
         public static string GetText(LangKey key) =>

@@ -55,6 +55,7 @@ namespace Elin_ItemRelocator {
             PriceDesc,
             EnchantMagAsc,
             EnchantMagDesc,
+            TotalEnchantMagDesc, // New: Sum of ALL enchants
             TotalWeightAsc,
             TotalWeightDesc,
             UnitWeightAsc,

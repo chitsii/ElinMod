@@ -203,37 +203,33 @@ namespace Elin_ItemRelocator {
             case RelocationProfile.ResultSortMode.PriceDesc:
                 matches.Sort((a, b) => b.GetPrice() - a.GetPrice());
                 break;
+            case RelocationProfile.ResultSortMode.TotalEnchantMagDesc:
+                matches.Sort((a, b) => {
+                    // Check common properties first to avoid calculation if possible? No, sockets are small list.
+                    // Just sum up
+                    int valA = 0;
+                    if (a.elements != null && a.elements.dict != null) {
+                        foreach (var e in a.elements.dict.Values) {
+                            if (e.Value > 0) // Exclude skills linking to attributes to avoid double counting? No, keep simple.
+                                valA += e.Value;
+                        }
+                    }
+
+                    int valB = 0;
+                    if (b.elements != null && b.elements.dict != null) {
+                        foreach (var e in b.elements.dict.Values) {
+                            if (e.Value > 0)
+                                valB += e.Value;
+                        }
+                    }
+                    return valB - valA;
+                });
+                break;
+
             case RelocationProfile.ResultSortMode.EnchantMagAsc:
             case RelocationProfile.ResultSortMode.EnchantMagDesc:
                 // Identify target element IDs from rules
-                List<int> targetEleIds = [];
-                foreach (var r in profile.Rules) {
-                    if (r.Enabled && r.Enchants != null) {
-                        foreach (var term in r.Enchants) {
-                            if (string.IsNullOrEmpty(term))
-                                continue;
-
-                            // Term format is typically "@Key" or "@Key>=Value"
-                            // Key can be Alias or Name
-                            string key = term.TrimStart('@');
-
-                            // Strip operators to isolate key
-                            string[] ops = [">=", "<=", "!=", ">", "<", "="];
-                            foreach (var o in ops) {
-                                int idx = key.IndexOf(o);
-                                if (idx > 0) { key = key.Substring(0, idx).Trim(); break; }
-                            }
-
-                            // Match against Element Name or Alias
-                            var sourceEle = EClass.sources.elements.map.Values.FirstOrDefault(e =>
-                                (e.alias is not null && e.alias.Equals(key, StringComparison.OrdinalIgnoreCase)) ||
-                                (e.GetName().Equals(key, StringComparison.OrdinalIgnoreCase))
-                            );
-                            if (sourceEle is not null)
-                                targetEleIds.Add(sourceEle.id);
-                        }
-                    }
-                }
+                List<int> targetEleIds = GetTargetEnchantIDs(profile);
 
                 // Sort Function
                 matches.Sort((a, b) => {
@@ -250,10 +246,10 @@ namespace Elin_ItemRelocator {
                 });
                 break;
             case RelocationProfile.ResultSortMode.TotalWeightAsc:
-                matches.Sort((a, b) => (a.SelfWeight * a.Num) - (b.SelfWeight * b.Num));
+                matches.Sort((a, b) => (a.ChildrenAndSelfWeight * a.Num) - (b.ChildrenAndSelfWeight * b.Num));
                 break;
             case RelocationProfile.ResultSortMode.TotalWeightDesc:
-                matches.Sort((a, b) => (b.SelfWeight * b.Num) - (a.SelfWeight * a.Num));
+                matches.Sort((a, b) => (b.ChildrenAndSelfWeight * b.Num) - (a.ChildrenAndSelfWeight * a.Num));
                 break;
             case RelocationProfile.ResultSortMode.UnitWeightAsc:
                 matches.Sort((a, b) => a.SelfWeight - b.SelfWeight);
@@ -271,6 +267,42 @@ namespace Elin_ItemRelocator {
 
             return matches;
         }
+
+        public List<int> GetTargetEnchantIDs(RelocationProfile profile) {
+            List<int> targetEleIds = [];
+            foreach (var r in profile.Rules) {
+                if (r.Enabled && r.Enchants != null) {
+                    foreach (var term in r.Enchants) {
+                        if (string.IsNullOrEmpty(term))
+                            continue;
+
+                        // Term format is typically "@Key" or "@Key>=Value"
+                        // Key can be Alias or Name
+                        string key = term.TrimStart('@');
+
+                        // Strip operators to isolate key
+                        string[] ops = [">=", "<=", "!=", ">", "<", "="];
+                        foreach (var o in ops) {
+                            int idx = key.IndexOf(o);
+                            if (idx > 0) { key = key.Substring(0, idx).Trim(); break; }
+                        }
+
+                        // Match against Element Name or Alias
+                        var sourceEle = EClass.sources.elements.map.Values.FirstOrDefault(e =>
+                            (e.alias is not null && e.alias.Equals(key, StringComparison.OrdinalIgnoreCase)) ||
+                            (e.GetName().Equals(key, StringComparison.OrdinalIgnoreCase))
+                        );
+                        if (sourceEle is not null && !targetEleIds.Contains(sourceEle.id))
+                            targetEleIds.Add(sourceEle.id);
+                    }
+                }
+            }
+            return targetEleIds;
+        }
+
+
+
+
 
         public void ExecuteRelocation(Thing container) {
             // Unlimited search for execution
