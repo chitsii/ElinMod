@@ -309,6 +309,12 @@ namespace Elin_ItemRelocator {
             case RelocationProfile.ResultSortMode.UidDesc:
                 matches.Sort((a, b) => b.uid - a.uid);
                 break;
+            case RelocationProfile.ResultSortMode.GenLvlAsc:
+                matches.Sort((a, b) => a.genLv - b.genLv);
+                break;
+            case RelocationProfile.ResultSortMode.GenLvlDesc:
+                matches.Sort((a, b) => b.genLv - a.genLv);
+                break;
             }
 
             return matches;

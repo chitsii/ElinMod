@@ -37,7 +37,9 @@ namespace Elin_ItemRelocator {
             UnitWeightAsc,
             UnitWeightDesc,
             UidAsc,
-            UidDesc
+            UidDesc,
+            GenLvlAsc,
+            GenLvlDesc
         }
 
         public enum RelocatorOp { Ge, Le, Eq, Ne, Gt, Lt }
@@ -56,12 +58,15 @@ namespace Elin_ItemRelocator {
         public List<string> Enchants = [];
         public int? Weight;
         public string WeightOp = ">=";
+        public int? GenLvl;
+        public string GenLvlOp = ">=";
 
         // Negation Flags
         public HashSet<string> NegatedCategoryIds = [];
         public bool NotQuality;
         public bool NotText;
         public bool NotWeight;
+        public bool NotGenLvl;
         public bool NotMaterial;
         public bool NotBless;
         public bool NotStolen;
@@ -81,6 +86,7 @@ namespace Elin_ItemRelocator {
         [JsonIgnore] private bool _cacheValid = false;
         [JsonIgnore] private int _cQualityVal; [JsonIgnore] private RelocationProfile.RelocatorOp _cQualityOp;
         [JsonIgnore] private int _cWeightVal; [JsonIgnore] private RelocationProfile.RelocatorOp _cWeightOp;
+        [JsonIgnore] private int _cGenLvlVal; [JsonIgnore] private RelocationProfile.RelocatorOp _cGenLvlOp;
 
         // Matching Logic (AND within Rule)
         public bool IsMatch(Thing t) {
@@ -100,7 +106,8 @@ namespace Elin_ItemRelocator {
                 (MaterialIds == null || MaterialIds.Count == 0) &&
                 (BlessStates == null || BlessStates.Count == 0) &&
                 !IsStolen.HasValue &&
-                !IsIdentified.HasValue) {
+                !IsIdentified.HasValue &&
+                !GenLvl.HasValue) {
                 return false;
             }
 
@@ -215,6 +222,15 @@ namespace Elin_ItemRelocator {
                     return false;
             }
 
+            // GenLv Condition
+            if (GenLvl.HasValue) {
+                bool match = CheckOp(t.genLv, _cGenLvlOp, _cGenLvlVal);
+                if (NotGenLvl)
+                    match = !match;
+                if (!match)
+                    return false;
+            }
+
             return true;
         }
 
@@ -246,6 +262,10 @@ namespace Elin_ItemRelocator {
                 string prefix = NotWeight ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
                 parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Weight) + " " + (string.IsNullOrEmpty(WeightOp) ? ">=" : WeightOp) + " " + Weight.Value);
             }
+            if (GenLvl.HasValue) {
+                string prefix = NotGenLvl ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl) + " " + (string.IsNullOrEmpty(GenLvlOp) ? ">=" : GenLvlOp) + " " + GenLvl.Value);
+            }
             return parts;
         }
 
@@ -271,6 +291,7 @@ namespace Elin_ItemRelocator {
                 return;
 
             ParseOp(string.IsNullOrEmpty(WeightOp) ? ">=" : WeightOp, Weight.HasValue ? Weight.Value : 0, out _cWeightOp, out _cWeightVal);
+            ParseOp(string.IsNullOrEmpty(GenLvlOp) ? ">=" : GenLvlOp, GenLvl.HasValue ? GenLvl.Value : 0, out _cGenLvlOp, out _cGenLvlVal);
             ParseOp(Quality, 0, out _cQualityOp, out _cQualityVal); // Quality string contains both op and value
 
 

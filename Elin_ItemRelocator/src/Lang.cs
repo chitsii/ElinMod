@@ -20,7 +20,7 @@ namespace Elin_ItemRelocator {
             Parent, Move, Msg_Moved, AddRule, NewRuleName,
             Material, Bless, Stolen, StateNormal, StateBlessed, StateCursed, StateDoomed, ScopeBoth, EditValue, ChangeEnchant,
             Enhancement, EditEnhancement, Identified, StateIdentified, StateUnidentified,
-            ResetRules, ResetRulesConfirm, Msg_RulesCleared, Details
+            ResetRules, ResetRulesConfirm, Msg_RulesCleared, Details, GenLvl, SortAsc, SortDesc
         }
 
         private static Dictionary<LangKey, string[]> _dict = new() {
@@ -111,7 +111,12 @@ namespace Elin_ItemRelocator {
             [LangKey.ResetRules] = ["Reset", "初期化"],
             [LangKey.ResetRulesConfirm] = ["Reset all filter conditions (clear text cache etc)?", "編集中の条件をすべて消去しますか？"],
             [LangKey.Msg_RulesCleared] = ["Conditions cleared.", "条件を消去しました。"],
-            [LangKey.Details] = ["Details", "詳細"]
+            [LangKey.ResetRulesConfirm] = ["Reset all filter conditions (clear text cache etc)?", "編集中の条件をすべて消去しますか？"],
+            [LangKey.Msg_RulesCleared] = ["Conditions cleared.", "条件を消去しました。"],
+            [LangKey.Details] = ["Details", "詳細"],
+            [LangKey.GenLvl] = ["Gen Lvl", "生成Lv"],
+            [LangKey.SortAsc] = ["Asc", "昇順"],
+            [LangKey.SortDesc] = ["Desc", "降順"]
         };
 
         public static string GetText(LangKey key) =>

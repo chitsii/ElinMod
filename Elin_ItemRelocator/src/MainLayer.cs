@@ -189,6 +189,12 @@ namespace Elin_ItemRelocator {
                         list.Add(new() { Rule = r, CondType = ConditionType.Identified, DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Identified) + ": " + val });
                     }
 
+                    // GenLv
+                    if (r.GenLvl.HasValue) {
+                        string prefix = r.NotGenLvl ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                        list.Add(new() { Rule = r, CondType = ConditionType.GenLvl, DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl) + ": " + (string.IsNullOrEmpty(r.GenLvlOp) ? ">=" : r.GenLvlOp) + r.GenLvl.Value });
+                    }
+
                     // ADD BUTTON
                     list.Add(new() { Rule = r, CondType = ConditionType.AddButton, DisplayText = " + " });
 
@@ -273,6 +279,10 @@ namespace Elin_ItemRelocator {
                         isNegated = node.Rule.NotWeight;
                         toggleNegation = () => { node.Rule.NotWeight = !node.Rule.NotWeight; refresh(); };
                         break;
+                    case ConditionType.GenLvl:
+                        isNegated = node.Rule.NotGenLvl;
+                        toggleNegation = () => { node.Rule.NotGenLvl = !node.Rule.NotGenLvl; refresh(); };
+                        break;
                     }
 
                     if (toggleNegation != null) {
@@ -295,35 +305,21 @@ namespace Elin_ItemRelocator {
                     // Remove Button (Updated Signature)
                     var btnRemove = CreateTinyButton(rowGO.transform, "x", () => {
                         Dialog.YesNo(RelocatorLang.GetText(RelocatorLang.LangKey.Delete) + "?", () => {
-                            switch (node.CondType) {
-                            case ConditionType.Category:
-                                node.Rule.CategoryIds.Remove(node.CondValue);
-                                break;
-                            case ConditionType.Rarity:
-                                node.Rule.Rarities = [];
-                                break;
-                            case ConditionType.Quality:
-                                node.Rule.Quality = null;
-                                break;
-                            case ConditionType.Text:
-                                node.Rule.Text = null;
-                                break;
-                            case ConditionType.Enchant:
-                                node.Rule.Enchants.Remove(node.CondValue);
-                                break;
-                            case ConditionType.Weight:
-                                node.Rule.Weight = null;
-                                break;
-                            case ConditionType.Material:
-                                node.Rule.MaterialIds = null;
-                                break;
-                            case ConditionType.Bless:
-                                node.Rule.BlessStates = null;
-                                break;
-                            case ConditionType.Stolen:
-                                node.Rule.IsStolen = null;
-                                break;
-                            }
+                            Action deleteAction = node.CondType switch {
+                                ConditionType.Category => () => node.Rule.CategoryIds.Remove(node.CondValue),
+                                ConditionType.Rarity => () => node.Rule.Rarities = [],
+                                ConditionType.Quality => () => node.Rule.Quality = null,
+                                ConditionType.Text => () => node.Rule.Text = null,
+                                ConditionType.Enchant => () => node.Rule.Enchants.Remove(node.CondValue),
+                                ConditionType.Weight => () => node.Rule.Weight = null,
+                                ConditionType.Material => () => node.Rule.MaterialIds = null,
+                                ConditionType.Bless => () => node.Rule.BlessStates = null,
+                                ConditionType.Stolen => () => node.Rule.IsStolen = null,
+                                ConditionType.Identified => () => node.Rule.IsIdentified = null,
+                                ConditionType.GenLvl => () => node.Rule.GenLvl = null,
+                                _ => () => { } // No-op for others (None, AddButton, Settings etc.)
+                            };
+                            deleteAction();
                             refresh();
                         });
                     });
@@ -447,6 +443,11 @@ namespace Elin_ItemRelocator {
                     case RelocationProfile.ResultSortMode.UnitWeightDesc:
                         // Unit Weight
                         return (t.SelfWeight * 0.001f).ToString("0.0") + "s";
+
+                    case RelocationProfile.ResultSortMode.GenLvlAsc:
+                    case RelocationProfile.ResultSortMode.GenLvlDesc:
+                        // Generation Level
+                        return t.genLv.ToString();
 
                     case RelocationProfile.ResultSortMode.TotalEnchantMagDesc:
                         int totalMag = 0;
@@ -755,7 +756,9 @@ namespace Elin_ItemRelocator {
                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortUnitWeightAsc), () => { profile.SortMode = RelocationProfile.ResultSortMode.UnitWeightAsc; refresh(); })
                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortUnitWeightDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.UnitWeightDesc; refresh(); })
                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortUidAsc), () => { profile.SortMode = RelocationProfile.ResultSortMode.UidAsc; refresh(); })
-                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortUidDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.UidDesc; refresh(); });
+                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortUidDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.UidDesc; refresh(); })
+                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl) + " (" + RelocatorLang.GetText(RelocatorLang.LangKey.SortAsc) + ")", () => { profile.SortMode = RelocationProfile.ResultSortMode.GenLvlAsc; refresh(); })
+                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl) + " (" + RelocatorLang.GetText(RelocatorLang.LangKey.SortDesc) + ")", () => { profile.SortMode = RelocationProfile.ResultSortMode.GenLvlDesc; refresh(); });
                 })
                 .AddSeparator()
                 .AddChild(RelocatorLang.GetText(RelocatorLang.LangKey.Presets), (child) => {
@@ -853,6 +856,8 @@ namespace Elin_ItemRelocator {
             RelocationProfile.ResultSortMode.UnitWeightDesc => RelocatorLang.GetText(RelocatorLang.LangKey.SortUnitWeightDesc),
             RelocationProfile.ResultSortMode.UidAsc => RelocatorLang.GetText(RelocatorLang.LangKey.SortUidAsc),
             RelocationProfile.ResultSortMode.UidDesc => RelocatorLang.GetText(RelocatorLang.LangKey.SortUidDesc),
+            RelocationProfile.ResultSortMode.GenLvlAsc => RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl) + "(" + RelocatorLang.GetText(RelocatorLang.LangKey.SortAsc) + ")",
+            RelocationProfile.ResultSortMode.GenLvlDesc => RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl) + "(" + RelocatorLang.GetText(RelocatorLang.LangKey.SortDesc) + ")",
             _ => mode.ToString()
         };
     }

@@ -146,102 +146,117 @@ namespace Elin_ItemRelocator {
                            .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.StateIdentified), () => { rule.IsIdentified = true; refresh(); })
                            .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.StateUnidentified), () => { rule.IsIdentified = false; refresh(); });
                   })
+                  .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl), () => {
+                      Dialog.InputName("Enter GenLvl (e.g. >=10)", "", (c, text) => {
+                          if (!c && !string.IsNullOrEmpty(text)) {
+                              if (char.IsDigit(text[0]))
+                                  text = ">=" + text;
+                              string op = ">=";
+                              string valStr = text;
+                              if (text.StartsWith(">=") || text.StartsWith("<=") || text.StartsWith("==") || text.StartsWith("!=")) {
+                                  op = text.Substring(0, 2);
+                                  valStr = text.Substring(2);
+                              } else if (text.StartsWith(">") || text.StartsWith("<") || text.StartsWith("=")) {
+                                  op = text.Substring(0, 1);
+                                  valStr = text.Substring(1);
+                              }
+                              int w;
+                              if (int.TryParse(valStr, out w)) {
+                                  rule.GenLvl = w;
+                                  rule.GenLvlOp = op;
+                                  rule.InvalidateCache();
+                                  refresh();
+                              }
+                          }
+                      }, (Dialog.InputType)0);
+                  })
                   .Show();
         }
 
         public static void EditRuleCondition(FilterNode node, Action refresh) {
             var rule = node.Rule;
-            switch (node.CondType) {
-            case ConditionType.Text:
-                Dialog.InputName("Edit Text", rule.Text, (c, val) => { if (!c) { rule.Text = val; refresh(); } }, (Dialog.InputType)0);
-                break;
-            case ConditionType.Enchant:
-                RelocatorMenu.Create()
-                    .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.EditValue), () => {
-                        // Parse current string
-                        string current = node.CondValue;
-                        string name = current;
-                        string valPart = "";
-                        string[] ops = [">=", "<=", "!=", ">", "<", "="];
-                        foreach (var op in ops) {
-                            int idx = current.IndexOf(op);
-                            if (idx > 0) {
-                                name = current.Substring(0, idx).Trim();
-                                valPart = current.Substring(idx).Trim();
-                                break;
+            Action editAction = node.CondType switch {
+                ConditionType.Text => () => Dialog.InputName("Edit Text", rule.Text, (c, val) => { if (!c) { rule.Text = val; refresh(); } }, (Dialog.InputType)0),
+                ConditionType.Enchant => () => {
+                    RelocatorMenu.Create()
+                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.EditValue), () => {
+                            // Parse current string
+                            string current = node.CondValue;
+                            string name = current;
+                            string valPart = "";
+                            string[] ops = [">=", "<=", "!=", ">", "<", "="];
+                            foreach (var op in ops) {
+                                int idx = current.IndexOf(op);
+                                if (idx > 0) {
+                                    name = current.Substring(0, idx).Trim();
+                                    valPart = current.Substring(idx).Trim();
+                                    break;
+                                }
                             }
-                        }
 
-                        Dialog.InputName("Amount (e.g. >=10)", valPart, (c, val) => {
-                            if (!c && !string.IsNullOrEmpty(val)) {
-                                if (char.IsDigit(val[0]))
-                                    val = ">=" + val;
+                            Dialog.InputName("Amount (e.g. >=10)", valPart, (c, val) => {
+                                if (!c && !string.IsNullOrEmpty(val)) {
+                                    if (char.IsDigit(val[0]))
+                                        val = ">=" + val;
 
-                                string newFilter = name + val;
-                                rule.Enchants.Remove(node.CondValue);
-                                rule.Enchants.Add(newFilter);
-                                refresh();
-                            }
-                        }, (Dialog.InputType)0);
-                    })
-                    .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.ChangeEnchant), () => {
-                        RelocatorMenu.Create()
-                              .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.CatAll), () => {
-                                  RelocatorPickers.ShowEnchantPicker(0, (ele) => {
-                                      AddEnchantFilterDialog(ele, (text) => {
-                                          rule.Enchants.Remove(node.CondValue);
-                                          rule.Enchants.Add(text);
-                                          refresh();
+                                    string newFilter = name + val;
+                                    rule.Enchants.Remove(node.CondValue);
+                                    rule.Enchants.Add(newFilter);
+                                    refresh();
+                                }
+                            }, (Dialog.InputType)0);
+                        })
+                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.ChangeEnchant), () => {
+                            RelocatorMenu.Create()
+                                  .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.CatAll), () => {
+                                      RelocatorPickers.ShowEnchantPicker(0, (ele) => {
+                                          AddEnchantFilterDialog(ele, (text) => {
+                                              rule.Enchants.Remove(node.CondValue);
+                                              rule.Enchants.Add(text);
+                                              refresh();
+                                          });
                                       });
-                                  });
-                              })
-                              .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.CatWeapon), () => {
-                                  RelocatorPickers.ShowEnchantPicker(1, (ele) => {
-                                      AddEnchantFilterDialog(ele, (text) => {
-                                          rule.Enchants.Remove(node.CondValue);
-                                          rule.Enchants.Add(text);
-                                          refresh();
+                                  })
+                                  .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.CatWeapon), () => {
+                                      RelocatorPickers.ShowEnchantPicker(1, (ele) => {
+                                          AddEnchantFilterDialog(ele, (text) => {
+                                              rule.Enchants.Remove(node.CondValue);
+                                              rule.Enchants.Add(text);
+                                              refresh();
+                                          });
                                       });
-                                  });
-                              })
-                              .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.CatArmor), () => {
-                                  RelocatorPickers.ShowEnchantPicker(2, (ele) => {
-                                      AddEnchantFilterDialog(ele, (text) => {
-                                          rule.Enchants.Remove(node.CondValue);
-                                          rule.Enchants.Add(text);
-                                          refresh();
+                                  })
+                                  .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.CatArmor), () => {
+                                      RelocatorPickers.ShowEnchantPicker(2, (ele) => {
+                                          AddEnchantFilterDialog(ele, (text) => {
+                                              rule.Enchants.Remove(node.CondValue);
+                                              rule.Enchants.Add(text);
+                                              refresh();
+                                          });
                                       });
-                                  });
-                              })
-                              .Show();
-                    })
-                    .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Remove), () => {
-                        rule.Enchants.Remove(node.CondValue);
-                        refresh();
-                    })
-                    .Show();
-                break;
-
-            case ConditionType.Rarity:
-                RelocatorPickers.ShowRarityPicker(rule.Rarities?.ToList(), (selected) => {
+                                  })
+                                  .Show();
+                        })
+                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Remove), () => {
+                            rule.Enchants.Remove(node.CondValue);
+                            refresh();
+                        })
+                        .Show();
+                }
+                ,
+                ConditionType.Rarity => () => RelocatorPickers.ShowRarityPicker(rule.Rarities?.ToList(), (selected) => {
                     rule.Rarities = new HashSet<int>(selected);
                     refresh();
-                });
-                break;
-            case ConditionType.Quality:
-                Dialog.InputName(RelocatorLang.GetText(RelocatorLang.LangKey.EditEnhancement), rule.Quality, (c, val) => { if (!c) { rule.Quality = val; rule.InvalidateCache(); refresh(); } }, (Dialog.InputType)0);
-                break;
-            case ConditionType.Category:
-                RelocatorPickers.ShowCategoryPicker([node.CondValue], (ids) => {
+                }),
+                ConditionType.Quality => () => Dialog.InputName(RelocatorLang.GetText(RelocatorLang.LangKey.EditEnhancement), rule.Quality, (c, val) => { if (!c) { rule.Quality = val; rule.InvalidateCache(); refresh(); } }, (Dialog.InputType)0),
+                ConditionType.Category => () => RelocatorPickers.ShowCategoryPicker([node.CondValue], (ids) => {
                     rule.CategoryIds.Remove(node.CondValue);
                     foreach (var id in ids)
                         if (!rule.CategoryIds.Contains(id))
                             rule.CategoryIds.Add(id);
                     refresh();
-                });
-                break;
-            case ConditionType.Weight:
-                Dialog.InputName("Edit Weight", rule.Weight.ToString(), (c, val) => {
+                }),
+                ConditionType.Weight => () => Dialog.InputName("Edit Weight", rule.Weight.ToString(), (c, val) => {
                     if (!c && !string.IsNullOrEmpty(val)) {
                         if (char.IsDigit(val[0]))
                             val = ">=" + val;
@@ -262,34 +277,49 @@ namespace Elin_ItemRelocator {
                             refresh();
                         }
                     }
-                }, (Dialog.InputType)0);
-                break;
-            case ConditionType.Material:
-                RelocatorPickers.ShowMaterialPicker(rule.MaterialIds?.ToList(), (aliases) => {
+                }, (Dialog.InputType)0),
+                ConditionType.Material => () => RelocatorPickers.ShowMaterialPicker(rule.MaterialIds?.ToList(), (aliases) => {
                     rule.MaterialIds = new HashSet<string>(aliases);
                     refresh();
-                });
-                break;
-            case ConditionType.Bless:
-                RelocatorPickers.ShowBlessPicker(rule.BlessStates?.ToList(), (states) => {
+                }),
+                ConditionType.Bless => () => RelocatorPickers.ShowBlessPicker(rule.BlessStates?.ToList(), (states) => {
                     rule.BlessStates = new HashSet<int>(states);
                     refresh();
-                });
-                break;
-            case ConditionType.Stolen:
-                RelocatorMenu.Create()
-                     .AddButton("Yes (Is Stolen)", () => { rule.IsStolen = true; refresh(); })
-                     .AddButton("No (Not Stolen)", () => { rule.IsStolen = false; refresh(); })
-                     .Show();
-                break;
-            case ConditionType.Identified:
-                RelocatorMenu.Create()
-                     .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.StateIdentified), () => { node.Rule.IsIdentified = true; refresh(); })
-                     .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.StateUnidentified), () => { node.Rule.IsIdentified = false; refresh(); })
-                     .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Remove), () => { node.Rule.IsIdentified = null; refresh(); })
-                     .Show();
-                break;
-            }
+                }),
+                ConditionType.Stolen => () => RelocatorMenu.Create()
+                         .AddButton("Yes (Is Stolen)", () => { rule.IsStolen = true; refresh(); })
+                         .AddButton("No (Not Stolen)", () => { rule.IsStolen = false; refresh(); })
+                         .Show(),
+                ConditionType.Identified => () => RelocatorMenu.Create()
+                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.StateIdentified), () => { node.Rule.IsIdentified = true; refresh(); })
+                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.StateUnidentified), () => { node.Rule.IsIdentified = false; refresh(); })
+                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Remove), () => { node.Rule.IsIdentified = null; refresh(); })
+                         .Show(),
+                ConditionType.GenLvl => () => Dialog.InputName("Edit GenLvl", rule.GenLvl.ToString(), (c, val) => {
+                    if (!c && !string.IsNullOrEmpty(val)) {
+                        if (char.IsDigit(val[0]))
+                            val = ">=" + val;
+                        string op = ">=";
+                        string valStr = val;
+                        if (val.StartsWith(">=") || val.StartsWith("<=") || val.StartsWith("==") || val.StartsWith("!=")) {
+                            op = val.Substring(0, 2);
+                            valStr = val.Substring(2);
+                        } else if (val.StartsWith(">") || val.StartsWith("<") || val.StartsWith("=")) {
+                            op = val.Substring(0, 1);
+                            valStr = val.Substring(1);
+                        }
+                        int w;
+                        if (int.TryParse(valStr, out w)) {
+                            rule.GenLvl = w;
+                            rule.GenLvlOp = op;
+                            rule.InvalidateCache();
+                            refresh();
+                        }
+                    }
+                }, (Dialog.InputType)0),
+                _ => () => { }
+            };
+            editAction();
         }
     }
 }
