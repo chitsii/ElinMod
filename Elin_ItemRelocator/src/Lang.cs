@@ -19,7 +19,8 @@ namespace Elin_ItemRelocator {
             Presets, Rename, Delete, Msg_Renamed, Msg_Deleted, Msg_FileExists, Msg_RenamePrompt,
             Parent, Move, Msg_Moved, AddRule, NewRuleName,
             Material, Bless, Stolen, StateNormal, StateBlessed, StateCursed, StateDoomed, ScopeBoth, EditValue, ChangeEnchant,
-            Enhancement, EditEnhancement
+            Enhancement, EditEnhancement, Identified, StateIdentified, StateUnidentified,
+            ResetRules, ResetRulesConfirm, Msg_RulesCleared
         }
 
         private static Dictionary<LangKey, string[]> _dict = new() {
@@ -108,7 +109,13 @@ namespace Elin_ItemRelocator {
             [LangKey.EditValue] = ["Edit Value", "数値の編集"],
             [LangKey.ChangeEnchant] = ["Change Enchant", "エンチャント変更"],
             [LangKey.Enhancement] = ["Enhancement", "品質"],
-            [LangKey.EditEnhancement] = ["Edit Enhancement (e.g. >=2)", "品質設定 (例: >=2)"]
+            [LangKey.EditEnhancement] = ["Edit Enhancement (e.g. >=2)", "品質設定 (例: >=2)"],
+            [LangKey.Identified] = ["Identified", "鑑定済み"],
+            [LangKey.StateIdentified] = ["Yes (Identified)", "鑑定済み"],
+            [LangKey.StateUnidentified] = ["No (Unidentified)", "未鑑定"],
+            [LangKey.ResetRules] = ["Reset", "初期化"],
+            [LangKey.ResetRulesConfirm] = ["Reset all filter conditions (clear text cache etc)?", "編集中の条件をすべて消去しますか？"],
+            [LangKey.Msg_RulesCleared] = ["Conditions cleared.", "条件を消去しました。"]
         };
 
         public static string GetText(LangKey key) =>

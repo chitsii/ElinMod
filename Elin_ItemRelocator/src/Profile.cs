@@ -115,6 +115,7 @@ namespace Elin_ItemRelocator {
         public HashSet<int> Rarities = [];
 
         public bool? IsStolen;
+        public bool? IsIdentified;
         public void InvalidateCache() => _cacheValid = false;
 
         // --- Cache Fields (Optimization) ---
@@ -157,7 +158,8 @@ namespace Elin_ItemRelocator {
                 !Weight.HasValue &&
                 (MaterialIds == null || MaterialIds.Count == 0) &&
                 (BlessStates == null || BlessStates.Count == 0) &&
-                !IsStolen.HasValue) {
+                !IsStolen.HasValue &&
+                !IsIdentified.HasValue) {
                 return false;
             }
 
@@ -263,6 +265,12 @@ namespace Elin_ItemRelocator {
                 if (NotStolen)
                     match = !match;
                 if (!match)
+                    return false;
+            }
+
+            // Identified Flag
+            if (IsIdentified.HasValue) {
+                if (t.IsIdentified != IsIdentified.Value)
                     return false;
             }
 

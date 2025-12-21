@@ -208,26 +208,29 @@ namespace Elin_ItemRelocator {
                 // Identify target element IDs from rules
                 List<int> targetEleIds = [];
                 foreach (var r in profile.Rules) {
-                    if (r.Enabled && !string.IsNullOrEmpty(r.Text)) {
-                        string[] searchTerms = r.Text.Split([' ', '　'], StringSplitOptions.RemoveEmptyEntries);
-                        foreach (var term in searchTerms) {
-                            if (term.StartsWith("@")) {
-                                // Parse term: @Mining>=10 -> Mining
-                                string key = term.Substring(1);
-                                // Strip operators
-                                string[] ops = [">=", "<=", "!=", ">", "<", "="];
-                                foreach (var o in ops) {
-                                    int idx = key.IndexOf(o);
-                                    if (idx > 0) { key = key.Substring(0, idx).Trim(); break; }
-                                }
+                    if (r.Enabled && r.Enchants != null) {
+                        foreach (var term in r.Enchants) {
+                            if (string.IsNullOrEmpty(term))
+                                continue;
 
-                                var sourceEle = EClass.sources.elements.map.Values.FirstOrDefault(e =>
-                                    (e.alias is not null && e.alias.Equals(key, StringComparison.OrdinalIgnoreCase)) ||
-                                    (e.GetName().Equals(key, StringComparison.OrdinalIgnoreCase))
-                                );
-                                if (sourceEle is not null)
-                                    targetEleIds.Add(sourceEle.id);
+                            // Term format is typically "@Key" or "@Key>=Value"
+                            // Key can be Alias or Name
+                            string key = term.TrimStart('@');
+
+                            // Strip operators to isolate key
+                            string[] ops = [">=", "<=", "!=", ">", "<", "="];
+                            foreach (var o in ops) {
+                                int idx = key.IndexOf(o);
+                                if (idx > 0) { key = key.Substring(0, idx).Trim(); break; }
                             }
+
+                            // Match against Element Name or Alias
+                            var sourceEle = EClass.sources.elements.map.Values.FirstOrDefault(e =>
+                                (e.alias is not null && e.alias.Equals(key, StringComparison.OrdinalIgnoreCase)) ||
+                                (e.GetName().Equals(key, StringComparison.OrdinalIgnoreCase))
+                            );
+                            if (sourceEle is not null)
+                                targetEleIds.Add(sourceEle.id);
                         }
                     }
                 }

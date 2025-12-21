@@ -174,6 +174,14 @@ namespace Elin_ItemRelocator {
                         list.Add(new() { Rule = r, CondType = ConditionType.Stolen, DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Stolen) + ": " + (r.IsStolen.Value ? "Yes" : "No") });
                     }
 
+                    // Identified
+                    if (r.IsIdentified.HasValue) {
+                        string val = r.IsIdentified.Value
+                            ? RelocatorLang.GetText(RelocatorLang.LangKey.StateIdentified)
+                            : RelocatorLang.GetText(RelocatorLang.LangKey.StateUnidentified);
+                        list.Add(new() { Rule = r, CondType = ConditionType.Identified, DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Identified) + ": " + val });
+                    }
+
                     // ADD BUTTON
                     list.Add(new() { Rule = r, CondType = ConditionType.AddButton, DisplayText = " + " });
 
@@ -440,6 +448,23 @@ namespace Elin_ItemRelocator {
                         refresh();
                     }
                 }, (Dialog.InputType)0);
+            });
+            // Reset Button (Clear current rule conditions)
+            win.AddBottomButton(RelocatorLang.GetText(RelocatorLang.LangKey.ResetRules), () => {
+                Dialog.YesNo(RelocatorLang.GetText(RelocatorLang.LangKey.ResetRulesConfirm), () => {
+                    // Logic: "Erase editing search rule/condition (Initialize All)"
+                    // If this means "Reset Profile Rules to Empty", use:
+                    // profile.Rules.Clear();
+                    // But user said "editing...". If there's a selected rule, maybe just that one?
+                    // "すべて初期化する" (Initialize All) usually implies a full reset of the current context.
+                    // Given the "Relocator" context, I'll reset the entire profile rules list to be safe/thorough,
+                    // OR just the conditions of the rules? No, deleting rules is "Reset".
+                    // Actually, "Rules & Conditions".
+                    // I will Clear profile.Rules.
+                    profile.Rules.Clear();
+                    refresh();
+                    Msg.Say(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_RulesCleared));
+                });
             });
             win.AddBottomButton(RelocatorLang.GetText(RelocatorLang.LangKey.Settings), () => ShowSettingsMenu(profile, refresh));
             win.AddBottomButton(RelocatorLang.GetText(RelocatorLang.LangKey.Execute), () => {

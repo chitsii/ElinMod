@@ -141,6 +141,11 @@ namespace Elin_ItemRelocator {
                            .AddButton("Yes (Is Stolen)", () => { rule.IsStolen = true; refresh(); })
                            .AddButton("No (Not Stolen)", () => { rule.IsStolen = false; refresh(); });
                   })
+                  .AddChild(RelocatorLang.GetText(RelocatorLang.LangKey.Identified), (child) => {
+                      child
+                           .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.StateIdentified), () => { rule.IsIdentified = true; refresh(); })
+                           .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.StateUnidentified), () => { rule.IsIdentified = false; refresh(); });
+                  })
                   .Show();
         }
 
@@ -275,6 +280,13 @@ namespace Elin_ItemRelocator {
                 RelocatorMenu.Create()
                      .AddButton("Yes (Is Stolen)", () => { rule.IsStolen = true; refresh(); })
                      .AddButton("No (Not Stolen)", () => { rule.IsStolen = false; refresh(); })
+                     .Show();
+                break;
+            case ConditionType.Identified:
+                RelocatorMenu.Create()
+                     .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.StateIdentified), () => { node.Rule.IsIdentified = true; refresh(); })
+                     .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.StateUnidentified), () => { node.Rule.IsIdentified = false; refresh(); })
+                     .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Remove), () => { node.Rule.IsIdentified = null; refresh(); })
                      .Show();
                 break;
             }
