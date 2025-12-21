@@ -15,29 +15,6 @@ namespace Elin_ItemRelocator {
         // Main Data
         public List<RelocationRule> Rules = [];
 
-        // Legacy Support
-        [JsonProperty]
-        private List<RelocationFilter> Filters {
-            set {
-                if (value is { Count: > 0 }) {
-                    // Migration: Convert legacy Filters to Rules
-                    foreach (var f in value) {
-                        RelocationRule r = new();
-                        r.Name = "Imported Rule";
-                        if (f.CategoryIds is not null)
-                            r.CategoryIds = f.CategoryIds;
-                        if (f.Rarity.HasValue) {
-                            for (int i = f.Rarity.Value; i <= 4; i++)
-                                r.Rarities.Add(i);
-                        }
-                        r.Quality = f.Quality;
-                        r.Text = f.Text;
-                        Rules.Add(r);
-                        r.InvalidateCache(); // Invalidate cache for the newly created rule
-                    }
-                }
-            }
-        }
 
         public ResultSortMode SortMode = ResultSortMode.Default;
 
@@ -90,28 +67,10 @@ namespace Elin_ItemRelocator {
         public bool NotStolen;
 
         // New Condition Fields
-        [JsonProperty("MaterialId")]
-        private string LegacyMaterialId { set { if (!string.IsNullOrEmpty(value)) MaterialIds.Add(value); } }
         public HashSet<string> MaterialIds = new(StringComparer.OrdinalIgnoreCase); // Multi-select
 
-        [JsonProperty("Bless")]
-        private int? LegacyBless { set { if (value.HasValue) BlessStates.Add(value.Value); } }
         public HashSet<int> BlessStates = []; // Multi-select
 
-        [JsonProperty("Rarity")]
-        private int? LegacyRarity {
-            set {
-                if (value.HasValue) {
-                    // Legacy migration: Rarity was >= Value.
-                    // Since we are switching to strict multi-select, we can't perfectly migrate ">=2" to {2,3,4} without knowing max rarity.
-                    // However, safe default: Add the value itself.
-                    // Or: Add all rarities >= value up to max (Mythical=4).
-                    // Existing: -1=Crude, 0=Normal, 1=High, 2=Superior, 3=Legendary, 4=Mythical
-                    for (int i = value.Value; i <= 4; i++)
-                        Rarities.Add(i);
-                }
-            }
-        }
         public HashSet<int> Rarities = [];
 
         public bool? IsStolen;
@@ -128,24 +87,6 @@ namespace Elin_ItemRelocator {
             if (!Enabled || t.c_lockedHard)
                 return false;
 
-            // Migration: Move Enchants from Text to Enchants list
-            if (!string.IsNullOrEmpty(Text) && Text.Contains('@')) {
-                var parts = Text.Split([' ', '　'], StringSplitOptions.RemoveEmptyEntries).ToList();
-                var newText = new List<string>();
-                foreach (var p in parts) {
-                    if (p.StartsWith("@")) {
-                        if (Enchants is null)
-                            Enchants = [];
-                        Enchants.Add(p);
-                    } else {
-                        newText.Add(p);
-                    }
-                }
-                Text = String.Join(" ", newText.ToArray());
-                if (string.IsNullOrEmpty(Text))
-                    Text = null;
-                InvalidateCache(); // Invalidate cache if Text or Enchants changed
-            }
 
             EnsureCache();
 
@@ -312,7 +253,6 @@ namespace Elin_ItemRelocator {
             string[] parts = query.Split([' ', '　'], StringSplitOptions.RemoveEmptyEntries);
             foreach (var part in parts) {
                 string term = part.Trim();
-                // Legacy @ check removed (handled by migration)
                 if (!MatchesName(t, term))
                     return false;
             }
@@ -434,13 +374,4 @@ namespace Elin_ItemRelocator {
         }
     }
 
-    // Stub for Legacy JSON
-    [Serializable]
-    public class RelocationFilter {
-        public List<string> CategoryIds;
-        public int? Rarity;
-        public string RarityOp;
-        public string Quality;
-        public string Text;
-    }
 }
