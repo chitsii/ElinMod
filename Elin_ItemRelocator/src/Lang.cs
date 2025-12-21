@@ -4,15 +4,15 @@ using System.Collections.Generic;
 namespace Elin_ItemRelocator {
     public static class RelocatorLang {
         public enum LangKey {
-            Settings, AddFilter, Preview, Execute, Relocate, Scope, ExcludeHotbar, Rarity, Quality, Category, Text, Enchant, Remove, Edit, Enable, Disable, Title, Operator, Msg_Relocated, Inventory, Zone, ON, OFF, NoMatches, SelectEnchant, RelocatorCaption, DisabledSuffix, All, EditSearchText, EditCategoryID, EditQuality, Msg_ContainerFull, Msg_RelocatedResult, Msg_NoMatchLog,
+            Settings, AddFilter, Preview, Execute, Relocate, Scope,
+            Rarity, Quality, Category, Text, Enchant, Remove, Edit, Enable, Disable, Title, Operator, Msg_Relocated, Inventory, Zone, ON, OFF,
+            NoMatches, SelectEnchant, RelocatorCaption, DisabledSuffix, All, EditSearchText, EditCategoryID, EditQuality, Msg_ContainerFull, Msg_RelocatedResult, Msg_NoMatchLog,
             SortLabel, SortDefault, SortPriceAsc, SortPriceDesc, SortMagAsc, SortMagDesc, SortTotalEnchantMagDesc,
             SortWeightAsc, SortWeightDesc, SortUnitWeightAsc, SortUnitWeightDesc,
             SortUidAsc, SortUidDesc,
             CatAll,
             CatWeapon,
             CatArmor,
-            HelpTitle,
-            HelpText,
             Not,
             Weight,
             SavePreset, LoadPreset, PresetName, Msg_Saved, Msg_Loaded,
@@ -30,7 +30,6 @@ namespace Elin_ItemRelocator {
             [LangKey.Relocate] = ["Relocate", "アイテム転送"],
             [LangKey.Execute] = ["Relocate All", "全て転送"],
             [LangKey.Scope] = ["Scope", "範囲"],
-            [LangKey.ExcludeHotbar] = ["Exclude Hotbar", "ツールベルト除外"],
             [LangKey.Rarity] = ["Rarity", "レアリティ"],
             [LangKey.Quality] = ["Quality", "品質"],
             [LangKey.Category] = ["Category", "カテゴリ"],
@@ -60,7 +59,7 @@ namespace Elin_ItemRelocator {
             [LangKey.Msg_RelocatedResult] = ["Relocated {0} stacks to {1}.", "{0}個のスタックを{1}に移動した。"],
             [LangKey.Msg_NoMatchLog] = ["No matching items found.", "条件に合うアイテムが見つからない。"],
             [LangKey.SortLabel] = ["Sort: ", "並び替え: "],
-            [LangKey.SortDefault] = ["Default", "見つけた順(Default)"],
+            [LangKey.SortDefault] = ["Default", "検索ヒット順(Default)"],
             [LangKey.SortPriceAsc] = ["Price (Low to High)", "価格 (安い順)"],
             [LangKey.SortPriceDesc] = ["Price (High to Low)", "価格 (高い順)"],
             [LangKey.SortMagAsc] = ["Enchant (Weak to Strong)", "エンチャント強度 (弱い順)"],
@@ -69,11 +68,6 @@ namespace Elin_ItemRelocator {
             [LangKey.CatAll] = ["General", "汎用"],
             [LangKey.CatWeapon] = ["Weapon Specific", "武器特有"],
             [LangKey.CatArmor] = ["Armor Specific", "防具特有"],
-            [LangKey.HelpTitle] = ["About Rules & Filters", "ルールとフィルタについて"],
-            [LangKey.HelpText] = [
-                "[Rule Evaluation]\nRules are checked from top to bottom. If an item matches ANY rule, it gets moved (OR logic).\n\n[Condition Logic]\nWithin a single rule, an item must meet ALL conditions/filters (AND logic).\n\n<Example>\nRule 1: Magic Strength >= 40 AND Weapon\nRule 2: Anti-Magic <= 0\n\nItems matching EITHER (Rule 1) OR (Rule 2) will be moved.",
-                "【ルールの判定】\nリストの上から順に判定され、どれか1つのルールに該当すれば移動します（OR条件）。\n\n【条件の判定】\n1つのルール内に複数の条件がある場合、すべて満たす必要があります（AND条件）。\n\n＜利用例＞\nルール1：[<条件1>魔法強度が40以上] かつ [<条件2>武器]\nルール2：[<条件3>反魔法強度が0未満] かつ [<条件4>奇跡品以上]\n\nこの場合、「魔法強化40以上の武器」または「反魔法強度が0未満の奇跡以上」のアイテムが対象になります。"
-            ],
             [LangKey.Not] = ["N", "否"],
             [LangKey.Weight] = ["Weight", "重量"],
             [LangKey.SortWeightAsc] = ["Total Weight (Lighest)", "総重量 (軽い順)"],

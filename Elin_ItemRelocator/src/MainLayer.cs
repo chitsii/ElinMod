@@ -38,6 +38,8 @@ namespace Elin_ItemRelocator {
             // Setup Accordion Logic FIRST
             mainAccordion = RelocatorAccordion<FilterNode>.Create();
             var profile = RelocatorManager.Instance.GetProfile(container);
+            // Build Cache on Open
+            RelocatorManager.Instance.BuildCache(profile, container);
 
             // UX: Default Empty Rule for new/empty profiles
             if (profile.Rules.Count == 0) {
@@ -97,7 +99,12 @@ namespace Elin_ItemRelocator {
                             var source = EClass.sources.categories.map.TryGetValue(id);
                             if (source is not null)
                                 name = source.GetName();
-                            list.Add(new() { Rule = r, CondType = ConditionType.Category, CondValue = id, DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Category) + ": " + name });
+                            list.Add(new() {
+                                Rule = r,
+                                CondType = ConditionType.Category,
+                                CondValue = id,
+                                DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Category) + ": " + name
+                            });
                         }
                     }
                     if (r.Rarities is { Count: > 0 }) {
@@ -331,7 +338,6 @@ namespace Elin_ItemRelocator {
                     if (loaded is not null) {
                         profile.Rules = loaded.Rules;
                         profile.Scope = loaded.Scope;
-                        profile.ExcludeHotbar = loaded.ExcludeHotbar;
                         profile.SortMode = loaded.SortMode;
                         refresh();
                         Msg.Say(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_Loaded));
@@ -524,6 +530,7 @@ namespace Elin_ItemRelocator {
             win.AddBottomButton(RelocatorLang.GetText(RelocatorLang.LangKey.Settings), () => ShowSettingsMenu(profile, refresh));
             win.AddBottomButton(RelocatorLang.GetText(RelocatorLang.LangKey.Execute), () => {
                 RelocatorManager.Instance.ExecuteRelocation(container);
+                RelocatorManager.Instance.ClearCache();
                 Msg.Say(string.Format(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_Relocated), ""));
                 if (mainAccordion != null)
                     mainAccordion.Close();
@@ -615,6 +622,7 @@ namespace Elin_ItemRelocator {
                     _preview.Close();
                 if (_sidebar != null)
                     _sidebar.Close();
+                RelocatorManager.Instance.ClearCache();
             });
             OnKill(_preview, () => {
                 if (closing)
@@ -624,6 +632,7 @@ namespace Elin_ItemRelocator {
                     _main.Close();
                 if (_sidebar != null)
                     _sidebar.Close();
+                RelocatorManager.Instance.ClearCache();
             });
             OnKill(_sidebar, () => {
                 if (closing)
@@ -633,6 +642,7 @@ namespace Elin_ItemRelocator {
                     _main.Close();
                 if (_preview != null)
                     _preview.Close();
+                RelocatorManager.Instance.ClearCache();
             });
 
             main = _main;
@@ -693,25 +703,44 @@ namespace Elin_ItemRelocator {
             else if (profile.Scope == RelocationProfile.FilterScope.ZoneOnly)
                 currentScope = RelocatorLang.GetText(RelocatorLang.LangKey.Zone);
 
+            // Local Helper for Cache Updates
+            void UpdateProfile(Action<RelocationProfile> action) {
+                // With Master Cache, we only rebuild if game state changes (not scope/hotbar)
+                // However, if we CHANGE THE SORT? No, sort is handled dynamically.
+                // If we load PRESET? Preset might change rules.
+                // MainLayer calls BuildCache on Open.
+                // Scope/Hotbar toggles just need refresh.
+
+                // But wait, if we switch TO a scope that wasn't gathered?
+                // Master Cache gathers BOTH. So we have everything.
+
+                // So triggers are NOT needed for Scope/Exclusion changes.
+                // Just execute action and Refresh.
+
+                // If Rules change? Rules are filtered dynamically.
+                // So BuildCache is ONLY needed on:
+                // 1. Initial Open
+                // 2. Relocation Execution (items moved/destroyed)
+                // 3. User Explicit Refresh (if added)
+                // 4. Reset Rules? No, rules are dynamic.
+
+                // So UpdateProfile just becomes:
+                action(profile);
+                refresh();
+            }
+
             RelocatorMenu.Create()
                 .AddChild(RelocatorLang.GetText(RelocatorLang.LangKey.Scope) + ": " + currentScope, (child) => {
                     child
                          .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Inventory), () => {
-                             profile.Scope = RelocationProfile.FilterScope.Inventory;
-                             refresh();
+                             UpdateProfile(p => p.Scope = RelocationProfile.FilterScope.Inventory);
                          })
                          .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Zone), () => { // Zone Only
-                             profile.Scope = RelocationProfile.FilterScope.ZoneOnly;
-                             refresh();
+                             UpdateProfile(p => p.Scope = RelocationProfile.FilterScope.ZoneOnly);
                          })
                          .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.ScopeBoth), () => { // Both
-                             profile.Scope = RelocationProfile.FilterScope.Both;
-                             refresh();
+                             UpdateProfile(p => p.Scope = RelocationProfile.FilterScope.Both);
                          });
-                })
-                .AddCheck(RelocatorLang.GetText(RelocatorLang.LangKey.ExcludeHotbar), profile.ExcludeHotbar, (isOn) => {
-                    profile.ExcludeHotbar = isOn;
-                    refresh();
                 })
                 .AddChild(RelocatorLang.GetText(RelocatorLang.LangKey.SortLabel) + GetSortText(profile.SortMode), (child) => {
                     child
@@ -738,19 +767,19 @@ namespace Elin_ItemRelocator {
                                 }
                             }, (Dialog.InputType)0);
                         })
-                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.LoadPreset), () => {
-                            RelocatorPickers.ShowPresetPicker((name) => {
-                                var loaded = RelocatorManager.Instance.LoadPreset(name);
-                                if (loaded is not null) {
-                                    profile.Rules = loaded.Rules;
-                                    profile.Scope = loaded.Scope;
-                                    profile.ExcludeHotbar = loaded.ExcludeHotbar;
-                                    profile.SortMode = loaded.SortMode;
-                                    refresh();
-                                    Msg.Say(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_Loaded));
-                                }
-                            });
-                        });
+                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.LoadPreset), () => {
+                             RelocatorPickers.ShowPresetPicker((name) => {
+                                 var loaded = RelocatorManager.Instance.LoadPreset(name);
+                                 if (loaded is not null) {
+                                     UpdateProfile(p => {
+                                         p.Rules = loaded.Rules;
+                                         p.Scope = loaded.Scope;
+                                         p.SortMode = loaded.SortMode;
+                                     });
+                                     Msg.Say(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_Loaded));
+                                 }
+                             });
+                         });
                 })
                 .Show();
         }

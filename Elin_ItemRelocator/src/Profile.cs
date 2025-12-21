@@ -11,7 +11,6 @@ namespace Elin_ItemRelocator {
         public string ContainerName; // For display/debug
         public bool Enabled = true;
         public FilterScope Scope = FilterScope.Both;
-        public bool ExcludeHotbar = true; // Default to exclude
 
         // Main Data
         public List<RelocationRule> Rules = [];
