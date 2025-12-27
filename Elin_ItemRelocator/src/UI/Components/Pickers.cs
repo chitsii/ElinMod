@@ -330,5 +330,91 @@ namespace Elin_ItemRelocator {
 
             tree.Show();
         }
+
+        // General Element Picker (for DNA etc)
+        // DNA Content Picker (Tree-based)
+        public static void ShowDnaContentPicker(List<string> initialSelection, Action<List<string>> onConfirm) {
+            HashSet<string> selected = new HashSet<string>();
+            if (initialSelection != null)
+                foreach (var s in initialSelection) {
+                    // Handle "mining>=5" style strings - extract just the ID part for selection state
+                    string id = s;
+                    string[] ops = [">=", "<=", "!=", ">", "<", "="];
+                    foreach (var o in ops) {
+                        int idx = s.IndexOf(o);
+                        if (idx > 0) {
+                            id = s.Substring(0, idx).Trim();
+                            break;
+                        }
+                    }
+                    selected.Add(id);
+                }
+
+            // Roots: Categories
+            var categories = new List<string> { "attribute", "skill", "feat", "ability", "slot" };
+
+            // Map: Category -> List<SourceElement.Row>
+            var map = new Dictionary<string, List<SourceElement.Row>>();
+            foreach (var cat in categories)
+                map[cat] = new List<SourceElement.Row>();
+
+            foreach (var row in EClass.sources.elements.rows) {
+                if (string.IsNullOrEmpty(row.alias))
+                    continue;
+                if (row.tag.Contains("hidden"))
+                    continue;
+                if (map.ContainsKey(row.category)) {
+                    map[row.category].Add(row);
+                }
+            }
+
+            // Sort
+            foreach (var list in map.Values)
+                list.Sort((a, b) => a.id - b.id);
+
+            var tree = RelocatorTree<object>.Create();
+            tree.SetCaption("Select DNA Content");
+            tree.SetRoots(categories.Cast<object>());
+
+            tree.SetChildren((object obj) => {
+                if (obj is string cat && map.ContainsKey(cat)) {
+                    return map[cat].Cast<object>();
+                }
+                return null;
+            });
+
+            tree.SetText((object obj) => {
+                if (obj is string cat) {
+                    if (Enum.TryParse("Cat_" + char.ToUpper(cat[0]) + cat.Substring(1), out RelocatorLang.LangKey key))
+                        return RelocatorLang.GetText(key);
+                    return cat.ToUpper();
+                }
+                if (obj is SourceElement.Row row)
+                    return row.GetName();
+                return obj.ToString();
+            });
+
+            tree.SetIsSelected((object obj) => {
+                if (obj is SourceElement.Row row)
+                    return selected.Contains(row.alias);
+                return false;
+            });
+
+            tree.SetOnSelect((object obj) => {
+                if (obj is SourceElement.Row row) {
+                    if (selected.Contains(row.alias))
+                        selected.Remove(row.alias);
+                    else
+                        selected.Add(row.alias);
+                }
+            });
+
+            tree.AddBottomButton("[ OK ]", () => {
+                onConfirm(selected.ToList());
+                tree.Close();
+            }, new Color(0.3f, 0.5f, 0));
+
+            tree.Show();
+        }
     }
 }

@@ -315,6 +315,12 @@ namespace Elin_ItemRelocator {
             case RelocationProfile.ResultSortMode.GenLvlDesc:
                 matches.Sort((a, b) => b.genLv - a.genLv);
                 break;
+            case RelocationProfile.ResultSortMode.DnaAsc:
+                matches.Sort((a, b) => (a.c_DNA?.cost ?? 0) - (b.c_DNA?.cost ?? 0));
+                break;
+            case RelocationProfile.ResultSortMode.DnaDesc:
+                matches.Sort((a, b) => (b.c_DNA?.cost ?? 0) - (a.c_DNA?.cost ?? 0));
+                break;
             }
 
             return matches;

@@ -39,7 +39,9 @@ namespace Elin_ItemRelocator {
             UidAsc,
             UidDesc,
             GenLvlAsc,
-            GenLvlDesc
+            GenLvlDesc,
+            DnaAsc,
+            DnaDesc
         }
 
         public enum RelocatorOp { Ge, Le, Eq, Ne, Gt, Lt }
@@ -60,6 +62,9 @@ namespace Elin_ItemRelocator {
         public string WeightOp = ">=";
         public int? GenLvl;
         public string GenLvlOp = ">=";
+        public int? Dna;
+        public string DnaOp = ">=";
+        public HashSet<string> DnaIds = [];
 
         // Negation Flags
         public HashSet<string> NegatedCategoryIds = [];
@@ -67,9 +72,11 @@ namespace Elin_ItemRelocator {
         public bool NotText;
         public bool NotWeight;
         public bool NotGenLvl;
+        public bool NotDna;
         public bool NotMaterial;
         public bool NotBless;
         public bool NotStolen;
+        public bool NotDnaContent;
 
         // New Condition Fields
         public HashSet<string> MaterialIds = new(StringComparer.OrdinalIgnoreCase); // Multi-select
@@ -87,6 +94,7 @@ namespace Elin_ItemRelocator {
         [JsonIgnore] private int _cQualityVal; [JsonIgnore] private RelocationProfile.RelocatorOp _cQualityOp;
         [JsonIgnore] private int _cWeightVal; [JsonIgnore] private RelocationProfile.RelocatorOp _cWeightOp;
         [JsonIgnore] private int _cGenLvlVal; [JsonIgnore] private RelocationProfile.RelocatorOp _cGenLvlOp;
+        [JsonIgnore] private int _cDnaVal; [JsonIgnore] private RelocationProfile.RelocatorOp _cDnaOp;
 
         // Matching Logic (AND within Rule)
         public bool IsMatch(Thing t) {
@@ -107,7 +115,9 @@ namespace Elin_ItemRelocator {
                 (BlessStates == null || BlessStates.Count == 0) &&
                 !IsStolen.HasValue &&
                 !IsIdentified.HasValue &&
-                !GenLvl.HasValue) {
+                !GenLvl.HasValue &&
+                !Dna.HasValue &&
+                (DnaIds == null || DnaIds.Count == 0)) {
                 return false;
             }
 
@@ -230,6 +240,78 @@ namespace Elin_ItemRelocator {
                 if (!match)
                     return false;
             }
+            // DNA Condition
+            if (Dna.HasValue) {
+                bool hasDna = t.c_DNA != null;
+                bool match = false;
+                if (hasDna) {
+                    match = CheckOp(t.c_DNA.cost, _cDnaOp, _cDnaVal);
+                }
+
+                if (NotDna)
+                    match = !match;
+                if (!match)
+                    return false;
+            }
+
+            // DNA Content Condition (Group OR Logic)
+            if (DnaIds is { Count: > 0 }) {
+                if (t.c_DNA == null)
+                    return false;
+
+                bool anyMatch = false;
+                foreach (string cond in DnaIds) {
+                    string idStr = cond;
+                    string valPart = "";
+                    RelocationProfile.RelocatorOp op = RelocationProfile.RelocatorOp.Ge;
+                    int targetVal = 0;
+
+                    // Parse Op/Value if present (e.g. "eleName>=10")
+                    string[] ops = [">=", "<=", "!=", ">", "<", "="];
+                    foreach (var o in ops) {
+                        int idx = cond.IndexOf(o);
+                        if (idx > 0) {
+                            idStr = cond.Substring(0, idx).Trim();
+                            valPart = cond.Substring(idx);
+                            break;
+                        }
+                    }
+
+                    // Get Element ID
+                    int elementId = EClass.sources.elements.alias.TryGetValue(idStr, out var source) ? source.id : -1;
+                    if (elementId == -1)
+                        continue;
+
+                    // Check existence in vals
+                    bool found = false;
+                    int foundVal = 0;
+                    for (int i = 0; i < t.c_DNA.vals.Count; i += 2) {
+                        if (t.c_DNA.vals[i] == elementId) {
+                            found = true;
+                            foundVal = t.c_DNA.vals[i + 1];
+                            break;
+                        }
+                    }
+
+                    if (!found)
+                        continue;
+
+                    if (!string.IsNullOrEmpty(valPart)) {
+                        ParseOp(valPart, 0, out op, out targetVal);
+                        if (!CheckOp(foundVal, op, targetVal))
+                            continue;
+                    }
+
+                    anyMatch = true;
+                    break;
+                }
+
+                if (NotDnaContent)
+                    anyMatch = !anyMatch;
+
+                if (!anyMatch)
+                    return false;
+            }
 
             return true;
         }
@@ -266,6 +348,14 @@ namespace Elin_ItemRelocator {
                 string prefix = NotGenLvl ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
                 parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl) + " " + (string.IsNullOrEmpty(GenLvlOp) ? ">=" : GenLvlOp) + " " + GenLvl.Value);
             }
+            if (Dna.HasValue) {
+                string prefix = NotDna ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Dna) + " " + (string.IsNullOrEmpty(DnaOp) ? ">=" : DnaOp) + " " + Dna.Value);
+            }
+            if (DnaIds is { Count: > 0 }) {
+                string prefix = NotDnaContent ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.DnaContent) + ": " + string.Join(", ", DnaIds));
+            }
             return parts;
         }
 
@@ -292,6 +382,7 @@ namespace Elin_ItemRelocator {
 
             ParseOp(string.IsNullOrEmpty(WeightOp) ? ">=" : WeightOp, Weight.HasValue ? Weight.Value : 0, out _cWeightOp, out _cWeightVal);
             ParseOp(string.IsNullOrEmpty(GenLvlOp) ? ">=" : GenLvlOp, GenLvl.HasValue ? GenLvl.Value : 0, out _cGenLvlOp, out _cGenLvlVal);
+            ParseOp(string.IsNullOrEmpty(DnaOp) ? ">=" : DnaOp, Dna.HasValue ? Dna.Value : 0, out _cDnaOp, out _cDnaVal);
             ParseOp(Quality, 0, out _cQualityOp, out _cQualityVal); // Quality string contains both op and value
 
 

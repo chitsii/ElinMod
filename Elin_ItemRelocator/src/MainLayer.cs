@@ -195,6 +195,18 @@ namespace Elin_ItemRelocator {
                         list.Add(new() { Rule = r, CondType = ConditionType.GenLvl, DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl) + ": " + (string.IsNullOrEmpty(r.GenLvlOp) ? ">=" : r.GenLvlOp) + r.GenLvl.Value });
                     }
 
+                    // DNA
+                    if (r.Dna.HasValue) {
+                        string prefix = r.NotDna ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                        list.Add(new() { Rule = r, CondType = ConditionType.Dna, DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Dna) + ": " + (string.IsNullOrEmpty(r.DnaOp) ? ">=" : r.DnaOp) + r.Dna.Value });
+                    }
+
+                    // DNA Content
+                    if (r.DnaIds != null && r.DnaIds.Count > 0) {
+                        string disp = RelocatorLang.GetText(RelocatorLang.LangKey.DnaContent) + ": " + string.Join(", ", r.DnaIds);
+                        list.Add(new() { Rule = r, CondType = ConditionType.DnaContent, CondValue = "", DisplayText = disp });
+                    }
+
                     // ADD BUTTON
                     list.Add(new() { Rule = r, CondType = ConditionType.AddButton, DisplayText = " + " });
 
@@ -283,6 +295,14 @@ namespace Elin_ItemRelocator {
                         isNegated = node.Rule.NotGenLvl;
                         toggleNegation = () => { node.Rule.NotGenLvl = !node.Rule.NotGenLvl; refresh(); };
                         break;
+                    case ConditionType.Dna:
+                        isNegated = node.Rule.NotDna;
+                        toggleNegation = () => { node.Rule.NotDna = !node.Rule.NotDna; refresh(); };
+                        break;
+                    case ConditionType.DnaContent:
+                        isNegated = node.Rule.NotDnaContent;
+                        toggleNegation = () => { node.Rule.NotDnaContent = !node.Rule.NotDnaContent; refresh(); };
+                        break;
                     }
 
                     if (toggleNegation != null) {
@@ -317,6 +337,8 @@ namespace Elin_ItemRelocator {
                                 ConditionType.Stolen => () => node.Rule.IsStolen = null,
                                 ConditionType.Identified => () => node.Rule.IsIdentified = null,
                                 ConditionType.GenLvl => () => node.Rule.GenLvl = null,
+                                ConditionType.Dna => () => node.Rule.Dna = null,
+                                ConditionType.DnaContent => () => node.Rule.DnaIds.Clear(),
                                 _ => () => { } // No-op for others (None, AddButton, Settings etc.)
                             };
                             deleteAction();
@@ -448,6 +470,11 @@ namespace Elin_ItemRelocator {
                     case RelocationProfile.ResultSortMode.GenLvlDesc:
                         // Generation Level
                         return t.genLv.ToString();
+
+                    case RelocationProfile.ResultSortMode.DnaAsc:
+                    case RelocationProfile.ResultSortMode.DnaDesc:
+                        // DNA Cost
+                        return (t.c_DNA?.cost ?? 0).ToString();
 
                     case RelocationProfile.ResultSortMode.TotalEnchantMagDesc:
                         int totalMag = 0;
@@ -758,7 +785,9 @@ namespace Elin_ItemRelocator {
                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortUidAsc), () => { profile.SortMode = RelocationProfile.ResultSortMode.UidAsc; refresh(); })
                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortUidDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.UidDesc; refresh(); })
                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl) + " (" + RelocatorLang.GetText(RelocatorLang.LangKey.SortAsc) + ")", () => { profile.SortMode = RelocationProfile.ResultSortMode.GenLvlAsc; refresh(); })
-                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl) + " (" + RelocatorLang.GetText(RelocatorLang.LangKey.SortDesc) + ")", () => { profile.SortMode = RelocationProfile.ResultSortMode.GenLvlDesc; refresh(); });
+                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl) + " (" + RelocatorLang.GetText(RelocatorLang.LangKey.SortDesc) + ")", () => { profile.SortMode = RelocationProfile.ResultSortMode.GenLvlDesc; refresh(); })
+                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Dna) + " (" + RelocatorLang.GetText(RelocatorLang.LangKey.SortAsc) + ")", () => { profile.SortMode = RelocationProfile.ResultSortMode.DnaAsc; refresh(); })
+                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Dna) + " (" + RelocatorLang.GetText(RelocatorLang.LangKey.SortDesc) + ")", () => { profile.SortMode = RelocationProfile.ResultSortMode.DnaDesc; refresh(); });
                 })
                 .AddSeparator()
                 .AddChild(RelocatorLang.GetText(RelocatorLang.LangKey.Presets), (child) => {
@@ -858,6 +887,8 @@ namespace Elin_ItemRelocator {
             RelocationProfile.ResultSortMode.UidDesc => RelocatorLang.GetText(RelocatorLang.LangKey.SortUidDesc),
             RelocationProfile.ResultSortMode.GenLvlAsc => RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl) + "(" + RelocatorLang.GetText(RelocatorLang.LangKey.SortAsc) + ")",
             RelocationProfile.ResultSortMode.GenLvlDesc => RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl) + "(" + RelocatorLang.GetText(RelocatorLang.LangKey.SortDesc) + ")",
+            RelocationProfile.ResultSortMode.DnaAsc => RelocatorLang.GetText(RelocatorLang.LangKey.Dna) + "(" + RelocatorLang.GetText(RelocatorLang.LangKey.SortAsc) + ")",
+            RelocationProfile.ResultSortMode.DnaDesc => RelocatorLang.GetText(RelocatorLang.LangKey.Dna) + "(" + RelocatorLang.GetText(RelocatorLang.LangKey.SortDesc) + ")",
             _ => mode.ToString()
         };
     }

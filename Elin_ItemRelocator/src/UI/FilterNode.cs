@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Elin_ItemRelocator {
-    public enum ConditionType { None, Category, Rarity, Quality, Text, Id, AddButton, Settings, Weight, Material, Bless, Stolen, Enchant, Identified, GenLvl }
+    public enum ConditionType { None, Category, Rarity, Quality, Text, Id, AddButton, Settings, Weight, Material, Bless, Stolen, Enchant, Identified, GenLvl, Dna, DnaContent }
 
     public class FilterNode {
         public RelocationRule Rule;     // Level 1: Rule

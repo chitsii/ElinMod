@@ -10,6 +10,14 @@ namespace Elin_ItemRelocator {
             SortLabel, SortDefault, SortPriceAsc, SortPriceDesc, SortMagAsc, SortMagDesc, SortTotalEnchantMagDesc,
             SortWeightAsc, SortWeightDesc, SortUnitWeightAsc, SortUnitWeightDesc,
             SortUidAsc, SortUidDesc,
+            GenLvl,
+            Dna,
+            DnaContent,
+            Cat_Attribute,
+            Cat_Skill,
+            Cat_Feat,
+            Cat_Ability,
+            Cat_Slot,
             CatAll,
             CatWeapon,
             CatArmor,
@@ -20,7 +28,7 @@ namespace Elin_ItemRelocator {
             Parent, Move, Msg_Moved, AddRule, NewRuleName,
             Material, Bless, Stolen, StateNormal, StateBlessed, StateCursed, StateDoomed, ScopeBoth, EditValue, ChangeEnchant,
             Enhancement, EditEnhancement, Identified, StateIdentified, StateUnidentified,
-            ResetRules, ResetRulesConfirm, Msg_RulesCleared, Details, GenLvl, SortAsc, SortDesc
+            ResetRules, ResetRulesConfirm, Msg_RulesCleared, Details, SortAsc, SortDesc
         }
 
         private static Dictionary<LangKey, string[]> _dict = new() {
@@ -108,7 +116,7 @@ namespace Elin_ItemRelocator {
             [LangKey.Identified] = ["Identified", "鑑定済み"],
             [LangKey.StateIdentified] = ["Yes (Identified)", "鑑定済み"],
             [LangKey.StateUnidentified] = ["No (Unidentified)", "未鑑定"],
-            [LangKey.ResetRules] = ["Reset", "初期化"],
+            [LangKey.ResetRules] = ["Reset Conditions", "条件初期化"],
             [LangKey.ResetRulesConfirm] = ["Reset all filter conditions (clear text cache etc)?", "編集中の条件をすべて消去しますか？"],
             [LangKey.Msg_RulesCleared] = ["Conditions cleared.", "条件を消去しました。"],
             [LangKey.ResetRulesConfirm] = ["Reset all filter conditions (clear text cache etc)?", "編集中の条件をすべて消去しますか？"],
@@ -116,7 +124,14 @@ namespace Elin_ItemRelocator {
             [LangKey.Details] = ["Details", "詳細"],
             [LangKey.GenLvl] = ["Gen Lvl", "生成Lv"],
             [LangKey.SortAsc] = ["Asc", "昇順"],
-            [LangKey.SortDesc] = ["Desc", "降順"]
+            [LangKey.SortDesc] = ["Desc", "降順"],
+            [LangKey.Dna] = ["DNA Strength", "DNA消費FP"],
+            [LangKey.DnaContent] = ["DNA Content", "DNA補正内容"],
+            [LangKey.Cat_Attribute] = ["Attribute", "主能力"],
+            [LangKey.Cat_Skill] = ["Skill", "スキル"],
+            [LangKey.Cat_Feat] = ["Feat", "フィート"],
+            [LangKey.Cat_Ability] = ["Ability", "アビリティ"],
+            [LangKey.Cat_Slot] = ["Body Slot", "装備部位"]
         };
 
         public static string GetText(LangKey key) =>

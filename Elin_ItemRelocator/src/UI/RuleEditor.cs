@@ -170,6 +170,40 @@ namespace Elin_ItemRelocator {
                           }
                       }, (Dialog.InputType)0);
                   })
+                  .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Dna), () => {
+                      Dialog.InputName("Enter DNA Cost (e.g. >=100)", "", (c, text) => {
+                          if (!c && !string.IsNullOrEmpty(text)) {
+                              if (char.IsDigit(text[0]))
+                                  text = ">=" + text;
+                              string op = ">=";
+                              string valStr = text;
+                              if (text.StartsWith(">=") || text.StartsWith("<=") || text.StartsWith("==") || text.StartsWith("!=")) {
+                                  op = text.Substring(0, 2);
+                                  valStr = text.Substring(2);
+                              } else if (text.StartsWith(">") || text.StartsWith("<") || text.StartsWith("=")) {
+                                  op = text.Substring(0, 1);
+                                  valStr = text.Substring(1);
+                              }
+                              int w;
+                              if (int.TryParse(valStr, out w)) {
+                                  rule.Dna = w;
+                                  rule.DnaOp = op;
+                                  rule.InvalidateCache();
+                                  refresh();
+                              }
+                          }
+                      }, (Dialog.InputType)0);
+                  })
+                  .AddButton("DNA Content", () => {
+                      RelocatorPickers.ShowDnaContentPicker(rule.DnaIds != null ? rule.DnaIds.ToList() : null, (selectedList) => {
+                          if (rule.DnaIds == null)
+                              rule.DnaIds = [];
+                          rule.DnaIds.Clear();
+                          foreach (var s in selectedList)
+                              rule.DnaIds.Add(s);
+                          refresh();
+                      });
+                  })
                   .Show();
         }
 
@@ -317,6 +351,39 @@ namespace Elin_ItemRelocator {
                         }
                     }
                 }, (Dialog.InputType)0),
+                ConditionType.Dna => () => Dialog.InputName("Edit DNA Cost", rule.Dna.ToString(), (c, val) => {
+                    if (!c && !string.IsNullOrEmpty(val)) {
+                        if (char.IsDigit(val[0]))
+                            val = ">=" + val;
+                        string op = ">=";
+                        string valStr = val;
+                        if (val.StartsWith(">=") || val.StartsWith("<=") || val.StartsWith("==") || val.StartsWith("!=")) {
+                            op = val.Substring(0, 2);
+                            valStr = val.Substring(2);
+                        } else if (val.StartsWith(">") || val.StartsWith("<") || val.StartsWith("=")) {
+                            op = val.Substring(0, 1);
+                            valStr = val.Substring(1);
+                        }
+                        int w;
+                        if (int.TryParse(valStr, out w)) {
+                            rule.Dna = w;
+                            rule.DnaOp = op;
+                            rule.InvalidateCache();
+                            refresh();
+                        }
+                    }
+                }, (Dialog.InputType)0),
+                ConditionType.DnaContent => () => {
+                    RelocatorPickers.ShowDnaContentPicker(rule.DnaIds != null ? rule.DnaIds.ToList() : null, (selectedList) => {
+                        if (rule.DnaIds == null)
+                            rule.DnaIds = [];
+                        rule.DnaIds.Clear();
+                        foreach (var s in selectedList)
+                            rule.DnaIds.Add(s);
+                        refresh();
+                    });
+                }
+                ,
                 _ => () => { }
             };
             editAction();
