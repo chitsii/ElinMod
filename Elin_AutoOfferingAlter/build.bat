@@ -3,33 +3,10 @@ setlocal
 
 call "%~dp0config.bat"
 
-set CSC_PATH="C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
-if not exist %CSC_PATH% (
-    set CSC_PATH="C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe"
-)
-
-if not exist %CSC_PATH% (
-    echo csc.exe not found!
-    exit /b 1
-)
-
-echo Using csc at %CSC_PATH%
-
 if not exist "%~dp0_bin" mkdir "%~dp0_bin"
 
 echo Compiling...
-%CSC_PATH% /target:library /out:"%~dp0_bin\Elin_AutoOfferingAlter.dll" ^
-    /reference:"%~dp0elin_link\Elin_Data\Managed\Elin.dll" ^
-    /reference:"%~dp0elin_link\Elin_Data\Managed\UnityEngine.dll" ^
-    /reference:"%~dp0elin_link\Elin_Data\Managed\UnityEngine.CoreModule.dll" ^
-    /reference:"%~dp0elin_link\Elin_Data\Managed\UnityEngine.UI.dll" ^
-    /reference:"%~dp0elin_link\Elin_Data\Managed\Plugins.dll" ^
-    /reference:"%~dp0elin_link\Elin_Data\Managed\Plugins.BaseCore.dll" ^
-    /reference:"%~dp0elin_link\Elin_Data\Managed\Plugins.UI.dll" ^
-    /reference:"%~dp0elin_link\BepInEx\core\BepInEx.Core.dll" ^
-    /reference:"%~dp0elin_link\BepInEx\core\BepInEx.Unity.dll" ^
-    /reference:"%~dp0elin_link\BepInEx\core\0Harmony.dll" ^
-    "%~dp0src\Plugin.cs" "%~dp0src\ModConfig.cs" "%~dp0src\OfferLogic.cs" "%~dp0src\StackOptimizer.cs" "%~dp0src\PatchRecipe.cs" "%~dp0src\PatchConSleep.cs"
+dotnet build "%~dp0Elin_AutoOfferingAlter.csproj" -c Release
 
 if %ERRORLEVEL% NEQ 0 (
     echo Build Failed!

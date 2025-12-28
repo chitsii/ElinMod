@@ -16,49 +16,19 @@ namespace Elin_AutoOfferingAlter
         {
             string customId = Plugin.ID_OFFERING_BOX;
 
-            // Check if already added (unlikely in Init but good practice)
-            foreach (SourceThing.Row r in __instance.things.rows)
-            {
-                if (r.id == customId) return;
-            }
+            // Efficient check if already added
+            if (__instance.things.map.ContainsKey(customId)) return;
 
             // Find base row for "chest6" (Sturdy Box)
-            SourceThing.Row row = null;
-            foreach (SourceThing.Row r in __instance.things.rows)
-            {
-                if (r.id == "chest6")
-                {
-                    row = r;
-                    break;
-                }
-            }
+            SourceThing.Row row = __instance.things.map.TryGetValue("chest6", out var chest6) ? chest6 : null;
 
-            // Fallback
-            if (row == null)
-            {
-                foreach (SourceThing.Row r in __instance.things.rows)
-                {
-                    if (r.tag != null)
-                    {
-                       foreach(string t in r.tag)
-                       {
-                           if (t == "container")
-                           {
-                               row = r;
-                               break;
-                           }
-                       }
-                    }
-                    if (row != null) break;
-                }
-            }
             if (row == null) return;
 
-             // Clone the row using Reflection
+            // Clone the row using Reflection
             MethodInfo cloneMethod = typeof(object).GetMethod("MemberwiseClone", BindingFlags.NonPublic | BindingFlags.Instance);
             SourceThing.Row newRow = (SourceThing.Row)cloneMethod.Invoke(row, null);
 
-             if (ModConfig.EnableLog.Value)
+            if (ModConfig.EnableLog.Value)
             {
                 Plugin.Log.LogInfo("Src ID: " + row.id);
                 Plugin.Log.LogInfo("Src Trait: " + (row.trait != null ? string.Join(",", row.trait) : "null"));
@@ -122,14 +92,16 @@ namespace Elin_AutoOfferingAlter
 
         private static void AddCustomRecipe()
         {
-            try {
+            try
+            {
                 string customId = Plugin.ID_OFFERING_BOX;
                 if (!EClass.player.recipes.knownRecipes.ContainsKey(customId))
                 {
                     EClass.player.recipes.Add(customId, false);
                     if (ModConfig.EnableLog.Value) Plugin.Log.LogInfo("Learned custom recipe: " + customId);
                 }
-            } catch { }
+            }
+            catch { }
         }
     }
 }

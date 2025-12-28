@@ -16,21 +16,12 @@ namespace Elin_AutoOfferingAlter
                     Plugin.Log.LogInfo("[Elin_AutoOfferingAlter] Woke up. Checking for offerings...");
                 }
 
-                int processedCount = 0;
-
-                // 1. Check Player Inventory
                 foreach (Thing t in EClass.pc.things)
                 {
                     if (t.id == Plugin.ID_OFFERING_BOX && t.IsContainer)
                     {
-                         OfferLogic.Process(t);
-                         processedCount++;
+                        OfferLogic.Process(t);
                     }
-                }
-
-                if (ModConfig.EnableLog.Value && processedCount > 0)
-                {
-                    Plugin.Log.LogInfo("[Elin_AutoOfferingAlter] Processed " + processedCount + " offering boxes.");
                 }
             }
         }

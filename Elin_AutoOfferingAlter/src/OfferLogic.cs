@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,27 +8,16 @@ namespace Elin_AutoOfferingAlter
     {
         public static void Process(Thing container)
         {
-            if (EClass.pc.faith == EClass.game.religions.Eyth)
-            {
-                // Eyth doesn't usually accept offerings in the same way, or it's complicated.
-                // For safety and simplicity, skip if no faith (Eyth is default/no faith).
-                // Or if user wants to support Eyth offering (e.g. specialized items),
-                // TraitAltar might handle it, but typically it returns false for CanOffer.
-                // Let's rely on TraitAltar.CanOffer.
-            }
-
-            // Create a dummy altar trait wrapper
+            // Setup fake altar
             TraitAltar fakeAltar = new TraitAltar();
             fakeAltar.SetOwner(container);
 
-            // Log if enabled
             if (ModConfig.EnableLog.Value)
             {
-                Plugin.Log.LogInfo(string.Format("[Elin_AutoOfferingAlter] Processing container: {0} (UID:{1})", container.Name, container.uid));
+                Plugin.Log.LogInfo($"[Elin_AutoOfferingAlter] Processing container: {container.Name} (UID:{container.uid})");
             }
 
-            // Iterate through items in the container.
-            // MUST copy the list because OnOffer destroys items, modifying the collection during iteration.
+            // Create a safe list of items to iterate since offerings destroy items
             List<Thing> thingsToProcess = new List<Thing>();
             foreach (Thing t in container.things)
             {
@@ -38,41 +28,84 @@ namespace Elin_AutoOfferingAlter
             {
                 if (fakeAltar.CanOffer(t))
                 {
-                    // Prepare renaming once for this stack
+                    // Temporarily rename container for better log messages ("You offer to [God]")
                     string originalName = container.c_altName;
-
-                    // Force the fake altar to have the player's faith as its deity
                     fakeAltar.SetDeity(EClass.pc.faith.id);
-
-                    // Setup name for message
-                    string godName = EClass.pc.faith.Name;
-
-                    // Optimization: Rename container temporarily so messages say "You offer to [God]"
-                    // We do this around the entire stack processing to avoid flickering/overhead.
-                    container.c_altName = godName;
+                    container.c_altName = EClass.pc.faith.Name;
 
                     try
                     {
-                        // Use Optimizer to handle stack splitting
-                        StackOptimizer.OptimizeAndOffer(t, fakeAltar.Deity, (itemToOffer) =>
+                        OptimizeAndOffer(t, fakeAltar.Deity, (itemToOffer) =>
                         {
                             if (ModConfig.EnableLog.Value)
                             {
-                                Plugin.Log.LogInfo(string.Format("[Elin_AutoOfferingAlter] Offering item: {0} (x{1})", itemToOffer.Name, itemToOffer.Num));
+                                Plugin.Log.LogInfo($"[Elin_AutoOfferingAlter] Offering item: {itemToOffer.Name} (x{itemToOffer.Num})");
                             }
                             fakeAltar.OnOffer(EClass.pc, itemToOffer);
                         });
                     }
                     finally
                     {
-                        // Restore name
                         container.c_altName = originalName;
                     }
                 }
+            }
+        }
+
+        // Formerly StackOptimizer.cs
+        private static void OptimizeAndOffer(Thing t, Religion faith, Action<Thing> onOffer)
+        {
+            if (t.Num <= 1)
+            {
+                onOffer(t);
+                return;
+            }
+
+            int unitVal = faith.GetOfferingValue(t, 1);
+            if (unitVal <= 0)
+            {
+                onOffer(t);
+                return;
+            }
+
+            // Calculate optimal batch size to hit ~1500 value (min 1 faith point)
+            int targetVal = 1500;
+            int batchSize = (targetVal + unitVal - 1) / unitVal;
+
+            // Cap at 3000 value if possible to avoid waste
+            int maxVal = 3000;
+            if (batchSize * unitVal > maxVal)
+            {
+                batchSize = Math.Max(1, maxVal / unitVal);
+            }
+
+            // Digest remainder first
+            int remainder = t.Num % batchSize;
+
+            if (remainder > 0)
+            {
+                if (remainder < t.Num)
+                {
+                    onOffer(t.Split(remainder));
+                }
                 else
                 {
-                     // Verbose log for debug
-                     // if (ModConfig.EnableLog.Value) Plugin.Log.LogInfo(string.Format("Skipping {0}", t.Name));
+                    onOffer(t);
+                    return;
+                }
+            }
+
+            // Digest batches
+            while (t.Num > 0)
+            {
+                if (t.Num > batchSize)
+                {
+                    onOffer(t.Split(batchSize));
+                }
+                else
+                {
+                    onOffer(t);
+                    break;
                 }
             }
         }
