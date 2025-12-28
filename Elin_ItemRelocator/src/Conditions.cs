@@ -592,12 +592,12 @@ namespace Elin_ItemRelocator {
                 if (string.IsNullOrEmpty(key))
                     return false;
 
-                Debug.Log($"[Relocator] CheckEnchantMatch: Item={t?.Name ?? "Null"}, Key={key}, Op={op}, Val={val}");
+                // Debug.Log($"[Relocator] CheckEnchantMatch: Item={t?.Name ?? "Null"}, Key={key}, Op={op}, Val={val}");
 
                 if (string.IsNullOrEmpty(key))
                     return false;
 
-                Debug.Log($"[Relocator] CheckEnchantMatch: Item={t?.Name ?? "Null"}, Key={key}, Op={op}, Val={val}");
+                // Debug.Log($"[Relocator] CheckEnchantMatch: Item={t?.Name ?? "Null"}, Key={key}, Op={op}, Val={val}");
 
                 // 1. Exact / Alias Match
                 int eleId = EClass.sources.elements.alias.TryGetValue(key, out var source) ? source.id : -1;
@@ -616,29 +616,7 @@ namespace Elin_ItemRelocator {
                     return checkOp(curVal, op, val);
                 }
 
-                // 2. Wildcard Match (Fallback)
-                // Only scan active elements on the Thing
-                if (t.elements != null && t.elements.dict != null) {
-                    var keys = t.elements.dict.Keys.ToList(); // Copy keys to avoid CollectionModified exception
-                    foreach (var id in keys) {
-                        // Skip disabled/hidden? Usually all in dict are active.
-                        var eleSource = EClass.sources.elements.map[id];
-                        if (eleSource == null)
-                            continue; // Safety check
-                        string eleName = eleSource.GetName();
 
-                        // Helper: Case insensitive contains
-                        if (eleName.IndexOf(key, StringComparison.OrdinalIgnoreCase) >= 0) {
-                            Debug.Log($"[Relocator] Wildcard Match candidate: {eleName} (ID {id})");
-                            int curVal = t.elements.Value(id);
-                            Debug.Log($"[Relocator] Value: {curVal}");
-                            if (checkOp(curVal, op, val)) {
-                                Debug.Log($"[Relocator] CheckOp Passed. Returning TRUE.");
-                                return true; // Found a matching element that meets criteria
-                            }
-                        }
-                    }
-                }
             } catch (Exception ex) {
                 Debug.LogError($"[Relocator] Error: {ex.Message}\n{ex.StackTrace}");
                 Msg.Say($"Enchant Filter Error: {ex.Message}");
