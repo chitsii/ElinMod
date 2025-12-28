@@ -168,15 +168,14 @@ namespace Elin_ItemRelocator {
                             string prefix = cdc.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
                             List<string> names = [];
                             foreach (var id in cdc.DnaIds) {
-                                string displayName = id;
-                                if (EClass.sources.elements.alias.TryGetValue(id, out var source)) {
+                                ConditionRegistry.ParseKeyOp(id, out string key, out string op, out int val);
+                                string suffix = op + val;
+
+                                string displayName = key;
+                                if (EClass.sources.elements.alias.TryGetValue(key, out var source)) {
                                     displayName = source.GetName();
-                                } else {
-                                    // Fallback: Check if it's an integer ID or just use raw
-                                    // Try to find if it matches any row alias or name?
-                                    // For now, simple alias lookup is the standard way.
                                 }
-                                names.Add(displayName);
+                                names.Add(displayName + suffix);
                             }
 
                             // Truncation Logic (Limit 10)
@@ -201,11 +200,14 @@ namespace Elin_ItemRelocator {
                             // Lookup Names
                             List<string> displayNames = [];
                             foreach (var rune in ceOr.Runes) {
-                                string dName = rune;
-                                if (EClass.sources.elements.alias.TryGetValue(rune, out var source)) {
+                                ConditionRegistry.ParseKeyOp(rune, out string key, out string op, out int val);
+                                string suffix = op + val;
+
+                                string dName = key;
+                                if (EClass.sources.elements.alias.TryGetValue(key, out var source)) {
                                     dName = source.GetName();
                                 }
-                                displayNames.Add(dName);
+                                displayNames.Add(dName + suffix);
                             }
 
                             // Truncation Logic (Limit 10)
@@ -540,7 +542,6 @@ namespace Elin_ItemRelocator {
             win.AddBottomButton(RelocatorLang.GetText(RelocatorLang.LangKey.Execute), () => {
                 RelocatorManager.Instance.ExecuteRelocation(container);
                 RelocatorManager.Instance.ClearCache();
-                Msg.Say(string.Format(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_Relocated), ""));
                 if (mainAccordion != null)
                     mainAccordion.Close();
             });

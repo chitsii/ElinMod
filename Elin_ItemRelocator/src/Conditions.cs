@@ -184,14 +184,29 @@ namespace Elin_ItemRelocator {
         }
 
         private bool CheckSingleDna(Thing t, string cond) {
-            string idStr = cond;
-            // Handle "mining>=5" style if needed (currently assuming just ID/alias string)
-            // Just basic existence check for now as per previous logic
-            int elementId = EClass.sources.elements.alias.TryGetValue(idStr, out var source) ? source.id : -1;
-            if (elementId != -1) {
+            ConditionRegistry.ParseKeyOp(cond, out string key, out string op, out int val);
+
+            // Determine if value was explicitly provided or just default
+            // ParseKeyOp defaults to ">=1", but if the raw string didn't have operator?
+            // ParseKeyOp doesn't return that info.
+            // Check raw string for operator presence if needed or just trust defaults.
+            // For DNA, we might want ">=1" if no operator matches behavior of enchant?
+            // Enchant defaults to val=1.
+
+            // Re-check raw string for operator to know if we skip val check (hasVal logic)
+            // Or just always check val? If user selects "Mining", we want ANY mining.
+            // "Mining" -> op=">=", val=1.
+            // If item has Mining=5, 5>=1 is true. Correct.
+            // If item has Mining=0 (not present?), vals lookup fails.
+
+            // Lookup ID
+            int elementId = EClass.sources.elements.alias.TryGetValue(key, out var source) ? source.id : -1;
+            if (elementId != -1 && t.c_DNA != null && t.c_DNA.vals != null) {
                 for (int i = 0; i < t.c_DNA.vals.Count; i += 2) {
-                    if (t.c_DNA.vals[i] == elementId)
-                        return true;
+                    if (t.c_DNA.vals[i] == elementId) {
+                        int curVal = t.c_DNA.vals[i + 1];
+                        return ConditionRegistry.CheckOp(curVal, op, val);
+                    }
                 }
             }
             return false;
@@ -471,11 +486,13 @@ namespace Elin_ItemRelocator {
                         return null;
                     return new ConditionDnaContent {
                         DnaIds = new HashSet<string>(list),
+                        IsAndMode = (bool?)jo["IsAndMode"] ?? false,
                         Not = (bool?)jo["Negate"] ?? (bool?)jo["NotDnaContent"] ?? false
                     };
                 },
                 (jo, c) => {
                     jo.Add("DnaIds", JArray.FromObject(c.DnaIds));
+                    jo.Add("IsAndMode", c.IsAndMode);
                     jo.Add("Negate", c.Not);
                 }
             );
@@ -544,25 +561,38 @@ namespace Elin_ItemRelocator {
             int.TryParse(raw, out val);
         }
 
+        public static void ParseKeyOp(string raw, out string key, out string op, out int val) {
+            key = raw.StartsWith("@") ? raw.Substring(1) : raw;
+            op = ">=";
+            val = 1; // Default existence check
+
+            if (string.IsNullOrEmpty(raw))
+                return;
+
+            string[] ops = [">=", "<=", "!=", ">", "<", "="];
+            foreach (var o in ops) {
+                int idx = raw.IndexOf(o);
+                if (idx > 0) {
+                    op = o;
+                    key = raw.Substring(0, idx).Trim();
+                    key = key.StartsWith("@") ? key.Substring(1) : key;
+                    int.TryParse(raw.Substring(idx + o.Length), out val);
+                    return;
+                }
+            }
+        }
+
         public static bool CheckEnchantMatch(Thing t, string rune, Func<int, string, int, bool> checkOp) {
             try {
                 if (string.IsNullOrEmpty(rune))
                     return false;
-                string term = rune.StartsWith("@") ? rune.Substring(1) : rune;
-                string key = term;
-                string op = ">=";
-                int val = 1; // Default to 1 (existence) if no op specified. Fixes "Mining matches everything" bug.
-                string[] ops = [">=", "<=", "!=", ">", "<", "="];
 
-                foreach (var o in ops) {
-                    int idx = term.IndexOf(o);
-                    if (idx > 0) {
-                        op = o;
-                        key = term.Substring(0, idx).Trim();
-                        int.TryParse(term.Substring(idx + o.Length), out val);
-                        break;
-                    }
-                }
+                ParseKeyOp(rune, out string key, out string op, out int val);
+
+                if (string.IsNullOrEmpty(key))
+                    return false;
+
+                Debug.Log($"[Relocator] CheckEnchantMatch: Item={t?.Name ?? "Null"}, Key={key}, Op={op}, Val={val}");
 
                 if (string.IsNullOrEmpty(key))
                     return false;
@@ -614,6 +644,26 @@ namespace Elin_ItemRelocator {
                 Msg.Say($"Enchant Filter Error: {ex.Message}");
             }
             return false;
+        }
+
+
+        public static bool CheckOp(int current, string op, int target) {
+            switch (op) {
+            case ">=":
+                return current >= target;
+            case "<=":
+                return current <= target;
+            case "!=":
+                return current != target;
+            case ">":
+                return current > target;
+            case "<":
+                return current < target;
+            case "=":
+                return current == target;
+            default:
+                return current >= target;
+            }
         }
     }
 }

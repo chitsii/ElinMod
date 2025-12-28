@@ -240,19 +240,13 @@ namespace Elin_ItemRelocator {
         // DNA Content Picker (Tree-based)
         public static void ShowDnaContentPicker(List<string> initialSelection, Action<List<string>, bool> onConfirm, bool initialMode = false) {
             HashSet<string> selected = new HashSet<string>();
+            Dictionary<string, string> initialValues = new Dictionary<string, string>();
+
             if (initialSelection != null)
                 foreach (var s in initialSelection) {
-                    // Handle "mining>=5" style strings - extract just the ID part for selection state
-                    string id = s;
-                    string[] ops = [">=", "<=", "!=", ">", "<", "="];
-                    foreach (var o in ops) {
-                        int idx = s.IndexOf(o);
-                        if (idx > 0) {
-                            id = s.Substring(0, idx).Trim();
-                            break;
-                        }
-                    }
+                    ConditionRegistry.ParseKeyOp(s, out string id, out string op, out int val);
                     selected.Add(id);
+                    initialValues[id] = op + val;
                 }
 
             // Roots: Categories
@@ -280,10 +274,20 @@ namespace Elin_ItemRelocator {
             var tree = RelocatorTree<object>.Create();
             tree.SetCaption("Select DNA Content");
             tree.SetRoots(categories.Cast<object>());
+            tree.DefaultValue = ">0";
 
             // Enable Mode Toggle
             tree.ShowModeToggle = true;
             tree.IsAndMode = initialMode;
+
+            // Set Initial Values
+            foreach (var list in map.Values) {
+                foreach (var row in list) {
+                    if (initialValues.ContainsKey(row.alias)) {
+                        tree.SetValue(row, initialValues[row.alias]);
+                    }
+                }
+            }
 
             tree.SetChildren((object obj) => {
                 if (obj is string cat && map.ContainsKey(cat)) {
@@ -311,38 +315,56 @@ namespace Elin_ItemRelocator {
 
             tree.SetOnSelect((object obj) => {
                 if (obj is SourceElement.Row row) {
-                    if (selected.Contains(row.alias))
-                        selected.Remove(row.alias);
+                    string key = row.alias;
+                    if (selected.Contains(key))
+                        selected.Remove(key);
                     else
-                        selected.Add(row.alias);
+                        selected.Add(key);
                 }
             });
 
             tree.AddBottomButton("[ OK ]", () => {
-                onConfirm(selected.ToList(), tree.IsAndMode);
+                List<string> result = new List<string>();
+
+                foreach (var catList in map.Values) {
+                    foreach (var row in catList) {
+                        if (selected.Contains(row.alias)) {
+                            string val = tree.GetValue(row);
+                            // Let's use manual check as before to be safe about InputField content
+                            string[] validOps = [">=", "<=", "!=", ">", "<", "="];
+                            bool valid = false;
+                            foreach (var op in validOps) {
+                                if (val.StartsWith(op) && int.TryParse(val.Substring(op.Length), out _)) {
+                                    valid = true;
+                                    break;
+                                }
+                            }
+
+                            if (!valid) {
+                                EClass.ui.Say("Invalid format for " + row.GetName() + ": " + val);
+                                return;
+                            }
+                            result.Add(row.alias + val);
+                        }
+                    }
+                }
+                onConfirm(result, tree.IsAndMode);
                 tree.Close();
             }, new Color(0.3f, 0.5f, 0));
 
+            tree.ExpandSelected();
             tree.Show();
         }
 
         public static void ShowEnchantMultiPicker(List<string> initialSelection, Action<List<string>, bool> onConfirm, bool initialMode = true) {
             HashSet<string> selected = new HashSet<string>();
+            Dictionary<string, string> initialValues = new Dictionary<string, string>();
+
             if (initialSelection != null)
                 foreach (var s in initialSelection) {
-                    // Extract key from "Mining>=10" style strings
-                    string id = s;
-                    string[] ops = [">=", "<=", "!=", ">", "<", "="];
-                    foreach (var o in ops) {
-                        int idx = s.IndexOf(o);
-                        if (idx > 0) {
-                            id = s.Substring(0, idx).Trim();
-                            break;
-                        }
-                    }
-                    // Handle @alias format if present (though usually stored raw)
-                    id = id.TrimStart('@');
+                    ConditionRegistry.ParseKeyOp(s, out string id, out string op, out int val);
                     selected.Add(id);
+                    initialValues[id] = op + val;
                 }
 
             // Gather Valid Enchants
@@ -379,10 +401,20 @@ namespace Elin_ItemRelocator {
             var tree = RelocatorTree<object>.Create();
             tree.SetCaption(RelocatorLang.GetText(RelocatorLang.LangKey.SelectEnchant));
             tree.SetRoots(activeCats.Cast<object>());
+            tree.DefaultValue = ">0"; // Default for new selections
 
             // Enable Mode Toggle
             tree.ShowModeToggle = true;
             tree.IsAndMode = initialMode;
+
+            // Set Initial Values
+            foreach (var list in map.Values) {
+                foreach (var row in list) {
+                    if (initialValues.ContainsKey(row.alias)) {
+                        tree.SetValue(row, initialValues[row.alias]);
+                    }
+                }
+            }
 
             tree.SetChildren((object obj) => {
                 if (obj is string cat && map.ContainsKey(cat))
@@ -392,8 +424,6 @@ namespace Elin_ItemRelocator {
 
             tree.SetText((object obj) => {
                 if (obj is string cat) {
-                    // Try to localize category if possible, else Capitalize
-                    // E.g. "attribute" -> "Attribute"
                     return char.ToUpper(cat[0]) + cat.Substring(1);
                 }
                 if (obj is SourceElement.Row row)
@@ -403,7 +433,7 @@ namespace Elin_ItemRelocator {
 
             tree.SetIsSelected((object obj) => {
                 if (obj is SourceElement.Row row)
-                    return selected.Contains(row.alias); // or row.GetName()? usually alias is key
+                    return selected.Contains(row.alias);
                 return false;
             });
 
@@ -418,7 +448,34 @@ namespace Elin_ItemRelocator {
             });
 
             tree.AddBottomButton("[ OK ]", () => {
-                onConfirm(selected.ToList(), tree.IsAndMode);
+                List<string> result = new List<string>();
+                string[] validOps = [">=", "<=", "!=", ">", "<", "="];
+
+                // Validate and Build
+                foreach (var catList in map.Values) {
+                    foreach (var row in catList) {
+                        if (selected.Contains(row.alias)) {
+                            string val = tree.GetValue(row);
+                            // Validate
+                            bool valid = false;
+                            foreach (var op in validOps) {
+                                if (val.StartsWith(op)) {
+                                    if (int.TryParse(val.Substring(op.Length), out _)) {
+                                        valid = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!valid) {
+                                EClass.ui.Say("Invalid format for " + row.GetName() + ": " + val);
+                                return; // Do not close
+                            }
+                            result.Add(row.alias + val);
+                        }
+                    }
+                }
+
+                onConfirm(result, tree.IsAndMode);
                 tree.Close();
             }, new Color(0.3f, 0.5f, 0));
 

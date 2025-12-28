@@ -174,7 +174,7 @@ namespace Elin_ItemRelocator {
                     Debug.LogWarning("[RelocatorTree] LayerList has no windows!");
                 }
 
-                try { layer.SetSize(500, 700); } catch { }
+                try { layer.SetSize(650, 700); } catch { }
 
                 // --- MANUAL SETUP ---
                 if (layer.list != null) {
@@ -449,24 +449,73 @@ namespace Elin_ItemRelocator {
 
             // Wrapping Settings
             lbl.horizontalOverflow = HorizontalWrapMode.Wrap;
-            lbl.verticalOverflow = VerticalWrapMode.Truncate;
-            lbl.resizeTextForBestFit = false; // Disable BestFit for wrapping
-            lbl.raycastTarget = false; // Pass clicks to parent
-
-
+            lbl.verticalOverflow = VerticalWrapMode.Overflow;
+            lbl.resizeTextForBestFit = false;
 
             // Stretch Text to fill Label Container
             var rtTxt = txtGO.GetComponent<RectTransform>();
             rtTxt.anchorMin = Vector2.zero;
             rtTxt.anchorMax = Vector2.one;
-            rtTxt.offsetMin = Vector2.zero; // Left/Bottom
-            rtTxt.offsetMax = Vector2.zero; // Right/Top
-            // Add padding if needed? Original had no padding but HLG has padding.
+            rtTxt.offsetMin = Vector2.zero;
+            rtTxt.offsetMax = Vector2.zero;
 
-            // Logic
+
+
+            // Highlight Check
+            bool sel = isSelected != null && isSelected(item);
+            if (sel) {
+                imgRow.color = new Color(0.9f, 0.9f, 1f, 0.5f); // Selected Background
+            }
+
+            // Input Field for Selected Items (Leaf nodes only)
+            // Need to determine if leaf using getChildren
             var kids = getChildren != null ? getChildren(item) : null;
             bool hasKids = kids != null && kids.Any();
+            bool isLeaf = !hasKids;
 
+            if (sel && isLeaf) {
+                // Input Field Container
+                var inputGO = new GameObject("InputVal");
+                inputGO.transform.SetParent(rowGO.transform, false);
+                var leInput = inputGO.AddComponent<LayoutElement>();
+                leInput.minWidth = 60;
+                leInput.preferredWidth = 60;
+                leInput.preferredHeight = 24;
+
+                var imgInput = inputGO.AddComponent<Image>();
+                imgInput.color = new Color(0.1f, 0.1f, 0.1f, 0.5f);
+
+                var inputField = inputGO.AddComponent<InputField>();
+
+                // Text Component
+                var txtInputGO = new GameObject("Text");
+                txtInputGO.transform.SetParent(inputGO.transform, false);
+                var rtTxtInput = txtInputGO.AddComponent<RectTransform>();
+                rtTxtInput.anchorMin = Vector2.zero;
+                rtTxtInput.anchorMax = Vector2.one;
+                rtTxtInput.offsetMin = new Vector2(5, 0);
+                rtTxtInput.offsetMax = new Vector2(-5, 0);
+
+                var txtInput = txtInputGO.AddComponent<Text>();
+                txtInput.font = uiFont;
+                txtInput.fontSize = 14;
+                txtInput.color = Color.white;
+                txtInput.alignment = TextAnchor.MiddleLeft;
+                inputField.textComponent = txtInput;
+
+                // Init Value
+                string currentVal = GetValue(item);
+                if (string.IsNullOrEmpty(currentVal))
+                    currentVal = DefaultValue;
+                inputField.text = currentVal;
+
+                // Listener
+                inputField.onValueChanged.AddListener((val) => {
+                    SetValue(item, val);
+                });
+            }
+
+            // Logic: Expand Button
             if (hasKids) {
                 bool isExp = expanded.Contains(item);
                 txtExpand.text = isExp ? "-" : "+";
@@ -485,7 +534,6 @@ namespace Elin_ItemRelocator {
             }
 
             bool disabled = isDisabled != null && isDisabled(item);
-            bool selected = isSelected != null && isSelected(item);
 
             string extra = (getDebugText != null) ? getDebugText(item) : "";
             string name = (getText != null) ? getText(item) : item.ToString();
@@ -500,11 +548,10 @@ namespace Elin_ItemRelocator {
                 btnClicker.enabled = false;
                 btnLbl.enabled = false;
             } else {
-                lbl.text = (selected ? "[v] " : "[  ] ") + name + extra;
-                lbl.color = selected ? new Color(0, 0, 0.8f) : new Color(0.1f, 0.1f, 0.1f);
+                lbl.text = (sel ? "[v] " : "[  ] ") + name + extra;
+                lbl.color = sel ? new Color(0, 0, 0.8f) : new Color(0.1f, 0.1f, 0.1f);
                 btnClicker.enabled = true;
-                // Add Listener to BOTH global clicker (for empty space) and label clicker
-                // User said "Use individual judgments", but if global clicker is preserved for empty space safety:
+
                 Action doSelect = () => {
                     if (onSelect != null) {
                         onSelect(item);
@@ -550,6 +597,19 @@ namespace Elin_ItemRelocator {
             txt.alignment = TextAnchor.MiddleCenter;
             txt.text = "<b>" + def.Label + "</b>";
             txt.color = def.Color ?? new Color(0.1f, 0.1f, 0.1f);
+        }
+
+        // Value Storage
+        private Dictionary<T, string> valueMap = new Dictionary<T, string>();
+        public string DefaultValue = ">0";
+
+        public RelocatorTree<T> SetValue(T item, string val) {
+            valueMap[item] = val;
+            return this;
+        }
+
+        public string GetValue(T item) {
+            return valueMap.TryGetValue(item, out var v) ? v : DefaultValue;
         }
 
         public void Close() {
