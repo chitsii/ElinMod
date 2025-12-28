@@ -11,7 +11,8 @@ namespace Elin_ItemRelocator {
         // Level 2: Condition Details
         public ConditionType CondType;
         public string CondValue; // ID or Text
-        public string DisplayText;
+        public ICondition ConditionRef; // New Ref
+        public string DisplayText = "";
 
         public bool IsRule => Rule is not null && CondType is ConditionType.None;
         public bool IsCondition => CondType is not ConditionType.None and not ConditionType.AddButton and not ConditionType.Settings;

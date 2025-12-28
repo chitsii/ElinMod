@@ -89,127 +89,145 @@ namespace Elin_ItemRelocator {
 
             mainAccordion.SetChildren((node) => {
                 if (node.IsRule) {
-                    List<FilterNode> list = [];
+                    var list = new List<FilterNode>();
                     var r = node.Rule;
 
-                    // Deconstruct Rule into Nodes
-                    if (r.CategoryIds.Count > 0) {
-                        foreach (var id in r.CategoryIds) {
-                            string name = id;
-                            var source = EClass.sources.categories.map.TryGetValue(id);
-                            if (source is not null)
-                                name = source.GetName();
-                            list.Add(new() {
-                                Rule = r,
-                                CondType = ConditionType.Category,
-                                CondValue = id,
-                                DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Category) + ": " + name
-                            });
-                        }
-                    }
-                    if (r.Rarities is { Count: > 0 }) {
-                        var qualityNames = Lang.GetList("quality");
-                        List<string> display = [];
-                        // Sort for nicer display
-                        var sorted = r.Rarities.ToList();
-                        sorted.Sort();
-                        foreach (var rar in sorted) {
-                            int idx = rar + 1;
-                            if (idx >= 0 && idx < qualityNames.Length)
-                                display.Add(qualityNames[idx]);
-                            else
-                                display.Add(rar.ToString());
-                        }
-                        list.Add(new() { Rule = r, CondType = ConditionType.Rarity, DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Rarity) + ": " + string.Join(", ", display.ToArray()) });
-                    }
-                    if (!string.IsNullOrEmpty(r.Quality)) {
-                        list.Add(new() { Rule = r, CondType = ConditionType.Quality, DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Quality) + " " + r.Quality });
-                    }
-                    if (!string.IsNullOrEmpty(r.Text)) {
-                        list.Add(new() { Rule = r, CondType = ConditionType.Text, DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Text) + ": " + r.Text });
-                    }
-                    if (r.Enchants != null && r.Enchants.Count > 0) {
-                        foreach (var e in r.Enchants) {
-                            list.Add(new() { Rule = r, CondType = ConditionType.Enchant, CondValue = e, DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Enchant) + ": " + e });
-                        }
-                    }
-                    if (r.Weight.HasValue) {
-                        list.Add(new() { Rule = r, CondType = ConditionType.Weight, CondValue = r.Weight.Value.ToString(), DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Weight) + " " + (string.IsNullOrEmpty(r.WeightOp) ? ">=" : r.WeightOp) + " " + r.Weight });
-                    }
+                    foreach (var cond in r.Conditions) {
+                        var fNode = new FilterNode() { Rule = r, ConditionRef = cond };
 
-                    // ADD BUTTON
-                    // Material
-                    if (r.MaterialIds is { Count: > 0 }) {
-                        string prefix = r.NotMaterial ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
-                        HashSet<string> allMats = r.MaterialIds;
-                        string displayMat = "";
-                        if (allMats.Count <= 3) {
+                        switch (cond) {
+                        case ConditionCategory c: {
+                            string prefix = c.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
                             List<string> names = [];
-                            foreach (var mid in allMats) {
-                                var ms = EClass.sources.materials.rows.FirstOrDefault(m => m.alias.Equals(mid, StringComparison.OrdinalIgnoreCase) || m.id.ToString() == mid);
-                                names.Add(ms is not null ? ms.GetName() : mid);
+                            foreach (var id in c.CategoryIds) {
+                                var source = EClass.sources.categories.map.TryGetValue(id);
+                                names.Add(source is not null ? source.GetName() : id);
                             }
-                            displayMat = string.Join(", ", names.ToArray());
-                        } else {
-                            displayMat = "(" + allMats.Count + ")";
+                            fNode.CondType = ConditionType.Category;
+                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Category) + ": " + string.Join(", ", names);
                         }
-                        list.Add(new() { Rule = r, CondType = ConditionType.Material, CondValue = "Multi", DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Material) + ": " + displayMat });
-                    }
-
-                    // Bless
-                    if (r.BlessStates is { Count: > 0 }) {
-                        string prefix = r.NotBless ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
-                        HashSet<int> allStates = r.BlessStates;
-
-                        List<string> names = [];
-                        foreach (var b in allStates) {
-                            if (b == 1)
-                                names.Add(RelocatorLang.GetText(RelocatorLang.LangKey.StateBlessed));
-                            else if (b == -1)
-                                names.Add(RelocatorLang.GetText(RelocatorLang.LangKey.StateCursed));
-                            else if (b == 0)
-                                names.Add(RelocatorLang.GetText(RelocatorLang.LangKey.StateNormal));
-                            else
-                                names.Add(RelocatorLang.GetText(RelocatorLang.LangKey.StateDoomed));
+                        break;
+                        case ConditionRarity cr: {
+                            var qualityNames = Lang.GetList("quality");
+                            List<string> display = [];
+                            var sorted = cr.Rarities.ToList();
+                            sorted.Sort();
+                            foreach (var rar in sorted) {
+                                int idx = rar + 1;
+                                if (idx >= 0 && idx < qualityNames.Length)
+                                    display.Add(qualityNames[idx]);
+                                else
+                                    display.Add(rar.ToString());
+                            }
+                            fNode.CondType = ConditionType.Rarity;
+                            fNode.DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Rarity) + ": " + string.Join(", ", display.ToArray());
                         }
-                        list.Add(new() { Rule = r, CondType = ConditionType.Bless, DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Bless) + ": " + string.Join(", ", names.ToArray()) });
+                        break;
+                        case ConditionQuality cq: {
+                            string prefix = cq.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                            fNode.CondType = ConditionType.Quality;
+                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Enhancement) + " " + cq.Op + cq.Value;
+                        }
+                        break;
+                        case ConditionText ct: {
+                            string prefix = ct.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                            fNode.CondType = ConditionType.Text;
+                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Text) + ": " + ct.Text;
+                        }
+                        break;
+                        case ConditionWeight cw: {
+                            string prefix = cw.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                            fNode.CondType = ConditionType.Weight;
+                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Weight) + " " + cw.Op + " " + cw.Value;
+                        }
+                        break;
+                        case ConditionGenLvl cg: {
+                            string prefix = cg.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                            fNode.CondType = ConditionType.GenLvl;
+                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl) + " " + cg.Op + " " + cg.Value;
+                        }
+                        break;
+                        case ConditionDna cd: {
+                            string prefix = cd.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                            fNode.CondType = ConditionType.Dna;
+                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Dna) + " " + cd.Op + " " + cd.Value;
+                        }
+                        break;
+                        case ConditionDnaContent cdc: {
+                            string prefix = cdc.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                            List<string> names = [];
+                            foreach (var id in cdc.DnaIds) {
+                                string displayName = id;
+                                if (EClass.sources.elements.alias.TryGetValue(id, out var source)) {
+                                    displayName = source.GetName();
+                                } else {
+                                    // Fallback: Check if it's an integer ID or just use raw
+                                    // Try to find if it matches any row alias or name?
+                                    // For now, simple alias lookup is the standard way.
+                                }
+                                names.Add(displayName);
+                            }
+                            fNode.CondType = ConditionType.DnaContent;
+                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.DnaContent) + ": " + string.Join(", ", names);
+                        }
+                        break;
+                        case ConditionEnchant ce: {
+                            fNode.CondType = ConditionType.Enchant;
+                            fNode.DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Enchant) + ": " + string.Join(", ", ce.Runes);
+                        }
+                        break;
+                        case ConditionMaterial cm: {
+                            string prefix = cm.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                            string display = "";
+                            if (cm.MaterialIds.Count <= 3) {
+                                List<string> names = [];
+                                foreach (var mid in cm.MaterialIds) {
+                                    var ms = EClass.sources.materials.rows.FirstOrDefault(m => m.alias.Equals(mid, StringComparison.OrdinalIgnoreCase) || m.id.ToString() == mid);
+                                    names.Add(ms is not null ? ms.GetName() : mid);
+                                }
+                                display = string.Join(", ", names);
+                            } else {
+                                display = "(" + cm.MaterialIds.Count + ")";
+                            }
+                            fNode.CondType = ConditionType.Material;
+                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Material) + ": " + display;
+                        }
+                        break;
+                        case ConditionBless cb: {
+                            string prefix = cb.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                            List<string> names = [];
+                            foreach (var b in cb.States) {
+                                if (b == 1)
+                                    names.Add(RelocatorLang.GetText(RelocatorLang.LangKey.StateBlessed));
+                                else if (b == -1)
+                                    names.Add(RelocatorLang.GetText(RelocatorLang.LangKey.StateCursed));
+                                else if (b == 0)
+                                    names.Add(RelocatorLang.GetText(RelocatorLang.LangKey.StateNormal));
+                                else
+                                    names.Add(RelocatorLang.GetText(RelocatorLang.LangKey.StateDoomed));
+                            }
+                            fNode.CondType = ConditionType.Bless;
+                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Bless) + ": " + string.Join(", ", names);
+                        }
+                        break;
+                        case ConditionStolen cs: {
+                            string prefix = cs.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                            fNode.CondType = ConditionType.Stolen;
+                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Stolen) + ": " + (cs.IsStolen ? "Yes" : "No");
+                        }
+                        break;
+                        case ConditionIdentified ci: {
+                            string val = ci.IsIdentified ? RelocatorLang.GetText(RelocatorLang.LangKey.StateIdentified) : RelocatorLang.GetText(RelocatorLang.LangKey.StateUnidentified);
+                            fNode.CondType = ConditionType.Identified;
+                            fNode.DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Identified) + ": " + val;
+                        }
+                        break;
+                        }
+                        list.Add(fNode);
                     }
 
-                    // Stolen
-                    if (r.IsStolen.HasValue) {
-                        string prefix = r.NotStolen ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
-                        list.Add(new() { Rule = r, CondType = ConditionType.Stolen, DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Stolen) + ": " + (r.IsStolen.Value ? "Yes" : "No") });
-                    }
-
-                    // Identified
-                    if (r.IsIdentified.HasValue) {
-                        string val = r.IsIdentified.Value
-                            ? RelocatorLang.GetText(RelocatorLang.LangKey.StateIdentified)
-                            : RelocatorLang.GetText(RelocatorLang.LangKey.StateUnidentified);
-                        list.Add(new() { Rule = r, CondType = ConditionType.Identified, DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Identified) + ": " + val });
-                    }
-
-                    // GenLv
-                    if (r.GenLvl.HasValue) {
-                        string prefix = r.NotGenLvl ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
-                        list.Add(new() { Rule = r, CondType = ConditionType.GenLvl, DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl) + ": " + (string.IsNullOrEmpty(r.GenLvlOp) ? ">=" : r.GenLvlOp) + r.GenLvl.Value });
-                    }
-
-                    // DNA
-                    if (r.Dna.HasValue) {
-                        string prefix = r.NotDna ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
-                        list.Add(new() { Rule = r, CondType = ConditionType.Dna, DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Dna) + ": " + (string.IsNullOrEmpty(r.DnaOp) ? ">=" : r.DnaOp) + r.Dna.Value });
-                    }
-
-                    // DNA Content
-                    if (r.DnaIds != null && r.DnaIds.Count > 0) {
-                        string disp = RelocatorLang.GetText(RelocatorLang.LangKey.DnaContent) + ": " + string.Join(", ", r.DnaIds);
-                        list.Add(new() { Rule = r, CondType = ConditionType.DnaContent, CondValue = "", DisplayText = disp });
-                    }
-
-                    // ADD BUTTON
+                    // Add Button
                     list.Add(new() { Rule = r, CondType = ConditionType.AddButton, DisplayText = " + " });
-
                     return list;
                 }
                 return null;
@@ -218,7 +236,7 @@ namespace Elin_ItemRelocator {
             mainAccordion.SetText((node) => {
                 if (node.IsRule) {
                     string status = node.Rule.Enabled ? "" : " (Disabled)";
-                    return node.Rule.Name + " (" + node.Rule.GetConditionList().Count + ")" + status;
+                    return node.Rule.Name + " (" + RulePresenter.GetConditionList(node.Rule).Count + ")" + status;
                 }
                 return node.DisplayText;
             });
@@ -261,48 +279,23 @@ namespace Elin_ItemRelocator {
 
             mainAccordion.SetOnBuildRowExtra((node, rowGO) => {
                 if (node.IsCondition) {
+                    var cond = node.ConditionRef;
+
                     // Negation Button
                     bool isNegated = false;
                     Action toggleNegation = null;
 
-                    switch (node.CondType) {
-                    case ConditionType.Category:
-                        isNegated = node.Rule.NegatedCategoryIds is not null && node.Rule.NegatedCategoryIds.Contains(node.CondValue);
-                        toggleNegation = () => {
-                            if (node.Rule.NegatedCategoryIds is null)
-                                node.Rule.NegatedCategoryIds = [];
-                            if (node.Rule.NegatedCategoryIds.Contains(node.CondValue))
-                                node.Rule.NegatedCategoryIds.Remove(node.CondValue);
-                            else
-                                node.Rule.NegatedCategoryIds.Add(node.CondValue);
-                            refresh();
-                        };
-                        break;
+                    if (cond is BaseCondition baseCond) {
+                        // Most conditions support negation via BaseCondition.Not
+                        // Exceptions: Maybe 'Enchant' if we didn't implement Not for it (BaseCondition has it, but logic needs support)
+                        // ConditionEnchant overrides IsMatch and uses Not.
 
-                    case ConditionType.Quality:
-                        isNegated = node.Rule.NotQuality;
-                        toggleNegation = () => { node.Rule.NotQuality = !node.Rule.NotQuality; refresh(); };
-                        break;
-                    case ConditionType.Text:
-                        isNegated = node.Rule.NotText;
-                        toggleNegation = () => { node.Rule.NotText = !node.Rule.NotText; refresh(); };
-                        break;
-                    case ConditionType.Weight:
-                        isNegated = node.Rule.NotWeight;
-                        toggleNegation = () => { node.Rule.NotWeight = !node.Rule.NotWeight; refresh(); };
-                        break;
-                    case ConditionType.GenLvl:
-                        isNegated = node.Rule.NotGenLvl;
-                        toggleNegation = () => { node.Rule.NotGenLvl = !node.Rule.NotGenLvl; refresh(); };
-                        break;
-                    case ConditionType.Dna:
-                        isNegated = node.Rule.NotDna;
-                        toggleNegation = () => { node.Rule.NotDna = !node.Rule.NotDna; refresh(); };
-                        break;
-                    case ConditionType.DnaContent:
-                        isNegated = node.Rule.NotDnaContent;
-                        toggleNegation = () => { node.Rule.NotDnaContent = !node.Rule.NotDnaContent; refresh(); };
-                        break;
+                        // Check implies logic support
+                        if (cond is ConditionAddButton) { } // Skip
+                        else {
+                            isNegated = baseCond.Not;
+                            toggleNegation = () => { baseCond.Not = !baseCond.Not; refresh(); };
+                        }
                     }
 
                     if (toggleNegation != null) {
@@ -311,7 +304,7 @@ namespace Elin_ItemRelocator {
                         var imgNeg = btnNeg.GetComponent<Image>();
                         if (isNegated) {
                             if (txtNeg)
-                                txtNeg.color = Color.red; /*Red for Negated*/
+                                txtNeg.color = Color.red;
                             if (imgNeg)
                                 imgNeg.color = new Color(1f, 0.8f, 0.8f);
                         } else {
@@ -322,26 +315,13 @@ namespace Elin_ItemRelocator {
                         }
                     }
 
-                    // Remove Button (Updated Signature)
+                    // Remove Button
                     var btnRemove = CreateTinyButton(rowGO.transform, "x", () => {
                         Dialog.YesNo(RelocatorLang.GetText(RelocatorLang.LangKey.Delete) + "?", () => {
-                            Action deleteAction = node.CondType switch {
-                                ConditionType.Category => () => node.Rule.CategoryIds.Remove(node.CondValue),
-                                ConditionType.Rarity => () => node.Rule.Rarities = [],
-                                ConditionType.Quality => () => node.Rule.Quality = null,
-                                ConditionType.Text => () => node.Rule.Text = null,
-                                ConditionType.Enchant => () => node.Rule.Enchants.Remove(node.CondValue),
-                                ConditionType.Weight => () => node.Rule.Weight = null,
-                                ConditionType.Material => () => node.Rule.MaterialIds = null,
-                                ConditionType.Bless => () => node.Rule.BlessStates = null,
-                                ConditionType.Stolen => () => node.Rule.IsStolen = null,
-                                ConditionType.Identified => () => node.Rule.IsIdentified = null,
-                                ConditionType.GenLvl => () => node.Rule.GenLvl = null,
-                                ConditionType.Dna => () => node.Rule.Dna = null,
-                                ConditionType.DnaContent => () => node.Rule.DnaIds.Clear(),
-                                _ => () => { } // No-op for others (None, AddButton, Settings etc.)
-                            };
-                            deleteAction();
+                            // Polymorphic Removal is simple: Remove the object from the list.
+                            if (node.Rule.Conditions.Contains(cond)) {
+                                node.Rule.Conditions.Remove(cond);
+                            }
                             refresh();
                         });
                     });
@@ -370,6 +350,12 @@ namespace Elin_ItemRelocator {
                                     refresh();
                                 }
                             }, (Dialog.InputType)0);
+                        })
+                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Overwrite), () => {
+                            Dialog.YesNo(RelocatorLang.GetText(RelocatorLang.LangKey.Overwrite) + " " + name + "?", () => {
+                                RelocatorManager.Instance.SavePreset(name, profile);
+                                refresh();
+                            });
                         })
                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Delete), () => {
                             Dialog.YesNo(RelocatorLang.GetText(RelocatorLang.LangKey.Delete) + "?", () => {
@@ -450,65 +436,8 @@ namespace Elin_ItemRelocator {
                         return "";
 
                     // Show value based on current sort mode
-                    switch (profile.SortMode) {
-                    case RelocationProfile.ResultSortMode.PriceAsc:
-                    case RelocationProfile.ResultSortMode.PriceDesc:
-                        // Price
-                        return t.GetPrice().ToString() + " gp";
-
-                    case RelocationProfile.ResultSortMode.TotalWeightAsc:
-                    case RelocationProfile.ResultSortMode.TotalWeightDesc:
-                        // Total Weight
-                        return (t.ChildrenAndSelfWeight * t.Num * 0.001f).ToString("0.0") + "s";
-
-                    case RelocationProfile.ResultSortMode.UnitWeightAsc:
-                    case RelocationProfile.ResultSortMode.UnitWeightDesc:
-                        // Unit Weight
-                        return (t.SelfWeight * 0.001f).ToString("0.0") + "s";
-
-                    case RelocationProfile.ResultSortMode.GenLvlAsc:
-                    case RelocationProfile.ResultSortMode.GenLvlDesc:
-                        // Generation Level
-                        return t.genLv.ToString();
-
-                    case RelocationProfile.ResultSortMode.DnaAsc:
-                    case RelocationProfile.ResultSortMode.DnaDesc:
-                        // DNA Cost
-                        return (t.c_DNA?.cost ?? 0).ToString();
-
-                    case RelocationProfile.ResultSortMode.TotalEnchantMagDesc:
-                        int totalMag = 0;
-                        if (t.elements != null && t.elements.dict != null) {
-                            foreach (var e in t.elements.dict.Values) {
-                                if (e.Value > 0)
-                                    totalMag += e.Value;
-                            }
-                        }
-                        return "Total Mag: " + totalMag;
-
-                    case RelocationProfile.ResultSortMode.EnchantMagAsc:
-                    case RelocationProfile.ResultSortMode.EnchantMagDesc:
-                        // Enchant Magnitude
-                        List<int> targetEleIds = RelocatorManager.Instance.GetTargetEnchantIDs(profile);
-                        int val = 0;
-                        foreach (int id in targetEleIds) {
-                            val += t.elements.Value(id);
-                        }
-                        return "Mag: " + val;
-
-                    case RelocationProfile.ResultSortMode.UidAsc:
-                    case RelocationProfile.ResultSortMode.UidDesc:
-                        return "UID: " + t.uid;
-
-                    default:
-                        // Default View: Show simplified info (Weight + ID status)
-                        string info = "";
-                        if (t.SelfWeight > 0)
-                            info += (t.SelfWeight * 0.001f).ToString("0.0") + "s ";
-                        if (!t.IsIdentified)
-                            info += "(UnID) ";
-                        return info;
-                    }
+                    // Show value based on current sort mode
+                    return RelocatorManager.Instance.GetDisplayValue(t, profile);
                 });
 
             // Initialize Layers (Main and Preview)
@@ -551,6 +480,7 @@ namespace Elin_ItemRelocator {
                     // Actually, "Rules & Conditions".
                     // I will Clear profile.Rules.
                     profile.Rules.Clear();
+                    profile.Rules.Add(new RelocationRule()); // Add default rule
                     refresh();
                     Msg.Say(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_RulesCleared));
                 });
@@ -788,30 +718,6 @@ namespace Elin_ItemRelocator {
                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl) + " (" + RelocatorLang.GetText(RelocatorLang.LangKey.SortDesc) + ")", () => { profile.SortMode = RelocationProfile.ResultSortMode.GenLvlDesc; refresh(); })
                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Dna) + " (" + RelocatorLang.GetText(RelocatorLang.LangKey.SortAsc) + ")", () => { profile.SortMode = RelocationProfile.ResultSortMode.DnaAsc; refresh(); })
                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Dna) + " (" + RelocatorLang.GetText(RelocatorLang.LangKey.SortDesc) + ")", () => { profile.SortMode = RelocationProfile.ResultSortMode.DnaDesc; refresh(); });
-                })
-                .AddSeparator()
-                .AddChild(RelocatorLang.GetText(RelocatorLang.LangKey.Presets), (child) => {
-                    child
-                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SavePreset), () => {
-                            Dialog.InputName(RelocatorLang.GetText(RelocatorLang.LangKey.PresetName), "", (c, text) => {
-                                if (!c && !string.IsNullOrEmpty(text)) {
-                                    RelocatorManager.Instance.SavePreset(text, profile);
-                                }
-                            }, (Dialog.InputType)0);
-                        })
-                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.LoadPreset), () => {
-                             RelocatorPickers.ShowPresetPicker((name) => {
-                                 var loaded = RelocatorManager.Instance.LoadPreset(name);
-                                 if (loaded is not null) {
-                                     UpdateProfile(p => {
-                                         p.Rules = loaded.Rules;
-                                         p.Scope = loaded.Scope;
-                                         p.SortMode = loaded.SortMode;
-                                     });
-                                     Msg.Say(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_Loaded));
-                                 }
-                             });
-                         });
                 })
                 .Show();
         }

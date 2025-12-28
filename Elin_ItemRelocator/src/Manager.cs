@@ -8,25 +8,18 @@ using System.Linq;
 namespace Elin_ItemRelocator {
     public class RelocatorManager : Singleton<RelocatorManager> {
         public Dictionary<string, RelocationProfile> Profiles = [];
+        public const int CurrentProfileVersion = 1;
 
-        // Path to Presets folder inside the Mod's folder
-        private string PresetPath {
-            get {
-                // Assuming DLL is in plugins/Elin_ItemRelocator/
-                // We want plugins/Elin_ItemRelocator/Presets/
-                string pluginPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                // If the DLL is in _bin or similar during dev, adjust. But usually safe to use relative.
-                // Let's ensure directory exists.
-                string dir = Path.Combine(pluginPath, "Presets");
-                if (!Directory.Exists(dir))
-                    Directory.CreateDirectory(dir);
-                return dir;
-            }
-        }
+        private PresetRepository _repository = new();
 
-        public void Init() {
-            // No persistent load on init anymore
-        }
+        // Repository Delegates
+        public void SavePreset(string name, RelocationProfile profile) => _repository.Save(name, profile);
+        public RelocationProfile LoadPreset(string name) => _repository.Load(name);
+        public List<string> GetPresetList() => _repository.ListAll();
+        public void RenamePreset(string oldName, string newName) => _repository.Rename(oldName, newName);
+        public void DeletePreset(string name) => _repository.Delete(name);
+
+        public void Init() { }
 
         // Runtime-only profile retrieval
         public RelocationProfile GetProfile(Thing container) {
@@ -39,81 +32,12 @@ namespace Elin_ItemRelocator {
                 return profile;
             }
 
-            var newProfile = new RelocationProfile { ContainerName = container.Name };
+            var newProfile = new RelocationProfile {
+                ContainerName = container.Name,
+                Version = CurrentProfileVersion
+            };
             Profiles[key] = newProfile;
             return newProfile;
-        }
-
-        public void SavePreset(string name, RelocationProfile profile) {
-            try {
-                string path = Path.Combine(PresetPath, name + ".json");
-                string json = JsonConvert.SerializeObject(profile, Formatting.Indented);
-                File.WriteAllText(path, json);
-                Msg.Say(string.Format(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_Saved), name));
-            } catch (Exception e) {
-                Debug.LogError("[Elin_ItemRelocator] Failed to save preset: " + e);
-                Msg.Say("Error saving preset.");
-            }
-        }
-
-        public RelocationProfile LoadPreset(string name) {
-            try {
-                string path = Path.Combine(PresetPath, name + ".json");
-                if (File.Exists(path)) {
-                    string json = File.ReadAllText(path);
-                    return JsonConvert.DeserializeObject<RelocationProfile>(json);
-                }
-            } catch (Exception e) {
-                Debug.LogError("[Elin_ItemRelocator] Failed to load preset: " + e);
-                Msg.Say("Error loading preset.");
-            }
-            return null;
-        }
-
-        public List<string> GetPresetList() {
-            List<string> list = [];
-            try {
-                if (Directory.Exists(PresetPath)) {
-                    var files = new DirectoryInfo(PresetPath).GetFiles("*.json");
-                    // Sort by CreationTime ascending (Oldest first, newest last)
-                    foreach (var file in files.OrderBy(f => f.CreationTime)) {
-                        list.Add(Path.GetFileNameWithoutExtension(file.Name));
-                    }
-                }
-            } catch { }
-            return list;
-        }
-
-        public void RenamePreset(string oldName, string newName) {
-            try {
-                string oldPath = Path.Combine(PresetPath, oldName + ".json");
-                string newPath = Path.Combine(PresetPath, newName + ".json");
-
-                if (!File.Exists(oldPath))
-                    return;
-
-                if (File.Exists(newPath)) {
-                    Msg.Say(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_FileExists));
-                    return;
-                }
-
-                File.Move(oldPath, newPath);
-                Msg.Say(string.Format(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_Renamed), newName));
-            } catch (Exception e) {
-                Debug.LogError("[Elin_ItemRelocator] Failed to rename: " + e);
-            }
-        }
-
-        public void DeletePreset(string name) {
-            try {
-                string path = Path.Combine(PresetPath, name + ".json");
-                if (File.Exists(path)) {
-                    File.Delete(path);
-                    Msg.Say(string.Format(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_Deleted), name));
-                }
-            } catch (Exception e) {
-                Debug.LogError("[Elin_ItemRelocator] Failed to delete: " + e);
-            }
         }
 
         public string GetProfileKey(Thing container) {
@@ -395,29 +319,28 @@ namespace Elin_ItemRelocator {
         public List<int> GetTargetEnchantIDs(RelocationProfile profile) {
             List<int> targetEleIds = [];
             foreach (var r in profile.Rules) {
-                if (r.Enabled && r.Enchants != null) {
-                    foreach (var term in r.Enchants) {
-                        if (string.IsNullOrEmpty(term))
-                            continue;
+                if (!r.Enabled)
+                    continue;
+                foreach (var cond in r.Conditions) {
+                    if (cond is ConditionEnchant ce) {
+                        foreach (var term in ce.Runes) {
+                            if (string.IsNullOrEmpty(term))
+                                continue;
 
-                        // Term format is typically "@Key" or "@Key>=Value"
-                        // Key can be Alias or Name
-                        string key = term.TrimStart('@');
+                            string key = term.TrimStart('@');
+                            string[] ops = [">=", "<=", "!=", ">", "<", "="];
+                            foreach (var o in ops) {
+                                int idx = key.IndexOf(o);
+                                if (idx > 0) { key = key.Substring(0, idx).Trim(); break; }
+                            }
 
-                        // Strip operators to isolate key
-                        string[] ops = [">=", "<=", "!=", ">", "<", "="];
-                        foreach (var o in ops) {
-                            int idx = key.IndexOf(o);
-                            if (idx > 0) { key = key.Substring(0, idx).Trim(); break; }
+                            var sourceEle = EClass.sources.elements.map.Values.FirstOrDefault(e =>
+                                (e.alias is not null && e.alias.Equals(key, StringComparison.OrdinalIgnoreCase)) ||
+                                (e.GetName().Equals(key, StringComparison.OrdinalIgnoreCase))
+                            );
+                            if (sourceEle is not null && !targetEleIds.Contains(sourceEle.id))
+                                targetEleIds.Add(sourceEle.id);
                         }
-
-                        // Match against Element Name or Alias
-                        var sourceEle = EClass.sources.elements.map.Values.FirstOrDefault(e =>
-                            (e.alias is not null && e.alias.Equals(key, StringComparison.OrdinalIgnoreCase)) ||
-                            (e.GetName().Equals(key, StringComparison.OrdinalIgnoreCase))
-                        );
-                        if (sourceEle is not null && !targetEleIds.Contains(sourceEle.id))
-                            targetEleIds.Add(sourceEle.id);
                     }
                 }
             }
@@ -531,6 +454,60 @@ namespace Elin_ItemRelocator {
                         }
                     }
                 }
+            }
+        }
+        public string GetDisplayValue(Thing t, RelocationProfile profile) {
+            // Sorting Mode Display
+            switch (profile.SortMode) {
+            case RelocationProfile.ResultSortMode.PriceAsc:
+            case RelocationProfile.ResultSortMode.PriceDesc:
+                return t.GetValue().ToString("#,0") + " gp";
+            case RelocationProfile.ResultSortMode.TotalWeightAsc:
+            case RelocationProfile.ResultSortMode.TotalWeightDesc:
+                return (t.ChildrenAndSelfWeight * t.Num * 0.001f).ToString("0.0") + "s";
+
+            case RelocationProfile.ResultSortMode.UnitWeightAsc:
+            case RelocationProfile.ResultSortMode.UnitWeightDesc:
+                return (t.SelfWeight * 0.001f).ToString("0.0") + "s";
+
+            case RelocationProfile.ResultSortMode.DnaAsc:
+            case RelocationProfile.ResultSortMode.DnaDesc:
+                return (t.c_DNA?.cost ?? 0).ToString();
+
+            case RelocationProfile.ResultSortMode.TotalEnchantMagDesc:
+                int totalMag = 0;
+                if (t.elements != null && t.elements.dict != null) {
+                    foreach (var e in t.elements.dict.Values) {
+                        if (e.Value > 0)
+                            totalMag += e.Value;
+                    }
+                }
+                return "Total Mag: " + totalMag;
+
+            case RelocationProfile.ResultSortMode.EnchantMagAsc:
+            case RelocationProfile.ResultSortMode.EnchantMagDesc:
+                List<int> targetEleIds = GetTargetEnchantIDs(profile);
+                int val = 0;
+                foreach (int id in targetEleIds) {
+                    val += t.elements.Value(id);
+                }
+                return "Mag: " + val;
+
+            case RelocationProfile.ResultSortMode.UidAsc:
+            case RelocationProfile.ResultSortMode.UidDesc:
+                return "ID: " + t.uid.ToString();
+
+            case RelocationProfile.ResultSortMode.GenLvlAsc:
+            case RelocationProfile.ResultSortMode.GenLvlDesc:
+                return "Lv " + t.genLv.ToString();
+
+            default:
+                string info = "";
+                if (t.SelfWeight > 0)
+                    info += (t.SelfWeight * 0.001f).ToString("0.0") + "s ";
+                if (!t.IsIdentified)
+                    info += "(UnID) ";
+                return info;
             }
         }
     }

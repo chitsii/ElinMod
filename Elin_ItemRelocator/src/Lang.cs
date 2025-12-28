@@ -28,7 +28,8 @@ namespace Elin_ItemRelocator {
             Parent, Move, Msg_Moved, AddRule, NewRuleName,
             Material, Bless, Stolen, StateNormal, StateBlessed, StateCursed, StateDoomed, ScopeBoth, EditValue, ChangeEnchant,
             Enhancement, EditEnhancement, Identified, StateIdentified, StateUnidentified,
-            ResetRules, ResetRulesConfirm, Msg_RulesCleared, Details, SortAsc, SortDesc
+            ResetRules, ResetRulesConfirm, Msg_RulesCleared, Details, SortAsc, SortDesc,
+            Overwrite, Msg_MigrateConfirm, Msg_MigrateFailed
         }
 
         private static Dictionary<LangKey, string[]> _dict = new() {
@@ -41,7 +42,7 @@ namespace Elin_ItemRelocator {
             [LangKey.Rarity] = ["Rarity", "レアリティ"],
             [LangKey.Quality] = ["Quality", "品質"],
             [LangKey.Category] = ["Category", "カテゴリ"],
-            [LangKey.Text] = ["Text (Name/Tag)", "自由検索 (名前/タグ)"],
+            [LangKey.Text] = ["Item Name", "アイテム名"],
             [LangKey.Enchant] = ["Enchant", "エンチャント"],
             [LangKey.Remove] = ["Remove", "削除"],
             [LangKey.Edit] = ["Edit", "編集"],
@@ -57,7 +58,7 @@ namespace Elin_ItemRelocator {
             [LangKey.OFF] = ["OFF", "OFF"],
             [LangKey.NoMatches] = ["No matches found.", "該当なし"],
             [LangKey.SelectEnchant] = ["Select Enchant", "エンチャント選択"],
-            [LangKey.RelocatorCaption] = ["Relocator: {0} [{1}] (Matches: {2})", "リロケータ: {0} [{1}] (合致: {2})"],
+            [LangKey.RelocatorCaption] = ["Condition Builder: {0} [{1}] (Matches: {2})", "条件ビルダー: {0} [{1}] (合致: {2})"],
             [LangKey.DisabledSuffix] = [" (Disabled)", " (無効)"],
             [LangKey.All] = ["All ", "すべて選択 "],
             [LangKey.EditSearchText] = ["Edit Search Text", "検索テキスト編集"],
@@ -119,8 +120,6 @@ namespace Elin_ItemRelocator {
             [LangKey.ResetRules] = ["Reset Conditions", "条件初期化"],
             [LangKey.ResetRulesConfirm] = ["Reset all filter conditions (clear text cache etc)?", "編集中の条件をすべて消去しますか？"],
             [LangKey.Msg_RulesCleared] = ["Conditions cleared.", "条件を消去しました。"],
-            [LangKey.ResetRulesConfirm] = ["Reset all filter conditions (clear text cache etc)?", "編集中の条件をすべて消去しますか？"],
-            [LangKey.Msg_RulesCleared] = ["Conditions cleared.", "条件を消去しました。"],
             [LangKey.Details] = ["Details", "詳細"],
             [LangKey.GenLvl] = ["Gen Lvl", "生成Lv"],
             [LangKey.SortAsc] = ["Asc", "昇順"],
@@ -131,7 +130,10 @@ namespace Elin_ItemRelocator {
             [LangKey.Cat_Skill] = ["Skill", "スキル"],
             [LangKey.Cat_Feat] = ["Feat", "フィート"],
             [LangKey.Cat_Ability] = ["Ability", "アビリティ"],
-            [LangKey.Cat_Slot] = ["Body Slot", "装備部位"]
+            [LangKey.Cat_Slot] = ["Body Slot", "装備部位"],
+            [LangKey.Overwrite] = ["Overwrite", "上書き保存"],
+            [LangKey.Msg_MigrateConfirm] = ["Old preset format detected. Update format?", "古い形式のプリセットを検出しました。形式を更新して上書きしますか？"],
+            [LangKey.Msg_MigrateFailed] = ["Migration failed at step v{0}->v{1}: {2}", "v{0}からv{1}への移行に失敗しました: {2}"]
         };
 
         public static string GetText(LangKey key) =>
