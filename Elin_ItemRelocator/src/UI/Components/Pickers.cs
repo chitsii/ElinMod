@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -237,7 +238,7 @@ namespace Elin_ItemRelocator {
 
         // General Element Picker (for DNA etc)
         // DNA Content Picker (Tree-based)
-        public static void ShowDnaContentPicker(List<string> initialSelection, Action<List<string>> onConfirm) {
+        public static void ShowDnaContentPicker(List<string> initialSelection, Action<List<string>, bool> onConfirm, bool initialMode = false) {
             HashSet<string> selected = new HashSet<string>();
             if (initialSelection != null)
                 foreach (var s in initialSelection) {
@@ -280,6 +281,10 @@ namespace Elin_ItemRelocator {
             tree.SetCaption("Select DNA Content");
             tree.SetRoots(categories.Cast<object>());
 
+            // Enable Mode Toggle
+            tree.ShowModeToggle = true;
+            tree.IsAndMode = initialMode;
+
             tree.SetChildren((object obj) => {
                 if (obj is string cat && map.ContainsKey(cat)) {
                     return map[cat].Cast<object>();
@@ -314,7 +319,7 @@ namespace Elin_ItemRelocator {
             });
 
             tree.AddBottomButton("[ OK ]", () => {
-                onConfirm(selected.ToList());
+                onConfirm(selected.ToList(), tree.IsAndMode);
                 tree.Close();
             }, new Color(0.3f, 0.5f, 0));
 
@@ -343,7 +348,7 @@ namespace Elin_ItemRelocator {
             // Gather Valid Enchants
             var map = new Dictionary<string, List<SourceElement.Row>>();
             // Initialize known categories to ensure order
-            string[] cats = ["attribute", "resist", "skill", "enchant", "ability", "feat"];
+            string[] cats = ["attribute", "resist", "skill", "enchant", "ability"];
             foreach (var c in cats)
                 map[c] = new List<SourceElement.Row>();
             map["other"] = new List<SourceElement.Row>();
@@ -352,19 +357,9 @@ namespace Elin_ItemRelocator {
                 if (string.IsNullOrEmpty(row.alias))
                     continue;
 
-                // Filter Logic (Same as ShowEnchantPicker but inclusive)
-                bool isEnc = row.IsWeaponEnc || row.IsShieldEnc;
-                if (!string.IsNullOrEmpty(row.encSlot) && row.encSlot != "global")
-                    isEnc = true;
-
-                // Extra safety filters
-                if (!isEnc && row.category != "attribute" && row.category != "resist" && row.category != "skill")
-                    continue;
-                if (row.chance <= 0 && row.category != "attribute")
-                    continue; // Attributes always visible
-                if (row.tag.Contains("noRandomEnc") && row.category != "attribute")
-                    continue;
-                if (row.isSpell || row.isTrait)
+                // Match game logic: IsEncAppliable requires encSlot to be non-empty
+                // This single check covers spells, traits, and other non-enchant elements.
+                if (string.IsNullOrEmpty(row.encSlot))
                     continue;
 
                 string cat = row.category;

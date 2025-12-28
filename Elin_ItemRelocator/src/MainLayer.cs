@@ -43,7 +43,7 @@ namespace Elin_ItemRelocator {
 
             // UX: Default Empty Rule for new/empty profiles
             if (profile.Rules.Count == 0) {
-                profile.Rules.Add(new RelocationRule { Name = RelocatorLang.GetText(RelocatorLang.LangKey.NewRuleName) + " 1" });
+                profile.Rules.Add(new RelocationRule { Name = RelocatorLang.GetText(RelocatorLang.LangKey.NewRuleName) });
             }
 
             Action refresh = null;
@@ -188,8 +188,9 @@ namespace Elin_ItemRelocator {
                                 display = string.Join(", ", names.Take(limit)) + " ... (+" + (names.Count - limit) + ")";
                             }
 
+                            string mode = cdc.IsAndMode ? " (AND)" : " (OR)";
                             fNode.CondType = ConditionType.DnaContent;
-                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.DnaContent) + ": " + display;
+                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.DnaContent) + mode + ": " + display;
                         }
                         break;
                         case ConditionEnchantOr ceOr: {

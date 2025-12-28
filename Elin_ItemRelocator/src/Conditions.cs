@@ -151,29 +151,50 @@ namespace Elin_ItemRelocator {
 
     public class ConditionDnaContent : BaseCondition {
         public HashSet<string> DnaIds = new();
+        public bool IsAndMode;
+
         public override bool IsMatch(Thing t) {
             if (t.c_DNA == null)
                 return false;
-            // Logic: Matches ANY of DnaIds
-            bool anyMatch = false;
-            foreach (string cond in DnaIds) {
-                // Reuse parsing logic? For now simple check or copy basic parsing
-                // Assuming logic similar to original Profile.cs
-                // For brevity, using simplified check if no Value op
-                // Original logic parsed "eleName>=10"
-                // Let's defer full parser or implement simplified
-                // Just checking ID existence for now as placeholder for strict refactor
-                // Re-implementing original logic:
-                string idStr = cond;
-                // ... Parsing omitted for brevity, assuming alias match ...
-                int elementId = EClass.sources.elements.alias.TryGetValue(idStr, out var source) ? source.id : -1;
-                if (elementId != -1) {
-                    for (int i = 0; i < t.c_DNA.vals.Count; i += 2) {
-                        if (t.c_DNA.vals[i] == elementId) { anyMatch = true; break; }
+
+            if (DnaIds.Count == 0)
+                return false;
+
+            bool match;
+            if (IsAndMode) {
+                // AND: All DnaIds must be present
+                match = true;
+                foreach (string cond in DnaIds) {
+                    if (!CheckSingleDna(t, cond)) {
+                        match = false;
+                        break;
+                    }
+                }
+            } else {
+                // OR: Any DnaId present matches
+                match = false;
+                foreach (string cond in DnaIds) {
+                    if (CheckSingleDna(t, cond)) {
+                        match = true;
+                        break;
                     }
                 }
             }
-            return Not ? !anyMatch : anyMatch;
+            return Not ? !match : match;
+        }
+
+        private bool CheckSingleDna(Thing t, string cond) {
+            string idStr = cond;
+            // Handle "mining>=5" style if needed (currently assuming just ID/alias string)
+            // Just basic existence check for now as per previous logic
+            int elementId = EClass.sources.elements.alias.TryGetValue(idStr, out var source) ? source.id : -1;
+            if (elementId != -1) {
+                for (int i = 0; i < t.c_DNA.vals.Count; i += 2) {
+                    if (t.c_DNA.vals[i] == elementId)
+                        return true;
+                }
+            }
+            return false;
         }
     }
 
@@ -256,13 +277,13 @@ namespace Elin_ItemRelocator {
                     return new ConditionWeight {
                         Value = (int)jo["Weight"],
                         Op = jo["WeightOp"]?.ToString() ?? ">=",
-                        Not = (bool?)jo["NotWeight"] ?? false
+                        Not = (bool?)jo["Negate"] ?? (bool?)jo["NotWeight"] ?? false
                     };
                 },
                 (jo, c) => {
                     jo.Add("Weight", c.Value);
                     jo.Add("WeightOp", c.Op);
-                    jo.Add("NotWeight", c.Not);
+                    jo.Add("Negate", c.Not);
                 }
             );
 
@@ -274,13 +295,13 @@ namespace Elin_ItemRelocator {
                     return new ConditionGenLvl {
                         Value = (int)jo["GenLvl"],
                         Op = jo["GenLvlOp"]?.ToString() ?? ">=",
-                        Not = (bool?)jo["NotGenLvl"] ?? false
+                        Not = (bool?)jo["Negate"] ?? (bool?)jo["NotGenLvl"] ?? false
                     };
                 },
                 (jo, c) => {
                     jo.Add("GenLvl", c.Value);
                     jo.Add("GenLvlOp", c.Op);
-                    jo.Add("NotGenLvl", c.Not);
+                    jo.Add("Negate", c.Not);
                 }
             );
 
@@ -294,12 +315,12 @@ namespace Elin_ItemRelocator {
                         return null;
                     return new ConditionText {
                         Text = text,
-                        Not = (bool?)jo["NotText"] ?? false
+                        Not = (bool?)jo["Negate"] ?? (bool?)jo["NotText"] ?? false
                     };
                 },
                 (jo, c) => {
                     jo.Add("Text", c.Text);
-                    jo.Add("NotText", c.Not);
+                    jo.Add("Negate", c.Not);
                 }
             );
 
@@ -313,12 +334,12 @@ namespace Elin_ItemRelocator {
                     return new ConditionQuality {
                         Value = val,
                         Op = op,
-                        Not = (bool?)jo["NotQuality"] ?? false
+                        Not = (bool?)jo["Negate"] ?? (bool?)jo["NotQuality"] ?? false
                     };
                 },
                 (jo, c) => {
                     jo.Add("Quality", c.Op + c.Value);
-                    jo.Add("NotQuality", c.Not);
+                    jo.Add("Negate", c.Not);
                 }
             );
 
@@ -346,7 +367,7 @@ namespace Elin_ItemRelocator {
                     return new ConditionEnchantOr {
                         Runes = list,
                         IsAndMode = true,
-                        Not = (bool?)jo["NotEnchant"] ?? false
+                        Not = (bool?)jo["Negate"] ?? (bool?)jo["NotEnchant"] ?? false
                     };
                 },
                 (jo, c) => {
@@ -362,13 +383,13 @@ namespace Elin_ItemRelocator {
                     return new ConditionEnchantOr {
                         Runes = list,
                         IsAndMode = (bool?)jo["IsAndMode"] ?? false,
-                        Not = (bool?)jo["NotEnchantsOr"] ?? false
+                        Not = (bool?)jo["Negate"] ?? (bool?)jo["NotEnchantsOr"] ?? false
                     };
                 },
                 (jo, c) => {
                     jo.Add("EnchantsOr", JArray.FromObject(c.Runes));
                     jo.Add("IsAndMode", c.IsAndMode);
-                    jo.Add("NotEnchantsOr", c.Not);
+                    jo.Add("Negate", c.Not);
                 }
             );
 
@@ -389,12 +410,12 @@ namespace Elin_ItemRelocator {
                         return null;
                     return new ConditionBless {
                         States = new HashSet<int>(list),
-                        Not = (bool?)jo["NotBless"] ?? false
+                        Not = (bool?)jo["Negate"] ?? (bool?)jo["NotBless"] ?? false
                     };
                 },
                 (jo, c) => {
                     jo.Add("BlessStates", JArray.FromObject(c.States));
-                    jo.Add("NotBless", c.Not);
+                    jo.Add("Negate", c.Not);
                 }
             );
             // [Legacy Support] Remove this loader after 2026/04
@@ -417,12 +438,12 @@ namespace Elin_ItemRelocator {
                         return null;
                     return new ConditionMaterial {
                         MaterialIds = new HashSet<string>(list),
-                        Not = (bool?)jo["NotMaterial"] ?? false
+                        Not = (bool?)jo["Negate"] ?? (bool?)jo["NotMaterial"] ?? false
                     };
                 },
                 (jo, c) => {
                     jo.Add("MaterialIds", JArray.FromObject(c.MaterialIds));
-                    jo.Add("NotMaterial", c.Not);
+                    jo.Add("Negate", c.Not);
                 }
             );
 
@@ -433,13 +454,13 @@ namespace Elin_ItemRelocator {
                     return new ConditionDna {
                         Value = (int)jo["Dna"],
                         Op = jo["DnaOp"]?.ToString() ?? ">=",
-                        Not = (bool?)jo["NotDna"] ?? false
+                        Not = (bool?)jo["Negate"] ?? (bool?)jo["NotDna"] ?? false
                     };
                 },
                 (jo, c) => {
                     jo.Add("Dna", c.Value);
                     jo.Add("DnaOp", c.Op);
-                    jo.Add("NotDna", c.Not);
+                    jo.Add("Negate", c.Not);
                 }
             );
 
@@ -450,12 +471,12 @@ namespace Elin_ItemRelocator {
                         return null;
                     return new ConditionDnaContent {
                         DnaIds = new HashSet<string>(list),
-                        Not = (bool?)jo["NotDnaContent"] ?? false
+                        Not = (bool?)jo["Negate"] ?? (bool?)jo["NotDnaContent"] ?? false
                     };
                 },
                 (jo, c) => {
                     jo.Add("DnaIds", JArray.FromObject(c.DnaIds));
-                    jo.Add("NotDnaContent", c.Not);
+                    jo.Add("Negate", c.Not);
                 }
             );
 
@@ -465,12 +486,12 @@ namespace Elin_ItemRelocator {
                         return null;
                     return new ConditionStolen {
                         IsStolen = (bool)jo["IsStolen"],
-                        Not = (bool?)jo["NotStolen"] ?? false
+                        Not = (bool?)jo["Negate"] ?? (bool?)jo["NotStolen"] ?? false
                     };
                 },
                 (jo, c) => {
-                    jo.Add("IsStolen", true);
-                    jo.Add("NotStolen", c.Not);
+                    jo.Add("IsStolen", c.IsStolen);
+                    jo.Add("Negate", c.Not);
                 }
             );
 
@@ -480,13 +501,13 @@ namespace Elin_ItemRelocator {
                         return null;
                     return new ConditionIdentified {
                         IsIdentified = (bool)jo["IsIdentified"],
-                        Not = (bool?)jo["NotIdentified"] ?? false
+                        Not = (bool?)jo["Negate"] ?? (bool?)jo["NotIdentified"] ?? false
                     };
                 },
                 (jo, c) => {
-                    jo.Add("IsIdentified", true);
+                    jo.Add("IsIdentified", c.IsIdentified);
                     if (c.Not)
-                        jo.Add("NotIdentified", true);
+                        jo.Add("Negate", true);
                 }
             );
         }
@@ -507,7 +528,7 @@ namespace Elin_ItemRelocator {
             foreach (var o in ops) {
                 if (raw.Contains(o)) { // Contains check is safer for "Name>=10"
                     int idx = raw.IndexOf(o);
-                    if (idx > 0) { // Ensure name exists before op
+                    if (idx >= 0) { // Allow operator at start (e.g. ">=10")
                         op = o;
                         int.TryParse(raw.Substring(idx + o.Length), out val);
                         return;

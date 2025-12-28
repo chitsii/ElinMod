@@ -82,7 +82,7 @@ namespace Elin_ItemRelocator {
             [LangKey.Move] = ["Move", "転送"],
             [LangKey.Msg_Moved] = ["Moved {0}.", "{0}を転送しました。"],
             [LangKey.AddRule] = ["Add Rule", "ルール追加"],
-            [LangKey.NewRuleName] = ["Rule Name", "ルール名"],
+            [LangKey.NewRuleName] = ["Rule", "ルール"],
             [LangKey.Material] = ["Material", "素材"],
             [LangKey.Bless] = ["State (Bless)", "祝福状態"],
             [LangKey.StolenState] = ["State (Stolen)", "盗品状態"],

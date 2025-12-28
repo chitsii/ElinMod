@@ -34,7 +34,7 @@ namespace Elin_ItemRelocator {
     [JsonConverter(typeof(RelocationRuleConverter))]
     [Serializable]
     public class RelocationRule {
-        public string Name = "New Rule";
+        public string Name = RelocatorLang.GetText(RelocatorLang.LangKey.NewRuleName);
         public bool Enabled = true;
 
         [JsonIgnore]

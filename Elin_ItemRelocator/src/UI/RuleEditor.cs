@@ -127,8 +127,8 @@ namespace Elin_ItemRelocator {
                      }, (Dialog.InputType)0);
                  })
                  .AddButton("DNA Content", () => {
-                     RelocatorPickers.ShowDnaContentPicker(null, (selectedList) => {
-                         rule.Conditions.Add(new ConditionDnaContent { DnaIds = new HashSet<string>(selectedList) });
+                     RelocatorPickers.ShowDnaContentPicker(null, (selectedList, isAndMode) => {
+                         rule.Conditions.Add(new ConditionDnaContent { DnaIds = new HashSet<string>(selectedList), IsAndMode = isAndMode });
                          refresh();
                      });
                  })
@@ -213,10 +213,11 @@ namespace Elin_ItemRelocator {
                         }
                     }, (Dialog.InputType)0));
                 } else if (cond is ConditionDnaContent dc) {
-                    menu.AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Edit), () => RelocatorPickers.ShowDnaContentPicker(dc.DnaIds.ToList(), (ids) => {
+                    menu.AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Edit), () => RelocatorPickers.ShowDnaContentPicker(dc.DnaIds.ToList(), (ids, isAndMode) => {
                         dc.DnaIds = new HashSet<string>(ids);
+                        dc.IsAndMode = isAndMode;
                         refresh();
-                    }));
+                    }, initialMode: dc.IsAndMode));
                 } else if (cond is ConditionMaterial m) {
                     menu.AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Edit), () => RelocatorPickers.ShowMaterialPicker(m.MaterialIds.ToList(), (ids) => {
                         m.MaterialIds = new HashSet<string>(ids);
