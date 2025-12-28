@@ -255,14 +255,14 @@ namespace Elin_ItemRelocator {
             hlg.childControlWidth = true;
             hlg.childControlHeight = true;
             hlg.childForceExpandWidth = false;
-            hlg.childForceExpandHeight = true;
+            hlg.childForceExpandHeight = false; // Allow variable height
             hlg.childAlignment = TextAnchor.MiddleLeft; // Fix Vertical Alignment
             hlg.spacing = 5;
             hlg.padding = new RectOffset(5 + (depth * 20), 5, 2, 2);
 
             var leRow = rowGO.AddComponent<LayoutElement>();
             leRow.minHeight = 32;
-            leRow.preferredHeight = 32;
+            // leRow.preferredHeight = 32; // Allow expansion
             leRow.flexibleHeight = 0;
 
             // Content
@@ -272,6 +272,19 @@ namespace Elin_ItemRelocator {
             lblGO.transform.SetParent(rowGO.transform, false);
             var leLbl = lblGO.AddComponent<LayoutElement>();
             leLbl.flexibleWidth = 1;
+            leLbl.minWidth = 50; // Prevent collapse
+
+            // Allow height expansion
+            var csfLbl = lblGO.AddComponent<ContentSizeFitter>();
+            csfLbl.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            csfLbl.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+
+            var vlgLbl = lblGO.AddComponent<VerticalLayoutGroup>();
+            vlgLbl.childControlHeight = true;
+            vlgLbl.childControlWidth = true;
+            vlgLbl.childForceExpandHeight = false;
+            vlgLbl.padding = new RectOffset(0, 0, 2, 2);
+
             var lbl = lblGO.AddComponent<Text>();
             // Use Game Default Font
             // Use Game Default Font
@@ -285,6 +298,11 @@ namespace Elin_ItemRelocator {
             lbl.font = f;
             lbl.fontSize = 14;
             lbl.alignment = TextAnchor.MiddleLeft;
+
+            // Wrapping
+            lbl.horizontalOverflow = HorizontalWrapMode.Wrap;
+            lbl.verticalOverflow = VerticalWrapMode.Truncate;
+            lbl.resizeTextForBestFit = false;
             lbl.text = name;
 
             Color c = Color.black;

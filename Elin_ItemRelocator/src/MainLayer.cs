@@ -103,11 +103,22 @@ namespace Elin_ItemRelocator {
                                 var source = EClass.sources.categories.map.TryGetValue(id);
                                 names.Add(source is not null ? source.GetName() : id);
                             }
+
+                            // Truncation Logic (Limit 10)
+                            string display = "";
+                            int limit = 10;
+                            if (names.Count <= limit) {
+                                display = string.Join(", ", names);
+                            } else {
+                                display = string.Join(", ", names.Take(limit)) + " ... (+" + (names.Count - limit) + ")";
+                            }
+
                             fNode.CondType = ConditionType.Category;
-                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Category) + ": " + string.Join(", ", names);
+                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Category) + ": " + display;
                         }
                         break;
                         case ConditionRarity cr: {
+                            string prefix = cr.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
                             var qualityNames = Lang.GetList("quality");
                             List<string> display = [];
                             var sorted = cr.Rarities.ToList();
@@ -120,7 +131,7 @@ namespace Elin_ItemRelocator {
                                     display.Add(rar.ToString());
                             }
                             fNode.CondType = ConditionType.Rarity;
-                            fNode.DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Rarity) + ": " + string.Join(", ", display.ToArray());
+                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Rarity) + ": " + string.Join(", ", display.ToArray());
                         }
                         break;
                         case ConditionQuality cq: {
@@ -167,59 +178,98 @@ namespace Elin_ItemRelocator {
                                 }
                                 names.Add(displayName);
                             }
+
+                            // Truncation Logic (Limit 10)
+                            string display = "";
+                            int limit = 10;
+                            if (names.Count <= limit) {
+                                display = string.Join(", ", names);
+                            } else {
+                                display = string.Join(", ", names.Take(limit)) + " ... (+" + (names.Count - limit) + ")";
+                            }
+
                             fNode.CondType = ConditionType.DnaContent;
-                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.DnaContent) + ": " + string.Join(", ", names);
+                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.DnaContent) + ": " + display;
                         }
                         break;
-                        case ConditionEnchant ce: {
+                        case ConditionEnchantOr ceOr: {
                             fNode.CondType = ConditionType.Enchant;
-                            fNode.DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Enchant) + ": " + string.Join(", ", ce.Runes);
+                            string prefix = ceOr.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                            string mode = ceOr.IsAndMode ? " (AND)" : " (OR)";
+
+                            // Lookup Names
+                            List<string> displayNames = [];
+                            foreach (var rune in ceOr.Runes) {
+                                string dName = rune;
+                                if (EClass.sources.elements.alias.TryGetValue(rune, out var source)) {
+                                    dName = source.GetName();
+                                }
+                                displayNames.Add(dName);
+                            }
+
+                            // Truncation Logic (Limit 10)
+                            string display = "";
+                            int limit = 10;
+                            if (displayNames.Count <= limit) {
+                                display = string.Join(", ", displayNames);
+                            } else {
+                                display = string.Join(", ", displayNames.Take(limit)) + " ... (+" + (displayNames.Count - limit) + ")";
+                            }
+
+                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.EnchantOr) + mode + ": " + display;
                         }
                         break;
                         case ConditionMaterial cm: {
                             string prefix = cm.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                            // Truncation Logic (Limit 10)
                             string display = "";
-                            if (cm.MaterialIds.Count <= 3) {
-                                List<string> names = [];
-                                foreach (var mid in cm.MaterialIds) {
-                                    var ms = EClass.sources.materials.rows.FirstOrDefault(m => m.alias.Equals(mid, StringComparison.OrdinalIgnoreCase) || m.id.ToString() == mid);
-                                    names.Add(ms is not null ? ms.GetName() : mid);
-                                }
+                            int limit = 10;
+
+                            List<string> names = [];
+                            foreach (var mid in cm.MaterialIds) {
+                                var ms = EClass.sources.materials.rows.FirstOrDefault(m => m.alias.Equals(mid, StringComparison.OrdinalIgnoreCase) || m.id.ToString() == mid);
+                                names.Add(ms is not null ? ms.GetName() : mid);
+                            }
+
+                            if (names.Count <= limit) {
                                 display = string.Join(", ", names);
                             } else {
-                                display = "(" + cm.MaterialIds.Count + ")";
+                                display = string.Join(", ", names.Take(limit)) + " ... (+" + (names.Count - limit) + ")";
                             }
+
                             fNode.CondType = ConditionType.Material;
                             fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Material) + ": " + display;
                         }
                         break;
                         case ConditionBless cb: {
                             string prefix = cb.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
-                            List<string> names = [];
-                            foreach (var b in cb.States) {
-                                if (b == 1)
-                                    names.Add(RelocatorLang.GetText(RelocatorLang.LangKey.StateBlessed));
-                                else if (b == -1)
-                                    names.Add(RelocatorLang.GetText(RelocatorLang.LangKey.StateCursed));
-                                else if (b == 0)
-                                    names.Add(RelocatorLang.GetText(RelocatorLang.LangKey.StateNormal));
-                                else
-                                    names.Add(RelocatorLang.GetText(RelocatorLang.LangKey.StateDoomed));
-                            }
                             fNode.CondType = ConditionType.Bless;
-                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Bless) + ": " + string.Join(", ", names);
+                            List<string> sNames = [];
+                            foreach (var s in cb.States) {
+                                string key = s switch {
+                                    1 => RelocatorLang.LangKey.StateBlessed.ToString(),
+                                    -1 => RelocatorLang.LangKey.StateCursed.ToString(),
+                                    -2 => RelocatorLang.LangKey.StateDoomed.ToString(),
+                                    0 => RelocatorLang.LangKey.StateNormal.ToString(),
+                                    _ => s.ToString()
+                                };
+                                sNames.Add(Enum.TryParse(key, out RelocatorLang.LangKey k) ? RelocatorLang.GetText(k) : s.ToString());
+                            }
+                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Bless) + ": " + string.Join(", ", sNames);
                         }
                         break;
                         case ConditionStolen cs: {
                             string prefix = cs.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
                             fNode.CondType = ConditionType.Stolen;
-                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Stolen) + ": " + (cs.IsStolen ? "Yes" : "No");
+                            string val = cs.IsStolen ? RelocatorLang.GetText(RelocatorLang.LangKey.Stolen) : RelocatorLang.GetText(RelocatorLang.LangKey.StateNormal);
+                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.StolenState) + ": " + val;
                         }
                         break;
                         case ConditionIdentified ci: {
-                            string val = ci.IsIdentified ? RelocatorLang.GetText(RelocatorLang.LangKey.StateIdentified) : RelocatorLang.GetText(RelocatorLang.LangKey.StateUnidentified);
+                            string prefix = ci.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
                             fNode.CondType = ConditionType.Identified;
-                            fNode.DisplayText = RelocatorLang.GetText(RelocatorLang.LangKey.Identified) + ": " + val;
+                            string val = ci.IsIdentified ? RelocatorLang.GetText(RelocatorLang.LangKey.StateIdentified) : RelocatorLang.GetText(RelocatorLang.LangKey.StateUnidentified);
+                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.IdentifiedState) + ": " + val;
                         }
                         break;
                         }

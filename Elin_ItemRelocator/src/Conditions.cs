@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace Elin_ItemRelocator {
+
     // Discriminator based polymorphism
     public interface ICondition {
         bool IsMatch(Thing t);
@@ -174,42 +177,35 @@ namespace Elin_ItemRelocator {
         }
     }
 
-    public class ConditionEnchant : BaseCondition {
-        public List<string> Runes = new(); // "Mining>=10"
+
+
+    public class ConditionEnchantOr : BaseCondition {
+        public List<string> Runes = new();
+        public bool IsAndMode; // If true, all runes must match (AND). If false, any rune matches (OR).
+
         public override bool IsMatch(Thing t) {
-            // Logic: Matches ALL runestrings? Original was AND.
-            foreach (var r in Runes) {
-                // EvaluateAttribute logic
-                string term = r.StartsWith("@") ? r.Substring(1) : r;
-                // Quick parse
-                string[] ops = [">=", "<=", "!=", ">", "<", "="];
-                string op = ">";
-                int val = 0;
-                string key = term;
-                foreach (var o in ops) {
-                    int idx = term.IndexOf(o);
-                    if (idx > 0) { op = o; key = term.Substring(0, idx).Trim(); int.TryParse(term.Substring(idx + o.Length), out val); break; }
+            if (Runes.Count == 0)
+                return false;
+
+            bool match;
+            if (IsAndMode) {
+                match = true;
+                foreach (var r in Runes) {
+                    if (!ConditionRegistry.CheckEnchantMatch(t, r, CheckOp)) {
+                        match = false;
+                        break;
+                    }
                 }
-
-                // Match Logic (Same as original Manager.cs display logic?)
-                // Try alias first
-                int eleId = EClass.sources.elements.alias.TryGetValue(key, out var source) ? source.id : -1;
-
-                // If not found, try Name match (for localized inputs like "筋力")
-                if (eleId == -1) {
-                    var match = EClass.sources.elements.rows.FirstOrDefault(e =>
-                        e.GetName().Equals(key, StringComparison.OrdinalIgnoreCase) ||
-                        (e.alias != null && e.alias.Equals(key, StringComparison.OrdinalIgnoreCase))
-                    );
-                    if (match != null)
-                        eleId = match.id;
+            } else {
+                match = false;
+                foreach (var r in Runes) {
+                    if (ConditionRegistry.CheckEnchantMatch(t, r, CheckOp)) {
+                        match = true;
+                        break;
+                    }
                 }
-
-                int curVal = (eleId != -1) ? t.elements.Value(eleId) : 0;
-                if (!CheckOp(curVal, op, val))
-                    return Not; // Mismatch
             }
-            return !Not;
+            return Not ? !match : match;
         }
     }
     public class ConditionAddButton : BaseCondition {
@@ -341,21 +337,48 @@ namespace Elin_ItemRelocator {
             );
 
             // Enchants / Runes (Ambiguous keys)
-            Register<ConditionEnchant>("Enchants",
+            // Enchants / Runes (Ambiguous keys)
+            Register<ConditionEnchantOr>("Enchants",
                 jo => {
                     var list = jo["Enchants"]?.ToObject<List<string>>();
                     if (list == null || list.Count == 0)
                         return null;
-                    return new ConditionEnchant { Runes = list };
+                    return new ConditionEnchantOr {
+                        Runes = list,
+                        IsAndMode = true,
+                        Not = (bool?)jo["NotEnchant"] ?? false
+                    };
                 },
-                (jo, c) => jo.Add("Enchants", JArray.FromObject(c.Runes))
+                (jo, c) => {
+                    // No serialization needed for legacy key "Enchants" as we want to save in new format "EnchantsOr"
+                }
             );
+
+            Register<ConditionEnchantOr>("EnchantsOr",
+                jo => {
+                    var list = jo["EnchantsOr"]?.ToObject<List<string>>();
+                    if (list == null || list.Count == 0)
+                        return null;
+                    return new ConditionEnchantOr {
+                        Runes = list,
+                        IsAndMode = (bool?)jo["IsAndMode"] ?? false,
+                        Not = (bool?)jo["NotEnchantsOr"] ?? false
+                    };
+                },
+                (jo, c) => {
+                    jo.Add("EnchantsOr", JArray.FromObject(c.Runes));
+                    jo.Add("IsAndMode", c.IsAndMode);
+                    jo.Add("NotEnchantsOr", c.Not);
+                }
+            );
+
             // [Legacy Support] Remove this loader after 2026/04
             Loaders.Add(("Runes", jo => {
                 var list = jo["Runes"]?.ToObject<List<string>>();
                 if (list == null || list.Count == 0)
                     return null;
-                return new ConditionEnchant { Runes = list };
+                // Migration: Runes also maps to ConditionEnchantOr (AND)
+                return new ConditionEnchantOr { Runes = list, IsAndMode = true };
             }
             ));
 
@@ -482,13 +505,94 @@ namespace Elin_ItemRelocator {
                 return;
             string[] ops = [">=", "<=", "!=", ">", "<", "="];
             foreach (var o in ops) {
-                if (raw.StartsWith(o)) {
-                    op = o;
-                    int.TryParse(raw.Substring(o.Length), out val);
-                    return;
+                if (raw.Contains(o)) { // Contains check is safer for "Name>=10"
+                    int idx = raw.IndexOf(o);
+                    if (idx > 0) { // Ensure name exists before op
+                        op = o;
+                        int.TryParse(raw.Substring(idx + o.Length), out val);
+                        return;
+                    }
                 }
             }
+            // Fallback if starts with op (e.g. ">=10" but should be handled by caller usually passing full string)
+            // But here raw likely includes key?
+            // My previous ParseOp (line 478 original) assumed raw was VALUE part only for Quality?
+            // Wait, ConditionQuality loader passed ">=10".
+            // ConditionEnchant logic needs to split Key and Op.
+            // Let's make a ParseKeyOp helper or keep specific logic.
             int.TryParse(raw, out val);
+        }
+
+        public static bool CheckEnchantMatch(Thing t, string rune, Func<int, string, int, bool> checkOp) {
+            try {
+                if (string.IsNullOrEmpty(rune))
+                    return false;
+                string term = rune.StartsWith("@") ? rune.Substring(1) : rune;
+                string key = term;
+                string op = ">=";
+                int val = 1; // Default to 1 (existence) if no op specified. Fixes "Mining matches everything" bug.
+                string[] ops = [">=", "<=", "!=", ">", "<", "="];
+
+                foreach (var o in ops) {
+                    int idx = term.IndexOf(o);
+                    if (idx > 0) {
+                        op = o;
+                        key = term.Substring(0, idx).Trim();
+                        int.TryParse(term.Substring(idx + o.Length), out val);
+                        break;
+                    }
+                }
+
+                if (string.IsNullOrEmpty(key))
+                    return false;
+
+                Debug.Log($"[Relocator] CheckEnchantMatch: Item={t?.Name ?? "Null"}, Key={key}, Op={op}, Val={val}");
+
+                // 1. Exact / Alias Match
+                int eleId = EClass.sources.elements.alias.TryGetValue(key, out var source) ? source.id : -1;
+                if (eleId == -1) {
+                    var match = EClass.sources.elements.rows.FirstOrDefault(e =>
+                        e.GetName().Equals(key, StringComparison.OrdinalIgnoreCase) ||
+                        (e.alias != null && e.alias.Equals(key, StringComparison.OrdinalIgnoreCase))
+                    );
+                    if (match != null)
+                        eleId = match.id;
+                }
+
+                if (eleId != -1) {
+                    // Exact match found: Check only this element
+                    int curVal = t.elements.Value(eleId);
+                    return checkOp(curVal, op, val);
+                }
+
+                // 2. Wildcard Match (Fallback)
+                // Only scan active elements on the Thing
+                if (t.elements != null && t.elements.dict != null) {
+                    var keys = t.elements.dict.Keys.ToList(); // Copy keys to avoid CollectionModified exception
+                    foreach (var id in keys) {
+                        // Skip disabled/hidden? Usually all in dict are active.
+                        var eleSource = EClass.sources.elements.map[id];
+                        if (eleSource == null)
+                            continue; // Safety check
+                        string eleName = eleSource.GetName();
+
+                        // Helper: Case insensitive contains
+                        if (eleName.IndexOf(key, StringComparison.OrdinalIgnoreCase) >= 0) {
+                            Debug.Log($"[Relocator] Wildcard Match candidate: {eleName} (ID {id})");
+                            int curVal = t.elements.Value(id);
+                            Debug.Log($"[Relocator] Value: {curVal}");
+                            if (checkOp(curVal, op, val)) {
+                                Debug.Log($"[Relocator] CheckOp Passed. Returning TRUE.");
+                                return true; // Found a matching element that meets criteria
+                            }
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                Debug.LogError($"[Relocator] Error: {ex.Message}\n{ex.StackTrace}");
+                Msg.Say($"Enchant Filter Error: {ex.Message}");
+            }
+            return false;
         }
     }
 }

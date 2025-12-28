@@ -18,7 +18,12 @@ namespace Elin_ItemRelocator {
         private string caption = "Tree";
         private LayerList _layer;
         private HashSet<T> expanded = new HashSet<T>();
+        private string _filterText = ""; // Search filter
         private List<BottomButtonDef> bottomButtons = new List<BottomButtonDef>();
+
+        // Mode Controls
+        public bool ShowModeToggle = false;
+        public bool IsAndMode = true; // Default to AND
 
         // Cache the content transform to avoid accessing destroyed components
         private Transform _contentTrans;
@@ -95,6 +100,30 @@ namespace Elin_ItemRelocator {
             return this;
         }
 
+        public void ExpandSelected() {
+            if (isSelected == null)
+                return;
+
+            bool Check(T item) {
+                var children = getChildren != null ? getChildren(item) : null;
+                bool anyChildHit = false;
+                if (children != null) {
+                    foreach (var kid in children) {
+                        if (Check(kid))
+                            anyChildHit = true;
+                    }
+                }
+
+                bool hit = isSelected(item) || anyChildHit;
+                if (anyChildHit)
+                    expanded.Add(item);
+                return hit;
+            }
+
+            foreach (var root in roots)
+                Check(root);
+        }
+
         public LayerList Show() {
             bool isNew = false;
             // Robust Layer Creation
@@ -112,6 +141,35 @@ namespace Elin_ItemRelocator {
                 if (layer.windows.Count > 0) {
                     layer.windows[0].SetCaption(caption ?? "Tree");
                     layer.windows[0].setting.allowResize = true;
+
+                    // --- Search Bar Injection ---
+                    try {
+                        var searchBox = RelocatorSearchBox.Create(
+                            layer.list.transform.parent,
+                            uiFont,
+                            ShowModeToggle,
+                            IsAndMode,
+                            (val) => { _filterText = val; Refresh(); },
+                            (mode) => { IsAndMode = mode; }
+                        );
+
+                        searchBox.SetSiblingIndex(layer.list.transform.GetSiblingIndex());
+
+                        // Fix Parent Layout to prevent forcing height
+                        var parentGroup = layer.list.transform.parent.GetComponent<VerticalLayoutGroup>();
+                        if (parentGroup) {
+                            parentGroup.childForceExpandHeight = false;
+                            parentGroup.childControlHeight = true;
+                        }
+
+                        // Ensure List takes remaining space
+                        var listLE = layer.list.GetComponent<LayoutElement>();
+                        if (!listLE)
+                            listLE = layer.list.gameObject.AddComponent<LayoutElement>();
+                        listLE.flexibleHeight = 1;
+
+                    } catch (Exception ex) { Debug.LogError("Search UI Init Failed: " + ex); }
+
                 } else {
                     Debug.LogWarning("[RelocatorTree] LayerList has no windows!");
                 }
@@ -165,18 +223,64 @@ namespace Elin_ItemRelocator {
             var contentTrans = _contentTrans;
 
             // 1. Flatten Data
+            // 1. Flatten Data
             var flattened = new List<Tuple<T, int>>(); // Item, Depth
+
+            // Helper to check match
+            bool IsMatch(T item) {
+                if (string.IsNullOrEmpty(_filterText))
+                    return true;
+                string t = (getText != null ? getText(item) : item.ToString());
+                return t.IndexOf(_filterText, StringComparison.OrdinalIgnoreCase) >= 0;
+            }
+
+            // Recursive checker for filtering
+            // Returns true if item or any descendant matches filter
+            Func<T, bool> checkFilter = null;
+            var visibleItems = new HashSet<T>();
+            checkFilter = (item) => {
+                bool selfMatch = IsMatch(item);
+                bool childMatch = false;
+                var kids = getChildren != null ? getChildren(item) : null;
+                if (kids != null) {
+                    foreach (var k in kids) {
+                        if (checkFilter(k))
+                            childMatch = true;
+                    }
+                }
+                bool visible = selfMatch || childMatch;
+                if (visible)
+                    visibleItems.Add(item);
+                return visible;
+            };
+
+            if (!string.IsNullOrEmpty(_filterText)) {
+                foreach (var root in roots)
+                    checkFilter(root);
+            }
 
             Action<IEnumerable<T>, int> traverse = null;
             traverse = (items, depth) => {
                 if (items == null)
                     return;
                 foreach (var item in items) {
+                    // Filter Check
+                    if (!string.IsNullOrEmpty(_filterText) && !visibleItems.Contains(item))
+                        continue;
+
                     flattened.Add(Tuple.Create(item, depth));
+
                     // Check expansion
-                    if (expanded.Contains(item)) {
-                        var kids = getChildren != null ? getChildren(item) : null;
-                        if (kids != null && kids.Any()) {
+                    // If filtering, auto-expand if children are visible
+                    bool isFiltering = !string.IsNullOrEmpty(_filterText);
+                    bool shouldExpand = expanded.Contains(item) || (isFiltering && visibleItems.Contains(item)); // Simplification: actually if it has visible children we expand.
+
+                    // Optimization: check if any child is visible?
+                    var kids = getChildren != null ? getChildren(item) : null;
+                    if (kids != null && kids.Any()) {
+                        bool anyChildVisible = isFiltering ? kids.Any(k => visibleItems.Contains(k)) : true;
+
+                        if (shouldExpand && anyChildVisible) {
                             traverse(kids, depth + 1);
                         }
                     }
@@ -232,7 +336,8 @@ namespace Elin_ItemRelocator {
             hlg.childControlWidth = true;
             hlg.childControlHeight = true;
             hlg.childForceExpandWidth = false;
-            hlg.childForceExpandHeight = true;
+            hlg.childForceExpandHeight = false; // Allow children to have different heights
+            hlg.childAlignment = TextAnchor.MiddleLeft; // Center vertically
             hlg.spacing = 0;
             hlg.padding = new RectOffset(5, 5, 0, 0);
 
@@ -241,7 +346,7 @@ namespace Elin_ItemRelocator {
 
             var leRow = rowGO.AddComponent<LayoutElement>();
             leRow.minHeight = 28;
-            leRow.preferredHeight = 28;
+            // leRow.preferredHeight = 28; // Allow expansion
             leRow.flexibleHeight = 0;
 
             // Clicker
@@ -289,25 +394,74 @@ namespace Elin_ItemRelocator {
             txtExpand.fontStyle = FontStyle.Bold;
             txtExpand.raycastTarget = false;
 
+            // Expand Button
             var imgExpand = expandGO.AddComponent<Image>();
-            // Transparent
-            imgExpand.color = Color.clear;
+            imgExpand.color = Color.white; // Base White for Tint
             var btnExpand = expandGO.AddComponent<Button>();
             btnExpand.targetGraphic = imgExpand;
 
-            // Label
+            // Subtle Scale Highlight Logic
+            ColorBlock cb = btnExpand.colors;
+            cb.normalColor = Color.clear; // Invisible normally (White * Clear = Clear)
+            cb.highlightedColor = new Color(1f, 1f, 1f, 0.15f); // Faint White Highlight
+            cb.pressedColor = new Color(1f, 1f, 1f, 0.25f);
+            cb.selectedColor = Color.clear;
+            cb.disabledColor = Color.clear;
+            cb.colorMultiplier = 1f;
+            cb.fadeDuration = 0f; // No flicker
+            btnExpand.colors = cb;
+
+
+            // Label Container
             var lblGO = new GameObject("Label");
             lblGO.transform.SetParent(rowGO.transform, false);
             var leLbl = lblGO.AddComponent<LayoutElement>();
             leLbl.flexibleWidth = 1;
-            var lbl = lblGO.AddComponent<Text>();
+            leLbl.minWidth = 50; // Ensure it can shrink but not too much
+
+            // Allow height expansion based on Content
+            var csfLbl = lblGO.AddComponent<ContentSizeFitter>();
+            csfLbl.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            csfLbl.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+
+            // Internal Layout for padding/control
+            var vlgLbl = lblGO.AddComponent<VerticalLayoutGroup>();
+            vlgLbl.childControlHeight = true;
+            vlgLbl.childControlWidth = true;
+            vlgLbl.childForceExpandHeight = false;
+            vlgLbl.padding = new RectOffset(0, 0, 5, 5); // Add vertical padding
+
+            // Background Image for Hit Test
+            var imgLbl = lblGO.AddComponent<Image>();
+            imgLbl.color = Color.white; // Base White for Tint
+
+            var btnLbl = lblGO.AddComponent<Button>();
+            btnLbl.targetGraphic = imgLbl;
+            btnLbl.colors = cb; // Use same highlight style
+
+            // Actual Text
+            var txtGO = new GameObject("Text");
+            txtGO.transform.SetParent(lblGO.transform, false);
+            var lbl = txtGO.AddComponent<Text>();
             lbl.font = uiFont;
             lbl.fontSize = 14;
             lbl.alignment = TextAnchor.MiddleLeft;
-            lbl.resizeTextForBestFit = true;
-            lbl.resizeTextMinSize = 10;
-            lbl.resizeTextMaxSize = 14;
-            lbl.raycastTarget = false;
+
+            // Wrapping Settings
+            lbl.horizontalOverflow = HorizontalWrapMode.Wrap;
+            lbl.verticalOverflow = VerticalWrapMode.Truncate;
+            lbl.resizeTextForBestFit = false; // Disable BestFit for wrapping
+            lbl.raycastTarget = false; // Pass clicks to parent
+
+
+
+            // Stretch Text to fill Label Container
+            var rtTxt = txtGO.GetComponent<RectTransform>();
+            rtTxt.anchorMin = Vector2.zero;
+            rtTxt.anchorMax = Vector2.one;
+            rtTxt.offsetMin = Vector2.zero; // Left/Bottom
+            rtTxt.offsetMax = Vector2.zero; // Right/Top
+            // Add padding if needed? Original had no padding but HLG has padding.
 
             // Logic
             var kids = getChildren != null ? getChildren(item) : null;
@@ -344,17 +498,23 @@ namespace Elin_ItemRelocator {
                 lbl.text = "[P] " + name + extra;
                 lbl.color = Color.gray;
                 btnClicker.enabled = false;
+                btnLbl.enabled = false;
             } else {
                 lbl.text = (selected ? "[v] " : "[  ] ") + name + extra;
                 lbl.color = selected ? new Color(0, 0, 0.8f) : new Color(0.1f, 0.1f, 0.1f);
                 btnClicker.enabled = true;
-                btnClicker.onClick.AddListener(() => {
+                // Add Listener to BOTH global clicker (for empty space) and label clicker
+                // User said "Use individual judgments", but if global clicker is preserved for empty space safety:
+                Action doSelect = () => {
                     if (onSelect != null) {
                         onSelect(item);
                         EClass.Sound.Play("click");
                         Refresh();
                     }
-                });
+                };
+
+                btnClicker.onClick.AddListener(() => doSelect());
+                btnLbl.onClick.AddListener(() => doSelect());
             }
         }
 

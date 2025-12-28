@@ -15,17 +15,20 @@ namespace Elin_ItemRelocator {
 
             foreach (var cond in rule.Conditions) {
                 switch (cond) {
-                case ConditionCategory c:
+                case ConditionCategory c: {
                     foreach (var id in c.CategoryIds) {
                         var source = EClass.sources.categories.map.TryGetValue(id);
                         string name = source is not null ? source.GetName() : id;
                         string prefix = c.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
                         parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Category) + ": " + name);
                     }
-                    break;
-                case ConditionRarity r:
-                    parts.Add(RelocatorLang.GetText(RelocatorLang.LangKey.Rarity));
-                    break;
+                }
+                break;
+                case ConditionRarity r: {
+                    string prefix = r.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                    parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Rarity));
+                }
+                break;
                 case ConditionQuality q: {
                     string prefix = q.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
                     parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Enhancement) + " " + q.Op + q.Value);
@@ -56,9 +59,14 @@ namespace Elin_ItemRelocator {
                     parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.DnaContent) + ": " + string.Join(", ", dc.DnaIds));
                 }
                 break;
-                case ConditionEnchant e:
-                    parts.Add(RelocatorLang.GetText(RelocatorLang.LangKey.Enchant) + ": " + string.Join(", ", e.Runes));
-                    break;
+                case ConditionEnchantOr eOr: {
+                    string prefix = eOr.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
+                    string mode = eOr.IsAndMode ? " (AND)" : " (OR)";
+                    parts.Add(prefix + RelocatorLang.GetText(RelocatorLang.LangKey.EnchantOr) + mode + ": " + string.Join(", ", eOr.Runes));
+                }
+                break;
+
+
                 case ConditionMaterial m:
                     parts.Add(RelocatorLang.GetText(RelocatorLang.LangKey.Material));
                     break;

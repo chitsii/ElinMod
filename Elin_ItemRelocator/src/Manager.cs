@@ -322,8 +322,12 @@ namespace Elin_ItemRelocator {
                 if (!r.Enabled)
                     continue;
                 foreach (var cond in r.Conditions) {
-                    if (cond is ConditionEnchant ce) {
-                        foreach (var term in ce.Runes) {
+                    List<string> runes = null;
+                    if (cond is ConditionEnchantOr ceo)
+                        runes = ceo.Runes;
+
+                    if (runes != null) {
+                        foreach (var term in runes) {
                             if (string.IsNullOrEmpty(term))
                                 continue;
 
