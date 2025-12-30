@@ -1,4 +1,4 @@
-﻿namespace Elin_Mod
+namespace Elin_Mod
 {
 
 	public class Singleton<T> where T : class, new()

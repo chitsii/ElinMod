@@ -94,188 +94,8 @@ namespace Elin_ItemRelocator {
 
                     foreach (var cond in r.Conditions) {
                         var fNode = new FilterNode() { Rule = r, ConditionRef = cond };
-
-                        switch (cond) {
-                        case ConditionCategory c: {
-                            string prefix = c.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
-                            List<string> names = [];
-                            foreach (var id in c.CategoryIds) {
-                                var source = EClass.sources.categories.map.TryGetValue(id);
-                                names.Add(source is not null ? source.GetName() : id);
-                            }
-
-                            // Truncation Logic (Limit 10)
-                            string display = "";
-                            int limit = 10;
-                            if (names.Count <= limit) {
-                                display = string.Join(", ", names);
-                            } else {
-                                display = string.Join(", ", names.Take(limit)) + " ... (+" + (names.Count - limit) + ")";
-                            }
-
-                            fNode.CondType = ConditionType.Category;
-                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Category) + ": " + display;
-                        }
-                        break;
-                        case ConditionRarity cr: {
-                            string prefix = cr.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
-                            var qualityNames = Lang.GetList("quality");
-                            List<string> display = [];
-                            var sorted = cr.Rarities.ToList();
-                            sorted.Sort();
-                            foreach (var rar in sorted) {
-                                int idx = rar + 1;
-                                if (idx >= 0 && idx < qualityNames.Length)
-                                    display.Add(qualityNames[idx]);
-                                else
-                                    display.Add(rar.ToString());
-                            }
-                            fNode.CondType = ConditionType.Rarity;
-                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Rarity) + ": " + string.Join(", ", display.ToArray());
-                        }
-                        break;
-                        case ConditionQuality cq: {
-                            string prefix = cq.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
-                            fNode.CondType = ConditionType.Quality;
-                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Enhancement) + " " + cq.Op + cq.Value;
-                        }
-                        break;
-                        case ConditionText ct: {
-                            string prefix = ct.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
-                            fNode.CondType = ConditionType.Text;
-                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Text) + ": " + ct.Text;
-                        }
-                        break;
-                        case ConditionWeight cw: {
-                            string prefix = cw.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
-                            fNode.CondType = ConditionType.Weight;
-                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Weight) + " " + cw.Op + " " + cw.Value;
-                        }
-                        break;
-                        case ConditionGenLvl cg: {
-                            string prefix = cg.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
-                            fNode.CondType = ConditionType.GenLvl;
-                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl) + " " + cg.Op + " " + cg.Value;
-                        }
-                        break;
-                        case ConditionDna cd: {
-                            string prefix = cd.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
-                            fNode.CondType = ConditionType.Dna;
-                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Dna) + " " + cd.Op + " " + cd.Value;
-                        }
-                        break;
-                        case ConditionDnaContent cdc: {
-                            string prefix = cdc.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
-                            List<string> names = [];
-                            foreach (var id in cdc.DnaIds) {
-                                ConditionRegistry.ParseKeyOp(id, out string key, out string op, out int val);
-                                string suffix = op + val;
-
-                                string displayName = key;
-                                if (EClass.sources.elements.alias.TryGetValue(key, out var source)) {
-                                    displayName = source.GetName();
-                                }
-                                names.Add(displayName + suffix);
-                            }
-
-                            // Truncation Logic (Limit 10)
-                            string display = "";
-                            int limit = 10;
-                            if (names.Count <= limit) {
-                                display = string.Join(", ", names);
-                            } else {
-                                display = string.Join(", ", names.Take(limit)) + " ... (+" + (names.Count - limit) + ")";
-                            }
-
-                            string mode = cdc.IsAndMode ? " (AND)" : " (OR)";
-                            fNode.CondType = ConditionType.DnaContent;
-                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.DnaContent) + mode + ": " + display;
-                        }
-                        break;
-                        case ConditionEnchantOr ceOr: {
-                            fNode.CondType = ConditionType.Enchant;
-                            string prefix = ceOr.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
-                            string mode = ceOr.IsAndMode ? " (AND)" : " (OR)";
-
-                            // Lookup Names
-                            List<string> displayNames = [];
-                            foreach (var rune in ceOr.Runes) {
-                                ConditionRegistry.ParseKeyOp(rune, out string key, out string op, out int val);
-                                string suffix = op + val;
-
-                                string dName = key;
-                                if (EClass.sources.elements.alias.TryGetValue(key, out var source)) {
-                                    dName = source.GetName();
-                                }
-                                displayNames.Add(dName + suffix);
-                            }
-
-                            // Truncation Logic (Limit 10)
-                            string display = "";
-                            int limit = 10;
-                            if (displayNames.Count <= limit) {
-                                display = string.Join(", ", displayNames);
-                            } else {
-                                display = string.Join(", ", displayNames.Take(limit)) + " ... (+" + (displayNames.Count - limit) + ")";
-                            }
-
-                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.EnchantOr) + mode + ": " + display;
-                        }
-                        break;
-                        case ConditionMaterial cm: {
-                            string prefix = cm.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
-                            // Truncation Logic (Limit 10)
-                            string display = "";
-                            int limit = 10;
-
-                            List<string> names = [];
-                            foreach (var mid in cm.MaterialIds) {
-                                var ms = EClass.sources.materials.rows.FirstOrDefault(m => m.alias.Equals(mid, StringComparison.OrdinalIgnoreCase) || m.id.ToString() == mid);
-                                names.Add(ms is not null ? ms.GetName() : mid);
-                            }
-
-                            if (names.Count <= limit) {
-                                display = string.Join(", ", names);
-                            } else {
-                                display = string.Join(", ", names.Take(limit)) + " ... (+" + (names.Count - limit) + ")";
-                            }
-
-                            fNode.CondType = ConditionType.Material;
-                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Material) + ": " + display;
-                        }
-                        break;
-                        case ConditionBless cb: {
-                            string prefix = cb.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
-                            fNode.CondType = ConditionType.Bless;
-                            List<string> sNames = [];
-                            foreach (var s in cb.States) {
-                                string key = s switch {
-                                    1 => RelocatorLang.LangKey.StateBlessed.ToString(),
-                                    -1 => RelocatorLang.LangKey.StateCursed.ToString(),
-                                    -2 => RelocatorLang.LangKey.StateDoomed.ToString(),
-                                    0 => RelocatorLang.LangKey.StateNormal.ToString(),
-                                    _ => s.ToString()
-                                };
-                                sNames.Add(Enum.TryParse(key, out RelocatorLang.LangKey k) ? RelocatorLang.GetText(k) : s.ToString());
-                            }
-                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.Bless) + ": " + string.Join(", ", sNames);
-                        }
-                        break;
-                        case ConditionStolen cs: {
-                            string prefix = cs.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
-                            fNode.CondType = ConditionType.Stolen;
-                            string val = cs.IsStolen ? RelocatorLang.GetText(RelocatorLang.LangKey.Stolen) : RelocatorLang.GetText(RelocatorLang.LangKey.StateNormal);
-                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.StolenState) + ": " + val;
-                        }
-                        break;
-                        case ConditionIdentified ci: {
-                            string prefix = ci.Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
-                            fNode.CondType = ConditionType.Identified;
-                            string val = ci.IsIdentified ? RelocatorLang.GetText(RelocatorLang.LangKey.StateIdentified) : RelocatorLang.GetText(RelocatorLang.LangKey.StateUnidentified);
-                            fNode.DisplayText = prefix + RelocatorLang.GetText(RelocatorLang.LangKey.IdentifiedState) + ": " + val;
-                        }
-                        break;
-                        }
+                        fNode.CondType = cond.GetConditionType();
+                        fNode.DisplayText = cond.GetUiLabel();
                         list.Add(fNode);
                     }
 
@@ -752,24 +572,55 @@ namespace Elin_ItemRelocator {
                              UpdateProfile(p => p.Scope = RelocationProfile.FilterScope.Both);
                          });
                 })
-                .AddChild(RelocatorLang.GetText(RelocatorLang.LangKey.SortLabel) + GetSortText(profile.SortMode), (child) => {
-                    child
+                .AddChild(RelocatorLang.GetText(RelocatorLang.LangKey.SortLabel) + GetSortText(profile.SortMode), (sortRoot) => {
+                    sortRoot
+                        // Default
                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortDefault), () => { profile.SortMode = RelocationProfile.ResultSortMode.Default; refresh(); })
-                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortPriceAsc), () => { profile.SortMode = RelocationProfile.ResultSortMode.PriceAsc; refresh(); })
-                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortPriceDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.PriceDesc; refresh(); })
-                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortMagAsc), () => { profile.SortMode = RelocationProfile.ResultSortMode.EnchantMagAsc; refresh(); })
-                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortMagDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.EnchantMagDesc; refresh(); })
-                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortTotalEnchantMagDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.TotalEnchantMagDesc; refresh(); })
-                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortWeightAsc), () => { profile.SortMode = RelocationProfile.ResultSortMode.TotalWeightAsc; refresh(); })
-                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortWeightDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.TotalWeightDesc; refresh(); })
-                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortUnitWeightAsc), () => { profile.SortMode = RelocationProfile.ResultSortMode.UnitWeightAsc; refresh(); })
-                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortUnitWeightDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.UnitWeightDesc; refresh(); })
-                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortUidAsc), () => { profile.SortMode = RelocationProfile.ResultSortMode.UidAsc; refresh(); })
-                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortUidDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.UidDesc; refresh(); })
-                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl) + " (" + RelocatorLang.GetText(RelocatorLang.LangKey.SortAsc) + ")", () => { profile.SortMode = RelocationProfile.ResultSortMode.GenLvlAsc; refresh(); })
-                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl) + " (" + RelocatorLang.GetText(RelocatorLang.LangKey.SortDesc) + ")", () => { profile.SortMode = RelocationProfile.ResultSortMode.GenLvlDesc; refresh(); })
-                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Dna) + " (" + RelocatorLang.GetText(RelocatorLang.LangKey.SortAsc) + ")", () => { profile.SortMode = RelocationProfile.ResultSortMode.DnaAsc; refresh(); })
-                        .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Dna) + " (" + RelocatorLang.GetText(RelocatorLang.LangKey.SortDesc) + ")", () => { profile.SortMode = RelocationProfile.ResultSortMode.DnaDesc; refresh(); });
+
+                        // Price Group
+                        .AddChild(RelocatorLang.GetText(RelocatorLang.LangKey.LabelPrice), (g) => {
+                            g.AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortAsc), () => { profile.SortMode = RelocationProfile.ResultSortMode.PriceAsc; refresh(); })
+                             .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.PriceDesc; refresh(); });
+                        })
+
+                        // Enchant Group
+                        .AddChild(RelocatorLang.GetText(RelocatorLang.LangKey.Enchant), (g) => {
+                            g.AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortMagAsc), () => { profile.SortMode = RelocationProfile.ResultSortMode.EnchantMagAsc; refresh(); })
+                             .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortMagDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.EnchantMagDesc; refresh(); })
+                             .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortTotalEnchantMagDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.TotalEnchantMagDesc; refresh(); });
+                        })
+
+                        // Weight Group
+                        .AddChild(RelocatorLang.GetText(RelocatorLang.LangKey.Weight), (g) => {
+                            g.AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortWeightAsc), () => { profile.SortMode = RelocationProfile.ResultSortMode.TotalWeightAsc; refresh(); })
+                             .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortWeightDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.TotalWeightDesc; refresh(); })
+                             .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortUnitWeightAsc), () => { profile.SortMode = RelocationProfile.ResultSortMode.UnitWeightAsc; refresh(); })
+                             .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortUnitWeightDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.UnitWeightDesc; refresh(); });
+                        })
+
+                        // Gen Level
+                        .AddChild(RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl), (g) => {
+                            g.AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortAsc), () => { profile.SortMode = RelocationProfile.ResultSortMode.GenLvlAsc; refresh(); })
+                             .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.GenLvlDesc; refresh(); });
+                        })
+
+                        // DNA
+                        .AddChild(RelocatorLang.GetText(RelocatorLang.LangKey.Dna), (g) => {
+                            g.AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortAsc), () => { profile.SortMode = RelocationProfile.ResultSortMode.DnaAsc; refresh(); })
+                             .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.DnaDesc; refresh(); });
+                        })
+
+                        // Food Power
+                        .AddChild(RelocatorLang.GetText(RelocatorLang.LangKey.LabelFoodPower), (g) => {
+                            g.AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortAsc), () => { profile.SortMode = RelocationProfile.ResultSortMode.FoodPowerAsc; refresh(); })
+                             .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.FoodPowerDesc; refresh(); });
+                        })
+
+                        // UID
+                        .AddChild(RelocatorLang.GetText(RelocatorLang.LangKey.LabelUid), (g) => {
+                            g.AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortAsc), () => { profile.SortMode = RelocationProfile.ResultSortMode.UidAsc; refresh(); })
+                             .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.UidDesc; refresh(); });
+                        });
                 })
                 .Show();
         }
@@ -847,6 +698,8 @@ namespace Elin_ItemRelocator {
             RelocationProfile.ResultSortMode.GenLvlDesc => RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl) + "(" + RelocatorLang.GetText(RelocatorLang.LangKey.SortDesc) + ")",
             RelocationProfile.ResultSortMode.DnaAsc => RelocatorLang.GetText(RelocatorLang.LangKey.Dna) + "(" + RelocatorLang.GetText(RelocatorLang.LangKey.SortAsc) + ")",
             RelocationProfile.ResultSortMode.DnaDesc => RelocatorLang.GetText(RelocatorLang.LangKey.Dna) + "(" + RelocatorLang.GetText(RelocatorLang.LangKey.SortDesc) + ")",
+            RelocationProfile.ResultSortMode.FoodPowerAsc => RelocatorLang.GetText(RelocatorLang.LangKey.SortFoodPowerAsc),
+            RelocationProfile.ResultSortMode.FoodPowerDesc => RelocatorLang.GetText(RelocatorLang.LangKey.SortFoodPowerDesc),
             _ => mode.ToString()
         };
     }

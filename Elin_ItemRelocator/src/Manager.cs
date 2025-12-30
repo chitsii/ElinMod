@@ -245,6 +245,26 @@ namespace Elin_ItemRelocator {
             case RelocationProfile.ResultSortMode.DnaDesc:
                 matches.Sort((a, b) => (b.c_DNA?.cost ?? 0) - (a.c_DNA?.cost ?? 0));
                 break;
+            case RelocationProfile.ResultSortMode.FoodPowerAsc:
+            case RelocationProfile.ResultSortMode.FoodPowerDesc:
+                List<int> foodIds = GetTargetFoodElements(profile);
+                matches.Sort((a, b) => {
+                    int valA = 0;
+                    int valB = 0;
+                    if (a.elements != null) {
+                        foreach (int id in foodIds)
+                            valA += a.elements.Value(id);
+                    }
+                    if (b.elements != null) {
+                        foreach (int id in foodIds)
+                            valB += b.elements.Value(id);
+                    }
+                    if (profile.SortMode == RelocationProfile.ResultSortMode.FoodPowerDesc)
+                        return valB - valA;
+                    else
+                        return valA - valB;
+                });
+                break;
             }
 
             return matches;
@@ -349,6 +369,26 @@ namespace Elin_ItemRelocator {
                 }
             }
             return targetEleIds;
+        }
+
+        public List<int> GetTargetFoodElements(RelocationProfile profile) {
+            List<int> ids = [];
+            foreach (var r in profile.Rules) {
+                if (!r.Enabled)
+                    continue;
+                foreach (var cond in r.Conditions) {
+                    if (cond is ConditionFoodElement cfe) {
+                        foreach (var idStr in cfe.ElementIds) {
+                            ConditionRegistry.ParseKeyOp(idStr, out string key, out _, out _);
+                            if (EClass.sources.elements.alias.TryGetValue(key, out var source)) {
+                                if (!ids.Contains(source.id))
+                                    ids.Add(source.id);
+                            }
+                        }
+                    }
+                }
+            }
+            return ids;
         }
 
 
@@ -504,6 +544,16 @@ namespace Elin_ItemRelocator {
             case RelocationProfile.ResultSortMode.GenLvlAsc:
             case RelocationProfile.ResultSortMode.GenLvlDesc:
                 return "Lv " + t.genLv.ToString();
+
+            case RelocationProfile.ResultSortMode.FoodPowerAsc:
+            case RelocationProfile.ResultSortMode.FoodPowerDesc:
+                List<int> fIds = GetTargetFoodElements(profile);
+                int fVal = 0;
+                if (t.elements != null) {
+                    foreach (int id in fIds)
+                        fVal += t.elements.Value(id);
+                }
+                return "Food Pwr: " + fVal;
 
             default:
                 string info = "";

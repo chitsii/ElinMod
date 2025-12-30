@@ -1,4 +1,4 @@
-﻿namespace Elin_ItemRelocator {
+namespace Elin_ItemRelocator {
 
     public class Singleton<T> where T : class, new() {
         private static T s_Instance;

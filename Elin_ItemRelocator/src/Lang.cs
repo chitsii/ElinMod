@@ -23,7 +23,10 @@ namespace Elin_ItemRelocator {
             SortPriceAsc, SortPriceDesc, SortMagAsc, SortMagDesc,
             SortTotalEnchantMagDesc, SortWeightAsc, SortWeightDesc,
             SortUnitWeightAsc, SortUnitWeightDesc, SortUidAsc, SortUidDesc,
-            Overwrite, Msg_MigrateConfirm, Msg_MigrateFailed, EnchantOr
+            Overwrite, Msg_MigrateConfirm, Msg_MigrateFailed, EnchantOr,
+            FoodTraits,
+            SortFoodPowerAsc, SortFoodPowerDesc,
+            LabelPrice, LabelUid, LabelFoodPower
         }
 
         private static Dictionary<LangKey, string[]> _dict = new() {
@@ -105,7 +108,13 @@ namespace Elin_ItemRelocator {
             [LangKey.Overwrite] = ["Overwrite", "上書き保存"],
             [LangKey.Msg_MigrateConfirm] = ["Old preset format detected. Update format?", "古い形式のプリセットを検出しました。形式を更新して上書きしますか？"],
             [LangKey.Msg_MigrateFailed] = ["Migration failed at step v{0}->v{1}: {2}", "v{0}からv{1}への移行に失敗しました: {2}"],
-            [LangKey.EnchantOr] = ["Enchant", "エンチャント"]
+            [LangKey.EnchantOr] = ["Enchant", "エンチャント"],
+            [LangKey.FoodTraits] = ["Food Traits", "食材特性"],
+            [LangKey.SortFoodPowerAsc] = ["Food Power (Asc)", "食事効果 (昇順)"],
+            [LangKey.SortFoodPowerDesc] = ["Food Power (Desc)", "食事効果 (降順)"],
+            [LangKey.LabelPrice] = ["Price", "価格"],
+            [LangKey.LabelUid] = ["Creation (UID)", "生成順"],
+            [LangKey.LabelFoodPower] = ["Food Power", "食事効果"]
         };
 
         public static string GetText(LangKey key) =>

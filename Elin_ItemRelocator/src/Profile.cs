@@ -25,7 +25,8 @@ namespace Elin_ItemRelocator {
 
         public enum ResultSortMode {
             Default, PriceAsc, PriceDesc, EnchantMagAsc, EnchantMagDesc, TotalEnchantMagDesc,
-            TotalWeightAsc, TotalWeightDesc, UnitWeightAsc, UnitWeightDesc, UidAsc, UidDesc, GenLvlAsc, GenLvlDesc, DnaAsc, DnaDesc
+            TotalWeightAsc, TotalWeightDesc, UnitWeightAsc, UnitWeightDesc, UidAsc, UidDesc, GenLvlAsc, GenLvlDesc, DnaAsc, DnaDesc,
+            FoodPowerAsc, FoodPowerDesc
         }
 
         public enum RelocatorOp { Ge, Le, Eq, Ne, Gt, Lt }

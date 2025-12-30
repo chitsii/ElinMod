@@ -482,5 +482,89 @@ namespace Elin_ItemRelocator {
             tree.ExpandSelected();
             tree.Show();
         }
+
+
+        public static void ShowFoodElementPicker(List<string> initialSelection, bool initialAndMode, Action<List<string>, bool> onConfirm) {
+            HashSet<string> selected = new HashSet<string>();
+            if (initialSelection != null)
+                foreach (var s in initialSelection)
+                    selected.Add(s);
+
+            // Gather elements with foodEffect
+            var map = new Dictionary<string, List<SourceElement.Row>>();
+            string[] cats = ["attribute", "resist", "skill", "enchant", "ability"];
+            foreach (var c in cats)
+                map[c] = new List<SourceElement.Row>();
+            map["other"] = new List<SourceElement.Row>();
+
+            foreach (var row in EClass.sources.elements.rows) {
+                if (string.IsNullOrEmpty(row.alias))
+                    continue;
+
+                // Check foodEffect
+                if (row.foodEffect == null || row.foodEffect.Length == 0)
+                    continue;
+
+                string cat = row.category;
+                if (!map.ContainsKey(cat))
+                    cat = "other";
+
+                map[cat].Add(row);
+            }
+
+            // Remove empty categories
+            var activeCats = map.Where(kv => kv.Value.Count > 0).Select(kv => kv.Key).ToList();
+
+            // Sort items
+            foreach (var list in map.Values)
+                list.Sort((a, b) => a.id - b.id);
+
+            var tree = RelocatorTree<object>.Create();
+            tree.SetCaption(RelocatorLang.GetText(RelocatorLang.LangKey.FoodTraits)); // Create this key
+            tree.SetRoots(activeCats.Cast<object>());
+
+            // Add And/Or Toggle
+            tree.ShowModeToggle = true;
+            tree.IsAndMode = initialAndMode;
+
+            tree.SetChildren((object obj) => {
+                if (obj is string cat && map.ContainsKey(cat))
+                    return map[cat].Cast<object>();
+                return null;
+            });
+
+            tree.SetText((object obj) => {
+                if (obj is string cat) {
+                    return char.ToUpper(cat[0]) + cat.Substring(1);
+                }
+                if (obj is SourceElement.Row row)
+                    return row.GetName() + " (" + row.alias + ")";
+                return obj.ToString();
+            });
+
+            tree.SetIsSelected((object obj) => {
+                if (obj is SourceElement.Row row)
+                    return selected.Contains(row.alias);
+                return false;
+            });
+
+            tree.SetOnSelect((object obj) => {
+                if (obj is SourceElement.Row row) {
+                    string key = row.alias;
+                    if (selected.Contains(key))
+                        selected.Remove(key);
+                    else
+                        selected.Add(key);
+                }
+            });
+
+            tree.AddBottomButton("[ OK ]", () => {
+                onConfirm(selected.ToList(), tree.IsAndMode);
+                tree.Close();
+            }, new Color(0.3f, 0.5f, 0));
+
+            tree.ExpandSelected();
+            tree.Show();
+        }
     }
 }

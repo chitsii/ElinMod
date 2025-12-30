@@ -132,6 +132,14 @@ namespace Elin_ItemRelocator {
                          refresh();
                      });
                  })
+                 .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.FoodTraits), () => {
+                     RelocatorPickers.ShowFoodElementPicker(null, false, (selectedList, isAndMode) => {
+                         if (selectedList.Count > 0) {
+                             rule.Conditions.Add(new ConditionFoodElement { ElementIds = new HashSet<string>(selectedList), IsAndMode = isAndMode });
+                             refresh();
+                         }
+                     });
+                 })
                  .Show();
         }
 
@@ -244,8 +252,16 @@ namespace Elin_ItemRelocator {
                         }, initialMode: eo.IsAndMode);
                     });
 
-                }
+                } else if (cond is ConditionFoodElement fe) {
+                    menu.AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Edit), () => {
+                        RelocatorPickers.ShowFoodElementPicker(fe.ElementIds.ToList(), fe.IsAndMode, (selected, isAndMode) => {
+                            fe.ElementIds = new HashSet<string>(selected);
+                            fe.IsAndMode = isAndMode;
+                            refresh();
+                        });
+                    });
 
+                }
                 menu.Show();
             };
 

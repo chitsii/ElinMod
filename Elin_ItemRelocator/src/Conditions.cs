@@ -11,14 +11,17 @@ namespace Elin_ItemRelocator {
     // Discriminator based polymorphism
     public interface ICondition {
         bool IsMatch(Thing t);
-        // We might want a TypeID for serialization if not using auto-typing,
-        // but Newtonsoft.Json with TypeNameHandling.Auto is requested by user?
-        // Or custom key mapping. Let's start with classes.
+        string GetUiLabel();
+        ConditionType GetConditionType();
     }
 
     public abstract class BaseCondition : ICondition {
         public bool Not; // Negation flag common to most
         public abstract bool IsMatch(Thing t);
+        public abstract string GetUiLabel();
+        public abstract ConditionType GetConditionType();
+
+        public string GetNotPrefix() => Not ? RelocatorLang.GetText(RelocatorLang.LangKey.Not) + " " : "";
 
         protected bool CheckOp(int value, string op, int target) {
             return op switch {
@@ -45,7 +48,25 @@ namespace Elin_ItemRelocator {
                     return !Not;
                 }
             }
-            return Not; // If no match found, and Not=true, return true. If Not=false, return false.
+            return Not;
+        }
+
+        public override ConditionType GetConditionType() => ConditionType.Category;
+        public override string GetUiLabel() {
+            List<string> names = [];
+            foreach (var id in CategoryIds) {
+                var source = EClass.sources.categories.map.TryGetValue(id);
+                names.Add(source is not null ? source.GetName() : id);
+            }
+            // Truncation Logic (Limit 10)
+            string display = "";
+            int limit = 10;
+            if (names.Count <= limit) {
+                display = string.Join(", ", names);
+            } else {
+                display = string.Join(", ", names.Take(limit)) + " ... (+" + (names.Count - limit) + ")";
+            }
+            return GetNotPrefix() + RelocatorLang.GetText(RelocatorLang.LangKey.Category) + ": " + display;
         }
     }
 
@@ -57,6 +78,21 @@ namespace Elin_ItemRelocator {
             bool match = Rarities.Contains((int)t.rarity);
             return Not ? !match : match;
         }
+        public override ConditionType GetConditionType() => ConditionType.Rarity;
+        public override string GetUiLabel() {
+            var qualityNames = Lang.GetList("quality");
+            List<string> display = [];
+            var sorted = Rarities.ToList();
+            sorted.Sort();
+            foreach (var rar in sorted) {
+                int idx = rar + 1;
+                if (idx >= 0 && idx < qualityNames.Length)
+                    display.Add(qualityNames[idx]);
+                else
+                    display.Add(rar.ToString());
+            }
+            return GetNotPrefix() + RelocatorLang.GetText(RelocatorLang.LangKey.Rarity) + ": " + string.Join(", ", display.ToArray());
+        }
     }
 
     public class ConditionQuality : BaseCondition {
@@ -67,6 +103,8 @@ namespace Elin_ItemRelocator {
             bool match = CheckOp((int)t.encLV, Op, Value);
             return Not ? !match : match;
         }
+        public override ConditionType GetConditionType() => ConditionType.Quality;
+        public override string GetUiLabel() => GetNotPrefix() + RelocatorLang.GetText(RelocatorLang.LangKey.Enhancement) + " " + Op + Value;
     }
 
     public class ConditionWeight : BaseCondition {
@@ -76,6 +114,8 @@ namespace Elin_ItemRelocator {
             bool match = CheckOp(t.SelfWeight, Op, Value);
             return Not ? !match : match;
         }
+        public override ConditionType GetConditionType() => ConditionType.Weight;
+        public override string GetUiLabel() => GetNotPrefix() + RelocatorLang.GetText(RelocatorLang.LangKey.Weight) + " " + Op + " " + Value;
     }
 
     public class ConditionGenLvl : BaseCondition {
@@ -85,6 +125,8 @@ namespace Elin_ItemRelocator {
             bool match = CheckOp(t.genLv, Op, Value);
             return Not ? !match : match;
         }
+        public override ConditionType GetConditionType() => ConditionType.GenLvl;
+        public override string GetUiLabel() => GetNotPrefix() + RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl) + " " + Op + " " + Value;
     }
 
     public class ConditionDna : BaseCondition {
@@ -96,6 +138,8 @@ namespace Elin_ItemRelocator {
             bool match = CheckOp(t.c_DNA.cost, Op, Value);
             return Not ? !match : match;
         }
+        public override ConditionType GetConditionType() => ConditionType.Dna;
+        public override string GetUiLabel() => GetNotPrefix() + RelocatorLang.GetText(RelocatorLang.LangKey.Dna) + " " + Op + " " + Value;
     }
 
     public class ConditionText : BaseCondition {
@@ -113,6 +157,8 @@ namespace Elin_ItemRelocator {
             }
             return !Not;
         }
+        public override ConditionType GetConditionType() => ConditionType.Text;
+        public override string GetUiLabel() => GetNotPrefix() + RelocatorLang.GetText(RelocatorLang.LangKey.Text) + ": " + Text;
     }
 
     public class ConditionMaterial : BaseCondition {
@@ -123,6 +169,23 @@ namespace Elin_ItemRelocator {
             bool match = MaterialIds.Contains(t.material.alias) || MaterialIds.Contains(t.material.id.ToString());
             return Not ? !match : match;
         }
+        public override ConditionType GetConditionType() => ConditionType.Material;
+        public override string GetUiLabel() {
+            // Truncation Logic (Limit 10)
+            string display = "";
+            int limit = 10;
+            List<string> names = [];
+            foreach (var mid in MaterialIds) {
+                var ms = EClass.sources.materials.rows.FirstOrDefault(m => m.alias.Equals(mid, StringComparison.OrdinalIgnoreCase) || m.id.ToString() == mid);
+                names.Add(ms is not null ? ms.GetName() : mid);
+            }
+            if (names.Count <= limit) {
+                display = string.Join(", ", names);
+            } else {
+                display = string.Join(", ", names.Take(limit)) + " ... (+" + (names.Count - limit) + ")";
+            }
+            return GetNotPrefix() + RelocatorLang.GetText(RelocatorLang.LangKey.Material) + ": " + display;
+        }
     }
 
     public class ConditionBless : BaseCondition {
@@ -130,6 +193,21 @@ namespace Elin_ItemRelocator {
         public override bool IsMatch(Thing t) {
             bool match = States.Contains((int)t.blessedState);
             return Not ? !match : match;
+        }
+        public override ConditionType GetConditionType() => ConditionType.Bless;
+        public override string GetUiLabel() {
+            List<string> sNames = [];
+            foreach (var s in States) {
+                string key = s switch {
+                    1 => RelocatorLang.LangKey.StateBlessed.ToString(),
+                    -1 => RelocatorLang.LangKey.StateCursed.ToString(),
+                    -2 => RelocatorLang.LangKey.StateDoomed.ToString(),
+                    0 => RelocatorLang.LangKey.StateNormal.ToString(),
+                    _ => s.ToString()
+                };
+                sNames.Add(Enum.TryParse(key, out RelocatorLang.LangKey k) ? RelocatorLang.GetText(k) : s.ToString());
+            }
+            return GetNotPrefix() + RelocatorLang.GetText(RelocatorLang.LangKey.Bless) + ": " + string.Join(", ", sNames);
         }
     }
 
@@ -139,6 +217,11 @@ namespace Elin_ItemRelocator {
             bool match = t.isStolen == IsStolen;
             return Not ? !match : match; // Usually not negated for boolean flags, but BaseCondition has it.
         }
+        public override ConditionType GetConditionType() => ConditionType.Stolen;
+        public override string GetUiLabel() {
+            string val = IsStolen ? RelocatorLang.GetText(RelocatorLang.LangKey.Stolen) : RelocatorLang.GetText(RelocatorLang.LangKey.StateNormal);
+            return GetNotPrefix() + RelocatorLang.GetText(RelocatorLang.LangKey.StolenState) + ": " + val;
+        }
     }
 
     public class ConditionIdentified : BaseCondition {
@@ -146,6 +229,11 @@ namespace Elin_ItemRelocator {
         public override bool IsMatch(Thing t) {
             bool match = t.IsIdentified == IsIdentified;
             return Not ? !match : match;
+        }
+        public override ConditionType GetConditionType() => ConditionType.Identified;
+        public override string GetUiLabel() {
+            string val = IsIdentified ? RelocatorLang.GetText(RelocatorLang.LangKey.StateIdentified) : RelocatorLang.GetText(RelocatorLang.LangKey.StateUnidentified);
+            return GetNotPrefix() + RelocatorLang.GetText(RelocatorLang.LangKey.IdentifiedState) + ": " + val;
         }
     }
 
@@ -211,6 +299,30 @@ namespace Elin_ItemRelocator {
             }
             return false;
         }
+
+        public override ConditionType GetConditionType() => ConditionType.DnaContent;
+        public override string GetUiLabel() {
+            List<string> names = [];
+            foreach (var id in DnaIds) {
+                ConditionRegistry.ParseKeyOp(id, out string key, out string op, out int val);
+                string suffix = op + val;
+                string displayName = key;
+                if (EClass.sources.elements.alias.TryGetValue(key, out var source)) {
+                    displayName = source.GetName();
+                }
+                names.Add(displayName + suffix);
+            }
+            // Truncation Logic (Limit 10)
+            string display = "";
+            int limit = 10;
+            if (names.Count <= limit) {
+                display = string.Join(", ", names);
+            } else {
+                display = string.Join(", ", names.Take(limit)) + " ... (+" + (names.Count - limit) + ")";
+            }
+            string mode = IsAndMode ? " (AND)" : " (OR)";
+            return GetNotPrefix() + RelocatorLang.GetText(RelocatorLang.LangKey.DnaContent) + mode + ": " + display;
+        }
     }
 
 
@@ -243,9 +355,95 @@ namespace Elin_ItemRelocator {
             }
             return Not ? !match : match;
         }
+
+        public override ConditionType GetConditionType() => ConditionType.Enchant;
+        public override string GetUiLabel() {
+            string mode = IsAndMode ? " (AND)" : " (OR)";
+            List<string> displayNames = [];
+            foreach (var rune in Runes) {
+                ConditionRegistry.ParseKeyOp(rune, out string key, out string op, out int val);
+                string suffix = op + val;
+                string dName = key;
+                if (EClass.sources.elements.alias.TryGetValue(key, out var source)) {
+                    dName = source.GetName();
+                }
+                displayNames.Add(dName + suffix);
+            }
+            string display = "";
+            int limit = 10;
+            if (displayNames.Count <= limit) {
+                display = string.Join(", ", displayNames);
+            } else {
+                display = string.Join(", ", displayNames.Take(limit)) + " ... (+" + (displayNames.Count - limit) + ")";
+            }
+            return GetNotPrefix() + RelocatorLang.GetText(RelocatorLang.LangKey.EnchantOr) + mode + ": " + display;
+        }
+    }
+
+    public class ConditionFoodElement : BaseCondition {
+        public HashSet<string> ElementIds = new();
+        public bool IsAndMode; // Added IsAndMode
+
+        public override bool IsMatch(Thing t) {
+            try {
+                // User Requirement: Only match valid food items
+                if (t == null || t.trait is not TraitFood)
+                    return false;
+
+                if (ElementIds.Count == 0)
+                    return false;
+
+                if (t.elements == null)
+                    return false;
+
+                bool match = false;
+                foreach (var id in ElementIds) {
+                    // Using CheckEnchantMatch
+                    if (ConditionRegistry.CheckEnchantMatch(t, id, CheckOp)) {
+                        match = true;
+                        break;
+                    }
+                }
+                return Not ? !match : match;
+            } catch (Exception ex) {
+                Debug.LogError($"[Relocator] Error in FoodElement.IsMatch: {ex.Message}");
+                return false;
+            }
+        }
+        public override ConditionType GetConditionType() => ConditionType.FoodTraits;
+        public override string GetUiLabel() {
+            List<string> displayNames = [];
+            foreach (var id in ElementIds) {
+                // ID文字列からキー、演算子、値を解析 (例: "Strength>=10" -> key="Strength", op=">=", val=10)
+                ConditionRegistry.ParseKeyOp(id, out string key, out string op, out int val);
+
+                // 表示用サフィックスを作成 (例: ">=10")
+                string suffix = op + val;
+
+                // 表示名の解決
+                string dName = key;
+                if (EClass.sources.elements.alias.TryGetValue(key, out var source)) {
+                    dName = source.GetName();
+                }
+                displayNames.Add(dName + suffix);
+            }
+
+            // リストの整形（10件以上は省略）
+            string display = "";
+            int limit = 10;
+            if (displayNames.Count <= limit) {
+                display = string.Join(", ", displayNames);
+            } else {
+                display = string.Join(", ", displayNames.Take(limit)) + " ... (+" + (displayNames.Count - limit) + ")";
+            }
+
+            return GetNotPrefix() + RelocatorLang.GetText(RelocatorLang.LangKey.FoodTraits) + ": " + display;
+        }
     }
     public class ConditionAddButton : BaseCondition {
         public override bool IsMatch(Thing t) => false;
+        public override ConditionType GetConditionType() => ConditionType.AddButton;
+        public override string GetUiLabel() => " + ";
     }
 
     public static class ConditionRegistry {
@@ -373,7 +571,6 @@ namespace Elin_ItemRelocator {
             );
 
             // Enchants / Runes (Ambiguous keys)
-            // Enchants / Runes (Ambiguous keys)
             Register<ConditionEnchantOr>("Enchants",
                 jo => {
                     var list = jo["Enchants"]?.ToObject<List<string>>();
@@ -444,6 +641,22 @@ namespace Elin_ItemRelocator {
                 };
             }
             ));
+
+            Register<ConditionFoodElement>("FoodElementIds",
+                jo => {
+                    var list = jo["FoodElementIds"]?.ToObject<List<string>>();
+                    if (list == null || list.Count == 0)
+                        return null;
+                    return new ConditionFoodElement {
+                        ElementIds = new HashSet<string>(list),
+                        Not = (bool?)jo["Negate"] ?? (bool?)jo["NotFoodElement"] ?? false
+                    };
+                },
+                (jo, c) => {
+                    jo.Add("FoodElementIds", JArray.FromObject(c.ElementIds));
+                    jo.Add("Negate", c.Not);
+                }
+            );
 
 
             Register<ConditionMaterial>("MaterialIds",
@@ -592,19 +805,19 @@ namespace Elin_ItemRelocator {
                 if (string.IsNullOrEmpty(key))
                     return false;
 
+                // Safe debug log (commented out for release to reduce spam, uncomment if needed)
                 // Debug.Log($"[Relocator] CheckEnchantMatch: Item={t?.Name ?? "Null"}, Key={key}, Op={op}, Val={val}");
 
-                if (string.IsNullOrEmpty(key))
-                    return false;
+                // Safe lookup
+                int eleId = -1;
+                if (EClass.sources.elements.alias.ContainsKey(key))
+                    eleId = EClass.sources.elements.alias[key].id;
 
-                // Debug.Log($"[Relocator] CheckEnchantMatch: Item={t?.Name ?? "Null"}, Key={key}, Op={op}, Val={val}");
-
-                // 1. Exact / Alias Match
-                int eleId = EClass.sources.elements.alias.TryGetValue(key, out var source) ? source.id : -1;
                 if (eleId == -1) {
                     var match = EClass.sources.elements.rows.FirstOrDefault(e =>
+                        e != null && (
                         e.GetName().Equals(key, StringComparison.OrdinalIgnoreCase) ||
-                        (e.alias != null && e.alias.Equals(key, StringComparison.OrdinalIgnoreCase))
+                        (e.alias != null && e.alias.Equals(key, StringComparison.OrdinalIgnoreCase)))
                     );
                     if (match != null)
                         eleId = match.id;
@@ -616,10 +829,8 @@ namespace Elin_ItemRelocator {
                     return checkOp(curVal, op, val);
                 }
 
-
             } catch (Exception ex) {
-                Debug.LogError($"[Relocator] Error: {ex.Message}\n{ex.StackTrace}");
-                Msg.Say($"Enchant Filter Error: {ex.Message}");
+                Debug.LogError($"[Relocator] Error CheckEnchantMatch: {ex.Message}\n{ex.StackTrace}");
             }
             return false;
         }
