@@ -501,8 +501,20 @@ namespace Elin_ItemRelocator {
                 if (string.IsNullOrEmpty(row.alias))
                     continue;
 
-                // Check foodEffect
-                if (row.foodEffect == null || row.foodEffect.Length == 0)
+                // Match CraftUtil.IsValidTrait logic for Food
+                // Check noInherit
+                if (row.tag != null && Array.IndexOf(row.tag, "noInherit") != -1)
+                    continue;
+
+                bool isFoodTrait = (row.foodEffect != null && row.foodEffect.Length > 0);
+                bool isTrait = (row.tag != null && Array.IndexOf(row.tag, "trait") != -1);
+
+                // Previously hardcoded encSleep exception, but now relying on generic IsTrait check.
+                // If encSleep is a trait (which it should be if it appears on food), it will pass.
+                // However, user specifically mentioned sleepiness, so we trust IsTrait covers it or it has foodEffect.
+                // If encSleep has neither, it wouldn't appear on food via MixIngredients.
+
+                if (!isFoodTrait && !isTrait)
                     continue;
 
                 string cat = row.category;
@@ -520,12 +532,31 @@ namespace Elin_ItemRelocator {
                 list.Sort((a, b) => a.id - b.id);
 
             var tree = RelocatorTree<object>.Create();
-            tree.SetCaption(RelocatorLang.GetText(RelocatorLang.LangKey.FoodTraits)); // Create this key
+            tree.SetCaption(RelocatorLang.GetText(RelocatorLang.LangKey.FoodTraits));
             tree.SetRoots(activeCats.Cast<object>());
+            tree.DefaultValue = ">0"; // Default
 
             // Add And/Or Toggle
             tree.ShowModeToggle = true;
             tree.IsAndMode = initialAndMode;
+
+            // Set Initial Values (Parse alias>=10 etc)
+            Dictionary<string, string> initialValues = new Dictionary<string, string>();
+            if (initialSelection != null) {
+                foreach (string s in initialSelection) {
+                    ConditionRegistry.ParseKeyOp(s, out string key, out string op, out int val);
+                    initialValues[key] = op + val;
+                    selected.Add(key); // Pre-populate selected set
+                }
+            }
+
+            foreach (var list in map.Values) {
+                foreach (var row in list) {
+                    if (initialValues.ContainsKey(row.alias)) {
+                        tree.SetValue(row, initialValues[row.alias]);
+                    }
+                }
+            }
 
             tree.SetChildren((object obj) => {
                 if (obj is string cat && map.ContainsKey(cat))
@@ -542,6 +573,7 @@ namespace Elin_ItemRelocator {
                 return obj.ToString();
             });
 
+            // Selection is based on toggle
             tree.SetIsSelected((object obj) => {
                 if (obj is SourceElement.Row row)
                     return selected.Contains(row.alias);
@@ -559,7 +591,35 @@ namespace Elin_ItemRelocator {
             });
 
             tree.AddBottomButton("[ OK ]", () => {
-                onConfirm(selected.ToList(), tree.IsAndMode);
+                List<string> result = new List<string>();
+                string[] validOps = [">=", "<=", "!=", ">", "<", "="];
+
+                foreach (var catList in map.Values) {
+                    foreach (var row in catList) {
+                        if (selected.Contains(row.alias)) {
+                            string val = tree.GetValue(row);
+
+                            // Validation
+                            bool valid = false;
+                            foreach (var op in validOps) {
+                                if (val.StartsWith(op)) {
+                                    if (int.TryParse(val.Substring(op.Length), out _)) {
+                                        valid = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!valid) {
+                                // Fallback to >=1 if invalid? Or strictly enforce?
+                                // Enchant picker strictly enforces. Let's do same.
+                                EClass.ui.Say("Invalid format for " + row.GetName() + ": " + val);
+                                return;
+                            }
+                            result.Add(row.alias + val);
+                        }
+                    }
+                }
+                onConfirm(result, tree.IsAndMode);
                 tree.Close();
             }, new Color(0.3f, 0.5f, 0));
 

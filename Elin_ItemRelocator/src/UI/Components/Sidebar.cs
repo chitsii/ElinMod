@@ -82,13 +82,13 @@ namespace Elin_ItemRelocator {
                 if (g.transform.IsChildOf(layer.list.transform))
                     continue;
 
-                // Allow Title/Caption elements to stay visible
-                if (g.gameObject == win.textCaption.gameObject || g.transform.IsChildOf(win.textCaption.transform))
-                    continue;
+                // Allow Title/Caption elements to stay visible check REMOVED
+                // if (g.gameObject == win.textCaption.gameObject || g.transform.IsChildOf(win.textCaption.transform))
+                //    continue;
 
-                // Also keep the caption background if it's a specific object (usually named "Caption" or similar)
-                if (g.name.Contains("Caption"))
-                    continue;
+                // Also keep the caption background if it's a specific object (usually named "Caption" or similar) check REMOVED
+                // if (g.name.Contains("Caption"))
+                //    continue;
 
                 g.enabled = false;
                 g.raycastTarget = false;
@@ -147,13 +147,26 @@ namespace Elin_ItemRelocator {
                         // Force solid block to ensure opacity
                         btnImg.sprite = null;
 
+                        // Set Colors using ColorBlock to handle Highlight/Press states correctly
+                        Color baseColor = new Color(0.8f, 0.7f, 0.5f);
                         if (SkinManager.CurrentColors != null) {
-                            var c = SkinManager.CurrentColors.buttonSide; // Use Side button color
-                            c.a = 1.0f; // Force opaque
-                            btnImg.color = c;
-                        } else {
-                            btnImg.color = new Color(0.8f, 0.7f, 0.5f); // Fallback brown
+                            baseColor = SkinManager.CurrentColors.buttonSide; // Use Side button color
                         }
+                        baseColor.a = 1.0f; // Force opaque
+
+                        btn.transition = Selectable.Transition.ColorTint;
+                        var colors = btn.colors;
+                        colors.normalColor = baseColor;
+                        // Brighten for highlight (1.2x)
+                        colors.highlightedColor = new Color(Mathf.Min(baseColor.r * 1.2f, 1f), Mathf.Min(baseColor.g * 1.2f, 1f), Mathf.Min(baseColor.b * 1.2f, 1f), 1f);
+                        colors.pressedColor = new Color(baseColor.r * 0.8f, baseColor.g * 0.8f, baseColor.b * 0.8f, 1f);
+                        colors.selectedColor = baseColor;
+                        colors.disabledColor = new Color(baseColor.r * 0.5f, baseColor.g * 0.5f, baseColor.b * 0.5f, 0.5f);
+                        colors.colorMultiplier = 1f;
+                        btn.colors = colors;
+
+                        // Reset Image color to white so ColorTint works properly (it multiplies)
+                        btnImg.color = Color.white;
 
                         btnImg.raycastTarget = true;
 
@@ -176,10 +189,6 @@ namespace Elin_ItemRelocator {
                     if (btn.mainText) {
                         btn.mainText.alignment = TextAnchor.MiddleCenter;
                         // Use default text colors if not + button
-                        if (s == "+") {
-                            btn.mainText.color = Color.green;
-                            btn.mainText.fontStyle = FontStyle.Bold;
-                        }
                         btn.mainText.text = s;
 
                         var txtRect = btn.mainText.rectTransform;

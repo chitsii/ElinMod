@@ -325,6 +325,13 @@ namespace Elin_ItemRelocator {
                     presetSidebar.SetItems(RelocatorManager.Instance.GetPresetList());
                     presetSidebar.Refresh();
                 }
+                // Update Preview Header with Sort Mode
+                string sortText = GetSortText(profile.SortMode);
+                // "Details (Default)" looks weird if Default has no text? Default returns "".
+                if (!string.IsNullOrEmpty(sortText))
+                    previewTable.UpdateHeader(3, RelocatorLang.GetText(RelocatorLang.LangKey.Details) + " - " + sortText);
+                else
+                    previewTable.UpdateHeader(3, RelocatorLang.GetText(RelocatorLang.LangKey.Details));
             };
 
             // Restore Footer Buttons ("Settings", "Execute", "Add Rule")
@@ -613,7 +620,9 @@ namespace Elin_ItemRelocator {
                         // Food Power
                         .AddChild(RelocatorLang.GetText(RelocatorLang.LangKey.LabelFoodPower), (g) => {
                             g.AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortAsc), () => { profile.SortMode = RelocationProfile.ResultSortMode.FoodPowerAsc; refresh(); })
-                             .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.FoodPowerDesc; refresh(); });
+                             .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.FoodPowerDesc; refresh(); })
+                             .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortTotalFoodPowerAsc), () => { profile.SortMode = RelocationProfile.ResultSortMode.TotalFoodPowerAsc; refresh(); })
+                             .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SortTotalFoodPowerDesc), () => { profile.SortMode = RelocationProfile.ResultSortMode.TotalFoodPowerDesc; refresh(); });
                         })
 
                         // UID
@@ -694,12 +703,14 @@ namespace Elin_ItemRelocator {
             RelocationProfile.ResultSortMode.UnitWeightDesc => RelocatorLang.GetText(RelocatorLang.LangKey.SortUnitWeightDesc),
             RelocationProfile.ResultSortMode.UidAsc => RelocatorLang.GetText(RelocatorLang.LangKey.SortUidAsc),
             RelocationProfile.ResultSortMode.UidDesc => RelocatorLang.GetText(RelocatorLang.LangKey.SortUidDesc),
-            RelocationProfile.ResultSortMode.GenLvlAsc => RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl) + "(" + RelocatorLang.GetText(RelocatorLang.LangKey.SortAsc) + ")",
-            RelocationProfile.ResultSortMode.GenLvlDesc => RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl) + "(" + RelocatorLang.GetText(RelocatorLang.LangKey.SortDesc) + ")",
-            RelocationProfile.ResultSortMode.DnaAsc => RelocatorLang.GetText(RelocatorLang.LangKey.Dna) + "(" + RelocatorLang.GetText(RelocatorLang.LangKey.SortAsc) + ")",
-            RelocationProfile.ResultSortMode.DnaDesc => RelocatorLang.GetText(RelocatorLang.LangKey.Dna) + "(" + RelocatorLang.GetText(RelocatorLang.LangKey.SortDesc) + ")",
+            RelocationProfile.ResultSortMode.GenLvlAsc => RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl) + " - " + RelocatorLang.GetText(RelocatorLang.LangKey.SortAsc),
+            RelocationProfile.ResultSortMode.GenLvlDesc => RelocatorLang.GetText(RelocatorLang.LangKey.GenLvl) + " - " + RelocatorLang.GetText(RelocatorLang.LangKey.SortDesc),
+            RelocationProfile.ResultSortMode.DnaAsc => RelocatorLang.GetText(RelocatorLang.LangKey.Dna) + " - " + RelocatorLang.GetText(RelocatorLang.LangKey.SortAsc),
+            RelocationProfile.ResultSortMode.DnaDesc => RelocatorLang.GetText(RelocatorLang.LangKey.Dna) + " - " + RelocatorLang.GetText(RelocatorLang.LangKey.SortDesc),
             RelocationProfile.ResultSortMode.FoodPowerAsc => RelocatorLang.GetText(RelocatorLang.LangKey.SortFoodPowerAsc),
             RelocationProfile.ResultSortMode.FoodPowerDesc => RelocatorLang.GetText(RelocatorLang.LangKey.SortFoodPowerDesc),
+            RelocationProfile.ResultSortMode.TotalFoodPowerAsc => RelocatorLang.GetText(RelocatorLang.LangKey.SortTotalFoodPowerAsc),
+            RelocationProfile.ResultSortMode.TotalFoodPowerDesc => RelocatorLang.GetText(RelocatorLang.LangKey.SortTotalFoodPowerDesc),
             _ => mode.ToString()
         };
     }

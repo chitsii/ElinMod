@@ -26,6 +26,7 @@ namespace Elin_ItemRelocator {
             Overwrite, Msg_MigrateConfirm, Msg_MigrateFailed, EnchantOr,
             FoodTraits,
             SortFoodPowerAsc, SortFoodPowerDesc,
+            SortTotalFoodPowerAsc, SortTotalFoodPowerDesc,
             LabelPrice, LabelUid, LabelFoodPower
         }
 
@@ -60,8 +61,8 @@ namespace Elin_ItemRelocator {
             [LangKey.SortMagDesc] = ["Enchant (Strong to Weak)", "エンチャント強度 (強い順)"],
             [LangKey.SortTotalEnchantMagDesc] = ["Sort: ALL Enchant (High to Low)", "総エンチャント強度 (降順)"],
             [LangKey.GenLvl] = ["Gen Lvl", "生成Lv"],
-            [LangKey.Dna] = ["DNA Strength", "DNA消費FP"],
-            [LangKey.DnaContent] = ["DNA Content", "DNA補正内容"],
+            [LangKey.Dna] = ["DNA Strength", "遺伝子消費FP"],
+            [LangKey.DnaContent] = ["DNA Content", "遺伝子補正内容"],
             [LangKey.Not] = ["N", "否"],
             [LangKey.Weight] = ["Weight", "重量"],
             [LangKey.SortWeightAsc] = ["Total Weight (Lighest)", "総重量 (軽い順)"],
@@ -112,6 +113,8 @@ namespace Elin_ItemRelocator {
             [LangKey.FoodTraits] = ["Food Traits", "食材特性"],
             [LangKey.SortFoodPowerAsc] = ["Food Power (Asc)", "食事効果 (昇順)"],
             [LangKey.SortFoodPowerDesc] = ["Food Power (Desc)", "食事効果 (降順)"],
+            [LangKey.SortTotalFoodPowerAsc] = ["Total Food Power (Asc)", "総食事効果 (昇順)"],
+            [LangKey.SortTotalFoodPowerDesc] = ["Total Food Power (Desc)", "総食事効果 (降順)"],
             [LangKey.LabelPrice] = ["Price", "価格"],
             [LangKey.LabelUid] = ["Creation (UID)", "生成順"],
             [LangKey.LabelFoodPower] = ["Food Power", "食事効果"]

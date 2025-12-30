@@ -386,25 +386,38 @@ namespace Elin_ItemRelocator {
 
         public override bool IsMatch(Thing t) {
             try {
-                // User Requirement: Only match valid food items
-                if (t == null || t.trait is not TraitFood)
+                if (t == null || t.elements == null)
+                    return false;
+
+                // Check if it's food or drink (anything that can have food traits)
+                if (!t.IsFood && t.trait is not TraitDrink)
                     return false;
 
                 if (ElementIds.Count == 0)
                     return false;
 
-                if (t.elements == null)
-                    return false;
-
-                bool match = false;
-                foreach (var id in ElementIds) {
-                    // Using CheckEnchantMatch
-                    if (ConditionRegistry.CheckEnchantMatch(t, id, CheckOp)) {
-                        match = true;
-                        break;
+                if (IsAndMode) {
+                    foreach (var id in ElementIds) {
+                        if (!ConditionRegistry.CheckEnchantMatch(t, id, CheckOp))
+                            return Not; // strict AND fail -> !Not if Not is false? No.
+                                        // Standard: (A && B). If Not, !(A && B)
+                                        // If match fails, A && B is false.
+                                        // If Not=false, return false.
+                                        // If Not=true, return true.
+                                        // Waait, "Not" usually negates the whole result.
+                                        // Let's implement standard match bool first.
                     }
+                    // Loop completed = All matched. Match = true.
+                    return !Not;
+                } else {
+                    // OR Mode
+                    foreach (var id in ElementIds) {
+                        if (ConditionRegistry.CheckEnchantMatch(t, id, CheckOp))
+                            return !Not; // Match found. If Not=false, true. If Not=true, false.
+                    }
+                    // None matched. Match = false.
+                    return Not;
                 }
-                return Not ? !match : match;
             } catch (Exception ex) {
                 Debug.LogError($"[Relocator] Error in FoodElement.IsMatch: {ex.Message}");
                 return false;
@@ -416,8 +429,6 @@ namespace Elin_ItemRelocator {
             foreach (var id in ElementIds) {
                 // ID文字列からキー、演算子、値を解析 (例: "Strength>=10" -> key="Strength", op=">=", val=10)
                 ConditionRegistry.ParseKeyOp(id, out string key, out string op, out int val);
-
-                // 表示用サフィックスを作成 (例: ">=10")
                 string suffix = op + val;
 
                 // 表示名の解決
@@ -437,7 +448,8 @@ namespace Elin_ItemRelocator {
                 display = string.Join(", ", displayNames.Take(limit)) + " ... (+" + (displayNames.Count - limit) + ")";
             }
 
-            return GetNotPrefix() + RelocatorLang.GetText(RelocatorLang.LangKey.FoodTraits) + ": " + display;
+            string mode = IsAndMode ? " (AND)" : " (OR)";
+            return GetNotPrefix() + RelocatorLang.GetText(RelocatorLang.LangKey.FoodTraits) + mode + ": " + display;
         }
     }
     public class ConditionAddButton : BaseCondition {
@@ -649,11 +661,13 @@ namespace Elin_ItemRelocator {
                         return null;
                     return new ConditionFoodElement {
                         ElementIds = new HashSet<string>(list),
+                        IsAndMode = (bool?)jo["IsAndMode"] ?? false,
                         Not = (bool?)jo["Negate"] ?? (bool?)jo["NotFoodElement"] ?? false
                     };
                 },
                 (jo, c) => {
                     jo.Add("FoodElementIds", JArray.FromObject(c.ElementIds));
+                    jo.Add("IsAndMode", c.IsAndMode);
                     jo.Add("Negate", c.Not);
                 }
             );
@@ -826,6 +840,14 @@ namespace Elin_ItemRelocator {
                 if (eleId != -1) {
                     // Exact match found: Check only this element
                     int curVal = t.elements.Value(eleId);
+
+                    // Convert raw value to display level (Power) to match User Input and Tooltip (Lv.X)
+                    // Logic based on Card.GetTextTrait: val/10 + (val<0 ? -1 : 1)
+                    if (curVal != 0) {
+                        int lvl = curVal / 10;
+                        curVal = (curVal < 0) ? (lvl - 1) : (lvl + 1);
+                    }
+
                     return checkOp(curVal, op, val);
                 }
 

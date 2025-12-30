@@ -253,13 +253,36 @@ namespace Elin_ItemRelocator {
                     int valB = 0;
                     if (a.elements != null) {
                         foreach (int id in foodIds)
-                            valA += a.elements.Value(id);
+                            valA += GetLevelValue(a.elements.Value(id));
                     }
                     if (b.elements != null) {
                         foreach (int id in foodIds)
-                            valB += b.elements.Value(id);
+                            valB += GetLevelValue(b.elements.Value(id));
                     }
                     if (profile.SortMode == RelocationProfile.ResultSortMode.FoodPowerDesc)
+                        return valB - valA;
+                    else
+                        return valA - valB;
+                });
+                break;
+            case RelocationProfile.ResultSortMode.TotalFoodPowerAsc:
+            case RelocationProfile.ResultSortMode.TotalFoodPowerDesc:
+                matches.Sort((a, b) => {
+                    int valA = 0;
+                    int valB = 0;
+                    if (a.elements is { dict: not null }) {
+                        foreach (var e in a.elements.dict.Values) {
+                            if (e.source.foodEffect != null && e.source.foodEffect.Length > 0)
+                                valA += GetLevelValue(e.Value);
+                        }
+                    }
+                    if (b.elements is { dict: not null }) {
+                        foreach (var e in b.elements.dict.Values) {
+                            if (e.source.foodEffect != null && e.source.foodEffect.Length > 0)
+                                valB += GetLevelValue(e.Value);
+                        }
+                    }
+                    if (profile.SortMode == RelocationProfile.ResultSortMode.TotalFoodPowerDesc)
                         return valB - valA;
                     else
                         return valA - valB;
@@ -268,6 +291,13 @@ namespace Elin_ItemRelocator {
             }
 
             return matches;
+        }
+
+        private int GetLevelValue(int raw) {
+            if (raw == 0)
+                return 0;
+            int lvl = raw / 10;
+            return (raw < 0) ? (lvl - 1) : (lvl + 1);
         }
 
         // Helper to determine if a container is owned by PC (Inventory)
@@ -550,10 +580,34 @@ namespace Elin_ItemRelocator {
                 List<int> fIds = GetTargetFoodElements(profile);
                 int fVal = 0;
                 if (t.elements != null) {
-                    foreach (int id in fIds)
-                        fVal += t.elements.Value(id);
+                    foreach (int id in fIds) {
+                        int raw = t.elements.Value(id);
+                        if (raw != 0) {
+                            // Convert to Level to match filtering/tooltip
+                            int lvl = raw / 10;
+                            fVal += (raw < 0) ? (lvl - 1) : (lvl + 1);
+                        }
+                    }
                 }
-                return "Food Pwr: " + fVal;
+                return "Food Level: " + fVal;
+
+            case RelocationProfile.ResultSortMode.TotalFoodPowerAsc:
+            case RelocationProfile.ResultSortMode.TotalFoodPowerDesc:
+                int totalF = 0;
+                if (t.elements is { dict: not null }) {
+                    foreach (var e in t.elements.dict.Values) {
+                        if (e.source.foodEffect != null && e.source.foodEffect.Length > 0) {
+                            int raw = e.Value;
+                            if (raw != 0) {
+                                int lvl = raw / 10;
+                                totalF += (raw < 0) ? (lvl - 1) : (lvl + 1);
+                            }
+                        }
+                    }
+                }
+                return "Total Level: " + totalF;
+
+
 
             default:
                 string info = "";

@@ -159,7 +159,7 @@ namespace Elin_ItemRelocator {
                         if (SkinManager.CurrentColors != null)
                             hc = SkinManager.CurrentColors.textDefault;
                         t.color = hc;
-                        t.fontStyle = FontStyle.Bold;
+                        t.fontStyle = FontStyle.Normal;
                         t.alignment = TextAnchor.MiddleLeft;
                         t.resizeTextForBestFit = true;
                         t.resizeTextMinSize = 8;
@@ -292,6 +292,29 @@ namespace Elin_ItemRelocator {
 
         public void Refresh() {
             Show();
+        }
+
+        public void UpdateHeader(int columnIndex, string newText) {
+            if (columnIndex < 0 || columnIndex >= columns.Count)
+                return;
+            columns[columnIndex].Header = newText;
+
+            // Update UI if exists
+            if (_layer && _layer.windows.Count > 0) {
+                var headerRow = _layer.list.transform.parent.Find("HeaderRow");
+                if (headerRow) {
+                    // Children of HeaderRow are "Header_" + Title. Wait, we named them "Header_" + col.Header.
+                    // But order matches columns.
+                    // BUT sibling index matches? "HeaderRow" has "Header_..." children.
+                    // Let's rely on child index.
+                    if (columnIndex < headerRow.childCount) {
+                        var cell = headerRow.GetChild(columnIndex);
+                        var t = cell.GetComponent<Text>();
+                        if (t)
+                            t.text = newText;
+                    }
+                }
+            }
         }
     }
 }

@@ -126,7 +126,7 @@ namespace Elin_ItemRelocator {
                          }
                      }, (Dialog.InputType)0);
                  })
-                 .AddButton("DNA Content", () => {
+                 .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.DnaContent), () => {
                      RelocatorPickers.ShowDnaContentPicker(null, (selectedList, isAndMode) => {
                          rule.Conditions.Add(new ConditionDnaContent { DnaIds = new HashSet<string>(selectedList), IsAndMode = isAndMode });
                          refresh();
