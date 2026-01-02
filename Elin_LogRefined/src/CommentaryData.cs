@@ -1,9 +1,194 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace Elin_LogRefined
 {
     public static class CommentaryData
     {
+        private static List<string> _customDamage;
+        private static List<string> _customHeal;
+        private static List<string> _customDebuff;
+        private static bool _initialized = false;
+
+        // 外部ファイルのパス
+        private static string GetCommentaryDir()
+        {
+            return Path.Combine(Path.GetDirectoryName(typeof(CommentaryData).Assembly.Location), "commentary");
+        }
+
+        public static void Initialize()
+        {
+            if (_initialized) return;
+            _initialized = true;
+
+            string dir = GetCommentaryDir();
+            string lang = Lang.langCode?.ToLower() ?? "jp";
+
+            _customDamage = LoadCustomFile(dir, "damage", lang);
+            _customHeal = LoadCustomFile(dir, "heal", lang);
+            _customDebuff = LoadCustomFile(dir, "debuff", lang);
+        }
+
+        private static List<string> LoadCustomFile(string dir, string category, string lang)
+        {
+            // 言語固有のファイル -> フォールバック
+            string[] candidates = new string[]
+            {
+                Path.Combine(dir, $"{category}_{lang}.txt"),
+                Path.Combine(dir, $"{category}.txt")
+            };
+
+            foreach (string path in candidates)
+            {
+                if (File.Exists(path))
+                {
+                    try
+                    {
+                        var lines = File.ReadAllLines(path, System.Text.Encoding.UTF8)
+                            .Where(line => !string.IsNullOrWhiteSpace(line) && !line.TrimStart().StartsWith("#"))
+                            .ToList();
+
+                        if (lines.Count > 0)
+                        {
+                            return lines;
+                        }
+                        else
+                        {
+                            // ファイルは存在するが空またはコメントのみ
+                            ShowWarning($"Commentary file is empty: {Path.GetFileName(path)}");
+                            return null;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        ShowWarning($"Failed to load commentary file: {Path.GetFileName(path)}\n{e.Message}");
+                        return null;
+                    }
+                }
+            }
+            return null;
+        }
+
+        private static void ShowWarning(string message)
+        {
+            // ゲーム内ダイアログで警告表示
+            try
+            {
+                Dialog.Ok(message);
+            }
+            catch
+            {
+                // ダイアログが使えない場合は無視
+            }
+        }
+
+        // 戦闘中かどうかをチェック（combatCount ベース）
+        public static bool IsInCombat()
+        {
+            try
+            {
+                return EClass.pc != null && EClass.pc.combatCount > 0;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static string GetRandomDamage()
+        {
+            Initialize();
+            if (_customDamage != null && _customDamage.Count > 0)
+                return _customDamage.RandomItem();
+
+            if (Lang.langCode == "CN") return Damage_CN.RandomItem();
+            if (Lang.langCode == "EN") return Damage_EN.RandomItem();
+            return Damage_JP.RandomItem();
+        }
+
+        public static string GetRandomHeal()
+        {
+            Initialize();
+            if (_customHeal != null && _customHeal.Count > 0)
+                return _customHeal.RandomItem();
+
+            if (Lang.langCode == "CN") return Heal_CN.RandomItem();
+            if (Lang.langCode == "EN") return Heal_EN.RandomItem();
+            return Heal_JP.RandomItem();
+        }
+
+        public static string GetRandomDebuff()
+        {
+            Initialize();
+            if (_customDebuff != null && _customDebuff.Count > 0)
+                return _customDebuff.RandomItem();
+
+            if (Lang.langCode == "CN") return Debuff_CN.RandomItem();
+            if (Lang.langCode == "EN") return Debuff_EN.RandomItem();
+            return Debuff_JP.RandomItem();
+        }
+
+        // テンプレートファイルを生成
+        public static void GenerateTemplateFiles(bool overwrite)
+        {
+            string dir = GetCommentaryDir();
+
+            try
+            {
+                if (!Directory.Exists(dir))
+                {
+                    Directory.CreateDirectory(dir);
+                }
+
+                WriteTemplateFile(Path.Combine(dir, "damage_jp.txt"), Damage_JP, overwrite);
+                WriteTemplateFile(Path.Combine(dir, "damage_en.txt"), Damage_EN, overwrite);
+                WriteTemplateFile(Path.Combine(dir, "damage_cn.txt"), Damage_CN, overwrite);
+                WriteTemplateFile(Path.Combine(dir, "heal_jp.txt"), Heal_JP, overwrite);
+                WriteTemplateFile(Path.Combine(dir, "heal_en.txt"), Heal_EN, overwrite);
+                WriteTemplateFile(Path.Combine(dir, "heal_cn.txt"), Heal_CN, overwrite);
+                WriteTemplateFile(Path.Combine(dir, "debuff_jp.txt"), Debuff_JP, overwrite);
+                WriteTemplateFile(Path.Combine(dir, "debuff_en.txt"), Debuff_EN, overwrite);
+                WriteTemplateFile(Path.Combine(dir, "debuff_cn.txt"), Debuff_CN, overwrite);
+            }
+            catch (Exception e)
+            {
+                Dialog.Ok("Failed to create template files: " + e.Message);
+            }
+        }
+
+        public static void OpenCommentaryDir()
+        {
+            string dir = GetCommentaryDir();
+            if (Directory.Exists(dir))
+            {
+                System.Diagnostics.Process.Start(dir);
+            }
+            else
+            {
+                Dialog.Ok("Folder not found: " + dir);
+            }
+        }
+
+        private static void WriteTemplateFile(string path, List<string> lines, bool overwrite)
+        {
+            if (File.Exists(path) && !overwrite)
+            {
+                return;
+            }
+
+            string header = "# Commentary lines - one per line\n# Lines starting with # are comments\n\n";
+            File.WriteAllText(path, header + string.Join("\n", lines), System.Text.Encoding.UTF8);
+        }
+
+        // ファイルが存在するかどうか
+        public static bool TemplateFilesExist()
+        {
+            string dir = GetCommentaryDir();
+            return Directory.Exists(dir) && Directory.GetFiles(dir, "*.txt").Length > 0;
+        }
+
         // --- JP Data ---
         public static readonly List<string> Damage_JP = new List<string>
         {
@@ -240,7 +425,6 @@ namespace Elin_LogRefined
             "停不下来！谁也无法阻止这猛攻！"
         };
 
-
         public static readonly List<string> Heal_CN = new List<string>
         {
             "奇迹般的恢复！",
@@ -288,26 +472,5 @@ namespace Elin_LogRefined
             "脚步踉跄了！",
             "这是噩梦！简直像在做噩梦！"
         };
-
-        public static string GetRandomDamage()
-        {
-            if (Lang.langCode == "CN") return Damage_CN.RandomItem();
-            if (Lang.langCode == "EN") return Damage_EN.RandomItem();
-            return Damage_JP.RandomItem();
-        }
-
-        public static string GetRandomHeal()
-        {
-            if (Lang.langCode == "CN") return Heal_CN.RandomItem();
-            if (Lang.langCode == "EN") return Heal_EN.RandomItem();
-            return Heal_JP.RandomItem();
-        }
-
-        public static string GetRandomDebuff()
-        {
-            if (Lang.langCode == "CN") return Debuff_CN.RandomItem();
-            if (Lang.langCode == "EN") return Debuff_EN.RandomItem();
-            return Debuff_JP.RandomItem();
-        }
     }
 }

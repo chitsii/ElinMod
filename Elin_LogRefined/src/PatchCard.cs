@@ -16,7 +16,7 @@ namespace Elin_LogRefined
 
         [HarmonyPatch("DamageHP", new Type[] { typeof(long), typeof(int), typeof(int), typeof(AttackSource), typeof(Card), typeof(bool), typeof(Thing), typeof(Chara) })]
         [HarmonyPostfix]
-        public static void DamageHP_Postfix(Card __instance, int __state)
+        public static void DamageHP_Postfix(Card __instance, int __state, Card origin)
         {
             if (!ModConfig.EnableMod.Value || !ModConfig.ShowDamageLog.Value)
             {
@@ -33,15 +33,18 @@ namespace Elin_LogRefined
 
             if (isRelatedToPC)
             {
+                string targetName = __instance.Name;
+                string attackerName = origin?.Name ?? "???";
+
                 EClass.core.actionsNextFrame.Add(() =>
                 {
                     if (__instance == null) return;
 
                     Msg.SetColor(Msg.colors.Negative);
-                    string text = $"( {RefinedLogUtil.FormatNumber(damage)} {RefinedLogUtil.GetText("damage")} ) ";
-                    Msg.SayRaw(text);
+                    string text = RefinedLogUtil.FormatDamageLog(damage, targetName, attackerName);
+                    Msg.SayRaw(text + " ");
 
-                    if (ModConfig.EnableCommentary.Value)
+                    if (ModConfig.EnableCommentary.Value && CommentaryData.IsInCombat())
                     {
                         Msg.SetColor(Msg.colors.Talk);
                         string comment = CommentaryData.GetRandomDamage();
@@ -77,11 +80,15 @@ namespace Elin_LogRefined
 
             if (isRelatedToPC)
             {
-                Msg.SetColor(Msg.colors.MutateGood);
-                string text = $"( {RefinedLogUtil.FormatNumber(healed)} {RefinedLogUtil.GetText("heal")} ) ";
-                Msg.SayRaw(text);
+                string targetName = __instance.Name;
+                // 回復の場合、originは取得困難なので対象者を使う
+                string healerName = targetName;
 
-                if (ModConfig.EnableCommentary.Value)
+                Msg.SetColor(Msg.colors.MutateGood);
+                string text = RefinedLogUtil.FormatHealLog(healed, targetName, healerName);
+                Msg.SayRaw(text + " ");
+
+                if (ModConfig.EnableCommentary.Value && CommentaryData.IsInCombat())
                 {
                     Msg.SetColor(Msg.colors.Talk);
                     string comment = CommentaryData.GetRandomHeal();

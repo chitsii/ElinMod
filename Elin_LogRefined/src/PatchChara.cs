@@ -51,11 +51,11 @@ namespace Elin_LogRefined
                 detail = sb.ToString();
             }
 
-            // Fallback for ConBuffStats if dict was empty but CalcValue works (shouldn't happen if initialized correctly, but safety)
+            // Fallback for ConBuffStats if dict was empty but CalcValue works
             if (string.IsNullOrEmpty(detail) && __result is ConBuffStats buffStats)
             {
                 int val = buffStats.CalcValue();
-                if (buffStats.isDebuff) val = -val; // Apply negative sign for debuffs as CalcValue returns magnitude
+                if (buffStats.isDebuff) val = -val;
 
                 if (val != 0)
                 {
@@ -72,29 +72,34 @@ namespace Elin_LogRefined
             }
             else
             {
-                // Prepend name if we have details? e.g. "Hero : STR+10"
+                // Prepend name if we have details
                 detail = $"{__result.Name} : {detail}";
             }
 
-            // Determine color based on Buff/Debuff
-            // Use Msg.colors fields
+            string targetName = __instance.Name;
+            // 付与者は取得困難なので、self として扱う
+            string inflicterName = targetName;
+
+            // Determine color and format based on Buff/Debuff
             if (__result.Type == ConditionType.Debuff)
             {
                 Msg.SetColor(Msg.colors.Negative);
+                string text = RefinedLogUtil.FormatDebuffLog(detail, targetName, inflicterName);
+                Msg.SayRaw(text + " ");
+
+                // Apply commentary for Debuffs if enabled
+                if (ModConfig.EnableCommentary.Value && CommentaryData.IsInCombat())
+                {
+                    Msg.SetColor(Msg.colors.Talk);
+                    string comment = CommentaryData.GetRandomDebuff();
+                    Msg.SayRaw("「" + comment + "」");
+                }
             }
             else
             {
                 Msg.SetColor(Msg.colors.MutateGood);
-            }
-
-            Msg.SayRaw($"( {detail} ) ");
-
-            // Apply commentary for Debuffs if enabled
-            if (ModConfig.EnableCommentary.Value && __result.Type == ConditionType.Debuff)
-            {
-                Msg.SetColor(Msg.colors.Talk);
-                string comment = CommentaryData.GetRandomDebuff();
-                Msg.SayRaw("「" + comment + "」");
+                string text = RefinedLogUtil.FormatBuffLog(detail, targetName, inflicterName);
+                Msg.SayRaw(text + " ");
             }
         }
     }
