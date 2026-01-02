@@ -398,21 +398,15 @@ namespace Elin_ItemRelocator {
 
                 if (IsAndMode) {
                     foreach (var id in ElementIds) {
-                        if (!ConditionRegistry.CheckEnchantMatch(t, id, CheckOp))
-                            return Not; // strict AND fail -> !Not if Not is false? No.
-                                        // Standard: (A && B). If Not, !(A && B)
-                                        // If match fails, A && B is false.
-                                        // If Not=false, return false.
-                                        // If Not=true, return true.
-                                        // Waait, "Not" usually negates the whole result.
-                                        // Let's implement standard match bool first.
+                        if (!ConditionRegistry.CheckFoodTraitMatch(t, id, CheckOp))
+                            return Not;
                     }
                     // Loop completed = All matched. Match = true.
                     return !Not;
                 } else {
                     // OR Mode
                     foreach (var id in ElementIds) {
-                        if (ConditionRegistry.CheckEnchantMatch(t, id, CheckOp))
+                        if (ConditionRegistry.CheckFoodTraitMatch(t, id, CheckOp))
                             return !Not; // Match found. If Not=false, true. If Not=true, false.
                     }
                     // None matched. Match = false.
@@ -809,50 +803,68 @@ namespace Elin_ItemRelocator {
             }
         }
 
+        private static int ResolveElementId(string key) {
+            if (EClass.sources.elements.alias.ContainsKey(key))
+                return EClass.sources.elements.alias[key].id;
+
+            var match = EClass.sources.elements.rows.FirstOrDefault(e =>
+                e != null && (
+                e.GetName().Equals(key, StringComparison.OrdinalIgnoreCase) ||
+                (e.alias != null && e.alias.Equals(key, StringComparison.OrdinalIgnoreCase)))
+            );
+            return match?.id ?? -1;
+        }
+
         public static bool CheckEnchantMatch(Thing t, string rune, Func<int, string, int, bool> checkOp) {
             try {
                 if (string.IsNullOrEmpty(rune))
                     return false;
-
                 ParseKeyOp(rune, out string key, out string op, out int val);
-
                 if (string.IsNullOrEmpty(key))
                     return false;
 
-                // Safe debug log (commented out for release to reduce spam, uncomment if needed)
-                // Debug.Log($"[Relocator] CheckEnchantMatch: Item={t?.Name ?? "Null"}, Key={key}, Op={op}, Val={val}");
-
-                // Safe lookup
-                int eleId = -1;
-                if (EClass.sources.elements.alias.ContainsKey(key))
-                    eleId = EClass.sources.elements.alias[key].id;
-
-                if (eleId == -1) {
-                    var match = EClass.sources.elements.rows.FirstOrDefault(e =>
-                        e != null && (
-                        e.GetName().Equals(key, StringComparison.OrdinalIgnoreCase) ||
-                        (e.alias != null && e.alias.Equals(key, StringComparison.OrdinalIgnoreCase)))
-                    );
-                    if (match != null)
-                        eleId = match.id;
-                }
-
+                int eleId = ResolveElementId(key);
                 if (eleId != -1) {
-                    // Exact match found: Check only this element
                     int curVal = t.elements.Value(eleId);
 
-                    // Convert raw value to display level (Power) to match User Input and Tooltip (Lv.X)
+                    // Implicit check: 0 value means enchant/trait is missing.
+                    if (curVal == 0)
+                        return false;
+
+                    // Enchantment: Raw value comparison
+                    return checkOp(curVal, op, val);
+                }
+            } catch (Exception ex) {
+                Debug.LogError($"[Relocator] Error CheckEnchantMatch: {ex.Message}");
+            }
+            return false;
+        }
+
+        public static bool CheckFoodTraitMatch(Thing t, string rune, Func<int, string, int, bool> checkOp) {
+            try {
+                if (string.IsNullOrEmpty(rune))
+                    return false;
+                ParseKeyOp(rune, out string key, out string op, out int val);
+                if (string.IsNullOrEmpty(key))
+                    return false;
+
+                int eleId = ResolveElementId(key);
+                if (eleId != -1) {
+                    int curVal = t.elements.Value(eleId);
+
+                    // Implicit check: 0 value means trait is missing.
+                    if (curVal == 0)
+                        return false;
+
+                    // Food Trait: Convert to Level (Lv.X)
                     // Logic based on Card.GetTextTrait: val/10 + (val<0 ? -1 : 1)
-                    if (curVal != 0) {
-                        int lvl = curVal / 10;
-                        curVal = (curVal < 0) ? (lvl - 1) : (lvl + 1);
-                    }
+                    int lvl = curVal / 10;
+                    curVal = (curVal < 0) ? (lvl - 1) : (lvl + 1);
 
                     return checkOp(curVal, op, val);
                 }
-
             } catch (Exception ex) {
-                Debug.LogError($"[Relocator] Error CheckEnchantMatch: {ex.Message}\n{ex.StackTrace}");
+                Debug.LogError($"[Relocator] Error CheckFoodTraitMatch: {ex.Message}");
             }
             return false;
         }
