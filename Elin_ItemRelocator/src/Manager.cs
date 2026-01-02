@@ -1,11 +1,23 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+
 using Newtonsoft.Json;
 using UnityEngine;
-using System.Linq;
 
 namespace Elin_ItemRelocator {
+    // Candidate フラグ定義
+    public static class CF {
+        public const byte IsPCOwned = 1 << 0;     // PC所有アイテムか
+        public const byte IsRelocatable = 1 << 1; // 基本的な移動可能条件を満たしているか
+    }
+
+    // 軽量な候補構造体
+    public struct Candidate {
+        public Thing Thing;
+        public byte Flags;
+    }
+
     public class RelocatorManager : Singleton<RelocatorManager> {
         public Dictionary<string, RelocationProfile> Profiles = [];
         public const int CurrentProfileVersion = 1;
@@ -24,7 +36,7 @@ namespace Elin_ItemRelocator {
         // Runtime-only profile retrieval
         public RelocationProfile GetProfile(Thing container) {
             if (container is null)
-                return new(); // Safe fallback
+                return new();
 
             string key = GetProfileKey(container);
 
@@ -46,126 +58,214 @@ namespace Elin_ItemRelocator {
             return string.Format("{0}_{1}", Game.id, container.uid);
         }
 
-        private List<Thing> cachedCandidates;
-
+        // ===== 最適化: Candidate構造体リストとHashSet再利用 =====
+        private List<Candidate> _cachedCandidates = new();
+        private readonly HashSet<Thing> _seen = new();
+        private readonly HashSet<Thing> _hotbarPool = new();
 
         public void BuildCache(RelocationProfile profile, Thing container) {
-            // Master Cache Strategy:
-            // ALWAYS gather candidates as if Scope is 'Both' (Inventory + Zone)
-            // This allows us to switch scopes dynamically without rebuilding cache.
+            _cachedCandidates.Clear();
+            _seen.Clear();
 
-            // Note: GatherCandidates ignores 'profile.Scope' if we manually aggregate?
-            // GatherCandidates uses profile.Scope internally! We must trick it or manually call.
+            // 事前計算: Container側の判定
+            bool destIsPC = IsPCOwned(container);
+            bool destIsToolbelt = container.trait is TraitToolBelt;
+            bool destIsLocked = container.c_lockLv != 0;
+            bool destIsNPC = container.isNPCProperty;
 
-            // Manually gather BOTH scopes
-            HashSet<Thing> raw = [];
+            // Early exit: 移動不可なコンテナ
+            if (destIsToolbelt || destIsLocked || destIsNPC)
+                return;
 
-            // 1. Inventory
-            // Actually, GatherCandidates implementation (not shown yet) likely depends on profile.
-            // Let's implement GatherCandidates logic directly or assume we can pass a modified profile.
-            // Modifying profile is risky if referenced elsewhere.
-            // Let's create a temp profile copy or just call GatherCandidates twice?
+            // GatherCandidates を直接インライン展開して高速化
+            // Inventory Scope
+            GatherFromContainer(EClass.pc.things, container, destIsPC, destIsNPC);
 
-            // Simplified: GatherCandidates iterates based on Scope.
-            // We want 'Both', and we want to include hotbar/equipped items initially (filtered later).
-            var tempProfile = new RelocationProfile() {
-                Scope = RelocationProfile.FilterScope.Both
-            };
-            var allCandidates = GatherCandidates(tempProfile, container);
-
-            cachedCandidates = new List<Thing>();
-            var seen = new HashSet<Thing>();
-            foreach (var t in allCandidates) {
-                if (!seen.Add(t))
+            // Body Slots (equipped containers)
+            var slots = EClass.pc.body.slots;
+            for (int i = 0; i < slots.Count; i++) {
+                var slot = slots[i];
+                if (slot.thing is null || !slot.thing.IsContainer || slot.thing.things.Count == 0)
                     continue;
-                // Use comprehensive game logic validation
-                if (IsRelocatableCandidate(t, container)) {
-                    cachedCandidates.Add(t);
+                if (slot.thing == container)
+                    continue;
+                GatherFromContainer(slot.thing.things, container, destIsPC, destIsNPC);
+            }
+
+            // Zone Scope
+            GatherFromContainer(EClass._map.things, container, destIsPC, destIsNPC, includeInstalledChildren: true);
+        }
+
+        private void GatherFromContainer(ThingContainer things, Thing container, bool destIsPC, bool destIsNPC, bool includeInstalledChildren = false) {
+            for (int i = 0; i < things.Count; i++) {
+                var t = things[i];
+                if (t == container)
+                    continue;
+                TryAddCandidate(t, container, destIsPC, destIsNPC);
+
+                // Recurse into containers
+                bool recurse = t.IsContainer && t.things is { Count: > 0 };
+                if (includeInstalledChildren)
+                    recurse = recurse && t.placeState == PlaceState.installed;
+
+                if (recurse) {
+                    for (int j = 0; j < t.things.Count; j++) {
+                        var child = t.things[j];
+                        if (child == container)
+                            continue;
+                        TryAddCandidate(child, container, destIsPC, destIsNPC);
+                    }
                 }
             }
-            // Hotbar items are INCLUDED in cache (filtered dynamic)
+        }
+
+        // Overload for List<Thing> (e.g., EClass._map.things)
+        private void GatherFromContainer(List<Thing> things, Thing container, bool destIsPC, bool destIsNPC, bool includeInstalledChildren = false) {
+            for (int i = 0; i < things.Count; i++) {
+                var t = things[i];
+                if (t == container)
+                    continue;
+                TryAddCandidate(t, container, destIsPC, destIsNPC);
+
+                // Recurse into containers
+                bool recurse = t.IsContainer && t.things is { Count: > 0 };
+                if (includeInstalledChildren)
+                    recurse = recurse && t.placeState == PlaceState.installed;
+
+                if (recurse) {
+                    for (int j = 0; j < t.things.Count; j++) {
+                        var child = t.things[j];
+                        if (child == container)
+                            continue;
+                        TryAddCandidate(child, container, destIsPC, destIsNPC);
+                    }
+                }
+            }
+        }
+
+        private void TryAddCandidate(Thing t, Thing container, bool destIsPC, bool destIsNPC) {
+            // Deduplication
+            if (!_seen.Add(t))
+                return;
+
+            // 安価なチェックを先頭に
+            if (t.isDestroyed)
+                return;
+            if (t.c_lockedHard)
+                return;
+            if (t.c_isImportant)
+                return;
+            if (t.placeState == PlaceState.installed)
+                return;
+
+            // 型判定と再帰は後
+            if (t.trait is TraitToolBelt)
+                return;
+            if (t.trait is TraitAbility && !destIsPC)
+                return;
+            if (!t.trait.CanBeDropped)
+                return;
+            if (t.isEquipped && t.IsCursed)
+                return;
+            if (t.IsContainer && t.things.Count > 0 && !destIsPC)
+                return;
+
+            if (!destIsPC) {
+                if (t.id == "money")
+                    return;
+                if (t.isGifted || t.isNPCProperty)
+                    return;
+            }
+
+            // フラグ計算: GetRootCard() は1回だけ
+            bool tOwned = t.GetRootCard() == EClass.pc;
+
+            _cachedCandidates.Add(new Candidate {
+                Thing = t,
+                Flags = (byte)((tOwned ? CF.IsPCOwned : 0) | CF.IsRelocatable)
+            });
         }
 
         public void ClearCache() {
-            cachedCandidates = null;
+            _cachedCandidates.Clear();
         }
 
         public IEnumerable<Thing> GetMatches(Thing container, int searchLimit = -1) {
             var profile = GetProfile(container);
             if (profile is null || !profile.Enabled)
-                return [];
+                return Array.Empty<Thing>();
 
             // Ensure Cache Exists
-            if (cachedCandidates == null) {
+            if (_cachedCandidates.Count == 0) {
                 BuildCache(profile, container);
             }
 
-            // Identify Hotbar Items (Dynamic Calculation or Cache?)
-            // If checking every frame, calculating hotbar set is cheap enough (few items).
-            HashSet<Thing> hotbarItems = [];
-            // Always calculate to ensure safety even if hotbar changes.
-            foreach (var bar in EClass.player.hotbars.bars) {
+            // ホットバーアイテムを再利用HashSetに収集
+            _hotbarPool.Clear();
+            var bars = EClass.player.hotbars.bars;
+            for (int b = 0; b < bars.Length; b++) {
+                var bar = bars[b];
                 if (bar is null)
                     continue;
-                foreach (var page in bar.pages) {
-                    foreach (var item in page.items) {
+                var pages = bar.pages;
+                for (int p = 0; p < pages.Count; p++) {
+                    var items = pages[p].items;
+                    for (int i = 0; i < items.Count; i++) {
+                        var item = items[i];
                         if (item is { Thing: not null })
-                            hotbarItems.Add(item.Thing);
+                            _hotbarPool.Add(item.Thing);
                     }
                 }
             }
 
-            List<Thing> matches = [];
+            List<Thing> matches = new();
+            var scope = profile.Scope;
+            var rules = profile.Rules;
+            int ruleCount = rules.Count;
+            if (ruleCount == 0)
+                return matches;
 
-            // Iterate Master Cache
-            foreach (var t in cachedCandidates) {
-                // Dynamic Filter 1: Scope
-                // Check if t belongs to Inventory or Zone based on profile.Scope
-                // Actually t.Root works well.
-                // Inventory items: Root is PC's thing container.
-                // Zone items: Root is Zone's map thing container/floor?
+            // 高速イテレーション
+            for (int i = 0; i < _cachedCandidates.Count; i++) {
+                var c = _cachedCandidates[i];
 
-                // Let's use simpler check:
-                // GatherCandidates logic for Inventory uses 'EClass.pc.things'.
-                // GatherCandidates logic for Zone uses 'EClass._map.things'.
-
-                // If profile.Scope is Inventory, we need to verify t is in Inventory.
-                // If profile.Scope is Zone, verify t is in Zone.
-                // If Both, accept all.
-
-                if (profile.Scope == RelocationProfile.FilterScope.Inventory) {
-                    if (!IsPCOwned(t))
-                        continue;
-                } else if (profile.Scope == RelocationProfile.FilterScope.ZoneOnly) {
-                    if (IsPCOwned(t))
-                        continue;
-                }
-
-                // Dynamic Filter 2: Hotbar (Always Protect Parents)
-                if (hotbarItems.Contains(t))
+                // コンテナを除外
+                if (c.Thing.IsContainer)
                     continue;
 
-                // Dynamic Filter 3: Rules
-                // Performance Limit Check (Pre-rule or Post-rule? Usually Post-match)
+                // スコープ判定 (高速: ビット演算)
+                bool isOwned = (c.Flags & CF.IsPCOwned) != 0;
+                if (scope == RelocationProfile.FilterScope.Inventory && !isOwned)
+                    continue;
+                if (scope == RelocationProfile.FilterScope.ZoneOnly && isOwned)
+                    continue;
+
+                // ホットバー判定 (高速: HashSet参照)
+                if (_hotbarPool.Contains(c.Thing))
+                    continue;
+
+                // Limit Check
                 if (searchLimit > 0 && matches.Count >= searchLimit)
                     break;
 
-                // Rule Check
-                if (profile.Rules.Count == 0)
-                    continue;
-
+                // ルール判定 (最も重い処理)
                 bool match = false;
-                foreach (var rule in profile.Rules) {
-                    if (rule.IsMatch(t)) {
+                for (int r = 0; r < ruleCount; r++) {
+                    if (rules[r].IsMatch(c.Thing)) {
                         match = true;
                         break;
                     }
                 }
                 if (match)
-                    matches.Add(t);
+                    matches.Add(c.Thing);
             }
 
             // Apply Sorting
+            ApplySorting(matches, profile);
+            return matches;
+        }
+
+        private void ApplySorting(List<Thing> matches, RelocationProfile profile) {
             switch (profile.SortMode) {
             case RelocationProfile.ResultSortMode.PriceAsc:
                 matches.Sort((a, b) => a.GetPrice() - b.GetPrice());
@@ -175,44 +275,30 @@ namespace Elin_ItemRelocator {
                 break;
             case RelocationProfile.ResultSortMode.TotalEnchantMagDesc:
                 matches.Sort((a, b) => {
-                    // Check common properties first to avoid calculation if possible? No, sockets are small list.
-                    // Just sum up
-                    int valA = 0;
-                    if (a.elements != null && a.elements.dict != null) {
-                        foreach (var e in a.elements.dict.Values) {
-                            if (e.Value > 0) // Exclude skills linking to attributes to avoid double counting? No, keep simple.
+                    int valA = 0, valB = 0;
+                    if (a.elements?.dict != null)
+                        foreach (var e in a.elements.dict.Values)
+                            if (e.Value > 0)
                                 valA += e.Value;
-                        }
-                    }
-
-                    int valB = 0;
-                    if (b.elements != null && b.elements.dict != null) {
-                        foreach (var e in b.elements.dict.Values) {
+                    if (b.elements?.dict != null)
+                        foreach (var e in b.elements.dict.Values)
                             if (e.Value > 0)
                                 valB += e.Value;
-                        }
-                    }
                     return valB - valA;
                 });
                 break;
-
             case RelocationProfile.ResultSortMode.EnchantMagAsc:
             case RelocationProfile.ResultSortMode.EnchantMagDesc:
-                // Identify target element IDs from rules
                 List<int> targetEleIds = GetTargetEnchantIDs(profile);
-
-                // Sort Function
                 matches.Sort((a, b) => {
-                    int valA = 0;
-                    int valB = 0;
-                    foreach (int id in targetEleIds) {
+                    int valA = 0, valB = 0;
+                    for (int i = 0; i < targetEleIds.Count; i++) {
+                        int id = targetEleIds[i];
                         valA += a.elements.Value(id);
                         valB += b.elements.Value(id);
                     }
-                    if (profile.SortMode == RelocationProfile.ResultSortMode.EnchantMagDesc)
-                        return valB - valA;
-                    else
-                        return valA - valB;
+                    return profile.SortMode == RelocationProfile.ResultSortMode.EnchantMagDesc
+                        ? valB - valA : valA - valB;
                 });
                 break;
             case RelocationProfile.ResultSortMode.TotalWeightAsc:
@@ -249,48 +335,34 @@ namespace Elin_ItemRelocator {
             case RelocationProfile.ResultSortMode.FoodPowerDesc:
                 List<int> foodIds = GetTargetFoodElements(profile);
                 matches.Sort((a, b) => {
-                    int valA = 0;
-                    int valB = 0;
-                    if (a.elements != null) {
-                        foreach (int id in foodIds)
-                            valA += GetLevelValue(a.elements.Value(id));
-                    }
-                    if (b.elements != null) {
-                        foreach (int id in foodIds)
-                            valB += GetLevelValue(b.elements.Value(id));
-                    }
-                    if (profile.SortMode == RelocationProfile.ResultSortMode.FoodPowerDesc)
-                        return valB - valA;
-                    else
-                        return valA - valB;
+                    int valA = 0, valB = 0;
+                    if (a.elements != null)
+                        for (int i = 0; i < foodIds.Count; i++)
+                            valA += GetLevelValue(a.elements.Value(foodIds[i]));
+                    if (b.elements != null)
+                        for (int i = 0; i < foodIds.Count; i++)
+                            valB += GetLevelValue(b.elements.Value(foodIds[i]));
+                    return profile.SortMode == RelocationProfile.ResultSortMode.FoodPowerDesc
+                        ? valB - valA : valA - valB;
                 });
                 break;
             case RelocationProfile.ResultSortMode.TotalFoodPowerAsc:
             case RelocationProfile.ResultSortMode.TotalFoodPowerDesc:
                 matches.Sort((a, b) => {
-                    int valA = 0;
-                    int valB = 0;
-                    if (a.elements is { dict: not null }) {
-                        foreach (var e in a.elements.dict.Values) {
-                            if (e.source.foodEffect != null && e.source.foodEffect.Length > 0)
+                    int valA = 0, valB = 0;
+                    if (a.elements?.dict != null)
+                        foreach (var e in a.elements.dict.Values)
+                            if (e.source.foodEffect is { Length: > 0 })
                                 valA += GetLevelValue(e.Value);
-                        }
-                    }
-                    if (b.elements is { dict: not null }) {
-                        foreach (var e in b.elements.dict.Values) {
-                            if (e.source.foodEffect != null && e.source.foodEffect.Length > 0)
+                    if (b.elements?.dict != null)
+                        foreach (var e in b.elements.dict.Values)
+                            if (e.source.foodEffect is { Length: > 0 })
                                 valB += GetLevelValue(e.Value);
-                        }
-                    }
-                    if (profile.SortMode == RelocationProfile.ResultSortMode.TotalFoodPowerDesc)
-                        return valB - valA;
-                    else
-                        return valA - valB;
+                    return profile.SortMode == RelocationProfile.ResultSortMode.TotalFoodPowerDesc
+                        ? valB - valA : valA - valB;
                 });
                 break;
             }
-
-            return matches;
         }
 
         private int GetLevelValue(int raw) {
@@ -300,100 +372,33 @@ namespace Elin_ItemRelocator {
             return (raw < 0) ? (lvl - 1) : (lvl + 1);
         }
 
-        // Helper to determine if a container is owned by PC (Inventory)
         public bool IsPCOwned(Thing t) {
             if (t == null)
                 return false;
-            // Use rigorous game API: GetRootCard()
-            // If the root owner is the PC, it is in player inventory.
             return t.GetRootCard() == EClass.pc;
         }
 
-        public bool IsRelocatableCandidate(Thing t, Thing container) {
-            // Basic Static Checks
-            if (t.isDestroyed || t.c_lockedHard)
-                return false;
-            if (t.c_isImportant)
-                return false;
-            if (t.placeState == PlaceState.installed)
-                return false;
-
-            // CRITICAL SAFETY: Prevent moving the Toolbelt itself (which might be in inventory/slots)
-            // Moving internal/system containers can corrupt save data.
-            if (t.trait is TraitToolBelt)
-                return false;
-
-            // -- Game Logic Checks (InvOwner.cs) --
-            bool destIsPC = IsPCOwned(container);
-
-            // 1. Toolbelt check (InvOwner.cs:359)
-            if (container.trait is TraitToolBelt)
-                return false;
-
-            // 2. Guide check (Skip)
-
-            // 3. Lock check (InvOwner.cs:367)
-            if (container.c_lockLv != 0)
-                return false;
-
-            // 4. Ability check (InvOwner.cs:371)
-            // "Skills cannot be put in shipping bin" (Ability -> Non-PC)
-            if (t.trait is TraitAbility && !destIsPC)
-                return false;
-
-            // 5. AllowTransfer check (InvOwner.cs:379)
-            if (container.isNPCProperty)
-                return false;
-
-            // 6. Non-empty Container check (InvOwner.cs:383)
-            if (t.IsContainer && t.things.Count > 0 && !destIsPC)
-                return false;
-
-            // 7. AllowHold Logic (InvOwner.cs:639)
-            if (!t.trait.CanBeDropped)
-                return false;
-            if (t.isEquipped && t.IsCursed)
-                return false;
-
-            // Destination is NOT PC checks
-            if (!destIsPC) {
-                if (t.id == "money")
-                    return false;
-                if (t.isGifted || t.isNPCProperty)
-                    return false;
-            }
-
-            return true;
-        }
-
         public List<int> GetTargetEnchantIDs(RelocationProfile profile) {
-            List<int> targetEleIds = [];
-            foreach (var r in profile.Rules) {
+            List<int> targetEleIds = new();
+            var rules = profile.Rules;
+            for (int ri = 0; ri < rules.Count; ri++) {
+                var r = rules[ri];
                 if (!r.Enabled)
                     continue;
-                foreach (var cond in r.Conditions) {
-                    List<string> runes = null;
-                    if (cond is ConditionEnchantOr ceo)
-                        runes = ceo.Runes;
-
-                    if (runes != null) {
-                        foreach (var term in runes) {
-                            if (string.IsNullOrEmpty(term))
-                                continue;
-
-                            string key = term.TrimStart('@');
-                            string[] ops = [">=", "<=", "!=", ">", "<", "="];
-                            foreach (var o in ops) {
-                                int idx = key.IndexOf(o);
-                                if (idx > 0) { key = key.Substring(0, idx).Trim(); break; }
-                            }
-
-                            var sourceEle = EClass.sources.elements.map.Values.FirstOrDefault(e =>
-                                (e.alias is not null && e.alias.Equals(key, StringComparison.OrdinalIgnoreCase)) ||
-                                (e.GetName().Equals(key, StringComparison.OrdinalIgnoreCase))
-                            );
-                            if (sourceEle is not null && !targetEleIds.Contains(sourceEle.id))
-                                targetEleIds.Add(sourceEle.id);
+                var conditions = r.Conditions;
+                for (int ci = 0; ci < conditions.Count; ci++) {
+                    var cond = conditions[ci];
+                    if (cond is not ConditionEnchantOr ceo)
+                        continue;
+                    var runes = ceo.Runes;
+                    for (int ti = 0; ti < runes.Count; ti++) {
+                        var term = runes[ti];
+                        if (string.IsNullOrEmpty(term))
+                            continue;
+                        ConditionRegistry.ParseKeyOp(term, out string key, out _, out _);
+                        if (EClass.sources.elements.alias.TryGetValue(key, out var source)) {
+                            if (!targetEleIds.Contains(source.id))
+                                targetEleIds.Add(source.id);
                         }
                     }
                 }
@@ -402,18 +407,23 @@ namespace Elin_ItemRelocator {
         }
 
         public List<int> GetTargetFoodElements(RelocationProfile profile) {
-            List<int> ids = [];
-            foreach (var r in profile.Rules) {
+            List<int> ids = new();
+            var rules = profile.Rules;
+            for (int ri = 0; ri < rules.Count; ri++) {
+                var r = rules[ri];
                 if (!r.Enabled)
                     continue;
-                foreach (var cond in r.Conditions) {
-                    if (cond is ConditionFoodElement cfe) {
-                        foreach (var idStr in cfe.ElementIds) {
-                            ConditionRegistry.ParseKeyOp(idStr, out string key, out _, out _);
-                            if (EClass.sources.elements.alias.TryGetValue(key, out var source)) {
-                                if (!ids.Contains(source.id))
-                                    ids.Add(source.id);
-                            }
+                var conditions = r.Conditions;
+                for (int ci = 0; ci < conditions.Count; ci++) {
+                    var cond = conditions[ci];
+                    if (cond is not ConditionFoodElement cfe)
+                        continue;
+                    var elementIds = cfe.ElementIds;
+                    foreach (var idStr in elementIds) {
+                        ConditionRegistry.ParseKeyOp(idStr, out string key, out _, out _);
+                        if (EClass.sources.elements.alias.TryGetValue(key, out var source)) {
+                            if (!ids.Contains(source.id))
+                                ids.Add(source.id);
                         }
                     }
                 }
@@ -421,17 +431,12 @@ namespace Elin_ItemRelocator {
             return ids;
         }
 
-
-
-
-
         public void ExecuteRelocation(Thing container) {
-            // Unlimited search for execution
-            var matches = GetMatches(container, -1).ToList();
+            var matches = new List<Thing>(GetMatches(container, -1));
             int count = 0;
 
-            foreach (var t in matches) {
-                // Double check state
+            for (int i = 0; i < matches.Count; i++) {
+                var t = matches[i];
                 if (t.isDestroyed || t.c_isImportant || t.placeState == PlaceState.installed)
                     continue;
 
@@ -456,11 +461,28 @@ namespace Elin_ItemRelocator {
             if (t.isDestroyed || t.c_isImportant)
                 return;
 
-            // Safety Check
-            if (!IsRelocatableCandidate(t, container)) {
+            // 事前判定
+            bool destIsPC = IsPCOwned(container);
+            if (container.trait is TraitToolBelt || container.c_lockLv != 0 || container.isNPCProperty) {
                 EClass.pc.PlaySound("beep");
                 return;
             }
+
+            // アイテム側の判定
+            if (t.c_lockedHard || t.placeState == PlaceState.installed)
+                return;
+            if (t.trait is TraitToolBelt)
+                return;
+            if (t.trait is TraitAbility && !destIsPC)
+                return;
+            if (!t.trait.CanBeDropped)
+                return;
+            if (t.isEquipped && t.IsCursed)
+                return;
+            if (t.IsContainer && t.things.Count > 0 && !destIsPC)
+                return;
+            if (!destIsPC && (t.id == "money" || t.isGifted || t.isNPCProperty))
+                return;
 
             if (container.things.IsFull()) {
                 Msg.Say(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_ContainerFull));
@@ -472,66 +494,7 @@ namespace Elin_ItemRelocator {
             Msg.Say(string.Format(RelocatorLang.GetText(RelocatorLang.LangKey.Msg_Moved), t.Name));
         }
 
-        private IEnumerable<Thing> GatherCandidates(RelocationProfile profile, Thing container) {
-            // Inventory Scope
-            if (profile.Scope != RelocationProfile.FilterScope.ZoneOnly) {
-                foreach (var t in EClass.pc.things) {
-                    if (t == container)
-                        continue;
-                    yield return t;
-
-                    if (t.IsContainer && t.things is { Count: > 0 }) {
-                        foreach (var child in t.things) {
-                            if (child == container)
-                                continue;
-                            yield return child;
-                        }
-                    }
-                }
-
-                // Hotbar items are referenced in body slots or inventory
-                foreach (var slot in EClass.pc.body.slots) {
-                    if (slot.thing is null || !slot.thing.IsContainer || slot.thing.things.Count == 0)
-                        continue;
-                    if (slot.thing == container)
-                        continue;
-
-                    foreach (var t in slot.thing.things) {
-                        if (t == container)
-                            continue;
-                        yield return t;
-
-                        if (t.IsContainer && t.things is { Count: > 0 }) {
-                            foreach (var child in t.things) {
-                                if (child == container)
-                                    continue;
-                                yield return child;
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Zone Scope
-            if (profile.Scope is RelocationProfile.FilterScope.Both or RelocationProfile.FilterScope.ZoneOnly) {
-                foreach (var t in EClass._map.things) {
-                    if (t == container)
-                        continue;
-                    yield return t;
-
-                    // Recurse into installed containers
-                    if (t.placeState == PlaceState.installed && t.IsContainer && t.things is { Count: > 0 }) {
-                        foreach (var child in t.things) {
-                            if (child == container)
-                                continue;
-                            yield return child;
-                        }
-                    }
-                }
-            }
-        }
         public string GetDisplayValue(Thing t, RelocationProfile profile) {
-            // Sorting Mode Display
             switch (profile.SortMode) {
             case RelocationProfile.ResultSortMode.PriceAsc:
             case RelocationProfile.ResultSortMode.PriceDesc:
@@ -539,76 +502,58 @@ namespace Elin_ItemRelocator {
             case RelocationProfile.ResultSortMode.TotalWeightAsc:
             case RelocationProfile.ResultSortMode.TotalWeightDesc:
                 return (t.ChildrenAndSelfWeight * t.Num * 0.001f).ToString("0.0") + "s";
-
             case RelocationProfile.ResultSortMode.UnitWeightAsc:
             case RelocationProfile.ResultSortMode.UnitWeightDesc:
                 return (t.SelfWeight * 0.001f).ToString("0.0") + "s";
-
             case RelocationProfile.ResultSortMode.DnaAsc:
             case RelocationProfile.ResultSortMode.DnaDesc:
                 return (t.c_DNA?.cost ?? 0).ToString();
-
             case RelocationProfile.ResultSortMode.TotalEnchantMagDesc:
                 int totalMag = 0;
-                if (t.elements != null && t.elements.dict != null) {
-                    foreach (var e in t.elements.dict.Values) {
+                if (t.elements?.dict != null)
+                    foreach (var e in t.elements.dict.Values)
                         if (e.Value > 0)
                             totalMag += e.Value;
-                    }
-                }
                 return "Total Mag: " + totalMag;
-
             case RelocationProfile.ResultSortMode.EnchantMagAsc:
             case RelocationProfile.ResultSortMode.EnchantMagDesc:
                 List<int> targetEleIds = GetTargetEnchantIDs(profile);
                 int val = 0;
-                foreach (int id in targetEleIds) {
-                    val += t.elements.Value(id);
-                }
+                for (int i = 0; i < targetEleIds.Count; i++)
+                    val += t.elements.Value(targetEleIds[i]);
                 return "Mag: " + val;
-
             case RelocationProfile.ResultSortMode.UidAsc:
             case RelocationProfile.ResultSortMode.UidDesc:
                 return "ID: " + t.uid.ToString();
-
             case RelocationProfile.ResultSortMode.GenLvlAsc:
             case RelocationProfile.ResultSortMode.GenLvlDesc:
                 return "Lv " + t.genLv.ToString();
-
             case RelocationProfile.ResultSortMode.FoodPowerAsc:
             case RelocationProfile.ResultSortMode.FoodPowerDesc:
                 List<int> fIds = GetTargetFoodElements(profile);
                 int fVal = 0;
-                if (t.elements != null) {
-                    foreach (int id in fIds) {
-                        int raw = t.elements.Value(id);
+                if (t.elements != null)
+                    for (int i = 0; i < fIds.Count; i++) {
+                        int raw = t.elements.Value(fIds[i]);
                         if (raw != 0) {
-                            // Convert to Level to match filtering/tooltip
                             int lvl = raw / 10;
                             fVal += (raw < 0) ? (lvl - 1) : (lvl + 1);
                         }
                     }
-                }
                 return "Food Level: " + fVal;
-
             case RelocationProfile.ResultSortMode.TotalFoodPowerAsc:
             case RelocationProfile.ResultSortMode.TotalFoodPowerDesc:
                 int totalF = 0;
-                if (t.elements is { dict: not null }) {
-                    foreach (var e in t.elements.dict.Values) {
-                        if (e.source.foodEffect != null && e.source.foodEffect.Length > 0) {
+                if (t.elements?.dict != null)
+                    foreach (var e in t.elements.dict.Values)
+                        if (e.source.foodEffect is { Length: > 0 }) {
                             int raw = e.Value;
                             if (raw != 0) {
                                 int lvl = raw / 10;
                                 totalF += (raw < 0) ? (lvl - 1) : (lvl + 1);
                             }
                         }
-                    }
-                }
                 return "Total Level: " + totalF;
-
-
-
             default:
                 string info = "";
                 if (t.SelfWeight > 0)
