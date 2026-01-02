@@ -28,7 +28,8 @@ namespace Elin_ItemRelocator {
             FoodTraits,
             SortFoodPowerAsc, SortFoodPowerDesc,
             SortTotalFoodPowerAsc, SortTotalFoodPowerDesc,
-            LabelPrice, LabelUid, LabelFoodPower
+            LabelPrice, LabelUid, LabelFoodPower,
+            SourceContainer
         }
 
         private static Dictionary<LangKey, string[]> _dict = new() {
@@ -119,7 +120,8 @@ namespace Elin_ItemRelocator {
             [LangKey.SortTotalFoodPowerDesc] = ["Total Food Power (Desc)", "総食事効果 (降順)"],
             [LangKey.LabelPrice] = ["Price", "価格"],
             [LangKey.LabelUid] = ["Creation (UID)", "生成順"],
-            [LangKey.LabelFoodPower] = ["Food Power", "食事効果"]
+            [LangKey.LabelFoodPower] = ["Food Power", "食事効果"],
+            [LangKey.SourceContainer] = ["Source Container Name", "コンテナ名"]
         };
 
         public static string GetText(LangKey key) =>

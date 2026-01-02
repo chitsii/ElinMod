@@ -446,6 +446,36 @@ namespace Elin_ItemRelocator {
             return GetNotPrefix() + RelocatorLang.GetText(RelocatorLang.LangKey.FoodTraits) + mode + ": " + display;
         }
     }
+    public class ConditionSourceContainer : BaseCondition {
+        public string ContainerName = "";
+
+        public override bool IsMatch(Thing t) {
+            if (string.IsNullOrEmpty(ContainerName))
+                return false;
+
+            // Get the parent container of this item
+            ICardParent parent = t.parent;
+            if (parent == null)
+                return Not; // No parent = PC's direct inventory
+
+            // Check if parent is a Thing (container)
+            if (parent is not Thing container)
+                return Not;
+
+            // Match container name (case-insensitive partial match)
+            string containerNameLower = container.Name.ToLower();
+            string searchLower = ContainerName.ToLower();
+            bool match = containerNameLower.Contains(searchLower);
+
+            return Not ? !match : match;
+        }
+
+        public override ConditionType GetConditionType() => ConditionType.SourceContainer;
+        public override string GetUiLabel() {
+            return GetNotPrefix() + RelocatorLang.GetText(RelocatorLang.LangKey.SourceContainer) + ": " + ContainerName;
+        }
+    }
+
     public class ConditionAddButton : BaseCondition {
         public override bool IsMatch(Thing t) => false;
         public override ConditionType GetConditionType() => ConditionType.AddButton;
@@ -744,6 +774,25 @@ namespace Elin_ItemRelocator {
                 },
                 (jo, c) => {
                     jo.Add("IsIdentified", c.IsIdentified);
+                    if (c.Not)
+                        jo.Add("Negate", true);
+                }
+            );
+
+            Register<ConditionSourceContainer>("SourceContainerName",
+                jo => {
+                    if (IsJNull(jo["SourceContainerName"]))
+                        return null;
+                    string name = jo["SourceContainerName"].ToString();
+                    if (string.IsNullOrEmpty(name))
+                        return null;
+                    return new ConditionSourceContainer {
+                        ContainerName = name,
+                        Not = (bool?)jo["Negate"] ?? false
+                    };
+                },
+                (jo, c) => {
+                    jo.Add("SourceContainerName", c.ContainerName);
                     if (c.Not)
                         jo.Add("Negate", true);
                 }

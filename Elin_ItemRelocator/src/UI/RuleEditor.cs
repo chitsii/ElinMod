@@ -140,6 +140,14 @@ namespace Elin_ItemRelocator {
                          }
                      });
                  })
+                 .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.SourceContainer), () => {
+                     Dialog.InputName(RelocatorLang.GetText(RelocatorLang.LangKey.SourceContainer), "", (c, text) => {
+                         if (!c && !string.IsNullOrEmpty(text)) {
+                             rule.Conditions.Add(new ConditionSourceContainer { ContainerName = text });
+                             refresh();
+                         }
+                     }, (Dialog.InputType)0);
+                 })
                  .Show();
         }
 
@@ -260,7 +268,15 @@ namespace Elin_ItemRelocator {
                             refresh();
                         });
                     });
-
+                } else if (cond is ConditionSourceContainer sc) {
+                    menu.AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.Edit), () => {
+                        Dialog.InputName(RelocatorLang.GetText(RelocatorLang.LangKey.SourceContainer), sc.ContainerName, (c, val) => {
+                            if (!c && !string.IsNullOrEmpty(val)) {
+                                sc.ContainerName = val;
+                                refresh();
+                            }
+                        }, (Dialog.InputType)0);
+                    });
                 }
                 menu.Show();
             };
