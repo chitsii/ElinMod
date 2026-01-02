@@ -16,11 +16,21 @@ namespace Elin_AutoOfferingAlter
                     Plugin.Log.LogInfo("[Elin_AutoOfferingAlter] Woke up. Checking for offerings...");
                 }
 
+                // Scan inventory (excluding equipped items to avoid duplication)
                 foreach (Thing t in EClass.pc.things)
                 {
-                    if (t.id == Plugin.ID_OFFERING_BOX && t.IsContainer)
+                    if (!t.isEquipped && t.id == Plugin.ID_OFFERING_BOX && t.IsContainer)
                     {
                         OfferLogic.Process(t);
+                    }
+                }
+
+                // Scan body slots (for equipped Offering Boxes)
+                foreach (BodySlot slot in EClass.pc.body.slots)
+                {
+                    if (slot.thing != null && slot.thing.id == Plugin.ID_OFFERING_BOX && slot.thing.IsContainer)
+                    {
+                        OfferLogic.Process(slot.thing);
                     }
                 }
             }
