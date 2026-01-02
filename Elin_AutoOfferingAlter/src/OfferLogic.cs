@@ -24,6 +24,13 @@ namespace Elin_AutoOfferingAlter
                 thingsToProcess.Add(t);
             }
 
+            /*
+            if (ModConfig.EnableLog.Value)
+            {
+                Plugin.Log.LogInfo($"[DEBUG] Container contains {thingsToProcess.Count} items.");
+            }
+            */
+
             foreach (Thing t in thingsToProcess)
             {
                 if (fakeAltar.CanOffer(t))
