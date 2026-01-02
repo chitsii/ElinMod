@@ -539,6 +539,8 @@ namespace Elin_ItemRelocator {
                 currentScope = RelocatorLang.GetText(RelocatorLang.LangKey.ScopeBoth);
             else if (profile.Scope == RelocationProfile.FilterScope.ZoneOnly)
                 currentScope = RelocatorLang.GetText(RelocatorLang.LangKey.Zone);
+            else if (profile.Scope == RelocationProfile.FilterScope.PetsOnly)
+                currentScope = RelocatorLang.GetText(RelocatorLang.LangKey.ScopePets);
 
             // Local Helper for Cache Updates
             void UpdateProfile(Action<RelocationProfile> action) {
@@ -577,6 +579,9 @@ namespace Elin_ItemRelocator {
                          })
                          .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.ScopeBoth), () => { // Both
                              UpdateProfile(p => p.Scope = RelocationProfile.FilterScope.Both);
+                         })
+                         .AddButton(RelocatorLang.GetText(RelocatorLang.LangKey.ScopePets), () => { // Pets Only
+                             UpdateProfile(p => p.Scope = RelocationProfile.FilterScope.PetsOnly);
                          });
                 })
                 .AddChild(RelocatorLang.GetText(RelocatorLang.LangKey.SortLabel) + GetSortText(profile.SortMode), (sortRoot) => {

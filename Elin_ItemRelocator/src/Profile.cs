@@ -21,7 +21,7 @@ namespace Elin_ItemRelocator {
         public ResultSortMode SortMode = ResultSortMode.Default;
 
         // Scope definition
-        public enum FilterScope { Inventory, Both, ZoneOnly }
+        public enum FilterScope { Inventory, Both, ZoneOnly, PetsOnly }
 
         public enum ResultSortMode {
             Default, PriceAsc, PriceDesc, EnchantMagAsc, EnchantMagDesc, TotalEnchantMagDesc,

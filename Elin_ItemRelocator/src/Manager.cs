@@ -10,6 +10,7 @@ namespace Elin_ItemRelocator {
     public static class CF {
         public const byte IsPCOwned = 1 << 0;     // PC所有アイテムか
         public const byte IsRelocatable = 1 << 1; // 基本的な移動可能条件を満たしているか
+        public const byte IsPetOwned = 1 << 2;    // ペット所有アイテムか
     }
 
     // 軽量な候補構造体
@@ -94,14 +95,38 @@ namespace Elin_ItemRelocator {
 
             // Zone Scope
             GatherFromContainer(EClass._map.things, container, destIsPC, destIsNPC, includeInstalledChildren: true);
+
+            // Pet Scope (Accompanying Party Members)
+            if (EClass.pc.party != null) {
+                foreach (var member in EClass.pc.party.members) {
+                    if (member == null || member.IsPC)
+                        continue;
+                    if (!member.IsAliveInCurrentZone)
+                        continue;
+
+                    // Pet Inventory
+                    GatherFromContainer(member.things, container, destIsPC, destIsNPC, isPetOwned: true);
+
+                    // Pet Body Slots (equipped containers like backpacks)
+                    var petSlots = member.body.slots;
+                    for (int i = 0; i < petSlots.Count; i++) {
+                        var slot = petSlots[i];
+                        if (slot.thing is null || !slot.thing.IsContainer || slot.thing.things.Count == 0)
+                            continue;
+                        if (slot.thing == container)
+                            continue;
+                        GatherFromContainer(slot.thing.things, container, destIsPC, destIsNPC, isPetOwned: true);
+                    }
+                }
+            }
         }
 
-        private void GatherFromContainer(ThingContainer things, Thing container, bool destIsPC, bool destIsNPC, bool includeInstalledChildren = false) {
+        private void GatherFromContainer(ThingContainer things, Thing container, bool destIsPC, bool destIsNPC, bool includeInstalledChildren = false, bool isPetOwned = false) {
             for (int i = 0; i < things.Count; i++) {
                 var t = things[i];
                 if (t == container)
                     continue;
-                TryAddCandidate(t, container, destIsPC, destIsNPC);
+                TryAddCandidate(t, container, destIsPC, destIsNPC, isPetOwned);
 
                 // Recurse into containers
                 bool recurse = t.IsContainer && t.things is { Count: > 0 };
@@ -113,19 +138,19 @@ namespace Elin_ItemRelocator {
                         var child = t.things[j];
                         if (child == container)
                             continue;
-                        TryAddCandidate(child, container, destIsPC, destIsNPC);
+                        TryAddCandidate(child, container, destIsPC, destIsNPC, isPetOwned);
                     }
                 }
             }
         }
 
         // Overload for List<Thing> (e.g., EClass._map.things)
-        private void GatherFromContainer(List<Thing> things, Thing container, bool destIsPC, bool destIsNPC, bool includeInstalledChildren = false) {
+        private void GatherFromContainer(List<Thing> things, Thing container, bool destIsPC, bool destIsNPC, bool includeInstalledChildren = false, bool isPetOwned = false) {
             for (int i = 0; i < things.Count; i++) {
                 var t = things[i];
                 if (t == container)
                     continue;
-                TryAddCandidate(t, container, destIsPC, destIsNPC);
+                TryAddCandidate(t, container, destIsPC, destIsNPC, isPetOwned);
 
                 // Recurse into containers
                 bool recurse = t.IsContainer && t.things is { Count: > 0 };
@@ -137,13 +162,13 @@ namespace Elin_ItemRelocator {
                         var child = t.things[j];
                         if (child == container)
                             continue;
-                        TryAddCandidate(child, container, destIsPC, destIsNPC);
+                        TryAddCandidate(child, container, destIsPC, destIsNPC, isPetOwned);
                     }
                 }
             }
         }
 
-        private void TryAddCandidate(Thing t, Thing container, bool destIsPC, bool destIsNPC) {
+        private void TryAddCandidate(Thing t, Thing container, bool destIsPC, bool destIsNPC, bool isPetOwned = false) {
             // Deduplication
             if (!_seen.Add(t))
                 return;
@@ -182,7 +207,7 @@ namespace Elin_ItemRelocator {
 
             _cachedCandidates.Add(new Candidate {
                 Thing = t,
-                Flags = (byte)((tOwned ? CF.IsPCOwned : 0) | CF.IsRelocatable)
+                Flags = (byte)((tOwned ? CF.IsPCOwned : 0) | (isPetOwned ? CF.IsPetOwned : 0) | CF.IsRelocatable)
             });
         }
 
@@ -235,9 +260,15 @@ namespace Elin_ItemRelocator {
 
                 // スコープ判定 (高速: ビット演算)
                 bool isOwned = (c.Flags & CF.IsPCOwned) != 0;
+                bool isPet = (c.Flags & CF.IsPetOwned) != 0;
+
                 if (scope == RelocationProfile.FilterScope.Inventory && !isOwned)
                     continue;
-                if (scope == RelocationProfile.FilterScope.ZoneOnly && isOwned)
+                if (scope == RelocationProfile.FilterScope.ZoneOnly && (isOwned || isPet))
+                    continue;
+                if (scope == RelocationProfile.FilterScope.PetsOnly && !isPet)
+                    continue;
+                if (scope == RelocationProfile.FilterScope.Both && isPet) // Both = PC + Zone (exclude Pets)
                     continue;
 
                 // ホットバー判定 (高速: HashSet参照)
