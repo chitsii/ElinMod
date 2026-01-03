@@ -14,12 +14,13 @@ PROJECT_ROOT = os.path.dirname(TOOLS_DIR)
 
 OUTPUT_PATH = os.path.join(PROJECT_ROOT, 'LangMod', 'JP', 'Dialog', 'Drama', 'drama_sukutsu_arena_master.xlsx')
 
-HEADERS = ['step', 'jump', 'if', 'if2', 'action', 'param', 'actor', 'id', 'text_JP', 'text_EN']
+# CWL準拠ヘッダー (TinyMita形式)
+HEADERS = ['step', 'jump', 'if', 'action', 'param', 'actor', 'version', 'id', 'text_JP', 'text_EN', 'text']
 
 def create_drama():
     wb = openpyxl.Workbook()
     ws = wb.active
-    ws.title = "main"
+    ws.title = "master"  # TinyMita形式: キャラクターIDをシート名に
 
     for col, header in enumerate(HEADERS, 1):
         ws.cell(row=1, column=col, value=header)
@@ -225,7 +226,8 @@ def create_drama():
         {'action': 'end'},
     ]
 
-    row = 5
+    # Row 6からデータ開始 (TinyMita形式)
+    row = 6
     for data in drama_data:
         for col, header in enumerate(HEADERS, 1):
             if header in data:

@@ -9,10 +9,10 @@ uv run python create_zone_excel.py
 popd
 
 echo Converting tsv to xlsx (requires LibreOffice)
-set SOFFICE="C:\Program Files\LibreOffice\program\soffice.exe"
-if exist %SOFFICE% (
-    %SOFFICE% --headless --convert-to "xlsx:Calc MS Excel 2007 XML" --infilter="CSV:9,34,76" "%~dp0LangMod\EN\Zone.tsv" --outdir "%~dp0LangMod\EN"
-    %SOFFICE% --headless --convert-to "xlsx:Calc MS Excel 2007 XML" --infilter="CSV:9,34,76" "%~dp0LangMod\JP\Zone.tsv" --outdir "%~dp0LangMod\JP"
+set "SOFFICE=C:\Program Files\LibreOffice\program\soffice.exe"
+if exist "%SOFFICE%" (
+    "%SOFFICE%" --headless --convert-to "xlsx:Calc MS Excel 2007 XML" --infilter="CSV:9,34,76" "%~dp0LangMod\EN\Zone.tsv" --outdir "%~dp0LangMod\EN"
+    "%SOFFICE%" --headless --convert-to "xlsx:Calc MS Excel 2007 XML" --infilter="CSV:9,34,76" "%~dp0LangMod\JP\Zone.tsv" --outdir "%~dp0LangMod\JP"
 
     echo Renaming Zone.xlsx to SourceSukutsu.xlsx
     move /Y "%~dp0LangMod\EN\Zone.xlsx" "%~dp0LangMod\EN\SourceSukutsu.xlsx"
@@ -28,8 +28,8 @@ if exist %SOFFICE% (
     uv run python create_chara_excel.py
     popd
 
-    %SOFFICE% --headless --convert-to "xlsx:Calc MS Excel 2007 XML" --infilter="CSV:9,34,76" "%~dp0LangMod\EN\Chara.tsv" --outdir "%~dp0LangMod\EN"
-    %SOFFICE% --headless --convert-to "xlsx:Calc MS Excel 2007 XML" --infilter="CSV:9,34,76" "%~dp0LangMod\JP\Chara.tsv" --outdir "%~dp0LangMod\JP"
+    "%SOFFICE%" --headless --convert-to "xlsx:Calc MS Excel 2007 XML" --infilter="CSV:9,34,76" "%~dp0LangMod\EN\Chara.tsv" --outdir "%~dp0LangMod\EN"
+    "%SOFFICE%" --headless --convert-to "xlsx:Calc MS Excel 2007 XML" --infilter="CSV:9,34,76" "%~dp0LangMod\JP\Chara.tsv" --outdir "%~dp0LangMod\JP"
 
     echo Renaming Chara.xlsx to SourceChara.xlsx...
     move /Y "%~dp0LangMod\EN\Chara.xlsx" "%~dp0LangMod\EN\SourceChara.xlsx"
@@ -38,6 +38,13 @@ if exist %SOFFICE% (
     echo Cleaning up TSV files (Chara)...
     del "%~dp0LangMod\EN\Chara.tsv"
     del "%~dp0LangMod\JP\Chara.tsv"
+    REM ----------------------
+
+    REM --- Drama Pipeline (openpyxl直接生成) ---
+    echo Generating Drama Excel files...
+    pushd tools
+    uv run python create_drama_excel.py
+    popd
     REM ----------------------
 
     echo Conversion complete.
