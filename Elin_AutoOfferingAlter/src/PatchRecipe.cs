@@ -1,7 +1,6 @@
 using HarmonyLib;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Reflection;
 
 namespace Elin_AutoOfferingAlter
 {
@@ -14,43 +13,22 @@ namespace Elin_AutoOfferingAlter
         [HarmonyPatch(typeof(SourceManager), "Init")]
         public static void Prefix_SourceManager_Init(SourceManager __instance)
         {
-            string customId = Plugin.ID_OFFERING_BOX;
-
-            // Efficient check if already added
-            if (__instance.things.map.ContainsKey(customId)) return;
-
-            // Find base row for "chest6" (Sturdy Box)
-            SourceThing.Row row = __instance.things.map.TryGetValue("chest6", out var chest6) ? chest6 : null;
-
-            if (row == null) return;
-
-            // Clone the row using Reflection
-            MethodInfo cloneMethod = typeof(object).GetMethod("MemberwiseClone", BindingFlags.NonPublic | BindingFlags.Instance);
-            SourceThing.Row newRow = (SourceThing.Row)cloneMethod.Invoke(row, null);
-
-            if (ModConfig.EnableLog.Value)
+            try
             {
-                Plugin.Log.LogInfo("Src ID: " + row.id);
-                Plugin.Log.LogInfo("Src Trait: " + (row.trait != null ? string.Join(",", row.trait) : "null"));
-                Plugin.Log.LogInfo("Src Components: " + (row.components != null ? string.Join(",", row.components) : "null"));
+                ModUtilRegister.RegisterFromBase(__instance.things, "chest6", Plugin.ID_OFFERING_BOX, row =>
+                {
+                    row.name_JP = "信仰の箱";
+                    row.name = "Offering Box";
+                    row.factory = new string[] { "self" };
+                    row.recipeKey = new string[] { "*" };
+                    row.detail_JP = "眠りにつくたび、中身を自動的に信仰する神へ捧げる不思議な箱。";
+                    row.detail = "A mysterious box that automatically offers its contents to your god whenever you sleep.";
+                });
             }
-
-            // Set properties
-            newRow.id = customId;
-            newRow.factory = new string[] { "self" }; // Simple craft requires "self" explicitly
-            // Retain original components/level from chest6
-            newRow.recipeKey = new string[] { "*" }; // Ensure it is treated as a known/valid recipe source
-            newRow.name_JP = "信仰の箱";
-            newRow.name = "Offering Box";
-
-            // Add to database
-            __instance.things.rows.Add(newRow);
-            if (!__instance.things.map.ContainsKey(customId))
+            catch (System.Exception e)
             {
-                __instance.things.map.Add(customId, newRow);
+                Plugin.Log.LogError("Error in Prefix_SourceManager_Init: " + e.Message);
             }
-
-            if (ModConfig.EnableLog.Value) Plugin.Log.LogInfo("Injected custom item: " + customId);
         }
 
         // Keep the Craft patch to apply specific tags and names
@@ -64,11 +42,7 @@ namespace Elin_AutoOfferingAlter
             {
                 __result.c_idDeity = Plugin.ID_OFFERING_BOX;
                 __result.c_altName = "信仰の箱";
-
-                if (ModConfig.EnableLog.Value)
-                {
-                    Plugin.Log.LogInfo("Crafted Offering Box!");
-                }
+                if (ModConfig.EnableLog.Value) Plugin.Log.LogInfo("Crafted Offering Box!");
             }
         }
     }
@@ -80,28 +54,14 @@ namespace Elin_AutoOfferingAlter
         [HarmonyPatch("OnLoad")]
         public static void Postfix_OnLoad(Player __instance)
         {
-            AddCustomRecipe();
+            ModUtilRegister.LearnRecipe(Plugin.ID_OFFERING_BOX);
         }
 
         [HarmonyPostfix]
         [HarmonyPatch("OnStartNewGame")]
         public static void Postfix_OnStartNewGame(Player __instance)
         {
-            AddCustomRecipe();
-        }
-
-        private static void AddCustomRecipe()
-        {
-            try
-            {
-                string customId = Plugin.ID_OFFERING_BOX;
-                if (!EClass.player.recipes.knownRecipes.ContainsKey(customId))
-                {
-                    EClass.player.recipes.Add(customId, false);
-                    if (ModConfig.EnableLog.Value) Plugin.Log.LogInfo("Learned custom recipe: " + customId);
-                }
-            }
-            catch { }
+            ModUtilRegister.LearnRecipe(Plugin.ID_OFFERING_BOX);
         }
     }
 }
