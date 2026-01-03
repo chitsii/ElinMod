@@ -1,0 +1,16 @@
+{
+    "Items": [
+        {
+            "Id": "potion_poison",
+            "Num": 1,
+            "Restock": false,
+            "Rarity": "Legendary"
+        },
+        {
+            "Id": "scroll_wish",
+            "Num": 1,
+            "Restock": false,
+            "Rarity": "Mythical"
+        }
+    ]
+}

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Meta>
+  <title>巣窟アリーナ - Sukutsu Arena</title>
+  <id>tishi.elin.sukutsu_arena</id>
+  <loadPriority>100</loadPriority>
+  <author>chitsii</author>
+  <version>0.23.252</version>
+  <tags>Custom Zone,Arena,CWL</tags>
+	<description>
+(English below)
+
+### 概要
+ワールドマップに「巣窟アリーナ」という新しいロケーションを追加します。
+
+### NPC
+- **受付嬢**: 便利なアイテムを販売
+- **アリーナマスター**: アリーナ戦闘の案内
+- **グランドマスター**: 強力なチャンピオン
+- **怪しい商人**: 強化アイテムを高額で販売
+
+### 依存
+- Custom Whatever Loader (CWL)
+
+### アンインストール
+いつでも安全に削除可能です。セーブデータには影響しません。
+
+---
+
+### Description
+Adds a new location "Sukutsu Arena" to the world map.
+
+### NPCs
+- **Receptionist**: Sells useful items
+- **Arena Master**: Guides arena battles
+- **Grand Master**: Powerful champion
+- **Shady Merchant**: Sells enhanced items at high prices
+
+### Dependency
+- Custom Whatever Loader (CWL)
+
+### Uninstall
+Safe to remove anytime. Does not affect save data.
+  </description>
+<builtin>false</builtin>
+</Meta>
