@@ -66,12 +66,20 @@ npcs = []
 # _idRenderData: @chara (PCCシステムを使用、Texture/ID.pngが自動ロードされる)
 # tiles: バニラのフォールバックタイルID (カスタム画像が見つからない時に使用)
 # idText: テキストID (同じIDのテキストファイルが参照される)
+#
+# CWL タグ仕様:
+# - addZone_ゾーンID: 指定ゾーンにキャラクターを生成
+# - addFlag_StayHomeZone: ランダム移動を無効化（初期ゾーンに留まる）
+# - addDrama_テーブル名: ドラマシートをリンク
+# - humanSpeak: 人間らしい会話表示（括弧なし）
+# - addStock: 商人の在庫を追加
 
-# 1. リリィ (サキュバス / 女性 / 受付嬢)
+ZONE_ID = 'sukutsu_arena'  # カスタムゾーンID
+
 # 1. リリィ (サキュバス / 女性 / 受付嬢)
 npcs.append({
     'id': 'sukutsu_receptionist',
-    'Author': 'tishi.elin.sukutsu_arena',  # Mod ID
+    'Author': 'tishi.elin.sukutsu_arena',
     'name_JP': 'リリィ',
     'name': 'Lily',
     'aka_JP': '魅惑の受付嬢',
@@ -80,11 +88,10 @@ npcs.append({
     'job': 'shopkeeper',
     'LV': 50,
     'hostility': 'Friend',
-
-
     'bio': 'f/1001/165/52/sexy',
     'idText': 'sukutsu_receptionist',
-    'tag': 'neutral,addStock',
+    # CWL タグ: ゾーン生成、ランダム移動無効、商人在庫、人間らしい会話
+    'tag': f'neutral,addZone_{ZONE_ID},addFlag_StayHomeZone,addStock,humanSpeak',
     'trait': 'Merchant',
     'quality': 4,
     'chance': 0,
@@ -102,10 +109,10 @@ npcs.append({
     'job': 'warrior',
     'LV': 70,
     'hostility': 'Friend',
-
     'bio': 'm/1002/185/90/stern',
     'idText': 'sukutsu_arena_master',
-    'tag': 'neutral,addDrama_drama_sukutsu_arena_master',
+    # CWL タグ: ゾーン生成、ランダム移動無効、ドラマリンク、人間らしい会話
+    'tag': f'neutral,addZone_{ZONE_ID},addFlag_StayHomeZone,addDrama_drama_sukutsu_arena_master,humanSpeak',
     'quality': 4,
     'chance': 0,
 })
@@ -122,10 +129,10 @@ npcs.append({
     'job': 'warrior',
     'LV': 100,
     'hostility': 'Friend',
-
     'bio': 'm/1003/210/150/proud',
     'idText': 'sukutsu_grand_master',
-    'tag': 'neutral',
+    # CWL タグ: ゾーン生成、ランダム移動無効
+    'tag': f'neutral,addZone_{ZONE_ID},addFlag_StayHomeZone',
     'quality': 5,
     'chance': 0,
 })
@@ -146,7 +153,8 @@ npcs.append({
     '_idRenderData': '',
     'bio': 'm/1004/170/65/sly',
     'idText': 'sukutsu_shady_merchant',
-    'tag': 'neutral,addStock',
+    # CWL タグ: ゾーン生成、ランダム移動無効、商人在庫
+    'tag': f'neutral,addZone_{ZONE_ID},addFlag_StayHomeZone,addStock',
     'trait': 'Merchant',
     'quality': 4,
     'chance': 0,

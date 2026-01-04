@@ -48,6 +48,23 @@ if exist "%SOFFICE%" (
     popd
     REM ----------------------
 
+    REM --- Flag System Pipeline ---
+    echo Generating C# Flag Classes...
+    pushd tools
+    uv run python generate_flags.py
+    popd
+
+    echo Validating Scenario Flags...
+    pushd tools
+    uv run python validate_scenario_flags.py
+    if %ERRORLEVEL% NEQ 0 (
+        echo Flag Validation Failed!
+        popd
+        exit /b 1
+    )
+    popd
+    REM ----------------------
+
     echo Conversion complete.
 ) else (
     echo WARNING: LibreOffice not found at %SOFFICE%. Skipping compatibility fix.
