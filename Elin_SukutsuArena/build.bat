@@ -44,6 +44,7 @@ if exist "%SOFFICE%" (
     echo Generating Drama Excel files...
     pushd tools
     uv run python create_drama_excel.py
+    uv run python create_opening_drama.py
     popd
     REM ----------------------
 
@@ -69,6 +70,7 @@ xcopy "%~dp0package.xml" "%~dp0elin_link\Package\%MOD_NAME%\" /Y
 xcopy "%~dp0LangMod" "%~dp0elin_link\Package\%MOD_NAME%\LangMod\" /E /Y /I
 xcopy "%~dp0Texture" "%~dp0elin_link\Package\%MOD_NAME%\Texture\" /E /Y /I
 xcopy "%~dp0Portrait" "%~dp0elin_link\Package\%MOD_NAME%\Portrait\" /E /Y /I
+xcopy "%~dp0Sound" "%~dp0elin_link\Package\%MOD_NAME%\Sound\" /E /Y /I
 
 echo Copying to Steam game folder...
 set STEAM_PACKAGE_DIR="C:\Program Files (x86)\Steam\steamapps\common\Elin\Package\%MOD_NAME%"
@@ -78,5 +80,6 @@ xcopy "%~dp0package.xml" %STEAM_PACKAGE_DIR% /Y
 xcopy "%~dp0LangMod" %STEAM_PACKAGE_DIR%\LangMod\ /E /Y /I
 xcopy "%~dp0Texture" %STEAM_PACKAGE_DIR%\Texture\ /E /Y /I
 xcopy "%~dp0Portrait" %STEAM_PACKAGE_DIR%\Portrait\ /E /Y /I
+xcopy "%~dp0Sound" %STEAM_PACKAGE_DIR%\Sound\ /E /Y /I
 
 endlocal

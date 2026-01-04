@@ -23,14 +23,30 @@ for r in range(1, 4):
     row_data = []
     for c in range(1, cols + 1):
         cell_val = sample_ws.cell(row=r, column=c).value
+        # 1行目ならヘッダーマップ作成
         if r == 1:
             header_map[c-1] = cell_val
         row_data.append(cell_val if cell_val is not None else "")
     rows.append(row_data)
 
+# 'Author' カラムが存在しない場合、強制的に追加
+if 'Author' not in header_map.values():
+    print("Adding missing 'Author' column...")
+    new_col_idx = len(header_map)
+    header_map[new_col_idx] = 'Author'
+
+    # Header行に追加
+    rows[0].append('Author')
+    # Type行, Default行に追加 (空文字)
+    rows[1].append('')
+    rows[2].append('')
+
+    # colsを更新
+    cols += 1
+
 # Helper
 def create_npc_row(npc_def):
-    row = [""] * cols
+    row = [""] * cols  # 更新されたcolsを使用
     for k, v in npc_def.items():
         found = False
         for col_idx, col_name in header_map.items():
@@ -39,7 +55,8 @@ def create_npc_row(npc_def):
                 found = True
                 break
         if not found:
-            print(f"WARNING: Field '{k}' not found in headers!")
+            # authorなどはここで処理済みのはずだが、もしヘッダーになければ警告
+             print(f"WARNING: Field '{k}' not found in headers!")
     return row
 
 npcs = []
@@ -50,43 +67,45 @@ npcs = []
 # tiles: バニラのフォールバックタイルID (カスタム画像が見つからない時に使用)
 # idText: テキストID (同じIDのテキストファイルが参照される)
 
-# 1. アリーナ受付嬢 (サキュバス / 女性 / 固定外見)
+# 1. リリィ (サキュバス / 女性 / 受付嬢)
+# 1. リリィ (サキュバス / 女性 / 受付嬢)
 npcs.append({
     'id': 'sukutsu_receptionist',
-    'name_JP': 'アリーナ受付嬢',
-    'name': 'Arena Receptionist',
-    'aka_JP': '魅惑の案内人',
-    'aka': 'Charming Guide',
+    'Author': 'tishi.elin.sukutsu_arena',  # Mod ID
+    'name_JP': 'リリィ',
+    'name': 'Lily',
+    'aka_JP': '魅惑の受付嬢',
+    'aka': 'Charming Receptionist',
     'race': 'succubus',
     'job': 'shopkeeper',
     'LV': 50,
     'hostility': 'Friend',
-    'tiles': 807,  # フォールバック用バニラタイル
-    '_idRenderData': '@chara',  # PCCシステム使用
-    'bio': 'f/1001/165/52/sexy',  # 女性/固定ID/身長/体重/性格
+
+
+    'bio': 'f/1001/165/52/sexy',
     'idText': 'sukutsu_receptionist',
-    'tag': 'neutral,addStock',  # 商人タグ
+    'tag': 'neutral,addStock',
     'trait': 'Merchant',
     'quality': 4,
-    'chance': 0,  # ランダムスポーン無効
+    'chance': 0,
 })
 
-# 2. アリーナマスター (人間 / 男性 / 戦士)
+# 2. バルガス (人間 / 男性 / アリーナマスター)
 npcs.append({
     'id': 'sukutsu_arena_master',
-    'name_JP': 'アリーナマスター',
-    'name': 'Arena Master',
+    'Author': 'tishi.elin.sukutsu_arena',
+    'name_JP': 'バルガス',
+    'name': 'Vargus',
     'aka_JP': '百戦の覇者',
     'aka': 'Champion of Hundred Battles',
     'race': 'human',
     'job': 'warrior',
     'LV': 70,
     'hostility': 'Friend',
-    'tiles': 807,
-    '_idRenderData': '@chara',
-    'bio': 'm/1002/185/90/stern',  # 男性/固定ID/身長/体重/性格
+
+    'bio': 'm/1002/185/90/stern',
     'idText': 'sukutsu_arena_master',
-    'tag': 'neutral,addDrama_drama_sukutsu_arena_master',  # CWLドラマスクリプト使用
+    'tag': 'neutral,addDrama_drama_sukutsu_arena_master',
     'quality': 4,
     'chance': 0,
 })
@@ -94,6 +113,7 @@ npcs.append({
 # 3. グランドマスター (ドラゴン / 男性 / チャンピオン)
 npcs.append({
     'id': 'sukutsu_grand_master',
+    'Author': 'tishi.elin.sukutsu_arena',
     'name_JP': 'グランドマスター',
     'name': 'Grand Master',
     'aka_JP': '竜鱗の王者',
@@ -102,9 +122,8 @@ npcs.append({
     'job': 'warrior',
     'LV': 100,
     'hostility': 'Friend',
-    'tiles': 807,
-    '_idRenderData': '@chara',
-    'bio': 'm/1003/210/150/proud',  # 男性/固定ID/身長/体重/性格
+
+    'bio': 'm/1003/210/150/proud',
     'idText': 'sukutsu_grand_master',
     'tag': 'neutral',
     'quality': 5,
@@ -114,6 +133,7 @@ npcs.append({
 # 4. 怪しい商人 (ミュータント / 性別不明 / 商人)
 npcs.append({
     'id': 'sukutsu_shady_merchant',
+    'Author': 'tishi.elin.sukutsu_arena',
     'name_JP': '怪しい商人',
     'name': 'Shady Merchant',
     'aka_JP': '闇市の支配者',
@@ -123,14 +143,16 @@ npcs.append({
     'LV': 60,
     'hostility': 'Friend',
     'tiles': 807,
-    '_idRenderData': '@chara',
-    'bio': 'm/1004/170/65/sly',  # 男性/固定ID/身長/体重/性格
+    '_idRenderData': '',
+    'bio': 'm/1004/170/65/sly',
     'idText': 'sukutsu_shady_merchant',
     'tag': 'neutral,addStock',
     'trait': 'Merchant',
     'quality': 4,
     'chance': 0,
 })
+
+
 
 for npc in npcs:
     rows.append(create_npc_row(npc))

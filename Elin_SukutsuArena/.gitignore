@@ -3,3 +3,5 @@ _bin/*
 elin_link/*
 # tmp/*
 obj/*
+
+__pycache__
