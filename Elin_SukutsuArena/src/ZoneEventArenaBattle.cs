@@ -1,4 +1,5 @@
 using UnityEngine;
+using Elin_SukutsuArena;
 
 /// <summary>
 /// アリーナ戦闘進行監視イベント
@@ -68,8 +69,14 @@ public class ZoneEventArenaBattle : ZoneEvent
             {
                 EClass.player.dialogFlags["sukutsu_arena_result"] = 1; // 勝利フラグ
 
+                // 勝利時の貢献度加算 (通常戦闘: +10)
+                ArenaFlagManager.Player.AddContribution(10);
+                int currentContribution = ArenaFlagManager.Player.GetContribution();
+
                 // ログとエフェクト
                 Msg.Say("敵を殲滅した！");
+                Msg.Say($"闘技場貢献度が上昇した。(現在: {currentContribution})");
+
                 EClass.Sound.Play("quest_complete");
                 EClass._zone.SetBGM(106); // 勝利BGM (Home)
 

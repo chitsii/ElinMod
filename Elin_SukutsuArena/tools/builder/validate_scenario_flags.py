@@ -6,6 +6,15 @@ Run during build to catch typos and invalid values.
 """
 import re
 import sys
+import os
+
+# Path setup
+BUILDER_DIR = os.path.dirname(os.path.abspath(__file__))
+TOOLS_DIR = os.path.dirname(BUILDER_DIR)
+COMMON_DIR = os.path.join(TOOLS_DIR, 'common')
+sys.path.append(TOOLS_DIR)
+sys.path.append(COMMON_DIR)
+
 from typing import List, Tuple, Set
 from flag_definitions import (
     get_all_flags, get_all_enums,
@@ -94,17 +103,15 @@ def validate_file(filepath: str) -> List[ValidationError]:
 
 def validate_scenarios() -> Tuple[int, int]:
     """Validate all scenario files. Returns (error_count, warning_count)"""
-    import os
 
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    scenarios_file = os.path.join(script_dir, "scenarios.py")
-
+    scenarios_file = os.path.join(COMMON_DIR, "scenarios.py")
     files_to_check = [scenarios_file]
 
-    # Also check any drama builder files
-    for fname in os.listdir(script_dir):
-        if fname.endswith('.py') and 'drama' in fname.lower():
-            files_to_check.append(os.path.join(script_dir, fname))
+    # Also check any drama files in common directory
+    if os.path.exists(COMMON_DIR):
+        for fname in os.listdir(COMMON_DIR):
+            if fname.endswith('.py') and 'drama' in fname.lower() and fname != 'drama_builder.py':
+                files_to_check.append(os.path.join(COMMON_DIR, fname))
 
     total_errors = 0
 

@@ -25,6 +25,9 @@ public class ZoneInstanceArenaBattle : ZoneInstance
     [JsonProperty]
     public int rewardPlat = 10;
 
+    [JsonProperty]
+    public bool isRankUp = false;
+
     public override ZoneTransition.EnterState ReturnState => ZoneTransition.EnterState.Exact;
 
     /// <summary>

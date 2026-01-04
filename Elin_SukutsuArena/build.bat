@@ -5,7 +5,7 @@ set MOD_NAME=Elin_SukutsuArena
 
 echo Generating Source.tsv (Zone.tsv)
 pushd tools
-uv run python create_zone_excel.py
+uv run python builder/create_zone_excel.py
 popd
 
 echo Converting tsv to xlsx (requires LibreOffice)
@@ -25,7 +25,7 @@ if exist "%SOFFICE%" (
     REM --- Chara Pipeline ---
     echo Generating Chara.tsv
     pushd tools
-    uv run python create_chara_excel.py
+    uv run python builder/create_chara_excel.py
     popd
 
     "%SOFFICE%" --headless --convert-to "xlsx:Calc MS Excel 2007 XML" --infilter="CSV:9,34,76" "%~dp0LangMod\EN\Chara.tsv" --outdir "%~dp0LangMod\EN"
@@ -43,20 +43,20 @@ if exist "%SOFFICE%" (
     REM --- Drama Pipeline (openpyxl直接生成) ---
     echo Generating Drama Excel files...
     pushd tools
-    uv run python create_drama_excel.py
-    uv run python create_opening_drama.py
+    uv run python builder/create_drama_excel.py
+    uv run python builder/create_opening_drama.py
     popd
     REM ----------------------
 
     REM --- Flag System Pipeline ---
     echo Generating C# Flag Classes...
     pushd tools
-    uv run python generate_flags.py
+    uv run python builder/generate_flags.py
     popd
 
     echo Validating Scenario Flags...
     pushd tools
-    uv run python validate_scenario_flags.py
+    uv run python builder/validate_scenario_flags.py
     if %ERRORLEVEL% NEQ 0 (
         echo Flag Validation Failed!
         popd
@@ -81,22 +81,29 @@ if %ERRORLEVEL% NEQ 0 (
 
 echo Build Successful!
 
-echo Copying to Package folder...
-xcopy "%~dp0_bin\%MOD_NAME%.dll" "%~dp0elin_link\Package\%MOD_NAME%\" /Y
-xcopy "%~dp0package.xml" "%~dp0elin_link\Package\%MOD_NAME%\" /Y
-xcopy "%~dp0LangMod" "%~dp0elin_link\Package\%MOD_NAME%\LangMod\" /E /Y /I
-xcopy "%~dp0Texture" "%~dp0elin_link\Package\%MOD_NAME%\Texture\" /E /Y /I
-xcopy "%~dp0Portrait" "%~dp0elin_link\Package\%MOD_NAME%\Portrait\" /E /Y /I
-xcopy "%~dp0Sound" "%~dp0elin_link\Package\%MOD_NAME%\Sound\" /E /Y /I
+REM Quiet copy to Package folder
+echo Deploying to Package folder...
+xcopy "%~dp0_bin\%MOD_NAME%.dll" "%~dp0elin_link\Package\%MOD_NAME%\" /Y /Q >nul
+xcopy "%~dp0package.xml" "%~dp0elin_link\Package\%MOD_NAME%\" /Y /Q >nul
+xcopy "%~dp0LangMod" "%~dp0elin_link\Package\%MOD_NAME%\LangMod\" /E /Y /I /Q >nul
+xcopy "%~dp0Texture" "%~dp0elin_link\Package\%MOD_NAME%\Texture\" /E /Y /I /Q >nul
+xcopy "%~dp0Portrait" "%~dp0elin_link\Package\%MOD_NAME%\Portrait\" /E /Y /I /Q >nul
+xcopy "%~dp0Sound" "%~dp0elin_link\Package\%MOD_NAME%\Sound\" /E /Y /I /Q >nul
+echo   Done.
 
-echo Copying to Steam game folder...
+REM Quiet copy to Steam game folder
+echo Deploying to Steam folder...
 set STEAM_PACKAGE_DIR="C:\Program Files (x86)\Steam\steamapps\common\Elin\Package\%MOD_NAME%"
 if not exist %STEAM_PACKAGE_DIR% mkdir %STEAM_PACKAGE_DIR%
-xcopy "%~dp0_bin\%MOD_NAME%.dll" %STEAM_PACKAGE_DIR% /Y
-xcopy "%~dp0package.xml" %STEAM_PACKAGE_DIR% /Y
-xcopy "%~dp0LangMod" %STEAM_PACKAGE_DIR%\LangMod\ /E /Y /I
-xcopy "%~dp0Texture" %STEAM_PACKAGE_DIR%\Texture\ /E /Y /I
-xcopy "%~dp0Portrait" %STEAM_PACKAGE_DIR%\Portrait\ /E /Y /I
-xcopy "%~dp0Sound" %STEAM_PACKAGE_DIR%\Sound\ /E /Y /I
+xcopy "%~dp0_bin\%MOD_NAME%.dll" %STEAM_PACKAGE_DIR% /Y /Q >nul
+xcopy "%~dp0package.xml" %STEAM_PACKAGE_DIR% /Y /Q >nul
+xcopy "%~dp0LangMod" %STEAM_PACKAGE_DIR%\LangMod\ /E /Y /I /Q >nul
+xcopy "%~dp0Texture" %STEAM_PACKAGE_DIR%\Texture\ /E /Y /I /Q >nul
+xcopy "%~dp0Portrait" %STEAM_PACKAGE_DIR%\Portrait\ /E /Y /I /Q >nul
+xcopy "%~dp0Sound" %STEAM_PACKAGE_DIR%\Sound\ /E /Y /I /Q >nul
+echo   Done.
+
+echo.
+echo === Build Complete ===
 
 endlocal

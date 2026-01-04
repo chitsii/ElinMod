@@ -275,8 +275,63 @@ class DramaBuilder:
         return self
 
     def play_bgm(self, bgm_id: str) -> 'DramaBuilder':
-        """BGMを再生"""
-        self.entries.append({'action': 'bgm', 'param': bgm_id})
+        """
+        BGMを再生
+
+        Args:
+            bgm_id: BGM ID (例: "BGM/sukutsu_arena_opening")
+
+        Note:
+            CWLカスタムBGMは SoundManager.current.GetData(id) で取得して再生
+        """
+        # evalアクションでC#コードを実行（デバッグログ付き）
+        # CWLはSoundManager.current.dictDataにサウンドを登録し、
+        # GetData(id)で取得可能。BGMはBGMDataとして作成される。
+        code = f'''
+            Debug.Log("[SukutsuArena] Attempting to play BGM: {bgm_id}");
+            var data = SoundManager.current.GetData("{bgm_id}");
+            if (data != null) {{
+                Debug.Log("[SukutsuArena] Found BGM data, type: " + data.GetType().Name);
+                if (data is BGMData bgm) {{
+                    Debug.Log("[SukutsuArena] Playing as BGM");
+                    LayerDrama.haltPlaylist = true;
+                    LayerDrama.maxBGMVolume = true;
+                    SoundManager.current.PlayBGM(bgm);
+                }} else {{
+                    Debug.Log("[SukutsuArena] Playing as Sound");
+                    SoundManager.current.Play(data);
+                }}
+            }} else {{
+                Debug.LogWarning("[SukutsuArena] BGM not found: {bgm_id}");
+            }}
+        '''.replace('\n', ' ').strip()
+        self.entries.append({
+            'action': 'eval',
+            'param': code
+        })
+        return self
+
+    def play_bgm_vanilla(self, bgm_id: int) -> 'DramaBuilder':
+        """
+        バニラBGMを再生（数値ID）
+
+        Args:
+            bgm_id: バニラBGM ID (数値)
+        """
+        code = f'''
+            Debug.Log("[SukutsuArena] Playing vanilla BGM ID: {bgm_id}");
+            if (EMono.core.refs.dictBGM.TryGetValue({bgm_id}, out var bgm)) {{
+                LayerDrama.haltPlaylist = true;
+                LayerDrama.maxBGMVolume = true;
+                EMono.Sound.PlayBGM(bgm);
+            }} else {{
+                Debug.LogWarning("[SukutsuArena] Vanilla BGM not found: {bgm_id}");
+            }}
+        '''.replace('\n', ' ').strip()
+        self.entries.append({
+            'action': 'eval',
+            'param': code
+        })
         return self
 
     def wait(self, seconds: float) -> 'DramaBuilder':
@@ -641,7 +696,7 @@ class DramaBuilder:
     # CWL 拡張機能: カメラ・フォーカス
     # ============================================================================
 
-    def focus_chara(self, chara_id: str, wait_before: float = 0.3, wait_after: float = 0.3) -> 'DramaBuilder':
+    def focus_chara(self, chara_id: str, wait_before: float = 0.5, wait_after: float = 0.5) -> 'DramaBuilder':
         """
         キャラクターにフォーカス（前後にウェイト付き）
 
@@ -657,7 +712,7 @@ class DramaBuilder:
             self.entries.append({'action': 'wait', 'param': str(wait_after)})
         return self
 
-    def focus_pc(self, wait_before: float = 0.3, wait_after: float = 0.3) -> 'DramaBuilder':
+    def focus_pc(self, wait_before: float = 0.5, wait_after: float = 0.5) -> 'DramaBuilder':
         """
         プレイヤーキャラにフォーカス（前後にウェイト付き）
 

@@ -15,6 +15,8 @@ public class ZonePreEnterArenaBattle : ZonePreEnterEvent
 
     public int stage = 1;  // ステージ番号
 
+    public bool isRankUp = false;
+
     public override void Execute()
     {
         Debug.Log("[SukutsuArena] ZonePreEnterArenaBattle.Execute()");

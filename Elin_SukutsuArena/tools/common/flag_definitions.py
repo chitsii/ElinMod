@@ -172,6 +172,14 @@ class PlayerFlags:
         description="カルマ値（善悪度）"
     )
 
+    contribution = IntFlag(
+        key="player.contribution",
+        default=0,
+        min_value=0,
+        max_value=1000,
+        description="闘技場貢献度（ランクアップ条件）"
+    )
+
     fugitive_status = BoolFlag(
         key="player.fugitive_status",
         default=False,
@@ -333,6 +341,7 @@ class Keys:
     MOTIVATION = PlayerFlags.motivation.full_key
     RANK = PlayerFlags.rank.full_key
     KARMA = PlayerFlags.karma.full_key
+    CONTRIBUTION = PlayerFlags.contribution.full_key
     FUGITIVE = PlayerFlags.fugitive_status.full_key
     LILY_TRUE_NAME = PlayerFlags.lily_true_name.full_key
     NULL_CHIP = PlayerFlags.null_chip_obtained.full_key

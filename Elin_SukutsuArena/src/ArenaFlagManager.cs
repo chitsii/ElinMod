@@ -106,6 +106,11 @@ namespace Elin_SukutsuArena
             public static void SetKarma(int value) => SetInt(ArenaFlagKeys.Karma, Clamp(value, -100, 100));
             public static void AddKarma(int delta) => SetKarma(GetKarma() + delta);
 
+            // --- Contribution ---
+            public static int GetContribution() => GetInt(ArenaFlagKeys.Contribution);
+            public static void SetContribution(int value) => SetInt(ArenaFlagKeys.Contribution, Clamp(value, 0, 1000));
+            public static void AddContribution(int delta) => SetContribution(GetContribution() + delta);
+
             // --- Boolean Flags ---
             public static bool IsFugitive => GetBool(ArenaFlagKeys.FugitiveStatus);
             public static void SetFugitive(bool value) => SetBool(ArenaFlagKeys.FugitiveStatus, value);

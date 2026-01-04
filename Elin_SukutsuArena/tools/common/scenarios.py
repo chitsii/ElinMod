@@ -34,8 +34,8 @@ def define_opening_drama(builder: DramaBuilder):
     # ==== メインステップ: 異次元への転落 ====
     builder.step(main)
 
-    # BGM開始
-    builder.play_bgm(22001)
+    # BGM開始 (CWL仕様: Sound/BGM/ファイル名 → "BGM/sukutsu_arena_opening")
+    builder.play_bgm("BGM/sukutsu_arena_opening")
 
     # ナレーション (PCの独白)
     builder.say("narr1", "(色彩は混濁し、上下左右の感覚が溶けていく。次に足が触れたのは、石畳だ。)", actor=pc) \
@@ -179,43 +179,70 @@ def define_arena_master_drama(builder: DramaBuilder):
         .choice(join_no, "いや、やめておく", "", text_id="c2") \
         .on_cancel(end)
 
-    # === Victory Comment ===
-    # 勝利後、関係値を少し上げる
-    builder.step(victory_comment) \
-        .mod_flag("sukutsu_arena_result", "=", 0) \
-        .mod_flag(Keys.REL_BALGAS, "+", 5) \
-        .say("win1", "ふん、生きて戻ったか。まあ、最低限の働きはしたようだな。勘違いするなよ、雑魚が。", "", actor=vargus) \
+    # === Rank Check Logic ===
+    rank_check = builder.label("rank_check")
+    rank_up_check = builder.label("rank_up_check")
+    to_rank_up = builder.label("to_rank_up")
+
+    # ランク確認表示 (C#でメッセージ生成)
+    check_code = '''
+        var rank = Elin_SukutsuArena.ArenaFlagManager.Player.GetRank();
+        var contribution = Elin_SukutsuArena.ArenaFlagManager.Player.GetContribution();
+        var nextPoints = 0;
+        var nextRankName = "";
+
+        // ランク設定 (Unranked -> G)
+        if (rank == Elin_SukutsuArena.Flags.ArenaFlags.Player.RankEnum.Unranked) {
+            nextPoints = 10;
+            nextRankName = "Rank G";
+        } else {
+            // 他のランク用 (仮)
+            nextPoints = 9999;
+            nextRankName = "Unknown";
+        }
+
+        var needed = nextPoints - contribution;
+        if (needed < 0) needed = 0;
+        var battles = (int)Math.Ceiling(needed / 10.0);
+
+        var msg = $"現在のランク: {rank}\\n";
+        msg += $"現在の貢献度: {contribution} pt\\n";
+        msg += $"------------------\\n";
+        msg += $"次のランク: {nextRankName}\\n";
+        msg += $"必要ポイント: {nextPoints} pt (残り {needed} pt)\\n";
+        msg += $"目安戦闘回数: あと {battles} 戦";
+
+        if (needed == 0) msg += "\\n\\n>> 昇格試験の資格があります！";
+
+        Msg.Alert(msg);
+    '''.replace('\n', ' ').strip()
+
+    builder.step(rank_check) \
+        .action("eval", param=check_code) \
         .jump(registered)
 
-    # === Defeat Comment ===
-    builder.step(defeat_comment) \
-        .mod_flag("sukutsu_arena_result", "=", 0) \
-        .branch_if("sukutsu_arena_failed_stage", ">=", 2, defeat_stage2) \
-        .say("defeat1", "ハッ、獣にやられたか。情けない。まあ、初心者が負けるのは当然だな。次は足を使え。止まったら死ぬぞ。", "", actor=vargus) \
+    # 昇格試験への分岐
+    builder.step(rank_up_check) \
+        .branch_if("player.rank", "==", 0, to_rank_up) # Unranked check
+        .say("rank_up_error", "お前が受けられる試験はないぜ。", "", actor=vargus) \
         .jump(registered)
 
-    # Defeat Stage 2
-    builder.step(defeat_stage2) \
-        .branch_if("sukutsu_arena_failed_stage", ">=", 3, defeat_stage3) \
-        .say("defeat2", "ケンタウロスに蹴り殺されたか？馬並みの速さについていけなかったな。逃げるのは悪くない。だが、いつまでも逃げてばかりじゃ勝てないぞ。", "", actor=vargus) \
-        .jump(registered)
-
-    # Defeat Stage 3
-    builder.step(defeat_stage3) \
-        .branch_if("sukutsu_arena_failed_stage", ">=", 4, defeat_champion) \
-        .say("defeat3", "ミノタウロスか...あれは厄介だったろう。俺も初見では負けたさ。奴の攻撃を見切れるようになれば、勝機はある。鍛え直して来い。", "", actor=vargus) \
-        .jump(registered)
-
-    # Defeat Champion
-    builder.step(defeat_champion) \
-        .say("defeat4", "...グランドマスターに挑んだのか。お前、無謀だな。だが、その無謀さは嫌いじゃない。もっと強くなってから、また来い。", "", actor=vargus) \
-        .jump(registered)
+    # 昇格試験本番へ
+    # TODO: define_rank_up_game_01 実装後にジャンプ先を設定
+    builder.step(to_rank_up) \
+        .say("rank_up_confirm", "ほう…『屑肉の洗礼』を受けるつもりか？死んでも文句は言えんぞ。", "", actor=vargus) \
+        .choice(end, "やめておく", "", text_id="c_cancel_rup") \
+        .on_cancel(registered)  # 今はまだ実装していないので会話終了
 
 
     # === Registered Greeting ===
     builder.step(registered) \
         .say("greet2", "おう、闘士よ。今日は何の用だ？", "", actor=vargus) \
         .choice(battle_prep, "戦いに挑む", "", text_id="c3") \
+        .choice(rank_check, "ランクを確認したい", "", text_id="c_rank_check") \
+        # 条件付き選択肢: Unranked(0) かつ Contribution >= 10
+        .choice_if(rank_up_check, "昇格試験を受けたい", "", text_id="c_rank_up",
+                   condition="Elin_SukutsuArena.ArenaFlagManager.Player.GetRank() == Elin_SukutsuArena.Flags.ArenaFlags.Player.RankEnum.Unranked && Elin_SukutsuArena.ArenaFlagManager.Player.GetContribution() >= 10") \
         .choice(end, "また今度", "", text_id="c4") \
         .on_cancel(end)
 
@@ -287,3 +314,59 @@ def define_arena_master_drama(builder: DramaBuilder):
         .finish()
 
     builder.step(end).finish()
+
+
+def define_rank_up_game_01(builder: DramaBuilder):
+    """
+    Rank G 昇格試験「屑肉の洗礼」
+
+    シナリオ: 02_rank_up_01.md
+    """
+    pc = builder.register_actor("pc", "あなた", "You")
+    lily = builder.register_actor("sukutsu_receptionist", "リリィ", "Lily")
+    vargus = builder.register_actor("sukutsu_arena_master", "バルガス", "Vargus")
+
+    main = builder.label("main")
+
+    # シーン1: 受付での宣告
+    reception = builder.label("reception")
+    # シーン2: バルガスの餞別
+    vargus_advice = builder.label("vargus_advice")
+    # シーン3: 戦闘開始
+    battle_start = builder.label("battle_start")
+
+    # --- Reception ---
+    builder.step(main) \
+        .play_bgm("BGM/sukutsu_arena_opening") \
+        .focus_chara("sukutsu_receptionist") \
+        .say("lily_r1", "……準備はよろしいですか？", "", actor=lily) \
+        .wait(1.0) \
+        .say("lily_r2", "これは単なる試合ではありません。あなたがこの『ヴォイド・コロシアム』の胃袋に放り込まれる、最初の『餌』になるための儀式です。", "", actor=lily) \
+        .say("lily_r3", "対戦相手は『飢えたヴォイド・プチ』の群れ。……ああ、地上にいる愛らしい彼らだと思わないことね。敗者の絶望を啜って肥大化した、純然たる殺意の塊ですから。", "", actor=lily) \
+        .say("lily_r4", "もし、五体満足で戻られたら……その時は、正式に『闘士』として登録して差し上げます。死体袋の用意は、あちらの隅に。……ご武運を。", "", actor=lily)
+
+    # プレイヤー選択肢 (PR用)
+    l_react = builder.label("lily_react")
+    builder.choice(l_react, "……死体袋は不要だ。俺は生きて帰る", "", text_id="c_r_1") \
+           .choice(l_react, "プチごときに負けるか。すぐに終わらせてやる", "", text_id="c_r_2") \
+           .choice(l_react, "（無言で羊皮紙を受け取る）", "", text_id="c_r_3")
+
+    builder.step(l_react) \
+           .say("lily_r5", "ふふ、その自信がどこまで保つか楽しみですね。", "", actor=lily) \
+           .unfocus() \
+           .jump(vargus_advice)
+
+    # --- Vargus Advice ---
+    builder.step(vargus_advice) \
+        .focus_chara("sukutsu_arena_master") \
+        .say("vargus_r1", "おい、足が震えてんぞ。", "", actor=vargus) \
+        .say("vargus_r2", "……いいか、一度だけ教えてやる。プチ共は『数』で来る。一匹一匹はゴミだが、囲まれればお前の肉は一瞬で削げ落ち、綺麗な骨の標本ができあがりだ。", "", actor=vargus) \
+        .say("vargus_r3", "壁を背にしろ。そして、スタミナを切らすな。呼吸を乱した瞬間に、奴らは喉笛に吸い付いてくる。……ほら、行け。観客どもが、お前の悲鳴を心待ちにしてやがるぜ。", "", actor=vargus) \
+        .jump(battle_start)
+
+    # --- Battle Start ---
+    # TODO: ArenaManagerにランクアップ試験用の戦闘開始メソッドを追加する必要があるかも
+    # 今は仮にステージ1相当として開始するが、後で ZonePreEnterArenaBattle でフラグを見てプチ大量発生に分岐させる
+    builder.step(battle_start) \
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.StartBattle(tg, 1, true);") \
+        .finish()

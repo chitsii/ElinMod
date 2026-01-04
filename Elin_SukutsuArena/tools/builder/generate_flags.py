@@ -5,7 +5,16 @@ Generates strongly-typed C# classes from flag_definitions.py.
 Output: src/Generated/ArenaFlags.cs
 """
 import os
+import sys
 from datetime import datetime
+
+# Path setup
+BUILDER_DIR = os.path.dirname(os.path.abspath(__file__))
+TOOLS_DIR = os.path.dirname(BUILDER_DIR)
+COMMON_DIR = os.path.join(TOOLS_DIR, 'common')
+sys.path.append(TOOLS_DIR)
+sys.path.append(COMMON_DIR)
+
 from flag_definitions import (
     get_all_flags, get_all_enums,
     EnumFlag, IntFlag, BoolFlag, StringFlag,
@@ -117,8 +126,8 @@ def generate_csharp() -> str:
 
 def main():
     # Determine output path
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    project_root = os.path.dirname(script_dir)
+    # script_dir = BUILDER_DIR
+    project_root = os.path.dirname(TOOLS_DIR)
     output_dir = os.path.join(project_root, "src", "Generated")
     output_file = os.path.join(output_dir, "ArenaFlags.cs")
 

@@ -7,8 +7,12 @@ import os
 import sys
 
 # toolsディレクトリをパスに追加してモジュールをインポート可能にする
-TOOLS_DIR = os.path.dirname(os.path.abspath(__file__))
+# toolsディレクトリをパスに追加してモジュールをインポート可能にする
+BUILDER_DIR = os.path.dirname(os.path.abspath(__file__))
+TOOLS_DIR = os.path.dirname(BUILDER_DIR)
+COMMON_DIR = os.path.join(TOOLS_DIR, 'common')
 sys.path.append(TOOLS_DIR)
+sys.path.append(COMMON_DIR)
 
 from drama_builder import DramaBuilder
 from scenarios import define_opening_drama

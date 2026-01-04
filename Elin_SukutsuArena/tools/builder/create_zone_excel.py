@@ -3,7 +3,8 @@ import os
 import csv
 
 # パス設定
-TOOLS_DIR = os.path.dirname(os.path.abspath(__file__))
+BUILDER_DIR = os.path.dirname(os.path.abspath(__file__))
+TOOLS_DIR = os.path.dirname(BUILDER_DIR)
 PROJECT_ROOT = os.path.dirname(TOOLS_DIR)
 SAMPLE_PATH = r'c:\Users\tishi\programming\elin_modding\CWL_AddLocation_Example\LangMod\EN\SourceSSS.xlsx'
 OUTPUT_EN_TSV = os.path.join(PROJECT_ROOT, 'LangMod', 'EN', 'Zone.tsv')

@@ -17,13 +17,27 @@ public static class ArenaManager
         public int[] MonsterLevels { get; set; }
         public int RewardPlat { get; set; }
         public string ZoneType { get; set; } = "field";  // 今後カスタムマップも可能
+        public bool IsRankUpBattle { get; set; } = false;
     }
 
     /// <summary>
     /// ステージ設定を取得
     /// </summary>
-    public static StageConfig GetStageConfig(int stage)
+    public static StageConfig GetStageConfig(int stage, bool isRankUp = false)
     {
+        // ランクアップ試験用の特別構成
+        if (isRankUp)
+        {
+            return new StageConfig
+            {
+                MonsterIds = new[] { "putty" }, // ヴォイド・プチ（仮ID）
+                MonsterLevels = new[] { 5 },   // レベル調整
+                RewardPlat = 0,                // ランクアップ自体が報酬
+                ZoneType = "field",
+                IsRankUpBattle = true
+            };
+        }
+
         return stage switch
         {
             1 => new StageConfig
@@ -69,9 +83,10 @@ public static class ArenaManager
     /// </summary>
     /// <param name="master">アリーナマスター</param>
     /// <param name="stage">ステージ番号</param>
-    public static void StartBattle(Chara master, int stage)
+    /// <param name="isRankUp">ランク検定かどうか</param>
+    public static void StartBattle(Chara master, int stage, bool isRankUp = false)
     {
-        Debug.Log($"[SukutsuArena] StartBattle called: master={master?.Name}, stage={stage}");
+        Debug.Log($"[SukutsuArena] StartBattle called: master={master?.Name}, stage={stage}, isRankUp={isRankUp}");
 
         if (master == null)
         {
@@ -79,7 +94,7 @@ public static class ArenaManager
             return;
         }
 
-        var config = GetStageConfig(stage);
+        var config = GetStageConfig(stage, isRankUp);
 
         // 一時戦闘マップを作成
         Zone battleZone = SpatialGen.CreateInstance(config.ZoneType, new ZoneInstanceArenaBattle
@@ -90,7 +105,8 @@ public static class ArenaManager
             uidZone = EClass._zone.uid,
             bossCount = config.MonsterIds.Length,
             stage = stage,
-            rewardPlat = config.RewardPlat
+            rewardPlat = config.RewardPlat,
+            isRankUp = isRankUp
         });
 
         // 敵配置イベントを追加
@@ -99,7 +115,8 @@ public static class ArenaManager
             bossLevel = config.MonsterLevels[0],
             bossCount = config.MonsterIds.Length,
             bossIds = config.MonsterIds,
-            stage = stage
+            stage = stage,
+            isRankUp = isRankUp
         });
 
         Debug.Log($"[SukutsuArena] Created battle zone, moving player...");
