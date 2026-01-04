@@ -164,7 +164,7 @@ class DramaBuilder:
         return self
 
     def choice(self, jump_to: Union[str, DramaLabel], text_jp: str,
-               text_en: str = "", text_id: str = "") -> 'DramaBuilder':
+               text_en: str = "", text_id: str = "", condition: str = "") -> 'DramaBuilder':
         """選択肢を追加"""
         key = self._resolve_key(jump_to)
         entry = {
@@ -175,8 +175,15 @@ class DramaBuilder:
         }
         if text_id:
             entry['id'] = text_id
+        if condition:
+            entry['if'] = condition
         self.entries.append(entry)
         return self
+
+    def choice_if(self, jump_to: Union[str, DramaLabel], text_jp: str,
+                  condition: str, text_en: str = "", text_id: str = "") -> 'DramaBuilder':
+        """条件付き選択肢を追加 (choiceのエイリアス)"""
+        return self.choice(jump_to, text_jp, text_en, text_id, condition)
 
     def jump(self, jump_to: Union[str, DramaLabel]) -> 'DramaBuilder':
         """指定ステップにジャンプ"""
@@ -708,36 +715,6 @@ class DramaBuilder:
         if wait_before > 0:
             self.entries.append({'action': 'wait', 'param': str(wait_before)})
         self.entries.append({'action': 'focusChara', 'param': chara_id})
-        if wait_after > 0:
-            self.entries.append({'action': 'wait', 'param': str(wait_after)})
-        return self
-
-    def focus_pc(self, wait_before: float = 0.5, wait_after: float = 0.5) -> 'DramaBuilder':
-        """
-        プレイヤーキャラにフォーカス（前後にウェイト付き）
-
-        Args:
-            wait_before: フォーカス前の待機秒数
-            wait_after: フォーカス後の待機秒数
-        """
-        if wait_before > 0:
-            self.entries.append({'action': 'wait', 'param': str(wait_before)})
-        self.entries.append({'action': 'focusPC'})
-        if wait_after > 0:
-            self.entries.append({'action': 'wait', 'param': str(wait_after)})
-        return self
-
-    def unfocus(self, wait_before: float = 0.2, wait_after: float = 0.2) -> 'DramaBuilder':
-        """
-        フォーカス解除（前後にウェイト付き）
-
-        Args:
-            wait_before: 解除前の待機秒数
-            wait_after: 解除後の待機秒数
-        """
-        if wait_before > 0:
-            self.entries.append({'action': 'wait', 'param': str(wait_before)})
-        self.entries.append({'action': 'unfocus'})
         if wait_after > 0:
             self.entries.append({'action': 'wait', 'param': str(wait_after)})
         return self

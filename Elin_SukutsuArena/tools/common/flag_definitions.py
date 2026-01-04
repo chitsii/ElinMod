@@ -37,6 +37,13 @@ class Rank(Enum):
     B = "B"
     A = "A"
     S = "S"
+    SS = "SS"
+    SSS = "SSS"
+    U = "U"
+    Z = "Z"
+    GOD_SLAYER = "god_slayer"
+    SINGULARITY = "singularity"
+    VOID_KING = "void_king"
 
     def __ge__(self, other):
         if not isinstance(other, Rank):

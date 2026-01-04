@@ -61,6 +61,16 @@ public class ZoneInstanceArenaBattle : ZoneInstance
             ScheduleAutoDialog();
         }
 
+        // ランクアップ戦かどうかをフラグに保存
+        if (isRankUp)
+        {
+            EClass.player.dialogFlags["sukutsu_is_rank_up_result"] = 1;
+        }
+        else
+        {
+            EClass.player.dialogFlags["sukutsu_is_rank_up_result"] = 0;
+        }
+
         // マスターIDを使って後処理などがあればここで行う
     }
 

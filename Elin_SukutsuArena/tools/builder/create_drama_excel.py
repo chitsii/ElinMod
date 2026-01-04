@@ -15,24 +15,29 @@ sys.path.append(TOOLS_DIR)
 sys.path.append(COMMON_DIR)
 
 from drama_builder import DramaBuilder
-from scenarios import define_arena_master_drama, define_rank_up_game_01
+from arena_drama_builder import ArenaDramaBuilder
+from scenarios.arena_master import define_arena_master_drama
+from scenarios.rank_up import define_rank_up_G
 
 PROJECT_ROOT = os.path.dirname(TOOLS_DIR)
 MASTER_OUTPUT_PATH = os.path.join(PROJECT_ROOT, 'LangMod', 'JP', 'Dialog', 'Drama', 'drama_sukutsu_arena_master.xlsx')
-RANK_UP_01_OUTPUT_PATH = os.path.join(PROJECT_ROOT, 'LangMod', 'JP', 'Dialog', 'Drama', 'drama_rank_up_game_01.xlsx')
 
 def main():
-    # --- Arena Master ---
-    builder_master = DramaBuilder()
+    output_dir_jp = os.path.join(PROJECT_ROOT, "LangMod", "JP", "Dialog", "Drama")
+    os.makedirs(output_dir_jp, exist_ok=True)
+
+    # Sukutsu Arena Master
+    builder_master = ArenaDramaBuilder()
     define_arena_master_drama(builder_master)
     builder_master.save(MASTER_OUTPUT_PATH, sheet_name="sukutsu_arena_master")
     print(f"Generated: {MASTER_OUTPUT_PATH}")
 
     # --- Rank Up G ---
-    builder_rankG = DramaBuilder()
-    define_rank_up_game_01(builder_rankG)
-    builder_rankG.save(RANK_UP_01_OUTPUT_PATH, sheet_name="drama_rank_up_game_01")
-    print(f"Generated: {RANK_UP_01_OUTPUT_PATH}")
+    RANK_G_OUTPUT_PATH = os.path.join(output_dir_jp, 'drama_rank_up_G.xlsx')
+    builder_rankG = ArenaDramaBuilder()
+    define_rank_up_G(builder_rankG)
+    builder_rankG.save(RANK_G_OUTPUT_PATH, sheet_name="drama_rank_up_G")
+    print(f"Generated: {RANK_G_OUTPUT_PATH}")
 
 if __name__ == "__main__":
     main()
