@@ -142,5 +142,5 @@ def define_vs_grandmaster_1(builder: DramaBuilder):
     # 終了処理
     # ========================================
     builder.step(ending) \
-        .set_flag(Keys.FUGITIVE, True) \
+        .set_flag(Keys.FUGITIVE, 1) \
         .finish()

@@ -158,7 +158,7 @@ def define_makuma(builder: DramaBuilder):
     # 終了処理
     # ========================================
     builder.step(ending) \
-        .set_flag(Keys.NULL_CHIP, True) \
+        .set_flag(Keys.NULL_CHIP, 1) \
         .mod_flag(Keys.REL_LILY, "+", 10) \
         .mod_flag(Keys.REL_ZEK, "+", 10) \
         .finish()
