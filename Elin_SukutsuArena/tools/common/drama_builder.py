@@ -597,40 +597,6 @@ class DramaBuilder:
         return f"<,{flag_name},{value}"
 
     # ============================================================================
-    # CWL 拡張機能: サウンド
-    # ============================================================================
-
-    def play_sound_with_probability(self, sound_id: str, probability: float = 1.0) -> 'DramaBuilder':
-        """
-        確率付き効果音を再生
-
-        Args:
-            sound_id: サウンドID
-            probability: 再生確率 (0.0-1.0)
-        """
-        if probability >= 1.0:
-            self.entries.append({'action': 'sound', 'param': sound_id})
-        else:
-            self.entries.append({'action': 'sound', 'param': f'{sound_id},{probability}'})
-        return self
-
-    @staticmethod
-    def sound_tag(sound_id: str, probability: float = 1.0) -> str:
-        """
-        テキスト内に埋め込むサウンドタグを生成
-
-        Args:
-            sound_id: サウンドID
-            probability: 再生確率 (0.0-1.0)
-
-        Returns:
-            埋め込み用タグ文字列 (例: "<sound=gandalf,0.8>")
-        """
-        if probability >= 1.0:
-            return f"<sound={sound_id}>"
-        return f"<sound={sound_id},{probability}>"
-
-    # ============================================================================
     # CWL 拡張機能: 視覚効果
     # ============================================================================
 
@@ -644,66 +610,16 @@ class DramaBuilder:
         self.entries.append({'action': 'fadeOut', 'param': color})
         return self
 
-    def fade_in_out(self, color: str = "black") -> 'DramaBuilder':
-        """フェードイン・アウト"""
-        self.entries.append({'action': 'fadeInOut', 'param': color})
-        return self
-
-    def alpha_in(self) -> 'DramaBuilder':
-        """アルファフェードイン"""
-        self.entries.append({'action': 'alphaIn'})
-        return self
-
-    def alpha_out(self) -> 'DramaBuilder':
-        """アルファフェードアウト"""
-        self.entries.append({'action': 'alphaOut'})
-        return self
-
     def shake(self) -> 'DramaBuilder':
         """画面を揺らす"""
         self.entries.append({'action': 'shake'})
-        return self
-
-    def hide_ui(self) -> 'DramaBuilder':
-        """UIを非表示"""
-        self.entries.append({'action': 'hideUI'})
-        return self
-
-    def hide_dialog(self) -> 'DramaBuilder':
-        """ダイアログを非表示"""
-        self.entries.append({'action': 'hideDialog'})
-        return self
-
-    # ============================================================================
-    # CWL 拡張機能: アイテム・リソース
-    # ============================================================================
-
-    def add_key_item(self, key_item_id: str) -> 'DramaBuilder':
-        """キーアイテムを追加"""
-        self.entries.append({'action': 'addKeyItem', 'param': key_item_id})
-        return self
-
-    def drop_item(self, item_id: str, count: int = 1) -> 'DramaBuilder':
-        """アイテムをドロップ"""
-        param = f"{item_id},{count}" if count > 1 else item_id
-        self.entries.append({'action': 'drop', 'param': param})
-        return self
-
-    def add_resource(self, resource_type: str, amount: int) -> 'DramaBuilder':
-        """リソースを追加 (ホームリソースなど)"""
-        self.entries.append({'action': 'addResource', 'param': f'{resource_type},{amount}'})
-        return self
-
-    def destroy_item(self, item_id: str) -> 'DramaBuilder':
-        """アイテムを破壊"""
-        self.entries.append({'action': 'destroyItem', 'param': item_id})
         return self
 
     # ============================================================================
     # CWL 拡張機能: カメラ・フォーカス
     # ============================================================================
 
-    def focus_chara(self, chara_id: str, wait_before: float = 0.5, wait_after: float = 0.5) -> 'DramaBuilder':
+    def focus_chara(self, chara_id: str, wait_before: float = 0.3, wait_after: float = 0.5) -> 'DramaBuilder':
         """
         キャラクターにフォーカス（前後にウェイト付き）
 
@@ -731,6 +647,68 @@ class DramaBuilder:
     def set_hour(self, hour: int) -> 'DramaBuilder':
         """時刻を設定"""
         self.entries.append({'action': 'setHour', 'param': str(hour)})
+        return self
+
+    # ============================================================================
+    # CWL 拡張機能: クエスト操作
+    # ============================================================================
+
+    def start_quest(self, quest_id: str) -> 'DramaBuilder':
+        """
+        新しいクエストを開始する
+
+        Args:
+            quest_id: クエストID (例: "q_collect_stone")
+        """
+        self.entries.append({'action': 'startQuest', 'param': quest_id})
+        return self
+
+    def complete_quest(self, quest_id: str = "") -> 'DramaBuilder':
+        """
+        クエストを完了する
+
+        Args:
+            quest_id: クエストID（省略時は現在のクエスト）
+        """
+        if quest_id:
+            self.entries.append({'action': 'completeQuest', 'param': quest_id})
+        else:
+            self.entries.append({'action': 'completeQuest'})
+        return self
+
+    def next_phase(self, quest_id: str) -> 'DramaBuilder':
+        """
+        クエストの次フェーズに進む
+
+        Args:
+            quest_id: クエストID
+        """
+        self.entries.append({'action': 'nextPhase', 'param': quest_id})
+        return self
+
+    def change_phase(self, quest_id: str, phase: int) -> 'DramaBuilder':
+        """
+        クエストのフェーズを変更する
+
+        Args:
+            quest_id: クエストID
+            phase: フェーズ番号
+        """
+        self.entries.append({'action': 'changePhase', 'param': f'{quest_id},{phase}'})
+        return self
+
+    def set_quest_client(self) -> 'DramaBuilder':
+        """
+        現在のクエストのクライアントを tg（会話相手）に設定する
+        """
+        self.entries.append({'action': 'setQuestClient'})
+        return self
+
+    def update_journal(self) -> 'DramaBuilder':
+        """
+        ジャーナルを更新する
+        """
+        self.entries.append({'action': 'updateJournal'})
         return self
 
     def build(self) -> List[Dict[str, Any]]:

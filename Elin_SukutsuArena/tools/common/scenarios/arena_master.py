@@ -58,11 +58,14 @@ def define_arena_master_drama(builder: DramaBuilder):
     to_rank_up = builder.label("to_rank_up")
 
     # --- Helper Function for Common Choices ---
+    debug_quest_accept = builder.label("debug_quest_accept")
+
     def add_choices(b):
         """共通の選択肢を追加する"""
         b.choice(battle_prep, "戦いに挑む", "", text_id="c3") \
          .choice(rank_check, "ランクを確認したい", "", text_id="c_rank_check") \
          .choice(rank_up_check, "昇格試験を受けたい", "", text_id="c_rank_up") \
+         .choice(debug_quest_accept, "[DEBUG] リリィのクエストを受ける", "", text_id="c_debug_quest") \
          .choice(end, "また今度", "", text_id="c4") \
          .on_cancel(end)
 
@@ -172,6 +175,7 @@ def define_arena_master_drama(builder: DramaBuilder):
     # 戻り先として確保(on_cancel等用)
     b = builder.step(registered_choices)
     add_choices(b)
+
 
     # 各ランク挨拶 + 選択肢インライン展開
     b = builder.step(greet_unranked).say("greet_u", "おう、ひよっこ。今日は何の用だ？", "", actor=vargus)
