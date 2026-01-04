@@ -14,11 +14,15 @@ COMMON_DIR = os.path.join(TOOLS_DIR, 'common')
 sys.path.append(TOOLS_DIR)
 sys.path.append(COMMON_DIR)
 
+import importlib
 from drama_builder import DramaBuilder
-from scenarios import define_opening_drama
+from drama_constants import DramaIds
+
+# Import numbered scenario modules using importlib
+define_opening_drama = importlib.import_module('scenarios.01_opening').define_opening_drama
 
 PROJECT_ROOT = os.path.dirname(TOOLS_DIR)
-OUTPUT_PATH = os.path.join(PROJECT_ROOT, 'LangMod', 'JP', 'Dialog', 'Drama', 'drama_sukutsu_opening.xlsx')
+OUTPUT_PATH = os.path.join(PROJECT_ROOT, 'LangMod', 'JP', 'Dialog', 'Drama', f'drama_{DramaIds.SUKUTSU_OPENING}.xlsx')
 
 def main():
     builder = DramaBuilder()

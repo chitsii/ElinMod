@@ -126,4 +126,5 @@ def define_opening_drama(builder: DramaBuilder):
         .set_flag("sukutsu_gladiator", 1) \
         .set_flag("sukutsu_arena_stage", 1) \
         .set_flag("sukutsu_opening_seen", 1) \
+        .complete_quest("01_opening") \
         .finish()

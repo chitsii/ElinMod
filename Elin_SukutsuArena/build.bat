@@ -65,6 +65,18 @@ if exist "%SOFFICE%" (
     popd
     REM ----------------------
 
+    REM --- Quest System Pipeline ---
+    echo Exporting Quest Definitions to JSON...
+    pushd tools\common
+    uv run python -c "from quest_dependencies import export_quests_to_json; import os; export_quests_to_json(os.path.join('..', '..', 'Package', 'quest_definitions.json'))"
+    if %ERRORLEVEL% NEQ 0 (
+        echo Quest Export Failed!
+        popd
+        exit /b 1
+    )
+    popd
+    REM ----------------------
+
     echo Conversion complete.
 ) else (
     echo WARNING: LibreOffice not found at %SOFFICE%. Skipping compatibility fix.
@@ -85,6 +97,7 @@ REM Quiet copy to Package folder
 echo Deploying to Package folder...
 xcopy "%~dp0_bin\%MOD_NAME%.dll" "%~dp0elin_link\Package\%MOD_NAME%\" /Y /Q >nul
 xcopy "%~dp0package.xml" "%~dp0elin_link\Package\%MOD_NAME%\" /Y /Q >nul
+xcopy "%~dp0Package\quest_definitions.json" "%~dp0elin_link\Package\%MOD_NAME%\Package\" /Y /I /Q >nul
 xcopy "%~dp0LangMod" "%~dp0elin_link\Package\%MOD_NAME%\LangMod\" /E /Y /I /Q >nul
 xcopy "%~dp0Texture" "%~dp0elin_link\Package\%MOD_NAME%\Texture\" /E /Y /I /Q >nul
 xcopy "%~dp0Portrait" "%~dp0elin_link\Package\%MOD_NAME%\Portrait\" /E /Y /I /Q >nul
@@ -97,6 +110,7 @@ set STEAM_PACKAGE_DIR="C:\Program Files (x86)\Steam\steamapps\common\Elin\Packag
 if not exist %STEAM_PACKAGE_DIR% mkdir %STEAM_PACKAGE_DIR%
 xcopy "%~dp0_bin\%MOD_NAME%.dll" %STEAM_PACKAGE_DIR% /Y /Q >nul
 xcopy "%~dp0package.xml" %STEAM_PACKAGE_DIR% /Y /Q >nul
+xcopy "%~dp0Package\quest_definitions.json" %STEAM_PACKAGE_DIR%\Package\ /Y /I /Q >nul
 xcopy "%~dp0LangMod" %STEAM_PACKAGE_DIR%\LangMod\ /E /Y /I /Q >nul
 xcopy "%~dp0Texture" %STEAM_PACKAGE_DIR%\Texture\ /E /Y /I /Q >nul
 xcopy "%~dp0Portrait" %STEAM_PACKAGE_DIR%\Portrait\ /E /Y /I /Q >nul

@@ -1,0 +1,517 @@
+[
+  {
+    "questId": "01_opening",
+    "questType": "main_story",
+    "dramaId": "sukutsu_opening",
+    "displayNameJP": "異次元の闘技場への到着",
+    "displayNameEN": "Arrival at the Dimensional Arena",
+    "description": "プレイヤーがアリーナに到着し、リリィとバルガスに出会う",
+    "requiredFlags": [],
+    "requiredQuests": [],
+    "completionFlags": {
+      "chitsii.arena.player.rank": "unranked",
+      "chitsii.arena.rel.lily": 30,
+      "chitsii.arena.rel.balgas": 20,
+      "chitsii.arena.rel.zek": 0
+    },
+    "branchChoices": [],
+    "blocksQuests": [],
+    "priority": 1000
+  },
+  {
+    "questId": "02_rank_up_G",
+    "questType": "rank_up",
+    "dramaId": "rank_up_G",
+    "displayNameJP": "ランクG昇格試験",
+    "displayNameEN": "Rank G Promotion Trial",
+    "description": "最初の試練を突破し、ランクGを獲得する",
+    "requiredFlags": [
+      {
+        "flagKey": "chitsii.arena.player.rank",
+        "operator": "==",
+        "value": "unranked"
+      }
+    ],
+    "requiredQuests": [
+      "01_opening"
+    ],
+    "completionFlags": {
+      "chitsii.arena.player.rank": "G"
+    },
+    "branchChoices": [],
+    "blocksQuests": [],
+    "priority": 900
+  },
+  {
+    "questId": "04_rank_up_F",
+    "questType": "rank_up",
+    "dramaId": "rank_up_F",
+    "displayNameJP": "ランクF昇格試験（凍土の魔犬）",
+    "displayNameEN": "Rank F Promotion Trial (Frozen Hound)",
+    "description": "凍土の魔犬を倒し、ランクFを獲得する",
+    "requiredFlags": [
+      {
+        "flagKey": "chitsii.arena.player.rank",
+        "operator": "==",
+        "value": "G"
+      }
+    ],
+    "requiredQuests": [
+      "02_rank_up_G"
+    ],
+    "completionFlags": {
+      "chitsii.arena.player.rank": "F"
+    },
+    "branchChoices": [],
+    "blocksQuests": [],
+    "priority": 900
+  },
+  {
+    "questId": "06_rank_up_E",
+    "questType": "rank_up",
+    "dramaId": "rank_up_E",
+    "displayNameJP": "ランクE昇格試験（錆びついた英雄カイン）",
+    "displayNameEN": "Rank E Promotion Trial (Rusted Hero Kain)",
+    "description": "錆びついた英雄カインを倒し、ランクEを獲得する",
+    "requiredFlags": [
+      {
+        "flagKey": "chitsii.arena.player.rank",
+        "operator": "==",
+        "value": "F"
+      }
+    ],
+    "requiredQuests": [
+      "04_rank_up_F"
+    ],
+    "completionFlags": {
+      "chitsii.arena.player.rank": "E"
+    },
+    "branchChoices": [],
+    "blocksQuests": [],
+    "priority": 900
+  },
+  {
+    "questId": "10_rank_up_D",
+    "questType": "rank_up",
+    "dramaId": "rank_up_D",
+    "displayNameJP": "ランクD昇格試験（銅貨稼ぎの洗礼）",
+    "displayNameEN": "Rank D Promotion Trial (Copper Earner's Baptism)",
+    "description": "観客の介入を避けながら戦い、ランクDを獲得する",
+    "requiredFlags": [
+      {
+        "flagKey": "chitsii.arena.player.rank",
+        "operator": "==",
+        "value": "E"
+      }
+    ],
+    "requiredQuests": [
+      "06_rank_up_E"
+    ],
+    "completionFlags": {
+      "chitsii.arena.player.rank": "D"
+    },
+    "branchChoices": [],
+    "blocksQuests": [],
+    "priority": 900
+  },
+  {
+    "questId": "09_rank_up_C",
+    "questType": "rank_up",
+    "dramaId": "rank_up_C",
+    "displayNameJP": "ランクC昇格試験（闘技場の鴉）",
+    "displayNameEN": "Rank C Promotion Trial (Arena Crow)",
+    "description": "堕ちた英雄たちを解放し、ランクCを獲得する",
+    "requiredFlags": [
+      {
+        "flagKey": "chitsii.arena.player.rank",
+        "operator": "==",
+        "value": "D"
+      }
+    ],
+    "requiredQuests": [
+      "10_rank_up_D"
+    ],
+    "completionFlags": {
+      "chitsii.arena.player.rank": "C"
+    },
+    "branchChoices": [],
+    "blocksQuests": [],
+    "priority": 900
+  },
+  {
+    "questId": "11_rank_up_B",
+    "questType": "rank_up",
+    "dramaId": "rank_up_B",
+    "displayNameJP": "ランクB昇格試験（暗殺者ヌル）",
+    "displayNameEN": "Rank B Promotion Trial (Assassin Null)",
+    "description": "暗殺者ヌルを倒し、ランクBを獲得する",
+    "requiredFlags": [
+      {
+        "flagKey": "chitsii.arena.player.rank",
+        "operator": "==",
+        "value": "C"
+      }
+    ],
+    "requiredQuests": [
+      "09_rank_up_C"
+    ],
+    "completionFlags": {
+      "chitsii.arena.player.rank": "B"
+    },
+    "branchChoices": [],
+    "blocksQuests": [],
+    "priority": 900
+  },
+  {
+    "questId": "14_rank_up_A",
+    "questType": "rank_up",
+    "dramaId": "rank_up_A",
+    "displayNameJP": "ランクA昇格試験（影との戦い）",
+    "displayNameEN": "Rank A Promotion Trial (Shadow Battle)",
+    "description": "自分の影（第二のヌル）を倒し、ランクAを獲得する",
+    "requiredFlags": [
+      {
+        "flagKey": "chitsii.arena.player.rank",
+        "operator": "==",
+        "value": "B"
+      }
+    ],
+    "requiredQuests": [
+      "11_rank_up_B",
+      "13_makuma2"
+    ],
+    "completionFlags": {
+      "chitsii.arena.player.rank": "A"
+    },
+    "branchChoices": [],
+    "blocksQuests": [],
+    "priority": 900
+  },
+  {
+    "questId": "15_rank_up_S",
+    "questType": "rank_up",
+    "dramaId": "vs_balgas",
+    "displayNameJP": "ランクS昇格試験（バルガス全盛期との一騎打ち）",
+    "displayNameEN": "Rank S Promotion Trial (Duel with Prime Balgas)",
+    "description": "バルガスの全盛期の姿と戦い、ランクSを獲得する",
+    "requiredFlags": [
+      {
+        "flagKey": "chitsii.arena.player.rank",
+        "operator": "==",
+        "value": "A"
+      }
+    ],
+    "requiredQuests": [
+      "14_rank_up_A"
+    ],
+    "completionFlags": {
+      "chitsii.arena.player.rank": "S"
+    },
+    "branchChoices": [
+      "balgas_choice"
+    ],
+    "blocksQuests": [],
+    "priority": 900
+  },
+  {
+    "questId": "03_zek_intro",
+    "questType": "character_event",
+    "dramaId": "zek_intro",
+    "displayNameJP": "影歩きの邂逅",
+    "displayNameEN": "Encounter with the Shadow Walker",
+    "description": "商人ゼクとの初遭遇",
+    "requiredFlags": [
+      {
+        "flagKey": "chitsii.arena.player.rank",
+        "operator": ">=",
+        "value": "G"
+      }
+    ],
+    "requiredQuests": [
+      "02_rank_up_G"
+    ],
+    "completionFlags": {
+      "chitsii.arena.rel.zek": 10
+    },
+    "branchChoices": [],
+    "blocksQuests": [],
+    "priority": 800
+  },
+  {
+    "questId": "05_1_lily_experiment",
+    "questType": "side_quest",
+    "dramaId": "lily_experiment",
+    "displayNameJP": "リリィの私的依頼『残響の器』",
+    "displayNameEN": "Lily's Private Request: Vessel of Echoes",
+    "description": "リリィのために虚空の共鳴瓶を製作する",
+    "requiredFlags": [
+      {
+        "flagKey": "chitsii.arena.player.rank",
+        "operator": ">=",
+        "value": "F"
+      }
+    ],
+    "requiredQuests": [
+      "04_rank_up_F"
+    ],
+    "completionFlags": {},
+    "branchChoices": [],
+    "blocksQuests": [],
+    "priority": 700
+  },
+  {
+    "questId": "05_2_zek_steal_bottle",
+    "questType": "side_quest",
+    "dramaId": "zek_steal_bottle",
+    "displayNameJP": "ゼクの器すり替え提案",
+    "displayNameEN": "Zek's Bottle Swap Proposal",
+    "description": "ゼクが共鳴瓶のすり替えを提案する【重要分岐】",
+    "requiredFlags": [
+      {
+        "flagKey": "chitsii.arena.player.rank",
+        "operator": ">=",
+        "value": "F"
+      }
+    ],
+    "requiredQuests": [
+      "05_1_lily_experiment"
+    ],
+    "completionFlags": {},
+    "branchChoices": [
+      "bottle_choice"
+    ],
+    "blocksQuests": [],
+    "priority": 700
+  },
+  {
+    "questId": "06_2_zek_steal_soulgem",
+    "questType": "side_quest",
+    "dramaId": "zek_steal_soulgem",
+    "displayNameJP": "カインの魂の選択",
+    "displayNameEN": "Kain's Soul Choice",
+    "description": "カインの魂をゼクに売るか、バルガスに返すか選択する【重要分岐】",
+    "requiredFlags": [
+      {
+        "flagKey": "chitsii.arena.player.rank",
+        "operator": "==",
+        "value": "E"
+      }
+    ],
+    "requiredQuests": [
+      "06_rank_up_E"
+    ],
+    "completionFlags": {},
+    "branchChoices": [
+      "kain_soul_choice"
+    ],
+    "blocksQuests": [],
+    "priority": 850
+  },
+  {
+    "questId": "07_upper_existence",
+    "questType": "main_story",
+    "dramaId": "upper_existence",
+    "displayNameJP": "高次元存在の真実",
+    "displayNameEN": "Truth of Higher Dimensional Beings",
+    "description": "観客の正体と闘技場の真実が明らかになる",
+    "requiredFlags": [
+      {
+        "flagKey": "chitsii.arena.player.rank",
+        "operator": "==",
+        "value": "D"
+      }
+    ],
+    "requiredQuests": [
+      "10_rank_up_D"
+    ],
+    "completionFlags": {},
+    "branchChoices": [],
+    "blocksQuests": [],
+    "priority": 800
+  },
+  {
+    "questId": "08_lily_private",
+    "questType": "character_event",
+    "dramaId": "lily_private",
+    "displayNameJP": "リリィの私室招待",
+    "displayNameEN": "Invitation to Lily's Private Room",
+    "description": "リリィの私室に招待される",
+    "requiredFlags": [
+      {
+        "flagKey": "chitsii.arena.player.rank",
+        "operator": ">=",
+        "value": "D"
+      },
+      {
+        "flagKey": "chitsii.arena.rel.lily",
+        "operator": ">=",
+        "value": 40
+      }
+    ],
+    "requiredQuests": [
+      "10_rank_up_D"
+    ],
+    "completionFlags": {},
+    "branchChoices": [],
+    "blocksQuests": [],
+    "priority": 600
+  },
+  {
+    "questId": "09_balgas_training",
+    "questType": "character_event",
+    "dramaId": "balgas_training",
+    "displayNameJP": "戦士の哲学：鉄を打つ鉄",
+    "displayNameEN": "Warrior's Philosophy: Iron Forges Iron",
+    "description": "バルガスから戦士の哲学を学ぶ特別訓練",
+    "requiredFlags": [
+      {
+        "flagKey": "chitsii.arena.player.rank",
+        "operator": ">=",
+        "value": "D"
+      },
+      {
+        "flagKey": "chitsii.arena.rel.balgas",
+        "operator": ">=",
+        "value": 40
+      }
+    ],
+    "requiredQuests": [
+      "10_rank_up_D"
+    ],
+    "completionFlags": {},
+    "branchChoices": [],
+    "blocksQuests": [],
+    "priority": 650
+  },
+  {
+    "questId": "12_makuma",
+    "questType": "main_story",
+    "dramaId": "makuma",
+    "displayNameJP": "ヌルの記憶チップとリリィの衣装",
+    "displayNameEN": "Null's Memory Chip and Lily's Outfit",
+    "description": "ランクB達成報酬として特別な衣装を授与され、ゼクがヌルの真実を暴露する",
+    "requiredFlags": [
+      {
+        "flagKey": "chitsii.arena.player.rank",
+        "operator": "==",
+        "value": "B"
+      }
+    ],
+    "requiredQuests": [
+      "11_rank_up_B"
+    ],
+    "completionFlags": {
+      "chitsii.arena.player.null_chip_obtained": true
+    },
+    "branchChoices": [],
+    "blocksQuests": [],
+    "priority": 850
+  },
+  {
+    "questId": "13_makuma2",
+    "questType": "main_story",
+    "dramaId": "makuma2",
+    "displayNameJP": "虚空の心臓製作【複数分岐統合】",
+    "displayNameEN": "Void Core Crafting [Multiple Branch Convergence]",
+    "description": "虚空の心臓を製作し、過去の選択の清算が行われる",
+    "requiredFlags": [
+      {
+        "flagKey": "chitsii.arena.player.rank",
+        "operator": "==",
+        "value": "B"
+      }
+    ],
+    "requiredQuests": [
+      "12_makuma"
+    ],
+    "completionFlags": {},
+    "branchChoices": [
+      "lily_bottle_confession",
+      "kain_soul_confession"
+    ],
+    "blocksQuests": [],
+    "priority": 850
+  },
+  {
+    "questId": "16_lily_real_name",
+    "questType": "character_event",
+    "dramaId": "lily_real_name",
+    "displayNameJP": "リリィの真名告白",
+    "displayNameEN": "Lily's True Name Revelation",
+    "description": "リリィが真名『リリアリス』を明かす",
+    "requiredFlags": [
+      {
+        "flagKey": "chitsii.arena.player.rank",
+        "operator": "==",
+        "value": "S"
+      },
+      {
+        "flagKey": "chitsii.arena.player.balgas_choice",
+        "operator": "==",
+        "value": "spared"
+      },
+      {
+        "flagKey": "chitsii.arena.rel.lily",
+        "operator": ">=",
+        "value": 50
+      }
+    ],
+    "requiredQuests": [
+      "15_rank_up_S"
+    ],
+    "completionFlags": {
+      "chitsii.arena.player.lily_true_name": "Liliaris"
+    },
+    "branchChoices": [],
+    "blocksQuests": [],
+    "priority": 600
+  },
+  {
+    "questId": "17_vs_grandmaster_1",
+    "questType": "main_story",
+    "dramaId": "vs_grandmaster_1",
+    "displayNameJP": "アスタロト初遭遇、ゼクによる救出",
+    "displayNameEN": "First Astaroth Encounter, Zek's Rescue",
+    "description": "アスタロトが降臨し、ゼクが介入して救出する",
+    "requiredFlags": [
+      {
+        "flagKey": "chitsii.arena.player.rank",
+        "operator": "==",
+        "value": "S"
+      }
+    ],
+    "requiredQuests": [
+      "15_rank_up_S"
+    ],
+    "completionFlags": {
+      "chitsii.arena.player.fugitive_status": true
+    },
+    "branchChoices": [],
+    "blocksQuests": [],
+    "priority": 900
+  },
+  {
+    "questId": "18_last_battle",
+    "questType": "ending",
+    "dramaId": "last_battle",
+    "displayNameJP": "最終決戦：アスタロト撃破",
+    "displayNameEN": "Final Battle: Defeat Astaroth",
+    "description": "アスタロトとの最終決戦、複数のエンディング分岐",
+    "requiredFlags": [
+      {
+        "flagKey": "chitsii.arena.player.fugitive_status",
+        "operator": "==",
+        "value": true
+      }
+    ],
+    "requiredQuests": [
+      "17_vs_grandmaster_1"
+    ],
+    "completionFlags": {},
+    "branchChoices": [
+      "ending"
+    ],
+    "blocksQuests": [],
+    "priority": 1000
+  }
+]

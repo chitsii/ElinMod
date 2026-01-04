@@ -122,18 +122,7 @@ public class ZoneInstanceArenaBattle : ZoneInstance
 
         Msg.Say($"勝利の報酬としてプラチナコイン {rewardPlat} 枚を獲得した！");
 
-        // ステージ進行（次のステージへ）
-        int currentStage = EClass.player.dialogFlags.ContainsKey("sukutsu_arena_stage")
-            ? EClass.player.dialogFlags["sukutsu_arena_stage"] : 1;
-
-        if (stage >= currentStage && stage < 4)
-        {
-            EClass.player.dialogFlags["sukutsu_arena_stage"] = stage + 1;
-            Msg.Say($"アリーナランクが上がった！ステージ {stage + 1} に挑戦できる！");
-        }
-        else if (stage >= 4)
-        {
-            Msg.Say("おめでとう！グランドチャンピオンだ！");
-        }
+        // ステージ進行は廃止 - クエストシステムで管理
+        // ランクアップはクエスト完了時にのみ発生
     }
 }

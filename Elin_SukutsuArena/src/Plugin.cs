@@ -19,7 +19,13 @@ public class Plugin : BaseUnityPlugin
     {
         new Harmony(ModGuid).PatchAll();
         Debug.Log("[SukutsuArena] Plugin loaded.");
-        Debug.Log("[SukutsuArena] Press F6 to show debug info, F7 to force create zone, F8 to enter zone.");
+        Debug.Log("[SukutsuArena] Debug Keys:");
+        Debug.Log("[SukutsuArena]   F6: Zone debug info");
+        Debug.Log("[SukutsuArena]   F7: Force create zone");
+        Debug.Log("[SukutsuArena]   F8: Enter zone");
+        Debug.Log("[SukutsuArena]   F9: Arena status (rank/flags/quests)");
+        Debug.Log("[SukutsuArena]   F10: Cycle rank up");
+        Debug.Log("[SukutsuArena]   F11: Complete next available quest");
     }
 
     private void Update()
@@ -43,6 +49,24 @@ public class Plugin : BaseUnityPlugin
         if (Input.GetKeyDown(KeyCode.F8))
         {
             EnterZone();
+        }
+
+        // F9: アリーナステータス表示
+        if (Input.GetKeyDown(KeyCode.F9))
+        {
+            ShowArenaStatus();
+        }
+
+        // F10: ランクを1つ上げる
+        if (Input.GetKeyDown(KeyCode.F10))
+        {
+            CycleRankUp();
+        }
+
+        // F11: 次の利用可能なクエストを完了
+        if (Input.GetKeyDown(KeyCode.F11))
+        {
+            CompleteNextQuest();
         }
     }
 
@@ -217,6 +241,118 @@ public class Plugin : BaseUnityPlugin
         Debug.Log($"[SukutsuArena] Entering zone '{ZoneId}'...");
         Msg.Say($"[SukutsuArena] ゾーン '{zone.Name}' に入ります...");
         EMono.player.MoveZone(zone);
+    }
+
+    private void ShowArenaStatus()
+    {
+        Debug.Log("[SukutsuArena] === Arena Status ===");
+
+        // フラグ状態を表示
+        ArenaFlagManager.DebugLogAllFlags();
+
+        // クエスト状態を表示
+        ArenaQuestManager.Instance.DebugLogQuestState();
+
+        // 画面にも表示
+        var rank = ArenaFlagManager.Player.GetRank();
+        var gladiator = ArenaFlagManager.GetBool("sukutsu_gladiator");
+        Msg.Say($"[Arena] Rank: {rank}, Gladiator: {gladiator}");
+        Msg.Say($"[Arena] Lily: {ArenaFlagManager.Rel.Lily}, Balgas: {ArenaFlagManager.Rel.Balgas}");
+
+        var available = ArenaQuestManager.Instance.GetAvailableQuests();
+        if (available.Count > 0)
+        {
+            Msg.Say($"[Arena] Available Quests: {available.Count}");
+            foreach (var quest in available)
+            {
+                Msg.Say($"  - {quest.QuestId}: {quest.DisplayNameJP}");
+            }
+        }
+        else
+        {
+            Msg.Say("[Arena] No quests available");
+        }
+    }
+
+    private void CycleRankUp()
+    {
+        var currentRank = ArenaFlagManager.Player.GetRank();
+        var nextRank = currentRank + 1;
+
+        // 最大ランクを超えないようにする
+        if (nextRank > Flags.Rank.S)
+        {
+            nextRank = Flags.Rank.Unranked;
+        }
+
+        ArenaFlagManager.Player.SetRank(nextRank);
+        Debug.Log($"[SukutsuArena] Rank changed: {currentRank} -> {nextRank}");
+        Msg.Say($"[Arena] Rank: {currentRank} -> {nextRank}");
+
+        // 闘士登録も確認
+        if (!ArenaFlagManager.GetBool("sukutsu_gladiator"))
+        {
+            ArenaFlagManager.SetBool("sukutsu_gladiator", true);
+            Msg.Say("[Arena] Gladiator status set to true");
+        }
+
+        // デバッグ用: 前提クエストを完了済みにする
+        CompletePrerequisiteQuests(nextRank);
+    }
+
+    /// <summary>
+    /// 指定ランクまでの前提クエストを全て完了済みにする（デバッグ用）
+    /// </summary>
+    private void CompletePrerequisiteQuests(Flags.Rank rank)
+    {
+        // 常にオープニングを完了
+        ArenaQuestManager.Instance.CompleteQuest("01_opening");
+
+        // ランクに応じて昇格試験クエストを完了
+        if (rank >= Flags.Rank.G)
+        {
+            ArenaQuestManager.Instance.CompleteQuest("02_rank_up_G");
+        }
+        if (rank >= Flags.Rank.F)
+        {
+            ArenaQuestManager.Instance.CompleteQuest("04_rank_up_F");
+        }
+        if (rank >= Flags.Rank.E)
+        {
+            ArenaQuestManager.Instance.CompleteQuest("06_rank_up_E");
+        }
+        if (rank >= Flags.Rank.D)
+        {
+            ArenaQuestManager.Instance.CompleteQuest("10_rank_up_D");
+        }
+        if (rank >= Flags.Rank.C)
+        {
+            ArenaQuestManager.Instance.CompleteQuest("09_rank_up_C");
+        }
+        if (rank >= Flags.Rank.B)
+        {
+            ArenaQuestManager.Instance.CompleteQuest("11_rank_up_B");
+        }
+
+        Debug.Log($"[SukutsuArena] Prerequisite quests completed for rank {rank}");
+        Msg.Say($"[Arena] Prerequisite quests completed");
+    }
+
+    private void CompleteNextQuest()
+    {
+        var available = ArenaQuestManager.Instance.GetAvailableQuests();
+        if (available.Count == 0)
+        {
+            Debug.Log("[SukutsuArena] No quests available to complete.");
+            Msg.Say("[Arena] No quests available");
+            return;
+        }
+
+        var quest = available[0];
+        ArenaQuestManager.Instance.CompleteQuest(quest.QuestId);
+        Debug.Log($"[SukutsuArena] Completed quest: {quest.QuestId}");
+        Msg.Say($"[Arena] Completed: {quest.QuestId}");
+        Msg.Say($"[Arena] ({quest.DisplayNameJP})");
     }
 
     /// <summary>

@@ -108,6 +108,7 @@ def add_rank_up_G_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .say("rup_vic_l1", "お疲れ様でした。約束通り、ギルドの台帳にあなたの名を刻んでおきました。", "", actor=lily) \
         .say("rup_vic_l2", "ランクG『屑肉』。ふふ、あなたにぴったりの、美味しそうな二つ名だと思いませんか？", "", actor=lily) \
         .say("rup_vic_l3", "あぁ、それと……。あなたが暴れたおかげで、あちこちの備品が壊れました。次は戦うついでに、修理用の『石材』でも拾ってきていただけますか？", "", actor=lily) \
+        .complete_quest("02_rank_up_G") \
         .set_flag("chitsii.arena.player.rank", 1) \
         .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"bottle\")); EClass.pc.Pick(ThingGen.Create(\"ration\"));") \
         .say("rup_vic_sys", "報酬として『バルガスの安酒』と『リリィの配給食』を受け取った。", "", actor=pc) \

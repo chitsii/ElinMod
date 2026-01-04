@@ -711,6 +711,99 @@ class DramaBuilder:
         self.entries.append({'action': 'updateJournal'})
         return self
 
+    # ============================================================================
+    # Arena Quest System: modInvoke Actions
+    # ============================================================================
+
+    def mod_invoke(self, method_call: str, actor: Union[str, DramaActor] = None) -> 'DramaBuilder':
+        """
+        C# メソッドを modInvoke アクションで呼び出す
+
+        Args:
+            method_call: メソッド呼び出し文字列（例: "check_quest_available(quest_01, label)"）
+            actor: アクター（デフォルト: pc）
+        """
+        actor_key = self._resolve_key(actor) if actor else 'pc'
+        self.entries.append({
+            'action': 'modInvoke',
+            'param': method_call,
+            'actor': actor_key,
+        })
+        return self
+
+    def check_quest_available(self, quest_id: str, jump_to: Union[str, DramaLabel],
+                               actor: Union[str, DramaActor] = None) -> 'DramaBuilder':
+        """
+        クエストが利用可能かチェックし、利用可能ならジャンプ
+
+        Args:
+            quest_id: クエストID
+            jump_to: ジャンプ先ラベル
+            actor: アクター（デフォルト: pc）
+        """
+        jump_key = self._resolve_key(jump_to)
+        return self.mod_invoke(f'check_quest_available({quest_id}, {jump_key})', actor)
+
+    def start_quest(self, quest_id: str, actor: Union[str, DramaActor] = None) -> 'DramaBuilder':
+        """
+        クエストを開始
+
+        Args:
+            quest_id: クエストID
+            actor: アクター（デフォルト: pc）
+        """
+        return self.mod_invoke(f'start_quest({quest_id})', actor)
+
+    def complete_quest(self, quest_id: str, actor: Union[str, DramaActor] = None) -> 'DramaBuilder':
+        """
+        クエストを完了
+
+        Args:
+            quest_id: クエストID
+            actor: アクター（デフォルト: pc）
+        """
+        return self.mod_invoke(f'complete_quest({quest_id})', actor)
+
+    def if_flag_string(self, flag: str, operator: str, value: str,
+                       jump_to: Union[str, DramaLabel],
+                       actor: Union[str, DramaActor] = None) -> 'DramaBuilder':
+        """
+        フラグの文字列/enum値を比較してジャンプ（modInvoke版）
+
+        Args:
+            flag: フラグキー
+            operator: 演算子（"==" または "!="）
+            value: 比較する文字列値
+            jump_to: 条件が真の場合のジャンプ先
+            actor: アクター（デフォルト: pc）
+        """
+        jump_key = self._resolve_key(jump_to)
+        actor_key = self._resolve_key(actor) if actor else 'pc'
+        self.entries.append({
+            'action': 'modInvoke',
+            'param': f'if_flag({flag}, {operator}, {value}, {jump_key})',
+            'actor': actor_key,
+        })
+        return self
+
+    def debug_log_flags(self, actor: Union[str, DramaActor] = None) -> 'DramaBuilder':
+        """
+        デバッグ: 全フラグをログ出力
+
+        Args:
+            actor: アクター（デフォルト: pc）
+        """
+        return self.mod_invoke('debug_log_flags()', actor)
+
+    def debug_log_quests(self, actor: Union[str, DramaActor] = None) -> 'DramaBuilder':
+        """
+        デバッグ: 全クエスト状態をログ出力
+
+        Args:
+            actor: アクター（デフォルト: pc）
+        """
+        return self.mod_invoke('debug_log_quests()', actor)
+
     def build(self) -> List[Dict[str, Any]]:
         """エントリーリストを返す（検証なし）"""
         return self.entries
