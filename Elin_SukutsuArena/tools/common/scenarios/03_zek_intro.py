@@ -4,7 +4,7 @@
 """
 
 from drama_builder import DramaBuilder
-from flag_definitions import Keys
+from flag_definitions import Keys, Actors, QuestIds
 
 def define_zek_intro(builder: DramaBuilder):
     """
@@ -12,10 +12,10 @@ def define_zek_intro(builder: DramaBuilder):
     シナリオ: 03_zek.md
     """
     # アクター登録
-    pc = builder.register_actor("pc", "あなた", "You")
-    lily = builder.register_actor("sukutsu_receptionist", "リリィ", "Lily")
-    balgas = builder.register_actor("sukutsu_arena_master", "バルガス", "Balgas")
-    zek = builder.register_actor("sukutsu_shady_merchant", "ゼク", "Zek")
+    pc = builder.register_actor(Actors.PC, "あなた", "You")
+    lily = builder.register_actor(Actors.LILY, "リリィ", "Lily")
+    balgas = builder.register_actor(Actors.BALGAS, "バルガス", "Balgas")
+    zek = builder.register_actor(Actors.ZEK, "ゼク", "Zek")
 
     # ラベル定義
     main = builder.label("main")
@@ -49,7 +49,7 @@ def define_zek_intro(builder: DramaBuilder):
     # シーン1: ゼク登場
     # ========================================
     builder.step(scene1) \
-        .focus_chara("sukutsu_shady_merchant") \
+        .focus_chara(Actors.ZEK) \
         .say("zek_1", "……おや。失礼、驚かせるつもりはなかったのですよ。", "", actor=zek) \
         .say("zek_2", "ただ、あまりに芳しい『敗北の予感』が漂ってきたもので……。つい、こちらの次元へ顔を出してしまいました。", "", actor=zek) \
         .say("narr_5", "（彼は優雅に、しかしどこか爬虫類を思わせる動作で一礼する。）", "", actor=pc) \
@@ -130,7 +130,7 @@ def define_zek_intro(builder: DramaBuilder):
     # バルガスの反応
     # ========================================
     builder.step(balgas_reaction) \
-        .focus_chara("sukutsu_arena_master") \
+        .focus_chara(Actors.BALGAS) \
         .say("balgas_1", "……ゼクの野郎と話しやがったか。", "", actor=balgas) \
         .say("balgas_2", "あいつから物を買うのは、悪魔に魂の切り売りをしてるのと同じだ。……まぁ、勝てば官軍だがな。せいぜい、干からびる前に使い倒してやれ。", "", actor=balgas) \
         .say("balgas_3", "ただな……あいつは『力』を売ってるんじゃねえ。『絶望の瞬間』を集めてやがるんだ。お前が最期に何を感じるか、それを観察してやがる。……気をつけろよ。", "", actor=balgas) \
@@ -140,7 +140,7 @@ def define_zek_intro(builder: DramaBuilder):
     # リリィの反応
     # ========================================
     builder.step(lily_reaction) \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("lily_1", "ゼクと話をされたのですね。", "", actor=lily) \
         .say("lily_2", "……彼は、このアリーナでも特別な存在です。グランドマスターですら、彼を完全には制御できていません。", "", actor=lily) \
         .say("lily_3", "ただ、彼の品が闘士の生存率を上げているのも事実。……使うか使わないかは、あなた次第ですが。", "", actor=lily) \
@@ -150,6 +150,6 @@ def define_zek_intro(builder: DramaBuilder):
     # 終了処理
     # ========================================
     builder.step(ending) \
-        .complete_quest("03_zek_intro") \
+        .complete_quest(QuestIds.ZEK_INTRO) \
         .set_flag(Keys.REL_ZEK, 10) \
         .finish()

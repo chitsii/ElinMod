@@ -1,7 +1,7 @@
 
 from drama_builder import DramaBuilder
 from flag_definitions import (
-    Keys,
+    Keys, Actors, FlagValues, QuestIds,
     Motivation, Rank,
     PlayerFlags, RelFlags
 )
@@ -12,9 +12,9 @@ def define_opening_drama(builder: DramaBuilder):
     フラグ管理システムを使用したバージョン + 演出強化
     """
     # アクター登録
-    pc = builder.register_actor("pc", "あなた", "You")
-    lily = builder.register_actor("sukutsu_receptionist", "リリィ", "Lily")
-    vargus = builder.register_actor("sukutsu_arena_master", "バルガス", "Vargus")
+    pc = builder.register_actor(Actors.PC, "あなた", "You")
+    lily = builder.register_actor(Actors.LILY, "リリィ", "Lily")
+    vargus = builder.register_actor(Actors.BALGAS, "バルガス", "Vargus")
 
     # ラベル定義
     main = builder.label("main")
@@ -41,13 +41,13 @@ def define_opening_drama(builder: DramaBuilder):
     builder.say("narr3", "(ただ、紫紺の渦を巻く「虚無」が天を覆い、時折、空間の裂け目から巨大な鎖が垂れ下がっている。遠くから響くのは、雷鳴のような喝采。だが、その声には「熱」がない。\n高次元の観客たちが、ただ死を消費するために発する、冷ややかな振動だ。)", actor=pc)
 
     # リリィ登場（フォーカスにウェイト内蔵）
-    builder.focus_chara("sukutsu_receptionist") \
+    builder.focus_chara(Actors.LILY) \
            .say("lily1", "……あら。珍しいこともあるものですね。召喚の儀も、空間の歪みもなしに、この『ヴォイド・コロシアム』に迷い込む『生きた肉』がいるなんて。", actor=lily) \
            .say("lily2", "お客様、それとも……新たな『商品』かしら？ここは境界の終わり、そして絶望の始まり。", actor=lily) \
            .say("lily3", "あなたがどこから来たのかは問いません。入られた方は皆、あそこにいる「飲んだくれ」に話を通すのが、ここの作法ですから。", actor=lily)
 
     # バルガス登場（フォーカスにウェイト内蔵）
-    builder.focus_chara("sukutsu_arena_master") \
+    builder.focus_chara(Actors.BALGAS) \
            .say("vargus1", "……ケッ、シケた面してやがる。おい、サキュバス。そんなひょろいガキ、鑑定するまでもねえ。", actor=vargus) \
            .say("vargus2", "どうせ地上でちょっとばかり魔物に追われて、運悪く次元の割れ目に滑り落ちただけの「迷い犬」だ。おい、小僧。ここは選ばれた狂人どもが、神々の暇つぶしのために殺し合う場所だ。", actor=vargus) \
            .say("vargus3", "そう、いわば闘技場だ。故郷が恋しいなら、隅で丸まって震えてな。運が良ければ、次の次元の潮流でお前の死体くらいは地上に打ち上げられるかもしれねえぜ。\n……あ？ なんだその目は。お前になにができるってんだ？", actor=vargus)
@@ -75,7 +75,7 @@ def define_opening_drama(builder: DramaBuilder):
 
     # --- Greed Route ---
     builder.step(greed) \
-        .set_flag(Keys.MOTIVATION, 0) \
+        .set_flag(Keys.MOTIVATION, FlagValues.Motivation.GREED) \
         .say("greed_v1", "ハッ！ わかりやすくていいぜ。金と権力……地上のクズどもが一生かけて追いまわすゴミ屑だ。だがいいか、ここでは金などただの石ころだ。", actor=vargus) \
         .say("greed_v2", "お前が手にするのは、神々すら平伏させる「圧倒的な階位」……。それが欲しけりゃ、他人の内臓を積み上げて階段を作るんだな。", actor=vargus) \
         .say("greed_l1", "ふふ、強欲な魂は好物ですよ。あなたが稼ぐ賞金……その何割を私が手数料としていただくことになるのか、楽しみです。精々、死なずに稼いでくださいね？", actor=lily) \
@@ -83,7 +83,7 @@ def define_opening_drama(builder: DramaBuilder):
 
     # --- Battle Route ---
     builder.step(battle) \
-        .set_flag(Keys.MOTIVATION, 1) \
+        .set_flag(Keys.MOTIVATION, FlagValues.Motivation.BATTLE_LUST) \
         .say("battle_v1", "……チッ、一番厄介な手合いだ。己の限界だと？ 深淵を前にそんなセリフが吐けるか。", actor=vargus) \
         .say("battle_v2", "いいぜ、お前のその真っ直ぐな瞳が、絶望で濁っていく様を見るのは……", actor=vargus) \
         .say("battle_v3", "……かつての俺を見るようで、反吐が出るがな。", actor=vargus) \
@@ -92,7 +92,7 @@ def define_opening_drama(builder: DramaBuilder):
 
     # --- Void Route ---
     builder.step(void) \
-        .set_flag(Keys.MOTIVATION, 2) \
+        .set_flag(Keys.MOTIVATION, FlagValues.Motivation.NIHILISM) \
         .say("void_v1", "……（沈黙）フン、訳ありか。だがな小僧、ここは逃げ込むための掃き溜めじゃねえ。生への執着を捨てた奴から死んでいく場所だ。", actor=vargus) \
         .say("void_v2", "……いいか、戦いの中でしか己の輪郭を保てねえってんなら、死に物狂いで剣を振れ。そうすりゃ、その虚無も少しは埋まるかもしれねえぜ。", actor=vargus) \
         .say("void_l1", "……居場所を求めて、わざわざ異次元まで。少し同情してしまいますね。ですが、事務手続きに私情は挟みませんよ？", actor=lily) \
@@ -100,7 +100,7 @@ def define_opening_drama(builder: DramaBuilder):
 
     # --- Pride Route ---
     builder.step(pride) \
-        .set_flag(Keys.MOTIVATION, 3) \
+        .set_flag(Keys.MOTIVATION, FlagValues.Motivation.ARROGANCE) \
         .shake() \
         .say("pride_v1", "……ハハハ！傑作だ！聞こえたかリリィ？ この新入り、初日から『王』を気取ってやがる！", actor=vargus) \
         .say("pride_v2", "だがな、その傲慢さが武器になることもある。神を殺すのはいつだって、己の身の程を知らぬ大馬鹿野郎だ。", actor=vargus) \
@@ -126,5 +126,5 @@ def define_opening_drama(builder: DramaBuilder):
         .set_flag("sukutsu_gladiator", 1) \
         .set_flag("sukutsu_arena_stage", 1) \
         .set_flag("sukutsu_opening_seen", 1) \
-        .complete_quest("01_opening") \
+        .complete_quest(QuestIds.OPENING) \
         .finish()

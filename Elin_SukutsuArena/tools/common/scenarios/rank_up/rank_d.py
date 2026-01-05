@@ -5,7 +5,7 @@
 """
 
 from drama_builder import DramaBuilder
-from flag_definitions import Keys, Rank
+from flag_definitions import Keys, Rank, Actors, QuestIds
 
 def define_rank_up_D(builder: DramaBuilder):
     """
@@ -13,9 +13,9 @@ def define_rank_up_D(builder: DramaBuilder):
     シナリオ: 10_rank_up_D.md
     """
     # アクター登録
-    pc = builder.register_actor("pc", "あなた", "You")
-    lily = builder.register_actor("sukutsu_receptionist", "リリィ", "Lily")
-    balgas = builder.register_actor("sukutsu_arena_master", "バルガス", "Balgas")
+    pc = builder.register_actor(Actors.PC, "あなた", "You")
+    lily = builder.register_actor(Actors.LILY, "リリィ", "Lily")
+    balgas = builder.register_actor(Actors.BALGAS, "バルガス", "Balgas")
 
     # ラベル定義
     main = builder.label("main")
@@ -42,7 +42,7 @@ def define_rank_up_D(builder: DramaBuilder):
         .jump(scene1)
 
     builder.step(scene1) \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("lily_1", "……お疲れ様でした。カインさんの魂を巡る選択、興味深く拝見させていただきました。", "", actor=lily) \
         .wait(0.5) \
         .say("lily_2", "さて、次はRank D『銅貨稼ぎ（Copper Earner）』への昇格試験です。", "", actor=lily) \
@@ -80,7 +80,7 @@ def define_rank_up_D(builder: DramaBuilder):
     # ========================================
     builder.step(scene2) \
         .play_bgm("BGM/Ominous_Suspense_01") \
-        .focus_chara("sukutsu_arena_master") \
+        .focus_chara(Actors.BALGAS) \
         .say("narr_4", "（バルガスが近づいてくる。その表情はいつになく真剣だ。）", "", actor=pc) \
         .say("balgas_1", "……おい、銅貨稼ぎ予備軍。", "", actor=balgas) \
         .say("balgas_2", "観客のヤジは、ただの嫌がらせじゃねえ。戦況を一変させる『変数』だ。", "", actor=balgas) \
@@ -121,7 +121,7 @@ def define_rank_up_D(builder: DramaBuilder):
         .say("narr_6", "（砂地の中央には、今回の対戦相手『次元の剣闘士』が三体、武器を構えて待ち構えていた。）", "", actor=pc) \
         .wait(1.0) \
         .say("narr_7", "（リリィの声が、魔術的な拡声によって会場全体に響き渡る。）", "", actor=pc) \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("lily_ann1", "……皆様、本日のメインディッシュです！", "", actor=lily) \
         .say("lily_ann2", "新たな『銅貨稼ぎ』候補による、命懸けのサーカスをお楽しみください！", "", actor=lily) \
         .wait(0.5) \
@@ -145,9 +145,9 @@ def add_rank_up_D_result_steps(builder: DramaBuilder, victory_label: str, defeat
         defeat_label: 敗北ステップのラベル名
         return_label: 結果表示後にジャンプするラベル名
     """
-    pc = "pc"
-    lily = "sukutsu_receptionist"
-    balgas = "sukutsu_arena_master"
+    pc = Actors.PC
+    lily = Actors.LILY
+    balgas = Actors.BALGAS
 
     # ========================================
     # Rank D 昇格試験 勝利
@@ -160,19 +160,19 @@ def add_rank_up_D_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .say("narr_v2", "（砂地には、戦闘中に降ってきた無数の物品が散乱している。石塊、割れた薬瓶、曲がった剣……。）", "", actor=pc) \
         .wait(0.5) \
         .say("narr_v3", "（ロビーに戻ると、リリィが満足げに微笑んでいた。）", "", actor=pc) \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("lily_v1", "……素晴らしい。観客の皆様も、大変お喜びでしたよ。", "", actor=lily) \
         .wait(0.5) \
         .say("lily_v2", "落下物を巧みに避け、時には利用する。その立ち回り、まさに『銅貨稼ぎ』の名に相応しい。", "", actor=lily) \
         .wait(0.5) \
-        .focus_chara("sukutsu_arena_master") \
+        .focus_chara(Actors.BALGAS) \
         .say("narr_v4", "（バルガスが酒瓶を傾けながら近づいてくる。）", "", actor=pc) \
         .say("balgas_v1", "……ケッ、やるじゃねえか。", "", actor=balgas) \
         .say("balgas_v2", "お前は今、ただの『鉄屑』から、観客に媚びを売って生き延びる『銅貨稼ぎ』になった。", "", actor=balgas) \
         .wait(0.5) \
         .say("balgas_v3", "誇れることじゃねえが……生き残るためには必要なスキルだ。", "", actor=balgas) \
         .wait(1.0) \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("lily_v3", "では、報酬の授与です。", "", actor=lily) \
         .say("lily_v4", "観客からの投げ銭……小さなコイン12枚とプラチナコイン4枚。それと、戦闘記録として素材を一つ選んでいただけます。", "", actor=lily)
 
@@ -206,7 +206,7 @@ def add_rank_up_D_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .say("lily_v5", "記録完了です。", "", actor=lily) \
         .say("lily_v6", "……それと、今回の戦いで、あなたは観客の『ヤジ』を避けるコツを掴んだようですね。", "", actor=lily) \
         .say("lily_v7", "次からは、もっと酷いものが降ってきます。……覚悟しておいてくださいね？", "", actor=lily) \
-        .complete_quest("10_rank_up_D") \
+        .complete_quest(QuestIds.RANK_UP_D) \
         .set_flag(Keys.RANK, 4) \
         .mod_flag(Keys.REL_LILY, "+", 10) \
         .say("sys_title", "【システム】称号『銅貨稼ぎ（Copper Earner）』を獲得しました。", "", actor=pc) \
@@ -219,7 +219,7 @@ def add_rank_up_D_result_steps(builder: DramaBuilder, victory_label: str, defeat
     builder.step(defeat_label) \
         .set_flag("sukutsu_arena_result", 0) \
         .play_bgm("BGM/Lobby_Normal") \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("lily_d1", "……あらあら、落下物に潰されてしまいましたね。", "", actor=lily) \
         .say("lily_d2", "観客の皆様も、少し期待外れだったようです。", "", actor=lily) \
         .say("lily_d3", "準備が整ったら、また挑戦してください。次はもっと上手く避けられるといいですね。", "", actor=lily) \

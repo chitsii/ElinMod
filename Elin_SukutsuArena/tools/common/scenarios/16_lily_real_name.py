@@ -4,7 +4,7 @@
 """
 
 from drama_builder import DramaBuilder
-from flag_definitions import Keys
+from flag_definitions import Keys, Actors, FlagValues
 
 def define_lily_real_name(builder: DramaBuilder):
     """
@@ -17,8 +17,8 @@ def define_lily_real_name(builder: DramaBuilder):
     - Didn't betray Lily with bottle swap (scenario 13)
     """
     # アクター登録
-    pc = builder.register_actor("pc", "あなた", "You")
-    lily = builder.register_actor("sukutsu_receptionist", "リリィ", "Lily")
+    pc = builder.register_actor(Actors.PC, "あなた", "You")
+    lily = builder.register_actor(Actors.LILY, "リリィ", "Lily")
 
     # ラベル定義
     main = builder.label("main")
@@ -58,7 +58,7 @@ def define_lily_real_name(builder: DramaBuilder):
         .jump(scene1)
 
     builder.step(scene1) \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("lily_1", "……おかえりなさい。バルガスさんは、今頃泥のように眠っています。", "", actor=lily) \
         .wait(0.5) \
         .say("lily_2", "あんなに安らかな寝顔を見たのは、私も初めてかもしれません。……ふふ、本当に、あなたという人は。", "", actor=lily) \
@@ -222,7 +222,7 @@ def define_lily_real_name(builder: DramaBuilder):
     # ========================================
     builder.step(ending) \
         .set_flag(Keys.REL_LILY, 100) \
-        .set_flag("chitsii.arena.player.lily_true_name", 1) \
+        .set_flag(Keys.LILY_TRUE_NAME, FlagValues.LilyTrueName.KNOWN) \
         .say("sys_buff", "【システム】『真名の契約者』を獲得しました。", "", actor=pc) \
         .say("sys_title", "【システム】称号『リリアリスの伴侶』を獲得しました。", "", actor=pc) \
         .action("eval", param="UnityEngine.Debug.Log(\"[SukutsuArena] TODO: バフ付与 - リリィ支援魔法+50%, 召喚可能, 魅了/精神汚染無効\");") \

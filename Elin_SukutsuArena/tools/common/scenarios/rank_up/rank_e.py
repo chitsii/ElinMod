@@ -4,7 +4,7 @@
 """
 
 from drama_builder import DramaBuilder
-from flag_definitions import Keys, Rank
+from flag_definitions import Keys, Rank, Actors, QuestIds
 
 def define_rank_up_E(builder: DramaBuilder):
     """
@@ -12,9 +12,9 @@ def define_rank_up_E(builder: DramaBuilder):
     シナリオ: 06_1_rank_up_03.md
     """
     # アクター登録
-    pc = builder.register_actor("pc", "あなた", "You")
-    lily = builder.register_actor("sukutsu_receptionist", "リリィ", "Lily")
-    balgas = builder.register_actor("sukutsu_arena_master", "バルガス", "Balgas")
+    pc = builder.register_actor(Actors.PC, "あなた", "You")
+    lily = builder.register_actor(Actors.LILY, "リリィ", "Lily")
+    balgas = builder.register_actor(Actors.BALGAS, "バルガス", "Balgas")
 
     # ラベル定義
     main = builder.label("main")
@@ -38,7 +38,7 @@ def define_rank_up_E(builder: DramaBuilder):
         .say("narr_1", "（ロビーの喧騒が嘘のように静まり返った深夜。）", "", actor=pc) \
         .say("narr_2", "（バルガスはいつもの酒瓶を持たず、代わりに血錆にまみれた「古い戦士の兜」を無造作に眺めていた。）", "", actor=pc) \
         .say("narr_3", "（彼がこれほどまでに静かなのは、あなたがここへ来てから初めてのことだった。）", "", actor=pc) \
-        .focus_chara("sukutsu_arena_master") \
+        .focus_chara(Actors.BALGAS) \
         .say("balgas_1", "……来たか。", "", actor=balgas) \
         .say("narr_4", "（彼は兜を撫でながら、低く掠れた声で話し始める。）", "", actor=pc) \
         .say("balgas_2", "おい、新入り。お前は『鉄』がなぜ錆びるか知ってるか？手入れを怠るからじゃねえ。……持ち主の心が折れた時、鉄も一緒に死ぬんだよ。", "", actor=balgas) \
@@ -121,9 +121,9 @@ def add_rank_up_E_result_steps(builder: DramaBuilder, victory_label: str, defeat
         defeat_label: 敗北ステップのラベル名
         return_label: 結果表示後にジャンプするラベル名
     """
-    pc = "pc"
-    lily = "sukutsu_receptionist"
-    balgas = "sukutsu_arena_master"
+    pc = Actors.PC
+    lily = Actors.LILY
+    balgas = Actors.BALGAS
 
     # ========================================
     # Rank E 昇格試験 勝利
@@ -133,14 +133,14 @@ def add_rank_up_E_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .play_bgm("BGM/Emotional_Sorrow_2") \
         .say("narr_v1", "（カインの体が粒子となって崩れ去る瞬間、騎士は一瞬だけバルガスの方向を見つめ、静かに首を振ったように見えた。）", "", actor=pc) \
         .say("narr_v2", "（静寂の中、ロビーに戻ると、バルガスが背を向けたまま待っている。）", "", actor=pc) \
-        .focus_chara("sukutsu_arena_master") \
+        .focus_chara(Actors.BALGAS) \
         .say("balgas_v1", "……終わったか。", "", actor=balgas) \
         .say("narr_v3", "（彼はゆっくりと振り返る。その目には、涙の跡。）", "", actor=pc) \
         .say("balgas_v2", "あの野郎、最期まで意地っ張りな面をしてやがったな。", "", actor=balgas) \
         .say("narr_v4", "（彼は拳でこっそりと目を拭う。）", "", actor=pc) \
         .say("balgas_v3", "……ありがよ。今日からお前は、ただの『泥犬』じゃねえ。何度叩かれても折れねえ、鈍く輝く『鉄屑（Iron Scrap）』だ。", "", actor=balgas) \
         .say("balgas_v4", "……お前は、カインが持っていた以上の、本物の『鋼の心』を持った戦士だ。", "", actor=balgas) \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("lily_v1", "お疲れ様でした。カインさんの魂の一部……回収いたしました。", "", actor=lily) \
         .say("lily_v2", "バルガスさんが珍しく涙ぐんでいたのは見なかったことにしてあげますから、報酬の授与をさせていただきます。", "", actor=lily) \
         .say("lily_v3", "観客からの報酬として、**小さなコイン8枚**と**プラチナコイン3枚**。それと、戦闘記録として**素材を一つ**選んでいただけます。", "", actor=lily)
@@ -173,7 +173,7 @@ def add_rank_up_E_result_steps(builder: DramaBuilder, victory_label: str, defeat
     builder.step(reward_end_e) \
         .action("eval", param="for(int i=0; i<8; i++) { EClass.pc.Pick(ThingGen.Create(\"coin\")); } for(int i=0; i<3; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
         .say("lily_v4_e", "あなたが鉄屑から『鋼鉄』、そして『伝説』へと至るまで……私は特等席で見守らせていただきますよ。", "", actor=lily) \
-        .complete_quest("06_rank_up_E") \
+        .complete_quest(QuestIds.RANK_UP_E) \
         .set_flag(Keys.RANK, 3) \
         .mod_flag(Keys.REL_BALGAS, "+", 15) \
         .jump(return_label)
@@ -183,7 +183,7 @@ def add_rank_up_E_result_steps(builder: DramaBuilder, victory_label: str, defeat
     # ========================================
     builder.step(defeat_label) \
         .set_flag("sukutsu_arena_result", 0) \
-        .focus_chara("sukutsu_arena_master") \
+        .focus_chara(Actors.BALGAS) \
         .say("balgas_d1", "……チッ。終わったか。", "", actor=balgas) \
         .say("balgas_d2", "お前も、あいつと同じ錆の一部になっちまったか。", "", actor=balgas) \
         .jump(return_label)

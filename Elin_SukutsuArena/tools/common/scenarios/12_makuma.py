@@ -4,7 +4,8 @@
 """
 
 from drama_builder import DramaBuilder
-from flag_definitions import Keys
+from flag_definitions import Keys, Actors, FlagValues
+
 
 def define_makuma(builder: DramaBuilder):
     """
@@ -12,10 +13,10 @@ def define_makuma(builder: DramaBuilder):
     シナリオ: 12_makuma.md
     """
     # アクター登録
-    pc = builder.register_actor("pc", "あなた", "You")
-    lily = builder.register_actor("sukutsu_receptionist", "リリィ", "Lily")
-    zek = builder.register_actor("sukutsu_shady_merchant", "ゼク", "Zek")
-    balgas = builder.register_actor("sukutsu_arena_master", "バルガス", "Balgas")
+    pc = builder.register_actor(Actors.PC, "あなた", "You")
+    lily = builder.register_actor(Actors.LILY, "リリィ", "Lily")
+    zek = builder.register_actor(Actors.ZEK, "ゼク", "Zek")
+    balgas = builder.register_actor(Actors.BALGAS, "バルガス", "Balgas")
 
     # ラベル定義
     main = builder.label("main")
@@ -42,7 +43,7 @@ def define_makuma(builder: DramaBuilder):
     # ========================================
     builder.step(main) \
         .play_bgm("BGM/Lily_Seductive") \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("narr_1", "（リリィの私室。以前よりも紫煙は濃く、甘い香りが理性を揺さぶる。）", "", actor=pc) \
         .say("narr_2", "（彼女は机の上に、銀色に輝く未知の布地と、空間を切り裂くほどに鋭い針を並べていた。）", "", actor=pc) \
         .say("narr_3", "（それは地上のどんな名工も手にしたことのない、『次元の境界線』そのものを織り込んだ素材だった。）", "", actor=pc) \
@@ -82,7 +83,7 @@ def define_makuma(builder: DramaBuilder):
         .play_bgm("BGM/Ominous_Suspense_02") \
         .say("narr_6", "（リリィの部屋を辞し、薄暗い廊下を歩くあなたの背後に、不自然な影が伸びる。）", "", actor=pc) \
         .say("narr_7", "（ゼクが、まるで壁のシミから染み出すように姿を現した。）", "", actor=pc) \
-        .focus_chara("sukutsu_shady_merchant") \
+        .focus_chara(Actors.ZEK) \
         .say("narr_8", "（その手には、先ほど倒した暗殺者『ヌル』の頭部から抜き取られた、鈍く明滅するクリスタルの破片——**『記録チップ』**が握られていた。）", "", actor=pc) \
         .say("zek_1", "……ククッ、美しい衣装ですな。", "", actor=zek) \
         .say("zek_2", "ですが、その華やかな衣の下に隠された『真実』に、あなたは耐えられますかな？ あなたが壊したあの人形……ヌル。あれが何であったか、知りたくはありませんか？", "", actor=zek) \
@@ -148,7 +149,7 @@ def define_makuma(builder: DramaBuilder):
     # ========================================
     builder.step(scene4) \
         .play_bgm("BGM/Lobby_Normal") \
-        .focus_chara("sukutsu_arena_master") \
+        .focus_chara(Actors.BALGAS) \
         .say("narr_15", "（バルガスが廊下に現れる。）", "", actor=pc) \
         .say("balgas_1", "……おい、何をボーッとしてる？ ゼクの野郎、また何か吹き込んでいったんじゃねえだろうな？", "", actor=balgas) \
         .say("balgas_2", "あいつの言うことは半分嘘、半分本当だ。全部を信じるなよ。……ただ、こいつだけは覚えておけ。お前が人間でいられるかどうかは、お前自身の選択次第だ。", "", actor=balgas) \
@@ -158,7 +159,7 @@ def define_makuma(builder: DramaBuilder):
     # 終了処理
     # ========================================
     builder.step(ending) \
-        .set_flag(Keys.NULL_CHIP, 1) \
+        .set_flag(Keys.NULL_CHIP, FlagValues.TRUE) \
         .mod_flag(Keys.REL_LILY, "+", 10) \
         .mod_flag(Keys.REL_ZEK, "+", 10) \
         .finish()

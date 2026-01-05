@@ -3,7 +3,7 @@
 """
 
 from drama_builder import DramaBuilder
-from flag_definitions import Keys
+from flag_definitions import Keys, Actors, FlagValues
 
 def define_makuma2(builder: DramaBuilder):
     """
@@ -11,14 +11,14 @@ def define_makuma2(builder: DramaBuilder):
     シナリオ: 13_makuma2.md
 
     Note: This scenario has complex conditional branches based on previous choices:
-    - If bottle_choice == "swapped": bottle malfunction event occurs
-    - If kain_soul_choice == "sold": Balgas confrontation occurs
+    - If bottle_choice == SWAPPED: bottle malfunction event occurs
+    - If kain_soul_choice == SOLD: Balgas confrontation occurs
     """
     # アクター登録
-    pc = builder.register_actor("pc", "あなた", "You")
-    lily = builder.register_actor("sukutsu_receptionist", "リリィ", "Lily")
-    balgas = builder.register_actor("sukutsu_arena_master", "バルガス", "Balgas")
-    zek = builder.register_actor("sukutsu_shady_merchant", "ゼク", "Zek")
+    pc = builder.register_actor(Actors.PC, "あなた", "You")
+    lily = builder.register_actor(Actors.LILY, "リリィ", "Lily")
+    balgas = builder.register_actor(Actors.BALGAS, "バルガス", "Balgas")
+    zek = builder.register_actor(Actors.ZEK, "ゼク", "Zek")
 
     # ラベル定義
     main = builder.label("main")
@@ -62,7 +62,7 @@ def define_makuma2(builder: DramaBuilder):
     # ========================================
     builder.step(main) \
         .play_bgm("BGM/Ominous_Tension") \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("narr_1", "（最近、アリーナ全体を断続的な震動が襲っている。）", "", actor=pc) \
         .shake() \
         .say("narr_2", "（それは観客の喝采によるものではなく、あなたの強大すぎる存在感に、異次元の構造自体が悲鳴を上げているのだ。）", "", actor=pc) \
@@ -96,11 +96,13 @@ def define_makuma2(builder: DramaBuilder):
         .jump(check_bottle)
 
     # ========================================
-    # 条件分岐: 瓶の暴走イベント (bottle_choice == 2 "swapped")
+    # 条件分岐: 瓶の暴走イベント (bottle_choice == SWAPPED)
+    # switch_on_flagで安全に分岐
     # ========================================
     builder.step(check_bottle) \
-        .branch_if(Keys.BOTTLE_CHOICE, "==", 2, bottle_event) \
-        .jump(scene2)  # bottle_choice: 2 = swapped
+        .switch_on_flag(Keys.BOTTLE_CHOICE, {
+            FlagValues.BottleChoice.SWAPPED: bottle_event,
+        }, fallback=scene2)
 
     builder.step(bottle_event) \
         .play_bgm("BGM/Ominous_Suspense_02") \
@@ -141,9 +143,9 @@ def define_makuma2(builder: DramaBuilder):
         .say("lily_16", "でも……でもね。あなたが今、正直に話してくれたこと……それだけは、評価します。", "", actor=lily) \
         .say("lily_17", "ゼクのような『完全な嘘つき』よりは、まだ救いがある。", "", actor=lily) \
         .say("lily_18", "……私は、あなたを許すわ。ただし、二度目はない。次にあなたが私を欺いたら……その時は、この爪であなたの喉を裂きます。約束よ。", "", actor=lily) \
-        .set_flag(Keys.LILY_BOTTLE_CONFESSION, 1) \
+        .set_flag(Keys.LILY_BOTTLE_CONFESSION, FlagValues.LilyBottleConfession.CONFESSED) \
         .set_flag(Keys.REL_LILY, 20) \
-        .set_flag(Keys.LILY_TRUST_REBUILD, 1) \
+        .set_flag(Keys.LILY_TRUST_REBUILD, FlagValues.TRUE) \
         .mod_flag(Keys.KARMA, "+", 5) \
         .jump(after_bottle)
 
@@ -153,7 +155,7 @@ def define_makuma2(builder: DramaBuilder):
         .say("lily_19", "それなら仕方ありませんね。ゼクという男は、そういう生き物ですから。", "", actor=lily) \
         .say("lily_20", "……さあ、虚空の心臓の製作に取り掛かりましょう。時間がありません。", "", actor=lily) \
         .say("narr_17", "（リリィの尻尾だけが、不機嫌そうに床を叩いている。）", "", actor=pc) \
-        .set_flag(Keys.LILY_BOTTLE_CONFESSION, 2) \
+        .set_flag(Keys.LILY_BOTTLE_CONFESSION, FlagValues.LilyBottleConfession.BLAMED_ZEK) \
         .jump(after_bottle)
 
     builder.step(bottle_deny) \
@@ -162,9 +164,9 @@ def define_makuma2(builder: DramaBuilder):
         .say("lily_21", "……そうですか。私の、管理ミス。", "", actor=lily) \
         .say("lily_22", "ふふふ……ええ、そうかもしれませんね。私が、あなたという『獣』を『人間』だと勘違いしていた。それが最大のミスでした。", "", actor=lily) \
         .say("lily_23", "結構です。どうぞ、虚空の心臓でも何でも作って、アスタロト様に挑んでください。……私は、もうあなたに期待しません。", "", actor=lily) \
-        .set_flag(Keys.LILY_BOTTLE_CONFESSION, 3) \
+        .set_flag(Keys.LILY_BOTTLE_CONFESSION, FlagValues.LilyBottleConfession.DENIED) \
         .set_flag(Keys.REL_LILY, 0) \
-        .set_flag(Keys.LILY_HOSTILE, 1) \
+        .set_flag(Keys.LILY_HOSTILE, FlagValues.TRUE) \
         .mod_flag(Keys.KARMA, "-", 30) \
         .jump(after_bottle)
 
@@ -187,7 +189,7 @@ def define_makuma2(builder: DramaBuilder):
     # ========================================
     builder.step(scene3) \
         .play_bgm("BGM/Ominous_Suspense_01") \
-        .focus_chara("sukutsu_arena_master") \
+        .focus_chara(Actors.BALGAS) \
         .say("narr_21", "（リリィとの打ち合わせを終え、素材を探しに出ようとするあなたの腕を、酒臭い、しかし岩のように力強い手が掴んだ。）", "", actor=pc) \
         .say("narr_22", "（バルガスだ。彼はあなたを人気の無い柱の影へと引きずり込み、周囲を警戒しながら低く、掠れた声で話し始めた。）", "", actor=pc) \
         .say("balgas_1", "……おい、待て。リリィの女狐に言われるがまま、あいつ（ゼク）の店へ行くつもりか？", "", actor=balgas) \
@@ -198,11 +200,13 @@ def define_makuma2(builder: DramaBuilder):
         .jump(check_kain)
 
     # ========================================
-    # 条件分岐: カインの魂について (kain_soul_choice == 2 "sold")
+    # 条件分岐: カインの魂について (kain_soul_choice == SOLD)
+    # switch_on_flagで安全に分岐
     # ========================================
     builder.step(check_kain) \
-        .branch_if(Keys.KAIN_SOUL_CHOICE, "==", 2, kain_event) \
-        .jump(after_kain)  # kain_soul_choice: 2 = sold
+        .switch_on_flag(Keys.KAIN_SOUL_CHOICE, {
+            FlagValues.KainSoulChoice.SOLD: kain_event,
+        }, fallback=after_kain)
 
     builder.step(kain_event) \
         .say("narr_23", "（バルガスは一瞬、言葉を止め、あなたを鋭く見つめる。）", "", actor=pc) \
@@ -226,9 +230,9 @@ def define_makuma2(builder: DramaBuilder):
         .say("balgas_12", "……ハッ、俺はなんてマヌケだ。お前を『カイン以上の戦士』だと思っちまってた。", "", actor=balgas) \
         .say("balgas_13", "……いいか、鴉。いや、もうお前を鴉とは呼ばねえ。俺はこれでも、裏切られ慣れてる。だから、お前を殺したりはしない。", "", actor=balgas) \
         .say("balgas_14", "だが……もう二度と、俺に『友』として話しかけるな。お前は今日から、ただの『契約闘士』だ。それ以上でも、それ以下でもねえ。", "", actor=balgas) \
-        .set_flag(Keys.KAIN_SOUL_CONFESSION, 1) \
+        .set_flag(Keys.KAIN_SOUL_CONFESSION, FlagValues.KainSoulConfession.CONFESSED) \
         .set_flag(Keys.REL_BALGAS, 0) \
-        .set_flag(Keys.BALGAS_TRUST_BROKEN, 1) \
+        .set_flag(Keys.BALGAS_TRUST_BROKEN, FlagValues.TRUE) \
         .mod_flag(Keys.KARMA, "-", 20) \
         .jump(after_kain)
 
@@ -238,7 +242,7 @@ def define_makuma2(builder: DramaBuilder):
         .say("balgas_15", "……そうか。", "", actor=balgas) \
         .say("balgas_16", "……なら、いい。……いや、よかねえな。俺の勘が外れてることを祈るよ。", "", actor=balgas) \
         .say("narr_29", "（バルガスがあなたの肩を叩くが、その手には以前のような力強さがない。）", "", actor=pc) \
-        .set_flag(Keys.KAIN_SOUL_CONFESSION, 2) \
+        .set_flag(Keys.KAIN_SOUL_CONFESSION, FlagValues.KainSoulConfession.LIED) \
         .set_flag(Keys.REL_BALGAS, 30) \
         .jump(after_kain)
 
@@ -275,7 +279,7 @@ def define_makuma2(builder: DramaBuilder):
     # ========================================
     builder.step(scene4) \
         .play_bgm("BGM/Lily_Tranquil") \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("narr_30", "（素材を集め、虚空の心臓を完成させたあなた。それを手にしたあなたは、リリィのもとへ向かう。）", "", actor=pc) \
         .say("lily_27", "……完成したのですね。見せてください。", "", actor=lily) \
         .say("narr_31", "（リリィが虚空の心臓を手に取り、魔力を流し込む。）", "", actor=pc) \

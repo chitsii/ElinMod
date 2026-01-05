@@ -26,6 +26,7 @@ public class Plugin : BaseUnityPlugin
         Debug.Log("[SukutsuArena]   F9: Arena status (rank/flags/quests)");
         Debug.Log("[SukutsuArena]   F10: Cycle rank up");
         Debug.Log("[SukutsuArena]   F11: Complete next available quest");
+
     }
 
     private void Update()

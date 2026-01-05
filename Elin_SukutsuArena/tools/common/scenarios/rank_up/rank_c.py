@@ -5,7 +5,7 @@
 """
 
 from drama_builder import DramaBuilder
-from flag_definitions import Keys, Rank
+from flag_definitions import Keys, Rank, Actors, QuestIds
 
 def define_rank_up_C(builder: DramaBuilder):
     """
@@ -13,9 +13,9 @@ def define_rank_up_C(builder: DramaBuilder):
     シナリオ: 11_rank_up_C.md
     """
     # アクター登録
-    pc = builder.register_actor("pc", "あなた", "You")
-    lily = builder.register_actor("sukutsu_receptionist", "リリィ", "Lily")
-    balgas = builder.register_actor("sukutsu_arena_master", "バルガス", "Balgas")
+    pc = builder.register_actor(Actors.PC, "あなた", "You")
+    lily = builder.register_actor(Actors.LILY, "リリィ", "Lily")
+    balgas = builder.register_actor(Actors.BALGAS, "バルガス", "Balgas")
 
     # ラベル定義
     main = builder.label("main")
@@ -42,7 +42,7 @@ def define_rank_up_C(builder: DramaBuilder):
         .jump(scene1)
 
     builder.step(scene1) \
-        .focus_chara("sukutsu_arena_master") \
+        .focus_chara(Actors.BALGAS) \
         .say("balgas_1", "……おい、銅貨稼ぎ。", "", actor=balgas) \
         .say("balgas_2", "次の試験は……俺にとっても、お前にとっても、辛いもんになる。", "", actor=balgas) \
         .say("balgas_3", "対戦相手は『堕ちた英雄たちの残党』だ。", "", actor=balgas) \
@@ -78,7 +78,7 @@ def define_rank_up_C(builder: DramaBuilder):
         .say("balgas_7", "……頼む。あいつらを、この地獄から解放してやってくれ。", "", actor=balgas) \
         .say("balgas_8", "俺には……もう、仲間を救う力がねえ。だが、お前なら……お前ならできる。", "", actor=balgas) \
         .say("narr_6", "（リリィが近づいてくる。）", "", actor=pc) \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("lily_1", "……お客様。", "", actor=lily) \
         .say("lily_2", "彼らは『英雄』でした。ですが、今は……ただの『記憶』です。", "", actor=lily) \
         .say("lily_3", "あなたがどれほど優しく戦っても、彼らに意識は戻りません。", "", actor=lily) \
@@ -117,7 +117,7 @@ def define_rank_up_C(builder: DramaBuilder):
         .say("obs_2", "（観客の声：「賭けは『新人が感情に飲まれて敗北』で」）", "", actor=pc) \
         .say("obs_3", "（観客の声：「いや、この新人は……冷静に戦うだろう」）", "", actor=pc) \
         .say("narr_11", "（バルガスの声が、遠くから聞こえる。）", "", actor=pc) \
-        .focus_chara("sukutsu_arena_master") \
+        .focus_chara(Actors.BALGAS) \
         .say("balgas_echo", "……頼んだぞ。", "", actor=balgas) \
         .start_battle(5, is_rank_up=True, master_id="sukutsu_arena_master") \
         .finish()
@@ -133,9 +133,9 @@ def add_rank_up_C_result_steps(builder: DramaBuilder, victory_label: str, defeat
         defeat_label: 敗北ステップのラベル名
         return_label: 結果表示後にジャンプするラベル名
     """
-    pc = "pc"
-    lily = "sukutsu_receptionist"
-    balgas = "sukutsu_arena_master"
+    pc = Actors.PC
+    lily = Actors.LILY
+    balgas = Actors.BALGAS
 
     # ========================================
     # Rank C 昇格試験 勝利
@@ -146,7 +146,7 @@ def add_rank_up_C_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .say("narr_v1", "（最後の英雄が倒れた瞬間、その体が光の粒子となって消えていく。）", "", actor=pc) \
         .say("narr_v2", "（彼らの顔に、一瞬だけ……安堵の表情が浮かんだように見えた。）", "", actor=pc) \
         .say("narr_v3", "（静寂の中、ロビーに戻ると、バルガスが背を向けたまま待っている。）", "", actor=pc) \
-        .focus_chara("sukutsu_arena_master") \
+        .focus_chara(Actors.BALGAS) \
         .say("balgas_v1", "……終わったか。", "", actor=balgas) \
         .say("narr_v4", "（彼はゆっくりと振り返る。その目には涙の跡。）", "", actor=pc) \
         .say("balgas_v2", "……ありがよ。", "", actor=balgas) \
@@ -154,7 +154,7 @@ def add_rank_up_C_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .say("balgas_v4", "お前は今、ただの『銅貨稼ぎ』じゃねえ。", "", actor=balgas) \
         .say("balgas_v5", "死肉を喰らい、戦場を飛び回り、そして仲間の魂を救う……『闘技場の鴉（Arena Crow）』だ。", "", actor=balgas) \
         .say("narr_v5", "（リリィが近づいてくる。）", "", actor=pc) \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("lily_v1", "……素晴らしい戦いでした。", "", actor=lily) \
         .say("lily_v2", "観客の皆様も、あなたの『慈悲』に感動されていたようです。", "", actor=lily) \
         .say("lily_v3", "では、報酬の授与です。", "", actor=lily) \
@@ -190,7 +190,7 @@ def add_rank_up_C_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .say("lily_v5", "記録完了です。", "", actor=lily) \
         .say("lily_v6", "……あなたは今、このアリーナで生き残るための『鋼の心』を手に入れました。", "", actor=lily) \
         .say("lily_v7", "次は、さらなる試練が待っています。……準備が整ったら、また声をかけてくださいね？", "", actor=lily) \
-        .complete_quest("09_rank_up_C") \
+        .complete_quest(QuestIds.RANK_UP_C) \
         .set_flag(Keys.RANK, 5) \
         .mod_flag(Keys.REL_BALGAS, "+", 25) \
         .mod_flag(Keys.REL_LILY, "+", 10) \
@@ -204,7 +204,7 @@ def add_rank_up_C_result_steps(builder: DramaBuilder, victory_label: str, defeat
     builder.step(defeat_label) \
         .set_flag("sukutsu_arena_result", 0) \
         .play_bgm("BGM/Lobby_Normal") \
-        .focus_chara("sukutsu_arena_master") \
+        .focus_chara(Actors.BALGAS) \
         .say("balgas_d1", "……チッ。", "", actor=balgas) \
         .say("balgas_d2", "まだ、お前には早かったか。", "", actor=balgas) \
         .say("balgas_d3", "……準備が整ったら、また来い。あいつらは、待ってる。", "", actor=balgas) \

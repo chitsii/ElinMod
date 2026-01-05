@@ -4,7 +4,7 @@
 """
 
 from drama_builder import DramaBuilder
-from flag_definitions import Keys
+from flag_definitions import Keys, Actors, QuestIds
 
 def define_lily_private(builder: DramaBuilder):
     """
@@ -12,8 +12,8 @@ def define_lily_private(builder: DramaBuilder):
     シナリオ: 08_lily_private.md
     """
     # アクター登録
-    pc = builder.register_actor("pc", "あなた", "You")
-    lily = builder.register_actor("sukutsu_receptionist", "リリィ", "Lily")
+    pc = builder.register_actor(Actors.PC, "あなた", "You")
+    lily = builder.register_actor(Actors.LILY, "リリィ", "Lily")
 
     # ラベル定義
     main = builder.label("main")
@@ -50,7 +50,7 @@ def define_lily_private(builder: DramaBuilder):
         .jump(scene1)
 
     builder.step(scene1) \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("lily_1", "……おかえりなさい。", "", actor=lily) \
         .say("lily_2", "観客席からの『供物』で、少しばかり身だしなみが乱れているようですね。ふふ、でも……今のあなたからは、とても複雑で、芳醇な香りがします。", "", actor=lily) \
         .say("narr_4", "（彼女は羽根ペンを置き、あなたに近づく。）", "", actor=pc) \
@@ -183,6 +183,7 @@ def define_lily_private(builder: DramaBuilder):
     # 終了処理
     # ========================================
     builder.step(ending) \
+        .complete_quest(QuestIds.LILY_PRIVATE) \
         .mod_flag(Keys.REL_LILY, "+", 10) \
         .say("sys_buff", "【システム】サキュバスの観察眼（24時間）を獲得しました。", "", actor=pc) \
         .action("eval", param="UnityEngine.Debug.Log(\"[SukutsuArena] TODO: バフ付与処理 - 魔法詠唱成功率+10%, 回避+5, 獲得VP+10%\");") \

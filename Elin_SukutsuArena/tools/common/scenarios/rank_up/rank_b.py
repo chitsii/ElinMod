@@ -4,7 +4,7 @@
 """
 
 from drama_builder import DramaBuilder
-from flag_definitions import Keys, Rank
+from flag_definitions import Keys, Rank, Actors, QuestIds
 
 def define_rank_up_B(builder: DramaBuilder):
     """
@@ -12,9 +12,9 @@ def define_rank_up_B(builder: DramaBuilder):
     シナリオ: 11_rank_up_B.md
     """
     # アクター登録
-    pc = builder.register_actor("pc", "あなた", "You")
-    lily = builder.register_actor("sukutsu_receptionist", "リリィ", "Lily")
-    balgas = builder.register_actor("sukutsu_arena_master", "バルガス", "Balgas")
+    pc = builder.register_actor(Actors.PC, "あなた", "You")
+    lily = builder.register_actor(Actors.LILY, "リリィ", "Lily")
+    balgas = builder.register_actor(Actors.BALGAS, "バルガス", "Balgas")
 
     # ラベル定義
     main = builder.label("main")
@@ -41,7 +41,7 @@ def define_rank_up_B(builder: DramaBuilder):
         .jump(scene1)
 
     builder.step(scene1) \
-        .focus_chara("sukutsu_arena_master") \
+        .focus_chara(Actors.BALGAS) \
         .say("balgas_1", "……おい、闘技場の鴉。", "", actor=balgas) \
         .say("balgas_2", "お前はここまで、よく戦ってきた。だが、次の相手は……今までの敵とは次元が違う。", "", actor=balgas) \
         .say("balgas_3", "『虚無の処刑人ヌル』。", "", actor=balgas) \
@@ -74,7 +74,7 @@ def define_rank_up_B(builder: DramaBuilder):
     # ========================================
     builder.step(scene2) \
         .play_bgm("BGM/Lily_Seductive_Danger") \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("narr_5", "（リリィが近づいてくる。その目には、珍しく真剣な光が宿っている。）", "", actor=pc) \
         .say("lily_1", "……お客様。ヌルは、このアリーナが生み出した『究極の絶望』の結晶です。", "", actor=lily) \
         .say("lily_2", "あなたがどれほど強くなっても、どれほど技術を磨いても、『虚無』の前では全てが等しく無意味。", "", actor=lily) \
@@ -132,9 +132,9 @@ def add_rank_up_B_result_steps(builder: DramaBuilder, victory_label: str, defeat
         defeat_label: 敗北ステップのラベル名
         return_label: 結果表示後にジャンプするラベル名
     """
-    pc = "pc"
-    lily = "sukutsu_receptionist"
-    balgas = "sukutsu_arena_master"
+    pc = Actors.PC
+    lily = Actors.LILY
+    balgas = Actors.BALGAS
 
     # ========================================
     # Rank B 昇格試験 勝利
@@ -145,18 +145,18 @@ def add_rank_up_B_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .say("narr_v1", "（ヌルの体が霧のように消え去る瞬間、あなたの耳に、かすかに音が戻ってきた。）", "", actor=pc) \
         .say("narr_v2", "（それは、観客の歓声でも、嘲笑でもない。ただ、静かな沈黙の中に響く、あなた自身の心臓の鼓動。）", "", actor=pc) \
         .say("narr_v3", "（ロビーに戻ると、リリィが駆け寄ってきた。）", "", actor=pc) \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("lily_v1", "……おかえりなさい。", "", actor=lily) \
         .say("narr_v4", "（彼女の目には涙。サキュバスが、二度目の涙を流している。）", "", actor=pc) \
         .say("lily_v2", "あなたは……本当に、虚無を打ち破ったのですね。", "", actor=lily) \
         .say("lily_v3", "信じられません。このアリーナの歴史で、ヌルを倒した闘士は……あなたが初めてです。", "", actor=lily) \
-        .focus_chara("sukutsu_arena_master") \
+        .focus_chara(Actors.BALGAS) \
         .say("narr_v5", "（バルガスが、珍しく笑顔で近づいてくる。）", "", actor=pc) \
         .say("balgas_v1", "……ケッ、やりやがったな。", "", actor=balgas) \
         .say("balgas_v2", "お前は、カインが持っていた以上の……いや、俺たち全員が持っていなかった『何か』を持っている。", "", actor=balgas) \
         .say("balgas_v3", "今日からお前は、ただの『闘技場の鴉』じゃねえ。", "", actor=balgas) \
         .say("balgas_v4", "絶望の空を飛び越え、希望を掴み取る……『銀翼（Silver Wing）』だ。", "", actor=balgas) \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("lily_v4", "では、報酬の授与です。", "", actor=lily) \
         .say("lily_v5", "観客からの祝福……小さなコイン20枚とプラチナコイン10枚。それと、戦闘記録として特別な素材を一つ選んでいただけます。", "", actor=lily)
 
@@ -190,7 +190,7 @@ def add_rank_up_B_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .say("lily_v6", "記録完了です。", "", actor=lily) \
         .say("lily_v7", "……あなたは今、このアリーナの頂点まであと僅かです。", "", actor=lily) \
         .say("lily_v8", "次は、グランドマスター・アスタロトとの決戦。……準備が整ったら、また声をかけてくださいね？", "", actor=lily) \
-        .complete_quest("11_rank_up_B") \
+        .complete_quest(QuestIds.RANK_UP_B) \
         .set_flag(Keys.RANK, 6) \
         .mod_flag(Keys.REL_BALGAS, "+", 20) \
         .mod_flag(Keys.REL_LILY, "+", 20) \
@@ -204,7 +204,7 @@ def add_rank_up_B_result_steps(builder: DramaBuilder, victory_label: str, defeat
     builder.step(defeat_label) \
         .set_flag("sukutsu_arena_result", 0) \
         .play_bgm("BGM/Lobby_Normal") \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("lily_d1", "……虚無に、飲み込まれてしまいましたね。", "", actor=lily) \
         .say("lily_d2", "でも、あなたはまだ生きています。それだけで、十分に奇跡です。", "", actor=lily) \
         .say("lily_d3", "準備が整ったら、また挑戦してください。私たちは、ここで待っていますから。", "", actor=lily) \

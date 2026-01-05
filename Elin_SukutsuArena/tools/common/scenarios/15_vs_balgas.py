@@ -4,7 +4,7 @@ Rank S昇格試験 - バルガスとの決戦と慈悲の選択
 """
 
 from drama_builder import DramaBuilder
-from flag_definitions import Keys
+from flag_definitions import Keys, Actors, FlagValues
 
 def define_vs_balgas(builder: DramaBuilder):
     """
@@ -12,10 +12,10 @@ def define_vs_balgas(builder: DramaBuilder):
     シナリオ: 15_vs_bulgas.md
     """
     # アクター登録
-    pc = builder.register_actor("pc", "あなた", "You")
-    balgas = builder.register_actor("sukutsu_arena_master", "バルガス", "Balgas")
-    lily = builder.register_actor("sukutsu_receptionist", "リリィ", "Lily")
-    zek = builder.register_actor("sukutsu_shady_merchant", "ゼク", "Zek")
+    pc = builder.register_actor(Actors.PC, "あなた", "You")
+    balgas = builder.register_actor(Actors.BALGAS, "バルガス", "Balgas")
+    lily = builder.register_actor(Actors.LILY, "リリィ", "Lily")
+    zek = builder.register_actor(Actors.ZEK, "ゼク", "Zek")
 
     # ラベル定義
     main = builder.label("main")
@@ -58,7 +58,7 @@ def define_vs_balgas(builder: DramaBuilder):
         .jump(scene1)
 
     builder.step(scene1) \
-        .focus_chara("sukutsu_arena_master") \
+        .focus_chara(Actors.BALGAS) \
         .say("balgas_1", "……おい、黄金の戦鬼。お前はもう、俺の手の届かねえ高みへ行こうとしてやがる。", "", actor=balgas) \
         .wait(1.0) \
         .say("balgas_2", "だがな、アスタロト……あのドラゴンの首を獲るには、圧倒的な『暴力』だけじゃ足りねえ。", "", actor=balgas) \
@@ -86,7 +86,7 @@ def define_vs_balgas(builder: DramaBuilder):
         .say("narr_7", "（リリィが震える手で水晶を握りしめている。）", "", actor=pc) \
         .wait(0.5) \
         .say("narr_8", "（その瞳には、事務的な冷徹さは微塵も残っていない。）", "", actor=pc) \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("lily_1", "……馬鹿な人。その薬は、命の火花を一度に使い果たす禁忌の炎……！", "", actor=lily) \
         .wait(1.0) \
         .say("lily_2", "お客様、お願いです。彼を止めて……！ でも、彼を殺さないで……。", "", actor=lily) \
@@ -133,7 +133,7 @@ def define_vs_balgas(builder: DramaBuilder):
         .wait(1.0) \
         .say("narr_16", "（あなたは剣を引き、バルガスの喉元に突きつけた刃を下ろす。）", "", actor=pc) \
         .wait(1.0) \
-        .focus_chara("sukutsu_arena_master") \
+        .focus_chara(Actors.BALGAS) \
         .say("balgas_6", "……な、何をしてやがる。……刺せ。それがアリーナの、戦士のケジメだろうが……！", "", actor=balgas) \
         .jump(choice4)
 
@@ -156,14 +156,15 @@ def define_vs_balgas(builder: DramaBuilder):
         .jump(introspection)
 
     # ========================================
-    # 内省：動機に応じた独白
+    # 内省：動機に応じた独白（switch_on_flagで安全に分岐）
     # ========================================
     builder.step(introspection) \
-        .branch_if(Keys.MOTIVATION, "==", 0, introspect_greed) \
-        .branch_if(Keys.MOTIVATION, "==", 1, introspect_battle) \
-        .branch_if(Keys.MOTIVATION, "==", 2, introspect_void) \
-        .branch_if(Keys.MOTIVATION, "==", 3, introspect_pride) \
-        .jump(introspect_done)
+        .switch_on_flag(Keys.MOTIVATION, {
+            FlagValues.Motivation.GREED: introspect_greed,
+            FlagValues.Motivation.BATTLE_LUST: introspect_battle,
+            FlagValues.Motivation.NIHILISM: introspect_void,
+            FlagValues.Motivation.ARROGANCE: introspect_pride,
+        }, fallback=introspect_done)
 
     # 強欲ルート
     builder.step(introspect_greed) \
@@ -214,9 +215,9 @@ def define_vs_balgas(builder: DramaBuilder):
         .say("narr_18", "（その瞬間、アリーナ全体を包んでいた不気味な魔力が霧散し、観客たちの声が落胆の溜息へと変わる。）", "", actor=pc) \
         .wait(0.5) \
         .say("narr_19", "（リリィが駆け寄り、泣きながらバルガスに回復魔法を注ぎ込む。）", "", actor=pc) \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .wait(0.5) \
-        .focus_chara("sukutsu_arena_master") \
+        .focus_chara(Actors.BALGAS) \
         .say("balgas_7", "……ハッ。甘っちょろい野郎だ。……だが、その甘さが、俺がカインに教えてやれなかった『本物の強さ』なのかもしれねえな。", "", actor=balgas) \
         .wait(1.0) \
         .say("balgas_8", "……負けたよ。今日からお前がランクS『屠竜者（Dragon Slayer）』だ。", "", actor=balgas) \
@@ -224,7 +225,7 @@ def define_vs_balgas(builder: DramaBuilder):
         .say("balgas_9", "俺はもう引退だ。これからは、ただの酔いどれの『隠居』として、お前の凱旋をここで待たせてもらうぜ。", "", actor=balgas) \
         .wait(1.0) \
         .say("narr_20", "（リリィは台帳を開き、涙を拭きながら何かを書き込む。）", "", actor=pc) \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("lily_4", "……ありがとう。本当に、ありがとうございます。", "", actor=lily) \
         .wait(0.5) \
         .say("lily_5", "観客からの報酬として、小さなコイン50枚とプラチナコイン30枚。それと、戦闘記録として素材を一つ選んでいただけます。", "", actor=lily) \
@@ -259,7 +260,7 @@ def define_vs_balgas(builder: DramaBuilder):
         .say("lily_8", "アリーナの命令を拒絶し、師匠を生かす……ふふ、あなたは本当に、システムの『バグ』ですね。", "", actor=lily) \
         .wait(1.0) \
         .say("narr_21", "（影の中から、ゼクが見つめている。）", "", actor=pc) \
-        .focus_chara("sukutsu_shady_merchant") \
+        .focus_chara(Actors.ZEK) \
         .say("zek_1", "……クク。システムの命令を拒絶しましたか。", "", actor=zek) \
         .wait(0.5) \
         .say("zek_2", "面白い。実に面白い。あなたは『黄金』を超え、ついにこの箱庭の『バグ』として完成した。", "", actor=zek) \
@@ -275,17 +276,17 @@ def define_vs_balgas(builder: DramaBuilder):
            .choice(final_nod, "（無言で頷く）", "", text_id="c_final_nod")
 
     builder.step(final_thanks) \
-        .focus_chara("sukutsu_arena_master") \
+        .focus_chara(Actors.BALGAS) \
         .say("balgas_r4", "……ハッ、礼はいらねえ。生き残って、アスタロトをぶっ倒せ。", "", actor=balgas) \
         .jump(ending)
 
     builder.step(final_human) \
-        .focus_chara("sukutsu_arena_master") \
+        .focus_chara(Actors.BALGAS) \
         .say("balgas_r5", "……ああ。少なくとも、まだ仲間を守れるだけの心がある。それが証拠だ。", "", actor=balgas) \
         .jump(ending)
 
     builder.step(final_nod) \
-        .focus_chara("sukutsu_arena_master") \
+        .focus_chara(Actors.BALGAS) \
         .say("balgas_r6", "……よし。じゃあ行け。俺は、ここで待ってるぜ。", "", actor=balgas) \
         .jump(ending)
 
@@ -296,7 +297,7 @@ def define_vs_balgas(builder: DramaBuilder):
         .set_flag(Keys.RANK, 7) \
         .set_flag(Keys.REL_BALGAS, 100) \
         .mod_flag(Keys.REL_LILY, "+", 30) \
-        .set_flag("chitsii.arena.player.balgas_choice", 1) \
+        .set_flag(Keys.BALGAS_CHOICE, FlagValues.BalgasChoice.SPARED) \
         .say("sys_title", "【システム】称号『理を拒む者（System Breaker）』を獲得しました。", "", actor=pc) \
         .say("sys_buff", "【システム】バルガスの加護（永続）を獲得しました。", "", actor=pc) \
         .action("eval", param="UnityEngine.Debug.Log(\"[SukutsuArena] TODO: 称号付与 - 状態異常耐性+30%, ピンチ時にバルガス加勢\");") \

@@ -1,5 +1,7 @@
 using HarmonyLib;
 using UnityEngine;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
 
@@ -7,19 +9,23 @@ namespace Elin_SukutsuArena
 {
     /// <summary>
     /// アリーナ関連のHarmonyパッチまとめ
+    /// フェーズベースのクエスト管理とNPCマーカーをサポート
     /// </summary>
     public static class ArenaZonePatches
     {
-        // 自動開始対象のクエストタイプ
-        private static readonly string[] AutoStartQuestTypes = new[]
-        {
-            "main_story",
-            "character_event",
-            "side_quest"
-        };
-
         // 一度のセッションで開始済みのクエストを追跡（連続トリガー防止）
         private static string lastTriggeredQuestId = null;
+
+        /// <summary>
+        /// ゾーンがアリーナかどうかを判定
+        /// </summary>
+        public static bool IsArenaZone(Zone zone)
+        {
+            if (zone == null) return false;
+            return zone.id == Plugin.ZoneId ||
+                   zone.id?.Contains("sukutsu") == true ||
+                   zone.id?.Contains("arena") == true;
+        }
 
         /// <summary>
         /// クエスト完了時にトラッキングをリセット（次のクエストが自動開始可能になる）
@@ -33,7 +39,7 @@ namespace Elin_SukutsuArena
         /// <summary>
         /// ゾーンがアクティブになった時のパッチ
         /// アリーナから敗北・勝利して戻った時に自動でアリーナマスターと会話を開始
-        /// ストーリークエストの自動開始
+        /// 自動発動クエストの開始とNPCマーカーの更新
         /// </summary>
         [HarmonyPatch(typeof(Zone), nameof(Zone.Activate))]
         public static class ArenaZoneActivatePatch
@@ -49,13 +55,20 @@ namespace Elin_SukutsuArena
                 if (isReturningFromBattle)
                 {
                     HandleBattleResultDialog();
-                    return; // 戦闘帰還時はストーリークエストをスキップ
+                    return; // 戦闘帰還時は自動クエストをスキップ
                 }
 
-                // ストーリークエストの自動開始（アリーナゾーンのみ）
-                if (__instance.id == Plugin.ZoneId)
+                // アリーナゾーンの処理
+                if (IsArenaZone(__instance))
                 {
-                    CheckAndTriggerStoryQuest();
+                    // NPCマーカーをリフレッシュ
+                    DOVirtual.DelayedCall(0.3f, () =>
+                    {
+                        ArenaQuestMarkerManager.Instance.RefreshAllMarkers();
+                    });
+
+                    // 自動発動クエストのチェックと開始
+                    CheckAndTriggerAutoQuest();
                 }
             }
 
@@ -92,8 +105,10 @@ namespace Elin_SukutsuArena
 
                 if (master != null && master.ExistsOnMap)
                 {
-                    Debug.Log($"[SukutsuArena] Showing dialog with {master.Name}");
-                    master.ShowDialog();
+                    // 戦闘結果ダイアログを直接指定（NpcQuestDialogPatchをバイパス）
+                    // これによりクエストドラマではなく結果ダイアログが表示される
+                    Debug.Log($"[SukutsuArena] Showing battle result dialog with {master.Name}");
+                    master.ShowDialog("drama_sukutsu_arena_master");
                 }
                 else
                 {
@@ -102,9 +117,9 @@ namespace Elin_SukutsuArena
             }
 
             /// <summary>
-            /// 条件を満たしたストーリークエストを自動開始
+            /// 自動発動クエストをチェックして開始（フェーズベース）
             /// </summary>
-            private static void CheckAndTriggerStoryQuest()
+            private static void CheckAndTriggerAutoQuest()
             {
                 // 闘士未登録なら何もしない
                 if (!ArenaFlagManager.GetBool("sukutsu_gladiator"))
@@ -118,28 +133,28 @@ namespace Elin_SukutsuArena
                 if (ArenaFlagManager.GetInt("sukutsu_is_rank_up_result") != 0)
                     return;
 
-                var availableQuests = ArenaQuestManager.Instance.GetAvailableQuests();
+                // 自動発動クエストを取得（フェーズと条件でフィルタリング済み）
+                var autoQuests = ArenaQuestManager.Instance.GetAutoTriggerQuests();
 
-                // 自動開始対象のクエストをフィルタリング
-                var storyQuest = availableQuests
-                    .Where(q => AutoStartQuestTypes.Contains(q.QuestType))
-                    .Where(q => q.QuestId != lastTriggeredQuestId) // 連続トリガー防止
+                // 連続トリガー防止と優先度でフィルタリング
+                var quest = autoQuests
+                    .Where(q => q.QuestId != lastTriggeredQuestId)
                     .OrderByDescending(q => q.Priority)
                     .FirstOrDefault();
 
-                if (storyQuest == null)
+                if (quest == null)
                 {
-                    Debug.Log("[SukutsuArena] No story quest available for auto-start");
+                    Debug.Log("[SukutsuArena] No auto-trigger quest available");
                     return;
                 }
 
-                Debug.Log($"[SukutsuArena] Auto-starting story quest: {storyQuest.QuestId} ({storyQuest.DramaId})");
-                lastTriggeredQuestId = storyQuest.QuestId;
+                Debug.Log($"[SukutsuArena] Auto-triggering quest: {quest.QuestId} (Phase: {quest.Phase}, Drama: {quest.DramaId})");
+                lastTriggeredQuestId = quest.QuestId;
 
                 // 少し遅延させてからドラマを開始（ゾーン遷移の完了を待つ）
                 DOVirtual.DelayedCall(0.5f, () =>
                 {
-                    TriggerQuestDrama(storyQuest);
+                    TriggerQuestDrama(quest);
                 });
             }
 
@@ -155,7 +170,7 @@ namespace Elin_SukutsuArena
                 try
                 {
                     // ドラマIDに基づいて対応するキャラクターを見つける
-                    string targetCharaId = GetQuestTargetChara(quest.QuestId);
+                    string targetCharaId = GetQuestTargetChara(quest);
                     Chara targetChara = null;
 
                     if (!string.IsNullOrEmpty(targetCharaId))
@@ -190,40 +205,118 @@ namespace Elin_SukutsuArena
             }
 
             /// <summary>
-            /// クエストIDに対応する対話相手のキャラクターIDを取得
+            /// クエストに対応する対話相手のキャラクターIDを取得
+            /// quest_giverを優先し、未定義の場合はフォールバック
             /// </summary>
-            private static string GetQuestTargetChara(string questId)
+            private static string GetQuestTargetChara(QuestDefinition quest)
             {
-                // クエストIDに基づいて対話相手を決定
-                return questId switch
+                // quest_giverが設定されていればそれを使用
+                if (!string.IsNullOrEmpty(quest.QuestGiver))
+                {
+                    return quest.QuestGiver;
+                }
+
+                // 自動発動クエスト（quest_giver = null）の場合はフォールバック
+                return quest.QuestId switch
                 {
                     // オープニング（リリィがナビゲーター）
                     "01_opening" => "sukutsu_receptionist",
 
-                    // ゼク関連
-                    "03_zek_intro" => "sukutsu_shady_merchant",
-                    "05_2_zek_steal_bottle" => "sukutsu_shady_merchant",
-                    "06_2_zek_steal_soulgem" => "sukutsu_shady_merchant",
-
-                    // リリィ関連
-                    "05_1_lily_experiment" => "sukutsu_receptionist",
-                    "08_lily_private" => "sukutsu_receptionist",
-                    "16_lily_real_name" => "sukutsu_receptionist",
-
-                    // バルガス関連
-                    "09_balgas_training" => "sukutsu_arena_master",
-                    "15_vs_balgas" => "sukutsu_arena_master",
-
                     // メインストーリー（リリィが語り手）
-                    "07_upper_existence" => "sukutsu_receptionist",
-                    "12_makuma" => "sukutsu_receptionist",
                     "13_makuma2" => "sukutsu_receptionist",
-                    "17_vs_grandmaster_1" => "sukutsu_arena_master",
+                    "17_escape" => "sukutsu_arena_master",
                     "18_last_battle" => "sukutsu_arena_master",
 
-                    _ => null
+                    // デフォルトはリリィ
+                    _ => "sukutsu_receptionist"
                 };
             }
+        }
+
+        /// <summary>
+        /// NPC会話開始時（引数なし）にクエストを持っているかチェックし、クエストドラマを優先するパッチ
+        /// ShowDialog()オーバーロードをパッチ（プレイヤーがNPCをクリックした時に呼ばれる）
+        ///
+        /// 注意: character_eventタイプのクエストのみ強制開始する
+        /// rank_upクエストは通常のNPCダイアログで選択できるようにする
+        /// </summary>
+        [HarmonyPatch(typeof(Chara), nameof(Chara.ShowDialog), new Type[] { })]
+        public static class NpcQuestDialogPatchNoArgs
+        {
+            // NPCクリックで自動開始すべきクエストタイプ
+            private static readonly HashSet<string> AutoStartQuestTypes = new HashSet<string>
+            {
+                "character_event",  // キャラクターイベント（ゼク初遭遇など）
+                "side_quest"        // サイドクエスト
+            };
+
+            [HarmonyPrefix]
+            public static bool Prefix(Chara __instance)
+            {
+                Debug.Log($"[NpcQuestDialog] ShowDialog() called: NPC={__instance?.id}");
+
+                // アリーナゾーン外ではスキップ
+                if (!IsArenaZone(EClass._zone))
+                {
+                    Debug.Log($"[NpcQuestDialog] SKIP: Not in arena zone (zone={EClass._zone?.id})");
+                    return true;
+                }
+
+                // アリーナNPCかチェック
+                string npcId = __instance.id;
+                if (!IsArenaNpc(npcId))
+                {
+                    Debug.Log($"[NpcQuestDialog] SKIP: Not an arena NPC ({npcId})");
+                    return true;
+                }
+
+                // このNPCが利用可能なクエストを持っているかチェック
+                Debug.Log($"[NpcQuestDialog] Checking quests for NPC: {npcId}");
+                var allQuests = ArenaQuestManager.Instance.GetQuestsForNpc(npcId);
+                Debug.Log($"[NpcQuestDialog] GetQuestsForNpc returned: {allQuests?.Count ?? 0} quests");
+
+                if (allQuests == null || allQuests.Count == 0)
+                {
+                    Debug.Log($"[NpcQuestDialog] SKIP: No quests for NPC {npcId}");
+                    return true;
+                }
+
+                // 自動開始すべきクエストタイプのみフィルタリング
+                // rank_up, main_storyなどはNPCダイアログ内で選択させる
+                var autoStartQuests = allQuests
+                    .Where(q => AutoStartQuestTypes.Contains(q.QuestType))
+                    .OrderByDescending(q => q.Priority)
+                    .ToList();
+
+                Debug.Log($"[NpcQuestDialog] Auto-start eligible quests: {autoStartQuests.Count} (types: {string.Join(",", AutoStartQuestTypes)})");
+
+                if (autoStartQuests.Count == 0)
+                {
+                    Debug.Log($"[NpcQuestDialog] SKIP: No auto-start quests for NPC {npcId}");
+                    return true;
+                }
+
+                var quest = autoStartQuests.First();
+                Debug.Log($"[SukutsuArena] NPC {npcId} has auto-start quest: {quest.QuestId} (type: {quest.QuestType}), starting quest drama");
+
+                // クエストドラマを開始（通常会話をスキップ）
+                string dramaName = $"drama_{quest.DramaId}";
+                Debug.Log($"[NpcQuestDialog] Starting drama: {dramaName}");
+                __instance.ShowDialog(dramaName);
+
+                return false; // 通常会話をスキップ
+            }
+        }
+
+        /// <summary>
+        /// アリーナNPCかどうかを判定（共通メソッド）
+        /// </summary>
+        private static bool IsArenaNpc(string npcId)
+        {
+            return npcId == "sukutsu_receptionist" ||
+                   npcId == "sukutsu_arena_master" ||
+                   npcId == "sukutsu_shady_merchant" ||
+                   npcId == "sukutsu_grandmaster";
         }
 
         /// <summary>
@@ -240,6 +333,59 @@ namespace Elin_SukutsuArena
                     // アリーナバトル中は強制的に復活可能（ゲームオーバーにならない）
                     // 実際の復活処理と退出はZoneEventArenaBattle.OnCharaDieで行う
                     __result = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// ダイアログ終了時にマーカーをリフレッシュするパッチ
+        /// </summary>
+        [HarmonyPatch(typeof(LayerDrama), nameof(LayerDrama.OnKill))]
+        public static class DramaEndMarkerRefreshPatch
+        {
+            [HarmonyPostfix]
+            public static void Postfix()
+            {
+                Debug.Log("[ArenaMarker] Drama layer closed, refreshing markers");
+
+                // 少し遅延させてリフレッシュ（ダイアログ終了処理完了後）
+                DOVirtual.DelayedCall(0.1f, () =>
+                {
+                    if (IsArenaZone(EClass._zone))
+                    {
+                        ArenaQuestMarkerManager.Instance.RefreshAllMarkers();
+                    }
+                });
+            }
+        }
+
+        /// <summary>
+        /// TickConditionsの直後にマーカーを設定するパッチ
+        /// TickConditionsでemoIconがnoneにリセットされるので、直後に再設定する
+        /// これにより点滅を防ぐ
+        /// </summary>
+        [HarmonyPatch(typeof(Chara), nameof(Chara.TickConditions))]
+        public static class CharaTickConditionsMarkerPatch
+        {
+            [HarmonyPostfix]
+            public static void Postfix(Chara __instance)
+            {
+                try
+                {
+                    // アリーナゾーン外ではスキップ
+                    if (!IsArenaZone(EClass._zone)) return;
+
+                    // このキャラがクエストマーカーを持つべきかチェック
+                    var npcsWithQuests = ArenaQuestMarkerManager.Instance.GetNpcsWithQuestsList();
+                    if (npcsWithQuests == null || !npcsWithQuests.Contains(__instance.id)) return;
+
+                    // emoIcon = Emo2.hint で「！」マーカーを直接表示
+                    // TickConditionsでnoneにリセットされた直後に設定するので点滅しない
+                    __instance.emoIcon = Emo2.hint;
+                }
+                catch
+                {
+                    // 静かに失敗
                 }
             }
         }

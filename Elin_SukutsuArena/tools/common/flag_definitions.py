@@ -15,6 +15,147 @@ PREFIX = "chitsii.arena"
 
 
 # ============================================================================
+# Actor IDs (Character IDs for CWL drama files)
+# ============================================================================
+
+class Actors:
+    """
+    キャラクターID定数
+
+    これらのIDはCWLドラマファイルのactor列で使用され、
+    ゲーム内のキャラクターIDと一致する必要がある。
+    """
+    # プレイヤー
+    PC = "pc"
+
+    # アリーナNPC
+    LILY = "sukutsu_receptionist"       # リリィ（受付嬢）
+    BALGAS = "sukutsu_arena_master"     # バルガス（アリーナマスター）
+    ZEK = "sukutsu_shady_merchant"      # ゼク（怪しい商人）
+    ASTAROTH = "sukutsu_grandmaster"    # アスタロト（グランドマスター）
+
+
+# ============================================================================
+# Quest IDs (Single Source of Truth for quest identifiers)
+# ============================================================================
+
+class QuestIds:
+    """
+    クエストID定数
+
+    全てのクエストIDをここで一元管理。
+    シナリオファイル、quest_dependencies.py、C#コードで使用する。
+    """
+    # === メインストーリー ===
+    OPENING = "01_opening"                  # オープニング
+
+    # === ランク昇格試験 ===
+    RANK_UP_G = "02_rank_up_G"              # ランクG昇格（屑肉の洗礼）
+    RANK_UP_F = "04_rank_up_F"              # ランクF昇格（凍土の魔犬）
+    RANK_UP_E = "06_rank_up_E"              # ランクE昇格（錆びついた英雄カイン）
+    RANK_UP_D = "10_rank_up_D"              # ランクD昇格（銅貨稼ぎの洗礼）
+    RANK_UP_C = "09_rank_up_C"              # ランクC昇格（闘技場の鴉）
+    RANK_UP_B = "11_rank_up_B"              # ランクB昇格（虚無の処刑人ヌル）
+    RANK_UP_A = "12_rank_up_A"              # ランクA昇格（影との戦い）
+    RANK_UP_S = "15_vs_balgas"              # ランクS昇格（バルガス戦）
+
+    # === ゼクルート ===
+    ZEK_INTRO = "03_zek_intro"              # ゼク初遭遇
+    ZEK_STEAL_BOTTLE = "05_2_zek_steal_bottle"    # 器すり替え提案
+    ZEK_STEAL_SOULGEM = "06_2_zek_steal_soulgem"  # カイン魂の選択
+
+    # === キャラクターイベント ===
+    LILY_EXPERIMENT = "05_1_lily_experiment"  # リリィの私的依頼
+    LILY_PRIVATE = "08_lily_private"          # リリィの私室招待
+    LILY_REAL_NAME = "16_lily_real_name"      # リリィの真名告白
+    BALGAS_TRAINING = "09_balgas_training"    # バルガスの特別訓練
+    UPPER_EXISTENCE = "07_upper_existence"    # 高次元存在の真実
+
+    # === 後半メインストーリー ===
+    MAKUMA = "12_makuma"                    # ヌルの記憶チップ
+    MAKUMA2 = "13_makuma2"                  # 虚空の心臓製作
+    VS_GRANDMASTER_1 = "17_vs_grandmaster_1"  # アスタロト初遭遇・逃亡
+    LAST_BATTLE = "18_last_battle"          # 最終決戦
+
+
+# ============================================================================
+# Flag Integer Values (for dialogFlags which only accepts integers)
+# ============================================================================
+
+class FlagValues:
+    """
+    フラグ値定数（dialogFlagsは整数のみ対応）
+
+    各フラグの取り得る値を定数として定義。
+    シナリオファイルではこれらの定数を使用してset_flag/branch_ifを呼び出す。
+    """
+
+    # --- Boolean Flags (True/False) ---
+    FALSE = 0
+    TRUE = 1
+
+    class BottleChoice:
+        """共鳴瓶の選択（05_2_zek_steal_bottle）"""
+        # Enum ordinals are 0-based: BottleChoice enum has 2 values
+        REFUSED = 0   # 拒否
+        SWAPPED = 1   # すり替えた
+
+    class KainSoulChoice:
+        """カインの魂の選択（06_2_zek_steal_soulgem）"""
+        # Enum ordinals are 0-based: KainSoulChoice enum has 2 values
+        RETURNED = 0  # バルガスに返した
+        SOLD = 1      # ゼクに売った
+
+    class LilyBottleConfession:
+        """瓶すり替え発覚時の告白（13_makuma2）"""
+        # Enum ordinals are 0-based: LilyBottleConfession enum has 3 values
+        CONFESSED = 0   # 正直に告白
+        BLAMED_ZEK = 1  # ゼクのせいにした
+        DENIED = 2      # 否定した
+
+    class KainSoulConfession:
+        """カイン魂売却発覚時の告白（13_makuma2）"""
+        # Enum ordinals are 0-based: KainSoulConfession enum has 2 values
+        CONFESSED = 0  # 正直に告白
+        LIED = 1       # 嘘をついた
+
+    class BalgasChoice:
+        """バルガス戦での選択（15_vs_balgas）"""
+        # Enum ordinals are 0-based: BalgasChoice enum has 2 values
+        SPARED = 0     # 見逃した
+        KILLED = 1     # 倒した
+
+    class LilyTrueName:
+        """リリィの真名（16_lily_real_name）"""
+        # Boolean flag uses TRUE = 1
+        KNOWN = 1      # 真名を知っている
+
+    class Ending:
+        """エンディング選択（18_last_battle）"""
+        # Enum ordinals are 0-based: Ending enum has 3 values
+        RETURN_TO_SURFACE = 0     # 地上に戻る
+        REBUILD_ARENA = 1         # アリーナを再建
+        CHALLENGE_OBSERVERS = 2   # 観客に挑む
+
+    class Motivation:
+        """プレイヤーの動機"""
+        GREED = 0       # 強欲
+        BATTLE_LUST = 1 # 戦闘狂
+        NIHILISM = 2    # 虚無
+        ARROGANCE = 3   # 傲慢
+
+    class Phase:
+        """ストーリーフェーズ"""
+        # Enum ordinals are 0-based: Phase enum has 6 values
+        PROLOGUE = 0      # ゲーム開始〜初戦
+        INITIATION = 1    # Rank G〜F
+        RISING = 2        # Rank E〜D
+        AWAKENING = 3     # Rank C〜B
+        CONFRONTATION = 4 # Rank A
+        CLIMAX = 5        # 逃亡〜最終決戦
+
+
+# ============================================================================
 # Enum Definitions
 # ============================================================================
 
@@ -108,6 +249,40 @@ class Ending(Enum):
     CHALLENGE_OBSERVERS = "challenge_observers"
 
 
+class Phase(Enum):
+    """ストーリーフェーズ（クエスト依存関係管理用）"""
+    PROLOGUE = "prologue"           # 0: ゲーム開始〜初戦
+    INITIATION = "initiation"       # 1: Rank G〜F (チュートリアル完了)
+    RISING = "rising"               # 2: Rank E〜D (カイン戦、観客介入導入)
+    AWAKENING = "awakening"         # 3: Rank C〜B (英雄残党、ヌル戦、真名イベント)
+    CONFRONTATION = "confrontation" # 4: Rank A (アスタロト対決、裏切り発覚)
+    CLIMAX = "climax"               # 5: 逃亡〜最終決戦
+
+    def __ge__(self, other):
+        if not isinstance(other, Phase):
+            return NotImplemented
+        order = list(Phase)
+        return order.index(self) >= order.index(other)
+
+    def __gt__(self, other):
+        if not isinstance(other, Phase):
+            return NotImplemented
+        order = list(Phase)
+        return order.index(self) > order.index(other)
+
+    def __le__(self, other):
+        if not isinstance(other, Phase):
+            return NotImplemented
+        order = list(Phase)
+        return order.index(self) <= order.index(other)
+
+    def __lt__(self, other):
+        if not isinstance(other, Phase):
+            return NotImplemented
+        order = list(Phase)
+        return order.index(self) < order.index(other)
+
+
 # ============================================================================
 # Flag Definition Classes
 # ============================================================================
@@ -169,6 +344,13 @@ class PlayerFlags:
         enum_type=Rank,
         default=Rank.UNRANKED,
         description="現在の闘技場ランク"
+    )
+
+    current_phase = EnumFlag(
+        key="player.current_phase",
+        enum_type=Phase,
+        default=Phase.PROLOGUE,
+        description="現在のストーリーフェーズ"
     )
 
     karma = IntFlag(
@@ -328,6 +510,7 @@ def get_all_enums() -> List[Type[Enum]]:
     return [
         Motivation,
         Rank,
+        Phase,
         BottleChoice,
         KainSoulChoice,
         BalgasChoice,
@@ -347,6 +530,7 @@ class Keys:
     # Player
     MOTIVATION = PlayerFlags.motivation.full_key
     RANK = PlayerFlags.rank.full_key
+    CURRENT_PHASE = PlayerFlags.current_phase.full_key
     KARMA = PlayerFlags.karma.full_key
     CONTRIBUTION = PlayerFlags.contribution.full_key
     FUGITIVE = PlayerFlags.fugitive_status.full_key

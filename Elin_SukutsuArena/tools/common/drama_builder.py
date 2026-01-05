@@ -16,11 +16,15 @@ try:
     from flag_definitions import (
         get_all_flags, get_all_enums,
         EnumFlag, IntFlag, BoolFlag, StringFlag,
-        PREFIX as FLAG_PREFIX
+        PREFIX as FLAG_PREFIX,
+        Actors, FlagValues, Keys
     )
     FLAG_VALIDATION_ENABLED = True
 except ImportError:
     FLAG_VALIDATION_ENABLED = False
+    Actors = None
+    FlagValues = None
+    Keys = None
     print("[DramaBuilder] Warning: flag_definitions not found, flag validation disabled")
 
 
@@ -196,6 +200,9 @@ class DramaBuilder:
                   actor: Union[str, DramaActor] = None) -> 'DramaBuilder':
         """
         条件分岐。invoke* + if_flag を使用。
+
+        注意: 複数のbranch_ifを連続して使用する場合、最後のフォールバックjumpが
+        先に実行される可能性があります。代わりに switch_on_flag() を使用してください。
         """
         key = self._resolve_key(jump_to)
         actor_key = self._resolve_key(actor) if actor else 'pc'
@@ -206,6 +213,112 @@ class DramaBuilder:
             'actor': actor_key,
         }
         self.entries.append(entry)
+        return self
+
+    def switch_on_flag(self, flag: str, cases: Dict[int, Union[str, DramaLabel]],
+                       fallback: Union[str, DramaLabel] = None,
+                       actor: Union[str, DramaActor] = None) -> 'DramaBuilder':
+        """
+        フラグ値に基づく複数条件分岐（安全なswitch-case風API）
+
+        branch_ifを連続して使用する際の問題（最後のjumpが先に実行される）を
+        回避するため、フォールバックも条件付きbranch_if（値==0）として生成します。
+
+        Args:
+            flag: チェックするフラグキー
+            cases: {値: ジャンプ先} の辞書
+            fallback: どの条件にも一致しない場合のジャンプ先（省略可）
+            actor: アクター（デフォルト: pc）
+
+        Example:
+            builder.switch_on_flag("sukutsu_quest_target_name", {
+                11: start_rank_g,
+                12: start_rank_f,
+                16: start_rank_b,
+            }, fallback=rank_up_not_ready)
+
+        Note:
+            フォールバックはフラグ値が0の場合にのみ実行されます。
+            check_quest_available等でフラグが設定されなかった場合に
+            0のままになるため、これが正しい動作となります。
+        """
+        actor_key = self._resolve_key(actor) if actor else 'pc'
+
+        # 各ケースをbranch_ifとして生成
+        for value, jump_to in cases.items():
+            key = self._resolve_key(jump_to)
+            entry = {
+                'action': 'invoke*',
+                'param': f'if_flag({flag}, =={value})',
+                'jump': key,
+                'actor': actor_key,
+            }
+            self.entries.append(entry)
+
+        # フォールバックも条件付きで生成（値が0の場合のみ）
+        if fallback is not None:
+            fallback_key = self._resolve_key(fallback)
+            entry = {
+                'action': 'invoke*',
+                'param': f'if_flag({flag}, ==0)',
+                'jump': fallback_key,
+                'actor': actor_key,
+            }
+            self.entries.append(entry)
+
+        return self
+
+    def choices_with_cancel(self, choices: list, cancel_target: Union[str, DramaLabel]) -> 'DramaBuilder':
+        """
+        選択肢群とキャンセル時のジャンプ先をセットで追加。
+
+        Args:
+            choices: 選択肢のリスト。各要素は以下の形式:
+                     (jump_to, text_jp, text_en, text_id) または
+                     (jump_to, text_jp, text_en) または
+                     (jump_to, text_jp)
+            cancel_target: キャンセル時のジャンプ先
+
+        Example:
+            builder.choices_with_cancel([
+                (react_accept, "分かった", "", "c_accept"),
+                (react_refuse, "断る", "", "c_refuse"),
+                (react_silent, "（無言）", "", "c_silent"),
+            ], cancel_target=main_menu)
+        """
+        for item in choices:
+            if len(item) == 4:
+                jump_to, text_jp, text_en, text_id = item
+                self.choice(jump_to, text_jp, text_en, text_id)
+            elif len(item) == 3:
+                jump_to, text_jp, text_en = item
+                self.choice(jump_to, text_jp, text_en)
+            elif len(item) == 2:
+                jump_to, text_jp = item
+                self.choice(jump_to, text_jp)
+            else:
+                raise ValueError(f"Invalid choice format: {item}")
+
+        self.on_cancel(cancel_target)
+        return self
+
+    def check_quests(self, checks: list, actor: Union[str, DramaActor] = None) -> 'DramaBuilder':
+        """
+        複数のクエスト利用可能チェックを一括で実行。
+
+        Args:
+            checks: (quest_id, jump_label) タプルのリスト
+            actor: アクター（デフォルト: pc）
+
+        Example:
+            builder.check_quests([
+                (QuestIds.RANK_UP_G, start_rank_g),
+                (QuestIds.RANK_UP_F, start_rank_f),
+                (QuestIds.RANK_UP_E, start_rank_e),
+            ])
+        """
+        for quest_id, jump_target in checks:
+            self.check_quest_available(quest_id, jump_target, actor)
         return self
 
     def set_flag(self, flag: str, value: int = 1) -> 'DramaBuilder':

@@ -3,7 +3,7 @@
 """
 
 from drama_builder import DramaBuilder
-from flag_definitions import Keys, Rank
+from flag_definitions import Keys, Rank, Actors, QuestIds
 
 def define_rank_up_F(builder: DramaBuilder):
     """
@@ -11,9 +11,9 @@ def define_rank_up_F(builder: DramaBuilder):
     シナリオ: 04_rank_up_02.md
     """
     # アクター登録
-    pc = builder.register_actor("pc", "あなた", "You")
-    lily = builder.register_actor("sukutsu_receptionist", "リリィ", "Lily")
-    balgas = builder.register_actor("sukutsu_arena_master", "バルガス", "Balgas")
+    pc = builder.register_actor(Actors.PC, "あなた", "You")
+    lily = builder.register_actor(Actors.LILY, "リリィ", "Lily")
+    balgas = builder.register_actor(Actors.BALGAS, "バルガス", "Balgas")
 
     # ラベル定義
     main = builder.label("main")
@@ -34,7 +34,7 @@ def define_rank_up_F(builder: DramaBuilder):
     # ========================================
     builder.step(main) \
         .play_bgm("BGM/Lobby_Normal") \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("narr_1", "（ロビーの空気が一変している。受付カウンターには薄く霜が降り、リリィの吐息すら白く濁っている。）", "", actor=pc) \
         .say("narr_2", "（彼女は冷たくなった指先を温めるように摩りながら、氷の結晶が浮き出た登録証を提示した。）", "", actor=pc) \
         .say("narr_3", "（松明の炎すら、凍気に押されて小さく震えている。床の石畳には薄い氷膜が張り、踏むたびにパリパリと音を立てる。）", "", actor=pc) \
@@ -71,7 +71,7 @@ def define_rank_up_F(builder: DramaBuilder):
     # シーン2: バルガスの冷徹な眼差し
     # ========================================
     builder.step(scene2_balgas) \
-        .focus_chara("sukutsu_arena_master") \
+        .focus_chara(Actors.BALGAS) \
         .say("narr_5", "（闘技場の門扉からは、身を切るような極寒の風が吹き荒れている。バルガスは分厚い外套に身を包み、凍りついた鉄格子を乱暴に叩いた。）", "", actor=pc) \
         .say("balgas_1", "おい、顔色が青白いぜ。戦う前から死体ごっこか？", "", actor=balgas) \
         .say("balgas_2", "いいか、寒さってのは『恐怖』と同じだ。一度足が止まれば、そこが終着駅だと思え。", "", actor=balgas) \
@@ -130,9 +130,9 @@ def add_rank_up_F_result_steps(builder: DramaBuilder, victory_label: str, defeat
         defeat_label: 敗北ステップのラベル名
         return_label: 結果表示後にジャンプするラベル名
     """
-    pc = "pc"
-    lily = "sukutsu_receptionist"
-    balgas = "sukutsu_arena_master"
+    pc = Actors.PC
+    lily = Actors.LILY
+    balgas = Actors.BALGAS
 
     # ========================================
     # Rank F 昇格試験 勝利
@@ -142,13 +142,13 @@ def add_rank_up_F_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .play_bgm("BGM/Lobby_Normal") \
         .say("narr_v1", "（砕け散った氷の破片が砂に混じり、冷気がゆっくりと霧散していく。）", "", actor=pc) \
         .say("narr_v2", "（体温を奪われ、這うようにしてロビーに戻ったあなたを、バルガスが力強く、しかし乱暴に迎える。）", "", actor=pc) \
-        .focus_chara("sukutsu_arena_master") \
+        .focus_chara(Actors.BALGAS) \
         .say("balgas_v1", "……ハッ！ 泥を啜ってでも生き残ったか。", "", actor=balgas) \
         .say("narr_v3", "（彼はあなたの肩を乱暴に叩く。その手は、熱を帯びている。）", "", actor=pc) \
         .say("balgas_v2", "いいぜ、その執念深さ。今の無様な姿こそ、このアリーナに相応しい。", "", actor=balgas) \
         .say("balgas_v3", "これで『屑肉』は卒業だ。今日からお前はランクF……泥にまみれても食らいつく『泥犬（Mud Dog）』だ。", "", actor=balgas) \
         .say("balgas_v4", "……まあ、悪くねえ。次も、その泥臭さを忘れるんじゃねえぞ。", "", actor=balgas) \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("lily_v1", "おめでとうございます。死体袋は、また次回まで取っておきましょう。", "", actor=lily) \
         .say("lily_v2", "この称号『泥犬』は、あなたがどれほど理不尽な環境でも生き延びる『害虫』のような生命力を持っている証です。……ふふ、褒めているのですよ？", "", actor=lily) \
         .say("lily_v3", "さて、次は……もう少し『暑い』場所になるかもしれません。装備を整えておきなさい。……あなたの魂が、あまりに早く壊れてしまわないように。", "", actor=lily) \
@@ -182,7 +182,7 @@ def add_rank_up_F_result_steps(builder: DramaBuilder, victory_label: str, defeat
 
     builder.step(reward_end_f) \
         .action("eval", param="for(int i=0; i<5; i++) { EClass.pc.Pick(ThingGen.Create(\"coin\")); } EClass.pc.Pick(ThingGen.Create(\"plat\"));") \
-        .complete_quest("04_rank_up_F") \
+        .complete_quest(QuestIds.RANK_UP_F) \
         .say("lily_v6_f", "記録完了です。……それと、今回の戦いで、あなたの体が少し『冷気』に慣れたようですね。台帳にその変化も記録しておきました。", "", actor=lily)
 
     # 最終選択肢 (ラベル名に _f サフィックスを付けて衝突を回避)
@@ -214,7 +214,7 @@ def add_rank_up_F_result_steps(builder: DramaBuilder, victory_label: str, defeat
     # ========================================
     builder.step(defeat_label) \
         .set_flag("sukutsu_arena_result", 0) \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("lily_d1", "あらあら……。凍死は、思ったより早かったですね。", "", actor=lily) \
         .say("lily_d2", "死体袋の用意が無駄にならなくて何よりです。……次の方、どうぞ。", "", actor=lily) \
         .jump(return_label)

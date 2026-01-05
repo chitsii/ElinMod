@@ -8,8 +8,22 @@ using UnityEngine;
 namespace Elin_SukutsuArena
 {
     /// <summary>
+    /// ストーリーフェーズ（クエスト依存関係管理用）
+    /// </summary>
+    public enum StoryPhase
+    {
+        Prologue = 0,      // ゲーム開始〜初戦
+        Initiation = 1,    // Rank G〜F
+        Rising = 2,        // Rank E〜D
+        Awakening = 3,     // Rank C〜B
+        Confrontation = 4, // Rank A
+        Climax = 5         // 逃亡〜最終決戦
+    }
+
+    /// <summary>
     /// クエスト管理クラス
     /// quest_definitions.jsonを読み込み、フラグ条件に基づいて利用可能なクエストを判定
+    /// フェーズベースの依存関係管理をサポート
     /// </summary>
     public class ArenaQuestManager
     {
@@ -20,6 +34,12 @@ namespace Elin_SukutsuArena
 
         private const string QuestDefinitionsPath = "Package/quest_definitions.json";
         private const string QuestCompletedFlagPrefix = "sukutsu_quest_done_";
+        private const string CurrentPhaseFlagKey = "chitsii.arena.player.current_phase";
+
+        /// <summary>
+        /// NPCクエスト更新イベント（マーカー管理用）
+        /// </summary>
+        public event Action OnQuestStateChanged;
 
         /// <summary>
         /// クエスト完了フラグのキーを生成
@@ -65,8 +85,48 @@ namespace Elin_SukutsuArena
                     { "A", 7 },
                     { "S", 8 }
                 }
+            },
+            {
+                "chitsii.arena.player.current_phase", new Dictionary<string, int>
+                {
+                    { "prologue", 0 },
+                    { "initiation", 1 },
+                    { "rising", 2 },
+                    { "awakening", 3 },
+                    { "confrontation", 4 },
+                    { "climax", 5 }
+                }
             }
         };
+
+        /// <summary>
+        /// 現在のストーリーフェーズを取得
+        /// </summary>
+        public StoryPhase GetCurrentPhase()
+        {
+            int phaseValue = ArenaFlagManager.GetInt(CurrentPhaseFlagKey, 0);
+            if (Enum.IsDefined(typeof(StoryPhase), phaseValue))
+            {
+                return (StoryPhase)phaseValue;
+            }
+            return StoryPhase.Prologue;
+        }
+
+        /// <summary>
+        /// ストーリーフェーズを設定
+        /// </summary>
+        public void SetCurrentPhase(StoryPhase phase)
+        {
+            int oldPhase = ArenaFlagManager.GetInt(CurrentPhaseFlagKey, 0);
+            int newPhase = (int)phase;
+
+            if (oldPhase != newPhase)
+            {
+                ArenaFlagManager.SetInt(CurrentPhaseFlagKey, newPhase);
+                Debug.Log($"[ArenaQuest] Phase advanced: {(StoryPhase)oldPhase} -> {phase}");
+                OnQuestStateChanged?.Invoke();
+            }
+        }
 
         private ArenaQuestManager()
         {
@@ -107,57 +167,106 @@ namespace Elin_SukutsuArena
         }
 
         /// <summary>
-        /// 利用可能なクエストを取得
+        /// 利用可能なクエストを取得（フェーズベース依存関係を考慮）
         /// </summary>
         public List<QuestDefinition> GetAvailableQuests()
         {
             var available = new List<QuestDefinition>();
+            var currentPhase = GetCurrentPhase();
 
             int completedCount = allQuests.Count(q => IsQuestCompleted(q.QuestId));
-            Debug.Log($"[ArenaQuest] Checking {allQuests.Count} quests, {completedCount} completed");
+            Debug.Log($"[ArenaQuest] Checking {allQuests.Count} quests, {completedCount} completed, Phase: {currentPhase}");
 
             foreach (var quest in allQuests)
             {
+                // 詳細ログ（アリーナマスターのクエストのみ）
+                bool isArenaMasterQuest = quest.QuestGiver == "sukutsu_arena_master";
+
                 // Already completed
                 if (IsQuestCompleted(quest.QuestId))
                 {
-                    Debug.Log($"[ArenaQuest]   {quest.QuestId}: Already completed");
+                    if (isArenaMasterQuest) Debug.Log($"[ArenaQuest] {quest.QuestId}: SKIP (completed)");
+                    continue;
+                }
+
+                // Phase check: quest must be in current or earlier phase
+                if (quest.Phase > currentPhase)
+                {
+                    if (isArenaMasterQuest) Debug.Log($"[ArenaQuest] {quest.QuestId}: SKIP (phase {quest.Phase} > current {currentPhase})");
                     continue;
                 }
 
                 // Check required quests
                 bool missingPrerequisite = false;
+                string missingQuestId = null;
                 foreach (var reqQuestId in quest.RequiredQuests)
                 {
                     if (!IsQuestCompleted(reqQuestId))
                     {
-                        Debug.Log($"[ArenaQuest]   {quest.QuestId}: Missing prerequisite {reqQuestId}");
                         missingPrerequisite = true;
+                        missingQuestId = reqQuestId;
                         break;
                     }
                 }
-                if (missingPrerequisite) continue;
+                if (missingPrerequisite)
+                {
+                    if (isArenaMasterQuest) Debug.Log($"[ArenaQuest] {quest.QuestId}: SKIP (missing prerequisite: {missingQuestId})");
+                    continue;
+                }
 
                 // Check required flags
                 bool flagsFailed = false;
+                string failedFlag = null;
                 foreach (var flagCondition in quest.RequiredFlags)
                 {
                     if (!CheckFlagCondition(flagCondition))
                     {
-                        Debug.Log($"[ArenaQuest]   {quest.QuestId}: Flag condition failed: {flagCondition.FlagKey} {flagCondition.Operator} {flagCondition.Value}");
                         flagsFailed = true;
+                        failedFlag = $"{flagCondition.FlagKey} {flagCondition.Operator} {flagCondition.Value}";
                         break;
                     }
                 }
-                if (flagsFailed) continue;
+                if (flagsFailed)
+                {
+                    if (isArenaMasterQuest) Debug.Log($"[ArenaQuest] {quest.QuestId}: SKIP (flag failed: {failedFlag})");
+                    continue;
+                }
 
-                Debug.Log($"[ArenaQuest]   {quest.QuestId}: AVAILABLE");
+                if (isArenaMasterQuest) Debug.Log($"[ArenaQuest] {quest.QuestId}: AVAILABLE");
                 available.Add(quest);
             }
 
             // Sort by priority (higher first)
             available.Sort((a, b) => b.Priority.CompareTo(a.Priority));
             return available;
+        }
+
+        /// <summary>
+        /// 自動発動クエストを取得（ゾーン入場時に発動）
+        /// </summary>
+        public List<QuestDefinition> GetAutoTriggerQuests()
+        {
+            return GetAvailableQuests().Where(q => q.AutoTrigger).ToList();
+        }
+
+        /// <summary>
+        /// 特定NPCが持つ利用可能なクエストを取得
+        /// </summary>
+        public List<QuestDefinition> GetQuestsForNpc(string npcId)
+        {
+            return GetAvailableQuests().Where(q => q.QuestGiver == npcId).ToList();
+        }
+
+        /// <summary>
+        /// クエストを持っているNPCのIDリストを取得（マーカー表示用）
+        /// </summary>
+        public List<string> GetNpcsWithQuests()
+        {
+            return GetAvailableQuests()
+                .Where(q => !string.IsNullOrEmpty(q.QuestGiver))
+                .Select(q => q.QuestGiver)
+                .Distinct()
+                .ToList();
         }
 
         /// <summary>
@@ -215,8 +324,17 @@ namespace Elin_SukutsuArena
                 SetFlagFromJson(kvp.Key, kvp.Value);
             }
 
+            // Advance phase if this quest triggers phase advancement
+            if (quest.AdvancesPhase.HasValue)
+            {
+                SetCurrentPhase(quest.AdvancesPhase.Value);
+            }
+
             // 次のクエストが自動開始できるようにトラッキングをリセット
             ArenaZonePatches.ResetQuestTriggerTracking();
+
+            // Notify listeners (for NPC marker updates)
+            OnQuestStateChanged?.Invoke();
 
             Debug.Log($"[ArenaQuest] Successfully completed quest: {questId}");
         }
@@ -360,6 +478,7 @@ namespace Elin_SukutsuArena
         {
             Debug.Log("[ArenaQuest] === Quest State ===");
             Debug.Log($"  Total Quests: {allQuests.Count}");
+            Debug.Log($"  Current Phase: {GetCurrentPhase()}");
 
             int completedCount = allQuests.Count(q => IsQuestCompleted(q.QuestId));
             Debug.Log($"  Completed: {completedCount}");
@@ -376,7 +495,15 @@ namespace Elin_SukutsuArena
 
             foreach (var quest in available)
             {
-                Debug.Log($"    - {quest.QuestId} ({quest.QuestType}) [Priority: {quest.Priority}]");
+                string marker = quest.AutoTrigger ? "[AUTO]" : !string.IsNullOrEmpty(quest.QuestGiver) ? $"[{quest.QuestGiver}]" : "";
+                Debug.Log($"    - {quest.QuestId} ({quest.Phase}) {marker} [Priority: {quest.Priority}]");
+            }
+
+            // NPCクエスト情報
+            var npcsWithQuests = GetNpcsWithQuests();
+            if (npcsWithQuests.Count > 0)
+            {
+                Debug.Log($"  NPCs with quests: {string.Join(", ", npcsWithQuests)}");
             }
 
             Debug.Log("[ArenaQuest] === End ===");
@@ -395,6 +522,16 @@ namespace Elin_SukutsuArena
         public string displayNameJP;
         public string displayNameEN;
         public string description;
+
+        // Phase system fields
+        public string phase;
+        public int phaseOrdinal;
+        public string questGiver;
+        public bool autoTrigger;
+        public string advancesPhase;
+        public int advancesPhaseOrdinal = -1;
+
+        // Requirements
         public List<FlagConditionData> requiredFlags = new List<FlagConditionData>();
         public List<string> requiredQuests = new List<string>();
         public Dictionary<string, object> completionFlags = new Dictionary<string, object>();
@@ -423,12 +560,24 @@ namespace Elin_SukutsuArena
         public string DisplayNameJP { get; }
         public string DisplayNameEN { get; }
         public string Description { get; }
+
+        // Phase system properties
+        public StoryPhase Phase { get; }
+        public string QuestGiver { get; }
+        public bool AutoTrigger { get; }
+        public StoryPhase? AdvancesPhase { get; }
+
+        // Requirements
         public List<FlagCondition> RequiredFlags { get; }
         public List<string> RequiredQuests { get; }
         public Dictionary<string, object> CompletionFlags { get; }
         public List<string> BranchChoices { get; }
         public List<string> BlocksQuests { get; }
         public int Priority { get; }
+
+        // Convenience properties
+        public bool IsAutoTrigger => AutoTrigger && string.IsNullOrEmpty(QuestGiver);
+        public bool IsNpcQuest => !string.IsNullOrEmpty(QuestGiver);
 
         public QuestDefinition(QuestData data)
         {
@@ -438,11 +587,27 @@ namespace Elin_SukutsuArena
             DisplayNameJP = data.displayNameJP;
             DisplayNameEN = data.displayNameEN;
             Description = data.description;
-            RequiredFlags = data.requiredFlags.Select(f => new FlagCondition(f)).ToList();
-            RequiredQuests = data.requiredQuests;
-            CompletionFlags = data.completionFlags;
-            BranchChoices = data.branchChoices;
-            BlocksQuests = data.blocksQuests;
+
+            // Parse phase ordinal to enum
+            Phase = (StoryPhase)data.phaseOrdinal;
+            QuestGiver = data.questGiver;
+            AutoTrigger = data.autoTrigger;
+
+            // Parse advances phase (-1 means null/no advancement)
+            if (data.advancesPhaseOrdinal >= 0 && Enum.IsDefined(typeof(StoryPhase), data.advancesPhaseOrdinal))
+            {
+                AdvancesPhase = (StoryPhase)data.advancesPhaseOrdinal;
+            }
+            else
+            {
+                AdvancesPhase = null;
+            }
+
+            RequiredFlags = data.requiredFlags?.Select(f => new FlagCondition(f)).ToList() ?? new List<FlagCondition>();
+            RequiredQuests = data.requiredQuests ?? new List<string>();
+            CompletionFlags = data.completionFlags ?? new Dictionary<string, object>();
+            BranchChoices = data.branchChoices ?? new List<string>();
+            BlocksQuests = data.blocksQuests ?? new List<string>();
             Priority = data.priority;
         }
     }

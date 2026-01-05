@@ -8,7 +8,7 @@ It provides a clear structure for quest progression based on flags.
 from dataclasses import dataclass, field
 from typing import List, Dict, Optional, Set
 from enum import Enum
-from flag_definitions import Keys
+from flag_definitions import Keys, Phase, Actors, QuestIds
 
 
 class QuestType(Enum):
@@ -41,6 +41,12 @@ class QuestDefinition:
     display_name_en: str
     description: str
 
+    # フェーズベース依存関係
+    phase: Phase = Phase.PROLOGUE  # このクエストが利用可能になるフェーズ
+    quest_giver: Optional[str] = None  # クエストを与えるNPC (None = 自動発動)
+    auto_trigger: bool = False  # ゾーン入場時に自動発動するか
+    advances_phase: Optional[Phase] = None  # クリア時にフェーズを進める先
+
     # 前提条件
     required_flags: List[FlagCondition] = field(default_factory=list)
     required_quests: List[str] = field(default_factory=list)  # 前提クエストID
@@ -67,12 +73,16 @@ QUEST_DEFINITIONS = [
     # メインストーリー - オープニング
     # ========================================
     QuestDefinition(
-        quest_id="01_opening",
+        quest_id=QuestIds.OPENING,
         quest_type=QuestType.MAIN_STORY,
         drama_id="sukutsu_opening",
         display_name_jp="異次元の闘技場への到着",
         display_name_en="Arrival at the Dimensional Arena",
         description="プレイヤーがアリーナに到着し、リリィとバルガスに出会う",
+        phase=Phase.PROLOGUE,
+        quest_giver=None,  # 自動発動
+        auto_trigger=True,
+        advances_phase=None,  # フェーズ進行なし（初戦勝利で進行）
         required_flags=[],
         required_quests=[],
         completion_flags={
@@ -88,33 +98,41 @@ QUEST_DEFINITIONS = [
     # ランク昇格試験
     # ========================================
     QuestDefinition(
-        quest_id="02_rank_up_G",
+        quest_id=QuestIds.RANK_UP_G,
         quest_type=QuestType.RANK_UP,
         drama_id="rank_up_G",
-        display_name_jp="ランクG昇格試験",
-        display_name_en="Rank G Promotion Trial",
+        display_name_jp="ランクG昇格試験（屑肉の洗礼）",
+        display_name_en="Rank G Promotion Trial (Baptism of Scraps)",
         description="最初の試練を突破し、ランクGを獲得する",
+        phase=Phase.PROLOGUE,
+        quest_giver=Actors.LILY,
+        auto_trigger=False,
+        advances_phase=Phase.INITIATION,  # 初戦勝利でフェーズ進行
         required_flags=[
             FlagCondition(Keys.RANK, "==", "unranked"),
         ],
-        required_quests=["01_opening"],
+        required_quests=[QuestIds.OPENING],
         completion_flags={
             Keys.RANK: "G",
         },
-        priority=900,
+        priority=950,
     ),
 
     QuestDefinition(
-        quest_id="04_rank_up_F",
+        quest_id=QuestIds.RANK_UP_F,
         quest_type=QuestType.RANK_UP,
         drama_id="rank_up_F",
         display_name_jp="ランクF昇格試験（凍土の魔犬）",
         display_name_en="Rank F Promotion Trial (Frozen Hound)",
         description="凍土の魔犬を倒し、ランクFを獲得する",
+        phase=Phase.INITIATION,
+        quest_giver=Actors.LILY,
+        auto_trigger=False,
+        advances_phase=Phase.RISING,  # Rank F昇格でフェーズ進行
         required_flags=[
             FlagCondition(Keys.RANK, "==", "G"),
         ],
-        required_quests=["02_rank_up_G"],
+        required_quests=[QuestIds.RANK_UP_G],
         completion_flags={
             Keys.RANK: "F",
         },
@@ -122,16 +140,20 @@ QUEST_DEFINITIONS = [
     ),
 
     QuestDefinition(
-        quest_id="06_rank_up_E",
+        quest_id=QuestIds.RANK_UP_E,
         quest_type=QuestType.RANK_UP,
         drama_id="rank_up_E",
         display_name_jp="ランクE昇格試験（錆びついた英雄カイン）",
         display_name_en="Rank E Promotion Trial (Rusted Hero Kain)",
         description="錆びついた英雄カインを倒し、ランクEを獲得する",
+        phase=Phase.RISING,
+        quest_giver=Actors.BALGAS,  # バルガスの依頼
+        auto_trigger=False,
+        advances_phase=None,
         required_flags=[
             FlagCondition(Keys.RANK, "==", "F"),
         ],
-        required_quests=["04_rank_up_F"],
+        required_quests=[QuestIds.RANK_UP_F],
         completion_flags={
             Keys.RANK: "E",
         },
@@ -139,16 +161,20 @@ QUEST_DEFINITIONS = [
     ),
 
     QuestDefinition(
-        quest_id="10_rank_up_D",
+        quest_id=QuestIds.RANK_UP_D,
         quest_type=QuestType.RANK_UP,
         drama_id="rank_up_D",
         display_name_jp="ランクD昇格試験（銅貨稼ぎの洗礼）",
         display_name_en="Rank D Promotion Trial (Copper Earner's Baptism)",
         description="観客の介入を避けながら戦い、ランクDを獲得する",
+        phase=Phase.RISING,
+        quest_giver=Actors.LILY,
+        auto_trigger=False,
+        advances_phase=Phase.AWAKENING,  # Rank D昇格でフェーズ進行
         required_flags=[
             FlagCondition(Keys.RANK, "==", "E"),
         ],
-        required_quests=["06_rank_up_E"],
+        required_quests=[QuestIds.RANK_UP_E],
         completion_flags={
             Keys.RANK: "D",
         },
@@ -156,16 +182,20 @@ QUEST_DEFINITIONS = [
     ),
 
     QuestDefinition(
-        quest_id="09_rank_up_C",
+        quest_id=QuestIds.RANK_UP_C,
         quest_type=QuestType.RANK_UP,
         drama_id="rank_up_C",
         display_name_jp="ランクC昇格試験（闘技場の鴉）",
         display_name_en="Rank C Promotion Trial (Arena Crow)",
         description="堕ちた英雄たちを解放し、ランクCを獲得する",
+        phase=Phase.AWAKENING,
+        quest_giver=Actors.BALGAS,  # バルガスの依頼
+        auto_trigger=False,
+        advances_phase=None,
         required_flags=[
             FlagCondition(Keys.RANK, "==", "D"),
         ],
-        required_quests=["10_rank_up_D"],
+        required_quests=[QuestIds.RANK_UP_D],
         completion_flags={
             Keys.RANK: "C",
         },
@@ -173,16 +203,20 @@ QUEST_DEFINITIONS = [
     ),
 
     QuestDefinition(
-        quest_id="11_rank_up_B",
+        quest_id=QuestIds.RANK_UP_B,
         quest_type=QuestType.RANK_UP,
         drama_id="rank_up_B",
-        display_name_jp="ランクB昇格試験（暗殺者ヌル）",
-        display_name_en="Rank B Promotion Trial (Assassin Null)",
-        description="暗殺者ヌルを倒し、ランクBを獲得する",
+        display_name_jp="ランクB昇格試験（虚無の処刑人ヌル）",
+        display_name_en="Rank B Promotion Trial (Null the Void Executioner)",
+        description="虚無の処刑人ヌルを倒し、ランクBを獲得する",
+        phase=Phase.AWAKENING,
+        quest_giver=Actors.LILY,
+        auto_trigger=False,
+        advances_phase=Phase.CONFRONTATION,  # Rank B昇格（ヌル撃破）でフェーズ進行
         required_flags=[
             FlagCondition(Keys.RANK, "==", "C"),
         ],
-        required_quests=["09_rank_up_C"],
+        required_quests=[QuestIds.RANK_UP_C],
         completion_flags={
             Keys.RANK: "B",
         },
@@ -190,16 +224,20 @@ QUEST_DEFINITIONS = [
     ),
 
     QuestDefinition(
-        quest_id="14_rank_up_A",
+        quest_id=QuestIds.RANK_UP_A,
         quest_type=QuestType.RANK_UP,
         drama_id="rank_up_A",
         display_name_jp="ランクA昇格試験（影との戦い）",
         display_name_en="Rank A Promotion Trial (Shadow Battle)",
         description="自分の影（第二のヌル）を倒し、ランクAを獲得する",
+        phase=Phase.CONFRONTATION,
+        quest_giver=Actors.LILY,
+        auto_trigger=False,
+        advances_phase=None,
         required_flags=[
             FlagCondition(Keys.RANK, "==", "B"),
         ],
-        required_quests=["11_rank_up_B", "13_makuma2"],
+        required_quests=[QuestIds.RANK_UP_B, QuestIds.MAKUMA2],
         completion_flags={
             Keys.RANK: "A",
         },
@@ -207,16 +245,20 @@ QUEST_DEFINITIONS = [
     ),
 
     QuestDefinition(
-        quest_id="15_rank_up_S",
+        quest_id=QuestIds.RANK_UP_S,
         quest_type=QuestType.RANK_UP,
         drama_id="vs_balgas",
         display_name_jp="ランクS昇格試験（バルガス全盛期との一騎打ち）",
         display_name_en="Rank S Promotion Trial (Duel with Prime Balgas)",
         description="バルガスの全盛期の姿と戦い、ランクSを獲得する",
+        phase=Phase.CONFRONTATION,
+        quest_giver=Actors.BALGAS,
+        auto_trigger=False,
+        advances_phase=None,
         required_flags=[
             FlagCondition(Keys.RANK, "==", "A"),
         ],
-        required_quests=["14_rank_up_A"],
+        required_quests=[QuestIds.RANK_UP_A],
         completion_flags={
             Keys.RANK: "S",
         },
@@ -225,19 +267,23 @@ QUEST_DEFINITIONS = [
     ),
 
     # ========================================
-    # キャラクターイベント
+    # キャラクターイベント・サイドクエスト
     # ========================================
     QuestDefinition(
-        quest_id="03_zek_intro",
+        quest_id=QuestIds.ZEK_INTRO,
         quest_type=QuestType.CHARACTER_EVENT,
         drama_id="zek_intro",
         display_name_jp="影歩きの邂逅",
         display_name_en="Encounter with the Shadow Walker",
         description="商人ゼクとの初遭遇",
+        phase=Phase.INITIATION,
+        quest_giver=Actors.ZEK,
+        auto_trigger=False,
+        advances_phase=None,
         required_flags=[
             FlagCondition(Keys.RANK, ">=", "G"),
         ],
-        required_quests=["02_rank_up_G"],
+        required_quests=[QuestIds.RANK_UP_G],
         completion_flags={
             Keys.REL_ZEK: 10,
         },
@@ -245,110 +291,138 @@ QUEST_DEFINITIONS = [
     ),
 
     QuestDefinition(
-        quest_id="05_1_lily_experiment",
+        quest_id=QuestIds.LILY_EXPERIMENT,
         quest_type=QuestType.SIDE_QUEST,
         drama_id="lily_experiment",
         display_name_jp="リリィの私的依頼『残響の器』",
         display_name_en="Lily's Private Request: Vessel of Echoes",
         description="リリィのために虚空の共鳴瓶を製作する",
+        phase=Phase.INITIATION,
+        quest_giver=Actors.LILY,
+        auto_trigger=False,
+        advances_phase=None,
         required_flags=[
             FlagCondition(Keys.RANK, ">=", "F"),
         ],
-        required_quests=["04_rank_up_F"],
+        required_quests=[QuestIds.RANK_UP_F],
         completion_flags={},  # rel.lily +5 は mod_flag で処理
         priority=700,
     ),
 
     QuestDefinition(
-        quest_id="05_2_zek_steal_bottle",
+        quest_id=QuestIds.ZEK_STEAL_BOTTLE,
         quest_type=QuestType.SIDE_QUEST,
         drama_id="zek_steal_bottle",
         display_name_jp="ゼクの器すり替え提案",
         display_name_en="Zek's Bottle Swap Proposal",
         description="ゼクが共鳴瓶のすり替えを提案する【重要分岐】",
+        phase=Phase.INITIATION,
+        quest_giver=Actors.ZEK,
+        auto_trigger=False,
+        advances_phase=None,
         required_flags=[
             FlagCondition(Keys.RANK, ">=", "F"),
         ],
-        required_quests=["05_1_lily_experiment"],
+        required_quests=[QuestIds.LILY_EXPERIMENT],
         completion_flags={},  # bottle_choice は選択で設定
         branch_choices=["bottle_choice"],
         priority=700,
     ),
 
     QuestDefinition(
-        quest_id="06_2_zek_steal_soulgem",
+        quest_id=QuestIds.ZEK_STEAL_SOULGEM,
         quest_type=QuestType.SIDE_QUEST,
         drama_id="zek_steal_soulgem",
         display_name_jp="カインの魂の選択",
         display_name_en="Kain's Soul Choice",
         description="カインの魂をゼクに売るか、バルガスに返すか選択する【重要分岐】",
+        phase=Phase.RISING,
+        quest_giver=Actors.ZEK,
+        auto_trigger=False,
+        advances_phase=None,
         required_flags=[
             FlagCondition(Keys.RANK, "==", "E"),
         ],
-        required_quests=["06_rank_up_E"],
-        completion_flags={},  # ランク昇格は10_rank_up_Dで行う
+        required_quests=[QuestIds.RANK_UP_E],
+        completion_flags={},
         branch_choices=["kain_soul_choice"],
         priority=850,
     ),
 
     QuestDefinition(
-        quest_id="07_upper_existence",
+        quest_id=QuestIds.UPPER_EXISTENCE,
         quest_type=QuestType.MAIN_STORY,
         drama_id="upper_existence",
         display_name_jp="高次元存在の真実",
         display_name_en="Truth of Higher Dimensional Beings",
         description="観客の正体と闘技場の真実が明らかになる",
+        phase=Phase.AWAKENING,
+        quest_giver=Actors.BALGAS,
+        auto_trigger=False,
+        advances_phase=None,
         required_flags=[
             FlagCondition(Keys.RANK, "==", "D"),
         ],
-        required_quests=["10_rank_up_D"],
+        required_quests=[QuestIds.RANK_UP_D],
         completion_flags={},
         priority=800,
     ),
 
     QuestDefinition(
-        quest_id="08_lily_private",
+        quest_id=QuestIds.LILY_PRIVATE,
         quest_type=QuestType.CHARACTER_EVENT,
         drama_id="lily_private",
         display_name_jp="リリィの私室招待",
         display_name_en="Invitation to Lily's Private Room",
         description="リリィの私室に招待される",
+        phase=Phase.AWAKENING,
+        quest_giver=Actors.LILY,
+        auto_trigger=False,
+        advances_phase=None,
         required_flags=[
             FlagCondition(Keys.RANK, ">=", "D"),
             FlagCondition(Keys.REL_LILY, ">=", 40),
         ],
-        required_quests=["10_rank_up_D"],
+        required_quests=[QuestIds.RANK_UP_D],
         completion_flags={},
         priority=600,
     ),
 
     QuestDefinition(
-        quest_id="09_balgas_training",
+        quest_id=QuestIds.BALGAS_TRAINING,
         quest_type=QuestType.CHARACTER_EVENT,
         drama_id="balgas_training",
         display_name_jp="戦士の哲学：鉄を打つ鉄",
         display_name_en="Warrior's Philosophy: Iron Forges Iron",
         description="バルガスから戦士の哲学を学ぶ特別訓練",
+        phase=Phase.AWAKENING,
+        quest_giver=Actors.BALGAS,
+        auto_trigger=False,
+        advances_phase=None,
         required_flags=[
             FlagCondition(Keys.RANK, ">=", "D"),
             FlagCondition(Keys.REL_BALGAS, ">=", 40),
         ],
-        required_quests=["10_rank_up_D"],
+        required_quests=[QuestIds.RANK_UP_D],
         completion_flags={},
         priority=650,
     ),
 
     QuestDefinition(
-        quest_id="12_makuma",
+        quest_id=QuestIds.MAKUMA,
         quest_type=QuestType.MAIN_STORY,
         drama_id="makuma",
         display_name_jp="ヌルの記憶チップとリリィの衣装",
         display_name_en="Null's Memory Chip and Lily's Outfit",
         description="ランクB達成報酬として特別な衣装を授与され、ゼクがヌルの真実を暴露する",
+        phase=Phase.CONFRONTATION,
+        quest_giver=Actors.LILY,
+        auto_trigger=False,
+        advances_phase=None,
         required_flags=[
             FlagCondition(Keys.RANK, "==", "B"),
         ],
-        required_quests=["11_rank_up_B"],
+        required_quests=[QuestIds.RANK_UP_B],
         completion_flags={
             Keys.NULL_CHIP: True,
         },
@@ -356,39 +430,47 @@ QUEST_DEFINITIONS = [
     ),
 
     QuestDefinition(
-        quest_id="13_makuma2",
+        quest_id=QuestIds.MAKUMA2,
         quest_type=QuestType.MAIN_STORY,
         drama_id="makuma2",
         display_name_jp="虚空の心臓製作【複数分岐統合】",
         display_name_en="Void Core Crafting [Multiple Branch Convergence]",
         description="虚空の心臓を製作し、過去の選択の清算が行われる",
+        phase=Phase.CONFRONTATION,
+        quest_giver=None,  # 自動発動（重要イベント）
+        auto_trigger=True,  # 条件付き自動発動
+        advances_phase=None,
         required_flags=[
             FlagCondition(Keys.RANK, "==", "B"),
+            FlagCondition(Keys.BOTTLE_CHOICE, "==", "swapped"),  # 瓶すり替え時のみ発動
         ],
-        required_quests=["12_makuma"],
+        required_quests=[QuestIds.MAKUMA],
         completion_flags={},
         branch_choices=["lily_bottle_confession", "kain_soul_confession"],
         priority=850,
     ),
 
     QuestDefinition(
-        quest_id="16_lily_real_name",
+        quest_id=QuestIds.LILY_REAL_NAME,
         quest_type=QuestType.CHARACTER_EVENT,
         drama_id="lily_real_name",
         display_name_jp="リリィの真名告白",
         display_name_en="Lily's True Name Revelation",
         description="リリィが真名『リリアリス』を明かす",
+        phase=Phase.CONFRONTATION,
+        quest_giver=Actors.LILY,
+        auto_trigger=False,
+        advances_phase=None,
         required_flags=[
             FlagCondition(Keys.RANK, "==", "S"),
             FlagCondition(Keys.BALGAS_CHOICE, "==", "spared"),
             FlagCondition(Keys.REL_LILY, ">=", 50),
         ],
-        required_quests=["15_rank_up_S"],
+        required_quests=[QuestIds.RANK_UP_S],
         completion_flags={
             Keys.LILY_TRUE_NAME: "Liliaris",
         },
-        # ブロック条件（これらのフラグが立っていると発生しない）
-        blocks_quests=[],  # フラグ条件で制御
+        blocks_quests=[],
         priority=600,
     ),
 
@@ -396,16 +478,20 @@ QUEST_DEFINITIONS = [
     # 最終章
     # ========================================
     QuestDefinition(
-        quest_id="17_vs_grandmaster_1",
+        quest_id=QuestIds.VS_GRANDMASTER_1,
         quest_type=QuestType.MAIN_STORY,
         drama_id="vs_grandmaster_1",
         display_name_jp="アスタロト初遭遇、ゼクによる救出",
         display_name_en="First Astaroth Encounter, Zek's Rescue",
         description="アスタロトが降臨し、ゼクが介入して救出する",
+        phase=Phase.CONFRONTATION,
+        quest_giver=None,  # 自動発動
+        auto_trigger=True,
+        advances_phase=Phase.CLIMAX,  # 逃亡開始でフェーズ進行
         required_flags=[
             FlagCondition(Keys.RANK, "==", "S"),
         ],
-        required_quests=["15_rank_up_S"],
+        required_quests=[QuestIds.RANK_UP_S],
         completion_flags={
             Keys.FUGITIVE: True,
         },
@@ -413,16 +499,20 @@ QUEST_DEFINITIONS = [
     ),
 
     QuestDefinition(
-        quest_id="18_last_battle",
+        quest_id=QuestIds.LAST_BATTLE,
         quest_type=QuestType.ENDING,
         drama_id="last_battle",
         display_name_jp="最終決戦：アスタロト撃破",
         display_name_en="Final Battle: Defeat Astaroth",
         description="アスタロトとの最終決戦、複数のエンディング分岐",
+        phase=Phase.CLIMAX,
+        quest_giver=None,  # 自動発動
+        auto_trigger=True,
+        advances_phase=None,
         required_flags=[
             FlagCondition(Keys.FUGITIVE, "==", True),
         ],
-        required_quests=["17_vs_grandmaster_1"],
+        required_quests=[QuestIds.VS_GRANDMASTER_1],
         completion_flags={},
         branch_choices=["ending"],
         priority=1000,
@@ -442,6 +532,17 @@ class QuestDependencyGraph:
         for quest in QUEST_DEFINITIONS:
             self.quests[quest.quest_id] = quest
 
+    def get_current_phase(self, current_flags: Dict[str, any]) -> Phase:
+        """現在のフェーズを取得"""
+        phase_value = current_flags.get(Keys.CURRENT_PHASE, 0)
+        if isinstance(phase_value, Phase):
+            return phase_value
+        # 整数値からPhaseに変換
+        phase_list = list(Phase)
+        if isinstance(phase_value, int) and 0 <= phase_value < len(phase_list):
+            return phase_list[phase_value]
+        return Phase.PROLOGUE
+
     def get_available_quests(self, current_flags: Dict[str, any],
                            completed_quests: Set[str]) -> List[QuestDefinition]:
         """
@@ -454,11 +555,16 @@ class QuestDependencyGraph:
         Returns:
             利用可能なクエストのリスト（優先度順）
         """
+        current_phase = self.get_current_phase(current_flags)
         available = []
 
         for quest in self.quests.values():
             # 既に完了済みならスキップ
             if quest.quest_id in completed_quests:
+                continue
+
+            # フェーズチェック（現在のフェーズより先のクエストはスキップ）
+            if quest.phase > current_phase:
                 continue
 
             # 前提クエストチェック
@@ -479,6 +585,56 @@ class QuestDependencyGraph:
         # 優先度順にソート
         available.sort(key=lambda q: q.priority, reverse=True)
         return available
+
+    def get_auto_trigger_quests(self, current_flags: Dict[str, any],
+                                completed_quests: Set[str]) -> List[QuestDefinition]:
+        """
+        自動発動クエストのみを取得
+
+        Args:
+            current_flags: 現在のフラグ状態
+            completed_quests: 完了済みクエストのIDセット
+
+        Returns:
+            自動発動可能なクエストのリスト（優先度順）
+        """
+        available = self.get_available_quests(current_flags, completed_quests)
+        return [q for q in available if q.auto_trigger]
+
+    def get_npc_quests(self, npc_id: str, current_flags: Dict[str, any],
+                       completed_quests: Set[str]) -> List[QuestDefinition]:
+        """
+        特定NPCが持つ利用可能なクエストを取得
+
+        Args:
+            npc_id: NPCのID（Actors定数）
+            current_flags: 現在のフラグ状態
+            completed_quests: 完了済みクエストのIDセット
+
+        Returns:
+            そのNPCが提供可能なクエストのリスト（優先度順）
+        """
+        available = self.get_available_quests(current_flags, completed_quests)
+        return [q for q in available if q.quest_giver == npc_id]
+
+    def get_all_npc_quests(self, current_flags: Dict[str, any],
+                          completed_quests: Set[str]) -> Dict[str, List[QuestDefinition]]:
+        """
+        全NPCの利用可能クエストをNPC別に取得
+
+        Returns:
+            {npc_id: [quests]} の形式
+        """
+        available = self.get_available_quests(current_flags, completed_quests)
+        npc_quests: Dict[str, List[QuestDefinition]] = {}
+
+        for quest in available:
+            if quest.quest_giver:
+                if quest.quest_giver not in npc_quests:
+                    npc_quests[quest.quest_giver] = []
+                npc_quests[quest.quest_giver].append(quest)
+
+        return npc_quests
 
     def _check_flag_conditions(self, conditions: List[FlagCondition],
                                current_flags: Dict[str, any]) -> bool:
@@ -645,6 +801,14 @@ def export_quests_to_json(output_path: str):
             "displayNameJP": quest.display_name_jp,
             "displayNameEN": quest.display_name_en,
             "description": quest.description,
+            # Phase system fields
+            "phase": quest.phase.value if quest.phase else None,
+            "phaseOrdinal": list(Phase).index(quest.phase) if quest.phase else 0,
+            "questGiver": quest.quest_giver,
+            "autoTrigger": quest.auto_trigger,
+            "advancesPhase": quest.advances_phase.value if quest.advances_phase else None,
+            "advancesPhaseOrdinal": list(Phase).index(quest.advances_phase) if quest.advances_phase else -1,
+            # Legacy fields
             "requiredFlags": [
                 {
                     "flagKey": cond.flag_key,
@@ -682,32 +846,61 @@ if __name__ == "__main__":
     else:
         print("  [OK] All dependencies are valid!")
 
+    # フェーズシステムテスト
+    print("\n=== Phase System Test ===")
+    print(f"Available phases: {[p.value for p in Phase]}")
+
     # 利用可能なクエストのテスト
     print("\n=== Testing Quest Availability ===")
 
-    # 初期状態
+    # 初期状態（PROLOGUE）
     current_flags = {
         Keys.RANK: "unranked",
+        Keys.CURRENT_PHASE: 0,  # PROLOGUE
         Keys.REL_LILY: 30,
         Keys.REL_BALGAS: 20,
         Keys.REL_ZEK: 0,
     }
     completed = set()
 
-    print(f"\nInitial state (Rank: unranked):")
+    print(f"\nPhase: PROLOGUE (Rank: unranked)")
     available = graph.get_available_quests(current_flags, completed)
     for quest in available:
+        marker = "[AUTO]" if quest.auto_trigger else f"[{quest.quest_giver}]" if quest.quest_giver else ""
+        print(f"  - {quest.quest_id}: {quest.display_name_jp} {marker}")
+
+    # 自動発動クエストのテスト
+    print("\n=== Auto-Trigger Quests ===")
+    auto_quests = graph.get_auto_trigger_quests(current_flags, completed)
+    for quest in auto_quests:
         print(f"  - {quest.quest_id}: {quest.display_name_jp}")
 
-    # ランクG取得後
-    current_flags[Keys.RANK] = "G"
+    # オープニング完了後
     completed.add("01_opening")
-    completed.add("02_rank_up_G")
+    completed.add("02_first_battle")
+    current_flags[Keys.CURRENT_PHASE] = 1  # INITIATION
+    current_flags[Keys.RANK] = "unranked"
 
-    print(f"\nAfter Rank G (completed: {len(completed)} quests):")
+    print(f"\nPhase: INITIATION (after first battle)")
+    # NPC別クエストのテスト
+    print("\n=== NPC Quests ===")
+    npc_quests = graph.get_all_npc_quests(current_flags, completed)
+    for npc_id, quests in npc_quests.items():
+        print(f"  {npc_id}:")
+        for quest in quests:
+            print(f"    - {quest.quest_id}: {quest.display_name_jp}")
+
+    # ランクG→F進行後
+    current_flags[Keys.RANK] = "F"
+    current_flags[Keys.CURRENT_PHASE] = 2  # RISING
+    completed.add("03_rank_up_G")
+    completed.add("04_rank_up_F")
+
+    print(f"\nPhase: RISING (Rank: F)")
     available = graph.get_available_quests(current_flags, completed)
     for quest in available:
-        print(f"  - {quest.quest_id}: {quest.display_name_jp}")
+        marker = "[AUTO]" if quest.auto_trigger else f"[{quest.quest_giver}]" if quest.quest_giver else ""
+        print(f"  - {quest.quest_id}: {quest.display_name_jp} {marker}")
 
     # クエストチェーンの表示
     print("\n=== Quest Chain to Final Battle ===")
@@ -715,7 +908,8 @@ if __name__ == "__main__":
     print(f"Total quests in chain: {len(chain)}")
     for i, q_id in enumerate(chain, 1):
         quest = graph.quests[q_id]
-        print(f"  {i}. {q_id}: {quest.display_name_jp}")
+        phase_name = quest.phase.value if quest.phase else "N/A"
+        print(f"  {i}. [{phase_name}] {q_id}: {quest.display_name_jp}")
 
     # Graphviz出力
     print("\n=== Generating Graphviz Graph ===")

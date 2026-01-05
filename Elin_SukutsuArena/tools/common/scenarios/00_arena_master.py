@@ -2,7 +2,7 @@
 from drama_builder import DramaBuilder
 from drama_constants import DramaNames
 from flag_definitions import (
-    Keys,
+    Keys, Actors, QuestIds,
     Motivation, Rank,
     PlayerFlags, RelFlags
 )
@@ -18,9 +18,9 @@ def define_arena_master_drama(builder: DramaBuilder):
     アリーナマスターのドラマを定義
     フラグ管理システムを使用（ランク/関係値チェック）
     """
-    pc = builder.register_actor("pc", "あなた", "You")
-    vargus = builder.register_actor("sukutsu_arena_master", "バルガス", "Vargus")
-    lily = builder.register_actor("sukutsu_receptionist", "リリィ", "Lily")
+    pc = builder.register_actor(Actors.PC, "あなた", "You")
+    vargus = builder.register_actor(Actors.BALGAS, "バルガス", "Vargus")
+    lily = builder.register_actor(Actors.LILY, "リリィ", "Lily")
 
     main = builder.label("main")
     victory_comment = builder.label("victory_comment")
@@ -111,49 +111,56 @@ def define_arena_master_drama(builder: DramaBuilder):
 
     builder.step("rank_up_result_check") \
         .set_flag("sukutsu_is_rank_up_result", 0) \
-        .branch_if("sukutsu_rank_up_trial", "==", 1, rank_up_result_g) \
-        .branch_if("sukutsu_rank_up_trial", "==", 2, rank_up_result_f) \
-        .branch_if("sukutsu_rank_up_trial", "==", 3, rank_up_result_e) \
-        .branch_if("sukutsu_rank_up_trial", "==", 4, rank_up_result_d) \
-        .branch_if("sukutsu_rank_up_trial", "==", 5, rank_up_result_c) \
-        .branch_if("sukutsu_rank_up_trial", "==", 6, rank_up_result_b) \
-        .jump(registered)  # fallback
+        .switch_on_flag("sukutsu_rank_up_trial", {
+            1: rank_up_result_g,
+            2: rank_up_result_f,
+            3: rank_up_result_e,
+            4: rank_up_result_d,
+            5: rank_up_result_c,
+            6: rank_up_result_b,
+        }, fallback=registered)
 
     # Rank G 結果分岐
     builder.step(rank_up_result_g) \
-        .branch_if("sukutsu_arena_result", "==", 1, rank_up_victory_g) \
-        .branch_if("sukutsu_arena_result", "==", 2, rank_up_defeat_g) \
-        .jump(registered)
+        .switch_on_flag("sukutsu_arena_result", {
+            1: rank_up_victory_g,
+            2: rank_up_defeat_g,
+        }, fallback=registered)
 
     # Rank F 結果分岐
     builder.step(rank_up_result_f) \
-        .branch_if("sukutsu_arena_result", "==", 1, rank_up_victory_f) \
-        .branch_if("sukutsu_arena_result", "==", 2, rank_up_defeat_f) \
-        .jump(registered)
+        .switch_on_flag("sukutsu_arena_result", {
+            1: rank_up_victory_f,
+            2: rank_up_defeat_f,
+        }, fallback=registered)
 
     # Rank E 結果分岐
     builder.step(rank_up_result_e) \
-        .branch_if("sukutsu_arena_result", "==", 1, rank_up_victory_e) \
-        .branch_if("sukutsu_arena_result", "==", 2, rank_up_defeat_e) \
-        .jump(registered)
+        .switch_on_flag("sukutsu_arena_result", {
+            1: rank_up_victory_e,
+            2: rank_up_defeat_e,
+        }, fallback=registered)
 
     # Rank D 結果分岐
     builder.step(rank_up_result_d) \
-        .branch_if("sukutsu_arena_result", "==", 1, rank_up_victory_d) \
-        .branch_if("sukutsu_arena_result", "==", 2, rank_up_defeat_d) \
-        .jump(registered)
+        .switch_on_flag("sukutsu_arena_result", {
+            1: rank_up_victory_d,
+            2: rank_up_defeat_d,
+        }, fallback=registered)
 
     # Rank C 結果分岐
     builder.step(rank_up_result_c) \
-        .branch_if("sukutsu_arena_result", "==", 1, rank_up_victory_c) \
-        .branch_if("sukutsu_arena_result", "==", 2, rank_up_defeat_c) \
-        .jump(registered)
+        .switch_on_flag("sukutsu_arena_result", {
+            1: rank_up_victory_c,
+            2: rank_up_defeat_c,
+        }, fallback=registered)
 
     # Rank B 結果分岐
     builder.step(rank_up_result_b) \
-        .branch_if("sukutsu_arena_result", "==", 1, rank_up_victory_b) \
-        .branch_if("sukutsu_arena_result", "==", 2, rank_up_defeat_b) \
-        .jump(registered)
+        .switch_on_flag("sukutsu_arena_result", {
+            1: rank_up_victory_b,
+            2: rank_up_defeat_b,
+        }, fallback=registered)
 
     # === Rank G 昇格試験 勝利/敗北 ===
     add_rank_up_G_result_steps(builder, rank_up_victory_g, rank_up_defeat_g, registered_choices)
@@ -217,19 +224,22 @@ def define_arena_master_drama(builder: DramaBuilder):
     builder.step(rank_up_check) \
         .set_flag("sukutsu_quest_found", 0) \
         .set_flag("sukutsu_quest_target_name", 0) \
-        .check_quest_available("02_rank_up_G", start_rank_g) \
-        .check_quest_available("04_rank_up_F", start_rank_f) \
-        .check_quest_available("06_rank_up_E", start_rank_e) \
-        .check_quest_available("10_rank_up_D", start_rank_d) \
-        .check_quest_available("09_rank_up_C", start_rank_c) \
-        .check_quest_available("11_rank_up_B", start_rank_b) \
-        .branch_if("sukutsu_quest_target_name", "==", 11, start_rank_g) \
-        .branch_if("sukutsu_quest_target_name", "==", 12, start_rank_f) \
-        .branch_if("sukutsu_quest_target_name", "==", 13, start_rank_e) \
-        .branch_if("sukutsu_quest_target_name", "==", 14, start_rank_d) \
-        .branch_if("sukutsu_quest_target_name", "==", 15, start_rank_c) \
-        .branch_if("sukutsu_quest_target_name", "==", 16, start_rank_b) \
-        .jump(rank_up_not_ready)
+        .check_quests([
+            (QuestIds.RANK_UP_G, start_rank_g),
+            (QuestIds.RANK_UP_F, start_rank_f),
+            (QuestIds.RANK_UP_E, start_rank_e),
+            (QuestIds.RANK_UP_D, start_rank_d),
+            (QuestIds.RANK_UP_C, start_rank_c),
+            (QuestIds.RANK_UP_B, start_rank_b),
+        ]) \
+        .switch_on_flag("sukutsu_quest_target_name", {
+            11: start_rank_g,
+            12: start_rank_f,
+            13: start_rank_e,
+            14: start_rank_d,
+            15: start_rank_c,
+            16: start_rank_b,
+        }, fallback=rank_up_not_ready)
 
     # 利用可能な昇格試験がない場合
     b = builder.step(rank_up_not_ready) \
@@ -318,23 +328,24 @@ def define_arena_master_drama(builder: DramaBuilder):
     # === Registered Greeting ===
 
     builder.step(registered) \
-        .branch_if("player.rank", "==", 0, greet_unranked) \
-        .branch_if("player.rank", "==", 1, greet_G) \
-        .branch_if("player.rank", "==", 2, greet_F) \
-        .branch_if("player.rank", "==", 3, greet_E) \
-        .branch_if("player.rank", "==", 4, greet_D) \
-        .branch_if("player.rank", "==", 5, greet_C) \
-        .branch_if("player.rank", "==", 6, greet_B) \
-        .branch_if("player.rank", "==", 7, greet_A) \
-        .branch_if("player.rank", "==", 8, greet_S) \
-        .branch_if("player.rank", "==", 9, greet_SS) \
-        .branch_if("player.rank", "==", 10, greet_SSS) \
-        .branch_if("player.rank", "==", 11, greet_U) \
-        .branch_if("player.rank", "==", 12, greet_Z) \
-        .branch_if("player.rank", "==", 13, greet_god_slayer) \
-        .branch_if("player.rank", "==", 14, greet_singularity) \
-        .branch_if("player.rank", "==", 15, greet_void_king) \
-        .jump(greet_default)
+        .switch_on_flag("player.rank", {
+            0: greet_unranked,
+            1: greet_G,
+            2: greet_F,
+            3: greet_E,
+            4: greet_D,
+            5: greet_C,
+            6: greet_B,
+            7: greet_A,
+            8: greet_S,
+            9: greet_SS,
+            10: greet_SSS,
+            11: greet_U,
+            12: greet_Z,
+            13: greet_god_slayer,
+            14: greet_singularity,
+            15: greet_void_king,
+        }, fallback=greet_default)
 
     # 戻り先として確保(on_cancel等用)
     b = builder.step(registered_choices)
@@ -496,45 +507,52 @@ def define_arena_master_drama(builder: DramaBuilder):
         .set_flag("sukutsu_quest_found", 0) \
         .set_flag("sukutsu_quest_target_name", 0) \
         .debug_log_quests() \
-        .check_quest_available("02_rank_up_G", quest_rank_up_g) \
-        .check_quest_available("04_rank_up_F", quest_rank_up_f) \
-        .check_quest_available("06_rank_up_E", quest_rank_up_e) \
-        .check_quest_available("10_rank_up_D", quest_rank_up_d) \
-        .check_quest_available("09_rank_up_C", quest_rank_up_c) \
-        .check_quest_available("11_rank_up_B", quest_rank_up_b) \
-        .check_quest_available("03_zek_intro", quest_zek_intro) \
-        .check_quest_available("05_1_lily_experiment", quest_lily_exp) \
-        .check_quest_available("05_2_zek_steal_bottle", quest_zek_steal_bottle) \
-        .check_quest_available("06_2_zek_steal_soulgem", quest_zek_steal_soulgem) \
-        .check_quest_available("07_upper_existence", quest_upper_existence) \
-        .check_quest_available("08_lily_private", quest_lily_private) \
-        .check_quest_available("09_balgas_training", quest_balgas_training) \
-        .check_quest_available("12_makuma", quest_makuma) \
-        .check_quest_available("13_makuma2", quest_makuma2) \
-        .check_quest_available("15_vs_balgas", quest_vs_balgas) \
-        .check_quest_available("16_lily_real_name", quest_lily_real_name) \
-        .check_quest_available("17_vs_grandmaster_1", quest_vs_grandmaster_1) \
-        .check_quest_available("18_last_battle", quest_last_battle) \
-        .branch_if("sukutsu_quest_target_name", "==", 11, quest_rank_up_g) \
-        .branch_if("sukutsu_quest_target_name", "==", 12, quest_rank_up_f) \
-        .branch_if("sukutsu_quest_target_name", "==", 13, quest_rank_up_e) \
-        .branch_if("sukutsu_quest_target_name", "==", 14, quest_rank_up_d) \
-        .branch_if("sukutsu_quest_target_name", "==", 15, quest_rank_up_c) \
-        .branch_if("sukutsu_quest_target_name", "==", 16, quest_rank_up_b) \
-        .branch_if("sukutsu_quest_target_name", "==", 21, quest_zek_intro) \
-        .branch_if("sukutsu_quest_target_name", "==", 22, quest_lily_exp) \
-        .branch_if("sukutsu_quest_target_name", "==", 23, quest_zek_steal_bottle) \
-        .branch_if("sukutsu_quest_target_name", "==", 24, quest_zek_steal_soulgem) \
-        .branch_if("sukutsu_quest_target_name", "==", 25, quest_upper_existence) \
-        .branch_if("sukutsu_quest_target_name", "==", 26, quest_lily_private) \
-        .branch_if("sukutsu_quest_target_name", "==", 27, quest_balgas_training) \
-        .branch_if("sukutsu_quest_target_name", "==", 28, quest_makuma) \
-        .branch_if("sukutsu_quest_target_name", "==", 29, quest_makuma2) \
-        .branch_if("sukutsu_quest_target_name", "==", 30, quest_vs_balgas) \
-        .branch_if("sukutsu_quest_target_name", "==", 31, quest_lily_real_name) \
-        .branch_if("sukutsu_quest_target_name", "==", 32, quest_vs_grandmaster_1) \
-        .branch_if("sukutsu_quest_target_name", "==", 33, quest_last_battle) \
-        .jump(quest_none)
+        .check_quests([
+            # ランクアップ系
+            (QuestIds.RANK_UP_G, quest_rank_up_g),
+            (QuestIds.RANK_UP_F, quest_rank_up_f),
+            (QuestIds.RANK_UP_E, quest_rank_up_e),
+            (QuestIds.RANK_UP_D, quest_rank_up_d),
+            (QuestIds.RANK_UP_C, quest_rank_up_c),
+            (QuestIds.RANK_UP_B, quest_rank_up_b),
+            # ストーリー系
+            (QuestIds.ZEK_INTRO, quest_zek_intro),
+            (QuestIds.LILY_EXPERIMENT, quest_lily_exp),
+            (QuestIds.ZEK_STEAL_BOTTLE, quest_zek_steal_bottle),
+            (QuestIds.ZEK_STEAL_SOULGEM, quest_zek_steal_soulgem),
+            (QuestIds.UPPER_EXISTENCE, quest_upper_existence),
+            (QuestIds.LILY_PRIVATE, quest_lily_private),
+            (QuestIds.BALGAS_TRAINING, quest_balgas_training),
+            (QuestIds.MAKUMA, quest_makuma),
+            (QuestIds.MAKUMA2, quest_makuma2),
+            (QuestIds.RANK_UP_S, quest_vs_balgas),
+            (QuestIds.LILY_REAL_NAME, quest_lily_real_name),
+            (QuestIds.VS_GRANDMASTER_1, quest_vs_grandmaster_1),
+            (QuestIds.LAST_BATTLE, quest_last_battle),
+        ]) \
+        .switch_on_flag("sukutsu_quest_target_name", {
+            # ランクアップ系
+            11: quest_rank_up_g,
+            12: quest_rank_up_f,
+            13: quest_rank_up_e,
+            14: quest_rank_up_d,
+            15: quest_rank_up_c,
+            16: quest_rank_up_b,
+            # ストーリー系
+            21: quest_zek_intro,
+            22: quest_lily_exp,
+            23: quest_zek_steal_bottle,
+            24: quest_zek_steal_soulgem,
+            25: quest_upper_existence,
+            26: quest_lily_private,
+            27: quest_balgas_training,
+            28: quest_makuma,
+            29: quest_makuma2,
+            30: quest_vs_balgas,
+            31: quest_lily_real_name,
+            32: quest_vs_grandmaster_1,
+            33: quest_last_battle,
+        }, fallback=quest_none)
 
     # === ランクアップ系クエスト情報 ===
     builder.step(quest_rank_up_g) \
@@ -562,98 +580,123 @@ def define_arena_master_drama(builder: DramaBuilder):
         .jump(registered_choices)
 
     # === ストーリー系クエスト ===
+    # バルガス（アリーナマスター）直接開始用ラベル
+    start_upper_existence = builder.label("start_upper_existence")
+    start_balgas_training = builder.label("start_balgas_training")
+    start_vs_balgas = builder.label("start_vs_balgas")
+
+    # -------------------------------------------
+    # ゼクのクエスト（情報提供のみ、ゼクに話しかけて開始）
+    # -------------------------------------------
     # クエスト: ゼクとの出会い
     builder.step(quest_zek_intro) \
-        .say("quest_zek_info", "おい、見慣れねえ商人が来てるぞ。『ゼク』って名乗る怪しい野郎だ。話を聞いてみるか？", "", actor=vargus) \
-        .choice(quest_info, "話を聞いてみる", "", text_id="c_accept_zek") \
-        .choice(registered_choices, "今は結構だ", "", text_id="c_decline_quest") \
-        .on_cancel(registered_choices)
-
-    # クエスト: リリィの実験
-    builder.step(quest_lily_exp) \
-        .say("quest_lily_info", "リリィが何やら困ってるらしいぜ。『虚空の共鳴瓶』とかいう怪しげなアイテムを作りたいとか...手伝ってやるか？", "", actor=vargus) \
-        .choice(quest_info, "手伝ってみる", "", text_id="c_accept_lily") \
-        .choice(registered_choices, "遠慮しておく", "", text_id="c_decline_quest") \
-        .on_cancel(registered_choices)
+        .say("quest_zek_info", "おい、見慣れねえ商人が来てるぞ。『ゼク』って名乗る怪しい野郎だ。", "", actor=vargus) \
+        .say("quest_zek_info2", "ロビーの隅にいるはずだ。興味があるなら話しかけてみろ。", "", actor=vargus) \
+        .jump(registered_choices)
 
     # クエスト: ゼクの瓶すり替え提案
     builder.step(quest_zek_steal_bottle) \
-        .say("quest_zek_bottle_info", "ゼクの野郎が何やら企んでやがる。リリィの瓶を『すり替えろ』だと？……お前の判断に任せる。", "", actor=vargus) \
-        .choice(quest_info, "話を聞く", "", text_id="c_accept_zek_bottle") \
-        .choice(registered_choices, "関わらない", "", text_id="c_decline_quest") \
-        .on_cancel(registered_choices)
+        .say("quest_zek_bottle_info", "ゼクの野郎が何やら企んでやがる。あいつに話しかけてみろ。", "", actor=vargus) \
+        .say("quest_zek_bottle_info2", "……俺は関わらねえが、お前の判断だ。", "", actor=vargus) \
+        .jump(registered_choices)
 
     # クエスト: カインの魂の選択
     builder.step(quest_zek_steal_soulgem) \
-        .say("quest_zek_soulgem_info", "ゼクがカインの『魂宝石』を買い取りたいと言ってる。……あいつの魂を売るのか、リリィに返すのか、お前が決めろ。", "", actor=vargus) \
-        .choice(quest_info, "話を聞く", "", text_id="c_accept_zek_soulgem") \
-        .choice(registered_choices, "後にする", "", text_id="c_decline_quest") \
-        .on_cancel(registered_choices)
+        .say("quest_zek_soulgem_info", "ゼクがカインの『魂宝石』について何か言いたいことがあるらしい。", "", actor=vargus) \
+        .say("quest_zek_soulgem_info2", "あいつのところへ行け。……慎重に選べよ。", "", actor=vargus) \
+        .jump(registered_choices)
 
-    # クエスト: 高次元存在の真実
-    builder.step(quest_upper_existence) \
-        .say("quest_upper_info", "リリィが『高次元存在』について話したがってるらしい。……あいつら『観客』の正体を知りたいか？", "", actor=vargus) \
-        .choice(quest_info, "聞いてみる", "", text_id="c_accept_upper") \
-        .choice(registered_choices, "今はいい", "", text_id="c_decline_quest") \
-        .on_cancel(registered_choices)
+    # -------------------------------------------
+    # リリィのクエスト（情報提供のみ、リリィに話しかけて開始）
+    # -------------------------------------------
+    # クエスト: リリィの実験
+    builder.step(quest_lily_exp) \
+        .say("quest_lily_info", "リリィが何やら困ってるらしいぜ。『虚空の共鳴瓶』とかいう怪しげなアイテムを作りたいとか。", "", actor=vargus) \
+        .say("quest_lily_info2", "あいつのところへ行って話を聞いてやれ。", "", actor=vargus) \
+        .jump(registered_choices)
 
     # クエスト: リリィの私室
     builder.step(quest_lily_private) \
-        .say("quest_lily_priv_info", "リリィが『自分の過去』について話したいらしい。……珍しいな。興味があるなら聞いてやれ。", "", actor=vargus) \
-        .choice(quest_info, "話を聞く", "", text_id="c_accept_lily_priv") \
-        .choice(registered_choices, "遠慮する", "", text_id="c_decline_quest") \
-        .on_cancel(registered_choices)
-
-    # クエスト: バルガスの訓練
-    builder.step(quest_balgas_training) \
-        .say("quest_balgas_info", "……おい。俺が直接、お前を鍛えてやろうと思ってる。死にたくなければ付いてこい。", "", actor=vargus) \
-        .choice(quest_info, "ついていく", "", text_id="c_accept_balgas") \
-        .choice(registered_choices, "今はやめておく", "", text_id="c_decline_quest") \
-        .on_cancel(registered_choices)
+        .say("quest_lily_priv_info", "リリィが『自分の過去』について話したいらしい。……珍しいな。", "", actor=vargus) \
+        .say("quest_lily_priv_info2", "興味があるならあいつに話しかけてやれ。", "", actor=vargus) \
+        .jump(registered_choices)
 
     # クエスト: マクマ登場
     builder.step(quest_makuma) \
-        .say("quest_makuma_info", "怪しい連中が闘技場をうろついてる。『マクマ』とかいう組織らしい。……気をつけろ。", "", actor=vargus) \
-        .choice(quest_info, "調べてみる", "", text_id="c_accept_makuma") \
-        .choice(registered_choices, "関わらない", "", text_id="c_decline_quest") \
-        .on_cancel(registered_choices)
-
-    # クエスト: マクマの陰謀
-    builder.step(quest_makuma2) \
-        .say("quest_makuma2_info", "マクマの連中が何か企んでやがる。リリィも巻き込まれてるかもしれねえ。……調べてくれねえか？", "", actor=vargus) \
-        .choice(quest_info, "分かった", "", text_id="c_accept_makuma2") \
-        .choice(registered_choices, "今はやめておく", "", text_id="c_decline_quest") \
-        .on_cancel(registered_choices)
-
-    # クエスト: バルガス戦
-    builder.step(quest_vs_balgas) \
-        .say("quest_vs_balgas_info", "……おい。俺と本気で戦う気はあるか？　これは試験じゃねえ。俺の『決着』だ。", "", actor=vargus) \
-        .choice(quest_info, "受けて立つ", "", text_id="c_accept_vs_balgas") \
-        .choice(registered_choices, "今は遠慮する", "", text_id="c_decline_quest") \
-        .on_cancel(registered_choices)
+        .say("quest_makuma_info", "怪しい連中が闘技場をうろついてる。『マクマ』とかいう組織らしい。", "", actor=vargus) \
+        .say("quest_makuma_info2", "リリィが詳しく知ってるかもしれねえ。あいつに聞いてみろ。", "", actor=vargus) \
+        .jump(registered_choices)
 
     # クエスト: リリィの真名
     builder.step(quest_lily_real_name) \
-        .say("quest_lily_name_info", "リリィが『真の名』を教えてくれるらしい。……あいつを本気で信用するのか？　お前の判断だ。", "", actor=vargus) \
-        .choice(quest_info, "聞いてみる", "", text_id="c_accept_lily_name") \
-        .choice(registered_choices, "まだ早い", "", text_id="c_decline_quest") \
+        .say("quest_lily_name_info", "リリィが『真の名』を教えてくれるらしい。", "", actor=vargus) \
+        .say("quest_lily_name_info2", "……あいつを本気で信用するのか？　あいつに話しかけろ。", "", actor=vargus) \
+        .jump(registered_choices)
+
+    # -------------------------------------------
+    # バルガス（アリーナマスター）のクエスト（直接開始可能）
+    # -------------------------------------------
+    # クエスト: 高次元存在の真実
+    builder.step(quest_upper_existence) \
+        .say("quest_upper_info", "……お前には『観客』の正体を教えておく必要がある。", "", actor=vargus) \
+        .say("quest_upper_info2", "聞く覚悟はあるか？　真実は重いぞ。", "", actor=vargus) \
+        .choice(start_upper_existence, "聞く", "", text_id="c_accept_upper") \
+        .choice(registered_choices, "今はいい", "", text_id="c_decline_upper") \
         .on_cancel(registered_choices)
 
-    # クエスト: グランドマスター戦
+    # 高次元存在ドラマ開始
+    builder.step(start_upper_existence) \
+        .say_and_start_drama("……いいだろう。座れ。", DramaNames.UPPER_EXISTENCE, "sukutsu_arena_master") \
+        .jump(end)
+
+    # クエスト: バルガスの訓練
+    builder.step(quest_balgas_training) \
+        .say("quest_balgas_info", "……おい。俺が直接、お前を鍛えてやろうと思ってる。", "", actor=vargus) \
+        .say("quest_balgas_info2", "死にたくなければ付いてこい。どうだ？", "", actor=vargus) \
+        .choice(start_balgas_training, "ついていく", "", text_id="c_accept_balgas") \
+        .choice(registered_choices, "今はやめておく", "", text_id="c_decline_balgas") \
+        .on_cancel(registered_choices)
+
+    # バルガス訓練ドラマ開始
+    builder.step(start_balgas_training) \
+        .say_and_start_drama("よし、来い！", DramaNames.BALGAS_TRAINING, "sukutsu_arena_master") \
+        .jump(end)
+
+    # クエスト: バルガス戦（ランクS昇格）
+    builder.step(quest_vs_balgas) \
+        .say("quest_vs_balgas_info", "……おい。俺と本気で戦う気はあるか？", "", actor=vargus) \
+        .say("quest_vs_balgas_info2", "これは試験じゃねえ。俺の『決着』だ。", "", actor=vargus) \
+        .choice(start_vs_balgas, "受けて立つ", "", text_id="c_accept_vs_balgas") \
+        .choice(registered_choices, "今は遠慮する", "", text_id="c_decline_vs_balgas") \
+        .on_cancel(registered_choices)
+
+    # バルガス戦ドラマ開始
+    builder.step(start_vs_balgas) \
+        .say_and_start_drama("……覚悟はいいな。", DramaNames.VS_BALGAS, "sukutsu_arena_master") \
+        .jump(end)
+
+    # -------------------------------------------
+    # 自動発動クエスト（情報提供のみ）
+    # -------------------------------------------
+    # クエスト: マクマの陰謀（自動発動のため情報のみ）
+    builder.step(quest_makuma2) \
+        .say("quest_makuma2_info", "マクマの連中が何か企んでやがる。リリィも巻き込まれてるかもしれねえ。", "", actor=vargus) \
+        .say("quest_makuma2_info2", "……気をつけろ。", "", actor=vargus) \
+        .jump(registered_choices)
+
+    # クエスト: グランドマスター戦（自動発動のため情報のみ）
     builder.step(quest_vs_grandmaster_1) \
-        .say("quest_gm_info", "……いよいよだな。グランドマスターとの戦いだ。覚悟はいいか？", "", actor=vargus) \
-        .choice(quest_info, "準備はできた", "", text_id="c_accept_gm") \
-        .choice(registered_choices, "もう少し待ってくれ", "", text_id="c_decline_quest") \
-        .on_cancel(registered_choices)
+        .say("quest_gm_info", "……いよいよだな。グランドマスターとの戦いが近い。", "", actor=vargus) \
+        .say("quest_gm_info2", "覚悟しておけ。", "", actor=vargus) \
+        .jump(registered_choices)
 
-    # クエスト: 最終決戦
+    # クエスト: 最終決戦（自動発動のため情報のみ）
     builder.step(quest_last_battle) \
-        .say("quest_last_info", "……これが最後の戦いだ。お前は何のために戦う？　答えを見つけてから来い。", "", actor=vargus) \
-        .choice(quest_info, "行こう", "", text_id="c_accept_last") \
-        .choice(registered_choices, "まだだ", "", text_id="c_decline_quest") \
-        .on_cancel(registered_choices)
+        .say("quest_last_info", "……これが最後の戦いだ。", "", actor=vargus) \
+        .say("quest_last_info2", "お前は何のために戦う？　答えを見つけておけ。", "", actor=vargus) \
+        .jump(registered_choices)
 
-    # クエスト受諾
+    # 汎用クエスト受諾（現在は未使用、将来の拡張用）
     builder.step(quest_info) \
         .say("quest_accepted", "よし、頑張れよ。報酬は期待できるかもしれねえぞ。", "", actor=vargus) \
         .jump(registered_choices)

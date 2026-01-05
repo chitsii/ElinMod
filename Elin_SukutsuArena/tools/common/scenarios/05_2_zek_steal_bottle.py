@@ -3,7 +3,8 @@
 """
 
 from drama_builder import DramaBuilder
-from flag_definitions import Keys, BottleChoice
+from flag_definitions import Keys, Actors, FlagValues, QuestIds
+
 
 def define_zek_steal_bottle(builder: DramaBuilder):
     """
@@ -11,9 +12,9 @@ def define_zek_steal_bottle(builder: DramaBuilder):
     シナリオ: 05_2_zek_steal_lily.md
     """
     # アクター登録
-    pc = builder.register_actor("pc", "あなた", "You")
-    lily = builder.register_actor("sukutsu_receptionist", "リリィ", "Lily")
-    zek = builder.register_actor("sukutsu_shady_merchant", "ゼク", "Zek")
+    pc = builder.register_actor(Actors.PC, "あなた", "You")
+    lily = builder.register_actor(Actors.LILY, "リリィ", "Lily")
+    zek = builder.register_actor(Actors.ZEK, "ゼク", "Zek")
 
     # ラベル定義
     main = builder.label("main")
@@ -42,7 +43,7 @@ def define_zek_steal_bottle(builder: DramaBuilder):
         .say("narr_2", "（ロビーの灯火が不自然に揺らぎ、あなたの足元の影が、まるで意思を持った沼のように長く伸びる。）", "", actor=pc) \
         .shake() \
         .say("narr_3", "（そこから、鎖の擦れる音と共に、ゼクが音もなく這い出してきた。）", "", actor=pc) \
-        .focus_chara("sukutsu_shady_merchant") \
+        .focus_chara(Actors.ZEK) \
         .say("zek_1", "……素晴らしい。実に、溜息が出るほどに。", "", actor=zek) \
         .say("zek_2", "あのサキュバスに渡すには、あまりに惜しい『傑作』を作られましたね、闘士殿。", "", actor=zek) \
         .say("narr_4", "（彼は細長い指で、あなたが持つ器を指し示す。）", "", actor=pc) \
@@ -117,7 +118,7 @@ def define_zek_steal_bottle(builder: DramaBuilder):
         .say("zek_ref1", "……残念です。ですが、無理強いはいたしません。", "", actor=zek) \
         .say("zek_ref2", "あなたが『忠犬』の道を選ばれるというのなら、それもまた一興。……いつか、その選択を後悔する日が来るかもしれませんが。", "", actor=zek) \
         .say("narr_ref", "（ゼクは影の中へと消えていく。）", "", actor=pc) \
-        .set_flag("chitsii.arena.player.bottle_choice", 1) \
+        .set_flag(Keys.BOTTLE_CHOICE, FlagValues.BottleChoice.REFUSED) \
         .mod_flag(Keys.REL_LILY, "+", 10) \
         .jump(ending)
 
@@ -129,7 +130,7 @@ def define_zek_steal_bottle(builder: DramaBuilder):
         .shake() \
         .say("zek_acc3", "これで、私の店での取引が、より『有利』になりますよ。……では、良い演技を。彼女に気づかれないよう、お気をつけて。", "", actor=zek) \
         .say("narr_acc2", "（ゼクは影の中へと消えていく。）", "", actor=pc) \
-        .set_flag("chitsii.arena.player.bottle_choice", 2) \
+        .set_flag(Keys.BOTTLE_CHOICE, FlagValues.BottleChoice.SWAPPED) \
         .mod_flag(Keys.REL_LILY, "+", 10) \
         .mod_flag(Keys.REL_ZEK, "+", 15) \
         .action("eval", param="for(int i=0; i<10; i++) { EClass.pc.Pick(ThingGen.Create(\"coin\")); } for(int i=0; i<3; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
@@ -141,7 +142,7 @@ def define_zek_steal_bottle(builder: DramaBuilder):
     builder.step(scene4_aftermath) \
         .play_bgm("BGM/Lobby_Normal") \
         .say("narr_aft1", "（ゼクが消えた直後、リリィが戻ってきて、何食わぬ顔でその「偽物」を受け取る。）", "", actor=pc) \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("lily_a1", "お待たせしました。", "", actor=lily) \
         .say("narr_aft2", "（彼女は器を手に取り、軽く傾ける。）", "", actor=pc) \
         .say("lily_a2", "……あら、なんだか少し、器の感触が変わったかしら？", "", actor=lily) \
@@ -153,5 +154,5 @@ def define_zek_steal_bottle(builder: DramaBuilder):
     # 終了処理
     # ========================================
     builder.step(ending) \
-        .complete_quest("05_2_zek_steal_bottle") \
+        .complete_quest(QuestIds.ZEK_STEAL_BOTTLE) \
         .finish()

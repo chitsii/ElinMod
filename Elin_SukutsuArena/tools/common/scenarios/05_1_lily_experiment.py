@@ -3,7 +3,7 @@
 """
 
 from drama_builder import DramaBuilder
-from flag_definitions import Keys
+from flag_definitions import Keys, Actors, QuestIds
 
 def define_lily_experiment(builder: DramaBuilder):
     """
@@ -11,8 +11,8 @@ def define_lily_experiment(builder: DramaBuilder):
     シナリオ: 05_1_lily_experiment.md
     """
     # アクター登録
-    pc = builder.register_actor("pc", "あなた", "You")
-    lily = builder.register_actor("sukutsu_receptionist", "リリィ", "Lily")
+    pc = builder.register_actor(Actors.PC, "あなた", "You")
+    lily = builder.register_actor(Actors.LILY, "リリィ", "Lily")
 
     # ラベル定義
     main = builder.label("main")
@@ -44,7 +44,7 @@ def define_lily_experiment(builder: DramaBuilder):
     # ========================================
     builder.step(main) \
         .play_bgm("BGM/Lobby_Normal") \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("narr_1", "（ロビーは相変わらず、異次元の歪みが軋む不快な音に満ちている。）", "", actor=pc) \
         .say("narr_2", "（リリィは眉間に皺を寄せ、羽根ペンを乱暴に机に置いた。その前には、どこか禍々しい幾何学模様が描かれた、古ぼけた設計図が広げられている。）", "", actor=pc) \
         .say("lily_1", "……あぁ、忌々しい。", "", actor=lily) \
@@ -171,6 +171,6 @@ def define_lily_experiment(builder: DramaBuilder):
     # 終了処理
     # ========================================
     builder.step(ending) \
-        .complete_quest("05_1_lily_experiment") \
+        .complete_quest(QuestIds.LILY_EXPERIMENT) \
         .mod_flag(Keys.REL_LILY, "+", 5) \
         .finish()

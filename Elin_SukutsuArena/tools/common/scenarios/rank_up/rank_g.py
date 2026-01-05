@@ -1,7 +1,7 @@
 
 from drama_builder import DramaBuilder
 from flag_definitions import (
-    Keys,
+    Keys, Actors, QuestIds,
     Motivation, Rank,
     PlayerFlags, RelFlags
 )
@@ -12,9 +12,9 @@ def define_rank_up_G(builder: DramaBuilder):
 
     シナリオ: 02_rank_up_01.md
     """
-    pc = builder.register_actor("pc", "あなた", "You")
-    lily = builder.register_actor("sukutsu_receptionist", "リリィ", "Lily")
-    vargus = builder.register_actor("sukutsu_arena_master", "バルガス", "Vargus")
+    pc = builder.register_actor(Actors.PC, "あなた", "You")
+    lily = builder.register_actor(Actors.LILY, "リリィ", "Lily")
+    vargus = builder.register_actor(Actors.BALGAS, "バルガス", "Vargus")
 
     main = builder.label("main")
 
@@ -36,7 +36,7 @@ def define_rank_up_G(builder: DramaBuilder):
     # このドラマは戦闘開始前の会話のみを担当する
     builder.step(main) \
         .play_bgm("BGM/sukutsu_arena_opening") \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("narr_1", "（薄暗いロビーに、異次元の嵐が石壁を叩く音が不気味に響いている。空気は重く、血と錆の臭いが鼻腔を突く。）", "", actor=pc) \
         .say("lily_r1", "……準備はよろしいですか？", "", actor=lily) \
         .wait(1.0) \
@@ -70,7 +70,7 @@ def define_rank_up_G(builder: DramaBuilder):
 
     # --- Vargus Advice ---
     builder.step(vargus_advice) \
-        .focus_chara("sukutsu_arena_master") \
+        .focus_chara(Actors.BALGAS) \
         .say("narr_3", "（闘技場へ繋がる鉄格子の前で、バルガスが研ぎ澄まされた剣を無造作に弄んでいる。）", "", actor=pc) \
         .say("vargus_r1", "おい、足が震えてんぞ。", "", actor=vargus) \
         .say("vargus_r2", "……いいか、一度だけ教えてやる。プチ共は『数』で来る。一匹一匹はゴミだが、囲まれればお前の肉は一瞬で削げ落ち、綺麗な骨の標本ができあがりだ。", "", actor=vargus) \
@@ -94,30 +94,30 @@ def add_rank_up_G_result_steps(builder: DramaBuilder, victory_label: str, defeat
         return_label: 結果表示後にジャンプするラベル名
     """
     # アクターは arena_master 側で既に登録済みのはず
-    pc = "pc"
-    lily = "sukutsu_receptionist"
-    vargus = "sukutsu_arena_master"
+    pc = Actors.PC
+    lily = Actors.LILY
+    vargus = Actors.BALGAS
 
     # === Rank G 昇格試験 勝利 ===
     builder.step(victory_label) \
         .set_flag("sukutsu_arena_result", 0) \
-        .focus_chara("sukutsu_arena_master") \
+        .focus_chara(Actors.BALGAS) \
         .say("rup_vic_v1", "……ケッ、しぶとい奴だ。", "", actor=vargus) \
         .say("rup_vic_v2", "まぁ、合格だ。", "", actor=vargus) \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("rup_vic_l1", "お疲れ様でした。約束通り、ギルドの台帳にあなたの名を刻んでおきました。", "", actor=lily) \
         .say("rup_vic_l2", "ランクG『屑肉』。ふふ、あなたにぴったりの、美味しそうな二つ名だと思いませんか？", "", actor=lily) \
         .say("rup_vic_l3", "あぁ、それと……。あなたが暴れたおかげで、あちこちの備品が壊れました。次は戦うついでに、修理用の『石材』でも拾ってきていただけますか？", "", actor=lily) \
-        .complete_quest("02_rank_up_G") \
+        .complete_quest(QuestIds.RANK_UP_G) \
         .set_flag("chitsii.arena.player.rank", 1) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"bottle\")); EClass.pc.Pick(ThingGen.Create(\"ration\"));") \
+        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"wine\")); EClass.pc.Pick(ThingGen.Create(\"ration\"));") \
         .say("rup_vic_sys", "報酬として『バルガスの安酒』と『リリィの配給食』を受け取った。", "", actor=pc) \
         .jump(return_label)
 
     # === Rank G 昇格試験 敗北 ===
     builder.step(defeat_label) \
         .set_flag("sukutsu_arena_result", 0) \
-        .focus_chara("sukutsu_receptionist") \
+        .focus_chara(Actors.LILY) \
         .say("rup_def_l1", "あらあら……。期待外れでしたね。", "", actor=lily) \
         .say("rup_def_l2", "死体袋の用意が無駄にならなくて何よりです。……次の方、どうぞ。", "", actor=lily) \
         .jump(return_label)
