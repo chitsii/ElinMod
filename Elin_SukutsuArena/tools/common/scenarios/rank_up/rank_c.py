@@ -191,8 +191,8 @@ def add_rank_up_C_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .set_flag(Keys.RANK, 5) \
         .mod_flag(Keys.REL_BALGAS, "+", 25) \
         .mod_flag(Keys.REL_LILY, "+", 10) \
-        .say("sys_title", "【システム】称号『闘技場の鴉（Arena Crow）』を獲得しました。", "", actor=pc) \
-        .action("eval", param="UnityEngine.Debug.Log(\"[SukutsuArena] TODO: 称号付与処理 - クリティカル率+10%, 敵撃破時SP微回復\");") \
+        .say("sys_title", "【システム】称号『闘技場の鴉（Arena Crow）』を獲得しました。器用+5、スタミナ+10 の加護を得た！", "") \
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantRankCBonus();") \
         .jump(return_label)
 
     # ========================================

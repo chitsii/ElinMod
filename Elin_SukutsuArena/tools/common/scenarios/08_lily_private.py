@@ -185,6 +185,6 @@ def define_lily_private(builder: DramaBuilder):
     builder.step(ending) \
         .complete_quest(QuestIds.LILY_PRIVATE) \
         .mod_flag(Keys.REL_LILY, "+", 10) \
-        .say("sys_buff", "【システム】サキュバスの観察眼（24時間）を獲得しました。", "", actor=pc) \
-        .action("eval", param="UnityEngine.Debug.Log(\"[SukutsuArena] TODO: バフ付与処理 - 魔法詠唱成功率+10%, 回避+5, 獲得VP+10%\");") \
+        .say("sys_buff", "【システム】『リリィの寵愛』を獲得しました。魔力+5、回避+5、魅了耐性+10 の加護を得た！", "") \
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantLilyPrivateBonus();") \
         .finish()

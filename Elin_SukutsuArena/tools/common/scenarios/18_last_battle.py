@@ -3,7 +3,8 @@
 """
 
 from drama_builder import DramaBuilder
-from flag_definitions import Keys, Actors, FlagValues
+from arena_drama_builder import ArenaDramaBuilder
+from flag_definitions import Keys, Actors, FlagValues, QuestIds
 
 def define_last_battle(builder: DramaBuilder):
     """
@@ -140,8 +141,11 @@ def define_last_battle(builder: DramaBuilder):
         .say("narr_12", "（権能を封じられたアスタロトの瞳に、初めて『驚愕』と『喜び』が混じる。）", "", actor=pc) \
         .say("astaroth_4", "……ハハッ！ 面白い！ システムの保護なしに、この私と殴り合おうというのか！", "", actor=astaroth) \
         .say("astaroth_5", "よかろう、黄金の戦鬼よ！ 私が背負う『一億の絶望』と、お前が背負う『一億の希望』……どちらが真の理か、ここで決めようではないか！", "", actor=astaroth) \
-        .say("narr_13", "（プレースホルダー：ここで実際の戦闘が発生する。）", "", actor=pc) \
-        .jump(act5)
+        .shake() \
+        .set_flag("sukutsu_is_quest_battle_result", 1) \
+        .set_flag("sukutsu_quest_battle", 3) \
+        .start_battle_by_stage("final_astaroth", master_id="sukutsu_arena_master") \
+        .finish()
 
     # ========================================
     # 第5幕: 終焉と、はじまり
@@ -247,4 +251,54 @@ def define_last_battle(builder: DramaBuilder):
         .say("balgas_f1", "……おい、いつまで感傷に浸ってんだ。次は俺の奢りで、地上で一番うまい酒を飲みに行くぞ！", "", actor=balgas) \
         .say("lily_f1", "ふふ、楽しみです。……リリィとして、初めての『デート』ですから。", "", actor=lily) \
         .say("zek_f1", "おや、私も混ぜてくださいよ。……商談という名の、ね。", "", actor=zek) \
+        .complete_quest(QuestIds.LAST_BATTLE) \
+        .say("sys_complete", "【システム】クエスト『最終決戦』をクリアしました！", "") \
         .finish()
+
+
+def add_last_battle_result_steps(builder: ArenaDramaBuilder, victory_label: str, defeat_label: str, return_label: str):
+    """
+    最終決戦クエストの勝利/敗北ステップを arena_master ビルダーに追加する
+
+    Args:
+        builder: arena_master の ArenaDramaBuilder インスタンス
+        victory_label: 勝利ステップのラベル名
+        defeat_label: 敗北ステップのラベル名
+        return_label: 結果表示後にジャンプするラベル名（敗北時のみ使用）
+    """
+    from drama_constants import DramaNames
+
+    pc = Actors.PC
+    lily = Actors.LILY
+    balgas = Actors.BALGAS
+    astaroth = Actors.ASTAROTH
+
+    # ========================================
+    # 最終決戦 勝利 - 続きのドラマを開始
+    # ========================================
+    # 勝利時は act5 以降の内容を別ドラマとして開始
+    # last_battle ドラマの act5 以降を呼び出す
+    builder.step(victory_label) \
+        .set_flag("sukutsu_arena_result", 0) \
+        .set_flag("sukutsu_quest_battle", 0) \
+        .play_bgm("BGM/Victory_Epilogue") \
+        .say("narr_v1", "（激闘の末、アスタロトの身体が崩れ始める。王座は砕け、アリーナの外壁は剥がれ落ち、そこから美しい『本当の星空』が姿を現した。）", "", actor=pc) \
+        .say("astaroth_v1", "……見事だ。私は……ただ、この閉じられた孵化器を守るだけの、古い部品に過ぎなかったのかもしれないな。", "", actor=astaroth) \
+        .say("astaroth_v2", "……リリィ、バルガス、ゼク。……そして新しき王よ。この世界の重さを、お前たちが分かち合うというのなら……私は、安心して土へ還ろう。", "", actor=astaroth) \
+        .say("narr_v2", "（アスタロトが柔らかな光となって霧散し、そのレベル（重さ）が残された四人へと分散して吸収されていく。）", "", actor=pc) \
+        .say("sys_title", "【システム】アスタロトの力の一部を吸収しました！全ステータス+10、全耐性+10 を獲得！", "") \
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantLastBattleBonus();") \
+        .say_and_start_drama("……続きがある。", DramaNames.LAST_BATTLE, "sukutsu_arena_master")
+
+    # ========================================
+    # 最終決戦 敗北
+    # ========================================
+    builder.step(defeat_label) \
+        .set_flag("sukutsu_arena_result", 0) \
+        .set_flag("sukutsu_quest_battle", 0) \
+        .play_bgm("BGM/Lobby_Normal") \
+        .say("narr_d1", "（アスタロトの圧倒的な力の前に、あなたは膝をついた。）", "", actor=pc) \
+        .say("astaroth_d1", "……まだ、足りないな。お前の中に宿る可能性は、未だ開花していない。", "", actor=astaroth) \
+        .say("astaroth_d2", "……出直して来い。私は、お前が『完成形』に至るまで待っていよう。", "", actor=astaroth) \
+        .say("narr_d2", "（あなたは闘技場の入口へと戻された。再び挑戦するには、さらなる鍛錬が必要だ……。）", "", actor=pc) \
+        .jump(return_label)

@@ -8,23 +8,19 @@ using Elin_SukutsuArena;
 /// </summary>
 public class ZonePreEnterArenaBattle : ZonePreEnterEvent
 {
-    public int bossLevel = 50;
-    public int bossCount = 1;
-
-    // 固定ボスID（ランクに応じて変更可能）
-    public string[] bossIds = new string[] { "hound" };  // デフォルト: 猟犬 (wolf ID無効のため)
-
-    public int stage = 1;  // ステージ番号
-
-    public bool isRankUp = false;
-
-    // 新API用フィールド
+    // ステージ設定
     public string stageId = "";
     public BattleStageData stageData = null;
 
     public override void Execute()
     {
         Debug.Log("[SukutsuArena] ZonePreEnterArenaBattle.Execute()");
+
+        if (stageData == null)
+        {
+            Debug.LogError($"[SukutsuArena] stageData is null for stage: {stageId}");
+            return;
+        }
 
         // 既存のモブを掃除（プレイヤーと仲間以外）
         ClearExistingCharas();
@@ -34,18 +30,8 @@ public class ZonePreEnterArenaBattle : ZonePreEnterEvent
 
         List<Chara> enemies = new List<Chara>();
 
-        // 新API（stageData）が設定されている場合はそれを使用
-        if (stageData != null)
-        {
-            Debug.Log($"[SukutsuArena] Using stageData for stage: {stageId}");
-            SpawnEnemiesFromStageData(centerPos, enemies);
-        }
-        else
-        {
-            // 旧API（bossIds, bossLevel等）を使用
-            Debug.Log($"[SukutsuArena] Using legacy config for stage: {stage}");
-            SpawnEnemiesLegacy(centerPos, enemies);
-        }
+        Debug.Log($"[SukutsuArena] Using stageData for stage: {stageId}");
+        SpawnEnemiesFromStageData(centerPos, enemies);
 
         // 全ての敵を敵対化
         foreach (Chara enemy in enemies)
@@ -60,16 +46,9 @@ public class ZonePreEnterArenaBattle : ZonePreEnterEvent
         EClass._zone.events.Add(new ZoneEventArenaBattle());
 
         // 開始メッセージ
-        if (stageData != null)
-        {
-            bool isJP = EClass.core.config.lang == "JP";
-            string displayName = isJP ? stageData.DisplayNameJp : stageData.DisplayNameEn;
-            Msg.Say($"{displayName} 開始！");
-        }
-        else
-        {
-            Msg.Say($"ステージ {stage} 開始！");
-        }
+        bool isJP = EClass.core.config.lang == "JP";
+        string displayName = isJP ? stageData.DisplayNameJp : stageData.DisplayNameEn;
+        Msg.Say($"{displayName} 開始！");
     }
 
     /// <summary>
@@ -225,6 +204,22 @@ public class ZonePreEnterArenaBattle : ZonePreEnterEvent
                 break;
         }
 
+        // ========================================
+        // 特殊キャラクター処理
+        // ========================================
+
+        // 影の自己: プレイヤーのステータスをコピー
+        if (config.CharaId == "sukutsu_shadow_self")
+        {
+            ApplyShadowSelfStats(enemy);
+        }
+
+        // ボスキャラクター: 耐久（END）を10倍に設定してHP増加
+        if (config.IsBoss)
+        {
+            ApplyBossEnduranceBoost(enemy);
+        }
+
         // 位置決定
         Point pos;
         if (config.Position == "fixed" && config.PositionX != 0 && config.PositionZ != 0)
@@ -242,67 +237,173 @@ public class ZonePreEnterArenaBattle : ZonePreEnterEvent
 
         // マップに追加
         EClass._zone.AddCard(enemy, pos);
-        Debug.Log($"[SukutsuArena] Spawned: {enemy.Name} (Lv.{enemy.LV}, {config.Rarity}) at {pos}");
+        Debug.Log($"[SukutsuArena] Spawned: {enemy.Name} (Lv.{enemy.LV}, {config.Rarity}, Boss={config.IsBoss}) at {pos}");
 
         return enemy;
     }
 
     /// <summary>
-    /// 旧API: bossIds等から敵を生成
+    /// 影の自己にプレイヤーのステータスをコピー
     /// </summary>
-    private void SpawnEnemiesLegacy(Point centerPos, List<Chara> enemies)
+    private void ApplyShadowSelfStats(Chara shadow)
     {
-        Debug.Log($"[SukutsuArena] Spawning {bossCount} boss(es) (legacy)");
+        var pc = EClass.pc;
+        if (pc == null) return;
 
-        // 戦闘BGM設定
-        EClass._zone.SetBGM(102);
+        Debug.Log($"[SukutsuArena] Applying Shadow Self stats from player...");
 
-        for (int i = 0; i < bossCount; i++)
+        // プレイヤーの主要ステータスをコピー
+        // Element IDs: STR=70, END=71, DEX=73, PER=74, LER=75, WIL=76, MAG=77, CHA=79
+        int[] mainStats = { 70, 71, 73, 74, 75, 76, 77, 79 };
+        foreach (int statId in mainStats)
         {
-            string bossId = (bossIds != null && i < bossIds.Length) ? bossIds[i] : "hound";
-            Chara boss = null;
+            var pcElement = pc.elements.GetElement(statId);
+            if (pcElement != null)
+            {
+                int pcValue = pcElement.ValueWithoutLink;
+                shadow.elements.SetBase(statId, pcValue);
+                Debug.Log($"[SukutsuArena] Shadow: Set stat {statId} = {pcValue}");
+            }
+        }
+
+        // 戦闘関連ステータスもコピー
+        // DV=152, PV=153
+        int[] combatStats = { 152, 153 };
+        foreach (int statId in combatStats)
+        {
+            var pcElement = pc.elements.GetElement(statId);
+            if (pcElement != null)
+            {
+                int pcValue = pcElement.ValueWithoutLink;
+                shadow.elements.SetBase(statId, pcValue);
+                Debug.Log($"[SukutsuArena] Shadow: Set combat stat {statId} = {pcValue}");
+            }
+        }
+
+        // ========================================
+        // プレイヤーの外見（PCC）をコピー
+        // ========================================
+        CopyPlayerAppearance(shadow, pc);
+
+        // ========================================
+        // プレイヤーの装備をコピー
+        // ========================================
+        CopyPlayerEquipment(shadow, pc);
+
+        // ========================================
+        // アイテムドロップ無効化
+        // ========================================
+        shadow.noMove = false;  // 動けるようにはしておく
+        // 装備品は全てisNPCProperty=trueでドロップ防止済み（CopyPlayerEquipmentで設定）
+        Debug.Log($"[SukutsuArena] Shadow: Item drops disabled (via isNPCProperty)");
+
+        // 影の名前をカスタマイズ（プレイヤー名を含める）
+        shadow.c_altName = $"影の{pc.Name}";
+
+        Debug.Log($"[SukutsuArena] Shadow Self stats applied. Name: {shadow.c_altName}");
+    }
+
+    /// <summary>
+    /// プレイヤーの外見（PCC）を影にコピー
+    /// </summary>
+    private void CopyPlayerAppearance(Chara shadow, Chara pc)
+    {
+        Debug.Log($"[SukutsuArena] Copying player appearance to shadow...");
+
+        try
+        {
+            // PCCデータをコピー（キャラチップの外見）
+            if (pc.pccData != null)
+            {
+                shadow.pccData = pc.pccData;
+                Debug.Log($"[SukutsuArena] Shadow: Copied pccData");
+            }
+
+            // 生物学的情報をコピー（性別のみ確実にアクセス可能）
+            if (pc.bio != null && shadow.bio != null)
+            {
+                shadow.bio.SetGender(pc.bio.gender);
+                shadow.bio.height = pc.bio.height;
+                shadow.bio.weight = pc.bio.weight;
+                Debug.Log($"[SukutsuArena] Shadow: Copied bio data (gender={pc.bio.gender})");
+            }
+
+            // スキンIDをコピー
+            shadow.idSkin = pc.idSkin;
+            Debug.Log($"[SukutsuArena] Shadow: Copied idSkin={pc.idSkin}");
+
+            // レンダラーをリフレッシュ
+            shadow.Refresh();
+            Debug.Log($"[SukutsuArena] Shadow appearance copy complete");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogWarning($"[SukutsuArena] Failed to copy appearance: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// プレイヤーの装備を影にコピー
+    /// </summary>
+    private void CopyPlayerEquipment(Chara shadow, Chara pc)
+    {
+        Debug.Log($"[SukutsuArena] Copying player equipment to shadow...");
+
+        // 影の既存アイテムを全削除
+        shadow.things.DestroyAll();
+
+        // プレイヤーの装備スロットをイテレート（武器・防具のみ）
+        // コンテナスロット(elementId=44)は除外
+        foreach (var slot in pc.body.slots)
+        {
+            if (slot.thing == null) continue;
+
+            // コンテナスロット(44)をスキップ
+            if (slot.elementId == 44) continue;
 
             try
             {
-                boss = CharaGen.Create(bossId);
-            }
-            catch { }
-
-            if (boss == null || boss.id == "chicken")
-            {
-                if (boss != null) boss.Destroy();
-
-                string fallbackId = (bossLevel < 30) ? "putty" : "orc_warrior";
-                try
+                // 装備のコピーを作成
+                Thing copy = slot.thing.Duplicate(1);
+                if (copy != null)
                 {
-                    boss = CharaGen.Create(fallbackId);
-                }
-                catch
-                {
-                    boss = CharaGen.CreateFromFilter("c_neutral", bossLevel);
+                    // コピーした装備はNPCプロパティとしてマーク（ドロップ防止）
+                    copy.isNPCProperty = true;
+
+                    // 影に装備させる
+                    shadow.AddThing(copy);
+                    shadow.body.Equip(copy);
+
+                    Debug.Log($"[SukutsuArena] Shadow equipped: {copy.Name} in slot {slot.element?.alias ?? "unknown"}");
                 }
             }
-
-            if (boss.LV < bossLevel)
+            catch (System.Exception ex)
             {
-                boss.SetLv(bossLevel);
+                Debug.LogWarning($"[SukutsuArena] Failed to copy equipment: {slot.thing.Name} - {ex.Message}");
             }
-
-            if (stage >= 2)
-            {
-                boss.ChangeRarity(Rarity.Superior);
-            }
-            if (stage >= 4)
-            {
-                boss.ChangeRarity(Rarity.Legendary);
-            }
-
-            Point pos = GetSpawnPos(centerPos, 3 + (i % 3));
-            EClass._zone.AddCard(boss, pos);
-            enemies.Add(boss);
-
-            Debug.Log($"[SukutsuArena] Spawned: {boss.Name} (Lv.{boss.LV}) at {pos}");
         }
+
+        // 装備後にステータスを再計算
+        shadow.Refresh();
+        Debug.Log($"[SukutsuArena] Shadow equipment copy complete");
+    }
+
+    /// <summary>
+    /// ボスキャラクターの耐久を10倍に設定
+    /// </summary>
+    private void ApplyBossEnduranceBoost(Chara boss)
+    {
+        // Element ID: END = 71
+        const int END_ELEMENT_ID = 71;
+        const int BOSS_ENDURANCE_MULTIPLIER = 10;
+
+        var endElement = boss.elements.GetElement(END_ELEMENT_ID);
+        int currentEnd = endElement?.ValueWithoutLink ?? 10;
+        int boostedEnd = currentEnd * BOSS_ENDURANCE_MULTIPLIER;
+
+        boss.elements.SetBase(END_ELEMENT_ID, boostedEnd);
+
+        Debug.Log($"[SukutsuArena] Boss Endurance Boost: {boss.Name} END {currentEnd} -> {boostedEnd} (x{BOSS_ENDURANCE_MULTIPLIER})");
     }
 
     /// <summary>

@@ -5,166 +5,11 @@ using DG.Tweening;
 namespace Elin_SukutsuArena
 {
     /// <summary>
-    /// アリーナのステージ設定を保持するクラス（旧互換用）
-    /// </summary>
-    public class ArenaStageConfig
-    {
-        public string[] MonsterIds { get; set; }
-        public int[] MonsterLevels { get; set; }
-        public string[] MonsterRarities { get; set; }
-        public int RewardPlat { get; set; }
-        public string ZoneType { get; set; }
-        public string BgmBattle { get; set; }
-        public string BgmVictory { get; set; }
-        public string StageId { get; set; }
-    }
-
-    /// <summary>
     /// アリーナ管理クラス
     /// CWL eval から呼び出すためにstatic メソッドを提供
     /// </summary>
     public static class ArenaManager
     {
-        /// <summary>
-        /// ステージごとの敵設定を取得
-        /// </summary>
-        public static ArenaStageConfig GetStageConfig(int stage, bool isRankUp = false)
-        {
-            // ランクアップ用の敵設定
-            if (isRankUp)
-            {
-                return new ArenaStageConfig
-                {
-                    MonsterIds = new[] { "putty", "putty", "putty", "putty", "putty" },
-                    MonsterLevels = new[] { 1, 1, 1, 1, 1 },
-                    RewardPlat = 5,
-                    ZoneType = "field"
-                };
-            }
-
-            // 通常ステージ設定
-            switch (stage)
-            {
-                case 1:
-                    return new ArenaStageConfig
-                    {
-                        MonsterIds = new[] { "wolf" },
-                        MonsterLevels = new[] { 1 },
-                        RewardPlat = 10,
-                        ZoneType = "field"
-                    };
-                case 2:
-                    return new ArenaStageConfig
-                    {
-                        MonsterIds = new[] { "centaur" },
-                        MonsterLevels = new[] { 1 },
-                        RewardPlat = 20,
-                        ZoneType = "field"
-                    };
-                case 3:
-                    return new ArenaStageConfig
-                    {
-                        MonsterIds = new[] { "minotaur" },
-                        MonsterLevels = new[] { 1 },
-                        RewardPlat = 30,
-                        ZoneType = "field"
-                    };
-                case 4:
-                    return new ArenaStageConfig
-                    {
-                        MonsterIds = new[] { "dragon" },
-                        MonsterLevels = new[] { 1 },
-                        RewardPlat = 50,
-                        ZoneType = "field"
-                    };
-                default:
-                    return new ArenaStageConfig
-                    {
-                        MonsterIds = new[] { "wolf" },
-                        MonsterLevels = new[] { 1 },
-                        RewardPlat = 10,
-                        ZoneType = "field"
-                    };
-            }
-        }
-
-        /// <summary>
-        /// 戦闘開始（CWL evalから呼び出し）
-        /// </summary>
-        /// <param name="master">アリーナマスター</param>
-        /// <param name="stage">ステージ番号</param>
-        /// <param name="isRankUp">ランク検定かどうか</param>
-        public static void StartBattle(Chara master, int stage, bool isRankUp = false)
-        {
-            Debug.Log($"[SukutsuArena] StartBattle called: master={master?.Name}, stage={stage}, isRankUp={isRankUp}");
-
-            if (master == null)
-            {
-                Debug.LogError("[SukutsuArena] Arena Master is null!");
-                return;
-            }
-
-            var config = GetStageConfig(stage, isRankUp);
-
-            // 一時戦闘マップを作成
-            Zone battleZone = SpatialGen.CreateInstance(config.ZoneType, new ZoneInstanceArenaBattle
-            {
-                uidMaster = master.uid,
-                returnX = master.pos.x,
-                returnZ = master.pos.z,
-                uidZone = EClass._zone.uid,
-                bossCount = config.MonsterIds.Length,
-                stage = stage,
-                rewardPlat = config.RewardPlat,
-                isRankUp = isRankUp
-            });
-
-            // 敵配置イベントを追加
-            battleZone.events.AddPreEnter(new ZonePreEnterArenaBattle
-            {
-                bossLevel = config.MonsterLevels[0],
-                bossCount = config.MonsterIds.Length,
-                bossIds = config.MonsterIds,
-                stage = stage,
-                isRankUp = isRankUp
-            });
-
-            // 戦闘監視イベントを追加
-            battleZone.events.Add(new ZoneEventArenaBattle());
-
-            Debug.Log($"[SukutsuArena] Created battle zone, moving player...");
-
-            // ダイアログ終了後にゾーン移動
-            LayerDrama.Instance?.SetOnKill(() =>
-            {
-                Debug.Log($"[SukutsuArena] Drama closed, moving to battle zone");
-                EClass.pc.MoveZone(battleZone, ZoneTransition.EnterState.Center);
-            });
-        }
-
-        /// <summary>
-        /// 戦闘開始（キャラクターIDからマスターを検索）
-        /// 別のドラマから呼び出す場合に使用
-        /// </summary>
-        /// <param name="masterId">アリーナマスターのキャラクターID</param>
-        /// <param name="stage">ステージ番号</param>
-        /// <param name="isRankUp">ランク検定かどうか</param>
-        public static void StartBattleById(string masterId, int stage, bool isRankUp = false)
-        {
-            Debug.Log($"[SukutsuArena] StartBattleById called: masterId={masterId}, stage={stage}, isRankUp={isRankUp}");
-
-            // ゾーン内からマスターを検索
-            var master = EClass._zone.FindChara(masterId);
-            if (master == null)
-            {
-                Debug.LogError($"[SukutsuArena] Arena Master not found by ID: {masterId}");
-                return;
-            }
-
-            // 既存のStartBattleに委譲
-            StartBattle(master, stage, isRankUp);
-        }
-
         /// <summary>
         /// ランク情報をログに表示（CWL evalから呼び出し）
         /// </summary>
@@ -287,23 +132,18 @@ namespace Elin_SukutsuArena
                 return;
             }
 
-            // ArenaStageConfigに変換
-            var config = ConvertToArenaStageConfig(stageData);
-
             // 一時戦闘マップを作成
-            Zone battleZone = SpatialGen.CreateInstance(config.ZoneType, new ZoneInstanceArenaBattle
+            Zone battleZone = SpatialGen.CreateInstance(stageData.ZoneType, new ZoneInstanceArenaBattle
             {
                 uidMaster = master.uid,
                 returnX = master.pos.x,
                 returnZ = master.pos.z,
                 uidZone = EClass._zone.uid,
-                bossCount = stageData.TotalEnemyCount,
-                stage = 0, // ステージID方式では使用しない
-                rewardPlat = config.RewardPlat,
+                rewardPlat = stageData.RewardPlat,
                 isRankUp = stageId.StartsWith("rank_"),
                 stageId = stageId,
-                bgmBattle = config.BgmBattle,
-                bgmVictory = config.BgmVictory
+                bgmBattle = stageData.BgmBattle,
+                bgmVictory = stageData.BgmVictory
             });
 
             // 敵配置イベントを追加
@@ -374,36 +214,281 @@ namespace Elin_SukutsuArena
             return null;
         }
 
-        /// <summary>
-        /// BattleStageDataをArenaStageConfigに変換
-        /// </summary>
-        private static ArenaStageConfig ConvertToArenaStageConfig(BattleStageData stageData)
-        {
-            var monsterIds = new System.Collections.Generic.List<string>();
-            var monsterLevels = new System.Collections.Generic.List<int>();
-            var monsterRarities = new System.Collections.Generic.List<string>();
+        // ============================================================
+        // 永久バフ付与システム（ランク昇格報酬）
+        // ============================================================
 
-            foreach (var enemy in stageData.Enemies)
+        /// <summary>
+        /// Rank D 昇格報酬: 銅貨稼ぎの加護
+        /// - 回避+5
+        /// - 運+3
+        /// </summary>
+        public static void GrantRankDBonus()
+        {
+            var pc = EClass.pc;
+            if (pc == null) return;
+
+            // 回避+5 (Element ID: 152 = DV)
+            pc.elements.ModBase(152, 5);
+            // 運+3 (Element ID: 78 = LUC)
+            pc.elements.ModBase(78, 3);
+
+            Msg.Say("【銅貨稼ぎの加護】回避+5、運+3 を獲得！");
+            Debug.Log("[SukutsuArena] Granted Rank D bonus: DV+5, LUC+3");
+        }
+
+        /// <summary>
+        /// Rank C 昇格報酬: 闘技場の鴉の加護
+        /// - クリティカル率向上（器用+5）
+        /// - スタミナ+10
+        /// </summary>
+        public static void GrantRankCBonus()
+        {
+            var pc = EClass.pc;
+            if (pc == null) return;
+
+            // 器用+5 (Element ID: 73 = DEX) - クリティカルに影響
+            pc.elements.ModBase(73, 5);
+            // スタミナ+10 (Element ID: 151 = Stamina)
+            pc.elements.ModBase(151, 10);
+
+            Msg.Say("【闘技場の鴉の加護】器用+5、スタミナ+10 を獲得！");
+            Debug.Log("[SukutsuArena] Granted Rank C bonus: DEX+5, Stamina+10");
+        }
+
+        /// <summary>
+        /// Rank B 昇格報酬: 銀翼の加護
+        /// - 全主要ステータス+3
+        /// - 魔法耐性+10
+        /// </summary>
+        public static void GrantRankBBonus()
+        {
+            var pc = EClass.pc;
+            if (pc == null) return;
+
+            // 主要ステータス全て+3
+            // STR=70, END=71, DEX=73, PER=74, LER=75, WIL=76, MAG=77, CHA=79
+            int[] mainStats = { 70, 71, 73, 74, 75, 76, 77, 79 };
+            foreach (int statId in mainStats)
             {
-                for (int i = 0; i < enemy.Count; i++)
-                {
-                    monsterIds.Add(enemy.CharaId);
-                    monsterLevels.Add(enemy.Level);
-                    monsterRarities.Add(enemy.Rarity);
-                }
+                pc.elements.ModBase(statId, 3);
             }
 
-            return new ArenaStageConfig
+            // 魔法耐性+10 (Element ID: 955 = resMagic)
+            pc.elements.ModBase(955, 10);
+
+            Msg.Say("【銀翼の加護】全ステータス+3、魔法耐性+10 を獲得！");
+            Debug.Log("[SukutsuArena] Granted Rank B bonus: All stats+3, Magic Resist+10");
+        }
+
+        /// <summary>
+        /// Rank A 昇格報酬: 黄金の戦鬼の加護（影の自己を倒した証）
+        /// - 筋力+5
+        /// - 魔力+5
+        /// - 回避+5
+        /// - PV+5
+        /// </summary>
+        public static void GrantRankABonus()
+        {
+            var pc = EClass.pc;
+            if (pc == null) return;
+
+            // 筋力+5 (Element ID: 70 = STR)
+            pc.elements.ModBase(70, 5);
+            // 魔力+5 (Element ID: 77 = MAG)
+            pc.elements.ModBase(77, 5);
+            // 回避+5 (Element ID: 152 = DV)
+            pc.elements.ModBase(152, 5);
+            // PV+5 (Element ID: 153 = PV)
+            pc.elements.ModBase(153, 5);
+
+            Msg.Say("【黄金の戦鬼】筋力+5、魔力+5、回避+5、PV+5 を獲得！");
+            Debug.Log("[SukutsuArena] Granted Rank A bonus: STR+5, MAG+5, DV+5, PV+5");
+        }
+
+        /// <summary>
+        /// Rank E 昇格報酬: 鉄屑の加護（カインを倒した証）
+        /// - 筋力+3
+        /// - PV+5
+        /// </summary>
+        public static void GrantRankEBonus()
+        {
+            var pc = EClass.pc;
+            if (pc == null) return;
+
+            // 筋力+3 (Element ID: 70 = STR)
+            pc.elements.ModBase(70, 3);
+            // PV+5 (Element ID: 153 = PV)
+            pc.elements.ModBase(153, 5);
+
+            Msg.Say("【鉄屑の加護】筋力+3、PV+5 を獲得！");
+            Debug.Log("[SukutsuArena] Granted Rank E bonus: STR+3, PV+5");
+        }
+
+        /// <summary>
+        /// Rank F 昇格報酬: 泥犬の加護（冷気を生き延びた証）
+        /// - 耐久+3
+        /// - 冷気耐性+5
+        /// </summary>
+        public static void GrantRankFBonus()
+        {
+            var pc = EClass.pc;
+            if (pc == null) return;
+
+            // 耐久+3 (Element ID: 71 = END)
+            pc.elements.ModBase(71, 3);
+            // 冷気耐性+5 (Element ID: 951 = resCold)
+            pc.elements.ModBase(951, 5);
+
+            Msg.Say("【泥犬の加護】耐久+3、冷気耐性+5 を獲得！");
+            Debug.Log("[SukutsuArena] Granted Rank F bonus: END+3, Cold Resist+5");
+        }
+
+        // ============================================================
+        // サブクエスト報酬バフ
+        // ============================================================
+
+        /// <summary>
+        /// リリィの私室クリア報酬: リリィの寵愛
+        /// - 魔力+5
+        /// - 回避+5
+        /// - 魅了耐性+10
+        /// </summary>
+        public static void GrantLilyPrivateBonus()
+        {
+            var pc = EClass.pc;
+            if (pc == null) return;
+
+            // 魔力+5 (Element ID: 77 = MAG)
+            pc.elements.ModBase(77, 5);
+            // 回避+5 (Element ID: 152 = DV)
+            pc.elements.ModBase(152, 5);
+            // 魅了耐性+10 (Element ID: 961 = resCharm)
+            pc.elements.ModBase(961, 10);
+
+            Msg.Say("【リリィの寵愛】魔力+5、回避+5、魅了耐性+10 を獲得！");
+            Debug.Log("[SukutsuArena] Granted Lily Private bonus: MAG+5, DV+5, resCharm+10");
+        }
+
+        /// <summary>
+        /// 上位存在クリア報酬: 観客の加護
+        /// - 回避+3
+        /// - 運+3
+        /// </summary>
+        public static void GrantUpperExistenceBonus()
+        {
+            var pc = EClass.pc;
+            if (pc == null) return;
+
+            // 回避+3 (Element ID: 152 = DV)
+            pc.elements.ModBase(152, 3);
+            // 運+3 (Element ID: 78 = LUC)
+            pc.elements.ModBase(78, 3);
+
+            Msg.Say("【観客の加護】回避+3、運+3 を獲得！");
+            Debug.Log("[SukutsuArena] Granted Upper Existence bonus: DV+3, LUC+3");
+        }
+
+        /// <summary>
+        /// バルガス訓練クリア報酬: 戦士の心得
+        /// - 筋力+3
+        /// - 器用+3
+        /// - PV+3
+        /// </summary>
+        public static void GrantBalgasTrainingBonus()
+        {
+            var pc = EClass.pc;
+            if (pc == null) return;
+
+            // 筋力+3 (Element ID: 70 = STR)
+            pc.elements.ModBase(70, 3);
+            // 器用+3 (Element ID: 73 = DEX)
+            pc.elements.ModBase(73, 3);
+            // PV+3 (Element ID: 153 = PV)
+            pc.elements.ModBase(153, 3);
+
+            Msg.Say("【戦士の心得】筋力+3、器用+3、PV+3 を獲得！");
+            Debug.Log("[SukutsuArena] Granted Balgas Training bonus: STR+3, DEX+3, PV+3");
+        }
+
+        /// <summary>
+        /// バルガス戦クリア報酬: 戦鬼の証
+        /// - 全耐性+5
+        /// - 筋力+5
+        /// - 耐久+5
+        /// </summary>
+        public static void GrantVsBalgasBonus()
+        {
+            var pc = EClass.pc;
+            if (pc == null) return;
+
+            // 筋力+5 (Element ID: 70 = STR)
+            pc.elements.ModBase(70, 5);
+            // 耐久+5 (Element ID: 71 = END)
+            pc.elements.ModBase(71, 5);
+            // 火炎耐性+5 (Element ID: 950)
+            pc.elements.ModBase(950, 5);
+            // 冷気耐性+5 (Element ID: 951)
+            pc.elements.ModBase(951, 5);
+            // 電撃耐性+5 (Element ID: 952)
+            pc.elements.ModBase(952, 5);
+            // 毒耐性+5 (Element ID: 953)
+            pc.elements.ModBase(953, 5);
+
+            Msg.Say("【戦鬼の証】筋力+5、耐久+5、各種耐性+5 を獲得！");
+            Debug.Log("[SukutsuArena] Granted VS Balgas bonus: STR+5, END+5, various resistances+5");
+        }
+
+        /// <summary>
+        /// リリィ真名クリア報酬: 真名の絆
+        /// - 魔力+10
+        /// - 精神耐性+20
+        /// - 魅了耐性+20
+        /// </summary>
+        public static void GrantLilyRealNameBonus()
+        {
+            var pc = EClass.pc;
+            if (pc == null) return;
+
+            // 魔力+10 (Element ID: 77 = MAG)
+            pc.elements.ModBase(77, 10);
+            // 精神耐性+20 (Element ID: 954 = resMind)
+            pc.elements.ModBase(954, 20);
+            // 魅了耐性+20 (Element ID: 961 = resCharm)
+            pc.elements.ModBase(961, 20);
+
+            Msg.Say("【真名の絆】魔力+10、精神耐性+20、魅了耐性+20 を獲得！");
+            Debug.Log("[SukutsuArena] Granted Lily Real Name bonus: MAG+10, resMind+20, resCharm+20");
+        }
+
+        /// <summary>
+        /// 最終決戦クリア報酬: 虚空の王の力
+        /// - 全主要ステータス+10
+        /// - 全耐性+10
+        /// </summary>
+        public static void GrantLastBattleBonus()
+        {
+            var pc = EClass.pc;
+            if (pc == null) return;
+
+            // 主要ステータス全て+10
+            // STR=70, END=71, DEX=73, PER=74, LER=75, WIL=76, MAG=77, CHA=79
+            int[] mainStats = { 70, 71, 73, 74, 75, 76, 77, 79 };
+            foreach (int statId in mainStats)
             {
-                MonsterIds = monsterIds.ToArray(),
-                MonsterLevels = monsterLevels.ToArray(),
-                MonsterRarities = monsterRarities.ToArray(),
-                RewardPlat = stageData.RewardPlat,
-                ZoneType = stageData.ZoneType,
-                BgmBattle = stageData.BgmBattle,
-                BgmVictory = stageData.BgmVictory,
-                StageId = stageData.StageId
-            };
+                pc.elements.ModBase(statId, 10);
+            }
+
+            // 全耐性+10
+            // 火炎=950, 冷気=951, 電撃=952, 毒=953, 精神=954, 魔法=955
+            int[] resistances = { 950, 951, 952, 953, 954, 955 };
+            foreach (int resId in resistances)
+            {
+                pc.elements.ModBase(resId, 10);
+            }
+
+            Msg.Say("【虚空の王の力】全ステータス+10、全耐性+10 を獲得！");
+            Debug.Log("[SukutsuArena] Granted Last Battle bonus: All stats+10, All resistances+10");
         }
     }
 }

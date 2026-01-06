@@ -173,6 +173,8 @@ def add_rank_up_E_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .complete_quest(QuestIds.RANK_UP_E) \
         .set_flag(Keys.RANK, 3) \
         .mod_flag(Keys.REL_BALGAS, "+", 15) \
+        .say("sys_title", "【システム】称号『鉄屑（Iron Scrap）』を獲得しました。筋力+3、PV+5 の加護を得た！", "") \
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantRankEBonus();") \
         .jump(return_label)
 
     # ========================================

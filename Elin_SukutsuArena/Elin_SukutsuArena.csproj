@@ -70,6 +70,10 @@
       <HintPath>elin_link\Elin_Data\Managed\Plugins.Sound.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Plugins.ActorSystem">
+      <HintPath>elin_link\Elin_Data\Managed\Plugins.ActorSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="DOTween">
       <HintPath>elin_link\Elin_Data\Managed\DOTween.dll</HintPath>
       <Private>False</Private>

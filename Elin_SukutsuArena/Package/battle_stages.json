@@ -279,7 +279,7 @@
       "zoneType": "field",
       "bgmBattle": "BGM/Battle_Astaroth_Phase1",
       "bgmVictory": "BGM/Final_Liberation",
-      "rewardPlat": 1000,
+      "rewardPlat": 10000,
       "enemies": [
         {
           "charaId": "sukutsu_astaroth",
@@ -393,6 +393,60 @@
       "gimmicks": [],
       "descriptionJp": "",
       "descriptionEn": ""
+    },
+    "upper_existence_battle": {
+      "stageId": "upper_existence_battle",
+      "displayNameJp": "見えざる観客の供物",
+      "displayNameEn": "Offering to the Unseen Audience",
+      "zoneType": "field",
+      "bgmBattle": "BGM/Battle_Audience_Chaos",
+      "bgmVictory": "",
+      "rewardPlat": 15,
+      "enemies": [
+        {
+          "charaId": "gladiator",
+          "level": 100,
+          "rarity": "Superior",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": true,
+          "count": 1
+        },
+        {
+          "charaId": "gladiator",
+          "level": 80,
+          "rarity": "Normal",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": false,
+          "count": 2
+        }
+      ],
+      "gimmicks": [
+        {
+          "gimmickType": "audience_interference",
+          "interval": 5.0,
+          "damage": 20,
+          "radius": 3,
+          "startDelay": 3.0,
+          "effectName": "explosion",
+          "soundName": "explosion",
+          "enableEscalation": true,
+          "escalationRate": 0.92,
+          "minInterval": 1.0,
+          "maxRadius": 5,
+          "radiusGrowthInterval": 25.0,
+          "enableItemDrop": true,
+          "itemDropChance": 0.15,
+          "blastRadius": 2,
+          "directHitChance": 0.35,
+          "explosionCount": 1
+        }
+      ],
+      "descriptionJp": "観客の「注目」が初めて向けられる戦い。彼らのヤジは物理的な力となって降り注ぐ。",
+      "descriptionEn": "The first battle where the audience's 'attention' focuses on you. Their jeers manifest as physical force."
     }
   },
   "debugStages": {
@@ -675,7 +729,7 @@
       "zoneType": "field",
       "bgmBattle": "BGM/Battle_Astaroth_Phase1",
       "bgmVictory": "BGM/Final_Liberation",
-      "rewardPlat": 1000,
+      "rewardPlat": 10000,
       "enemies": [
         {
           "charaId": "sukutsu_astaroth",
@@ -787,6 +841,60 @@
       "gimmicks": [],
       "descriptionJp": "",
       "descriptionEn": ""
+    },
+    "upper_existence_battle": {
+      "stageId": "upper_existence_battle",
+      "displayNameJp": "見えざる観客の供物",
+      "displayNameEn": "Offering to the Unseen Audience",
+      "zoneType": "field",
+      "bgmBattle": "BGM/Battle_Audience_Chaos",
+      "bgmVictory": "",
+      "rewardPlat": 15,
+      "enemies": [
+        {
+          "charaId": "gladiator",
+          "level": 100,
+          "rarity": "Superior",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": true,
+          "count": 1
+        },
+        {
+          "charaId": "gladiator",
+          "level": 80,
+          "rarity": "Normal",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": false,
+          "count": 2
+        }
+      ],
+      "gimmicks": [
+        {
+          "gimmickType": "audience_interference",
+          "interval": 5.0,
+          "damage": 20,
+          "radius": 3,
+          "startDelay": 3.0,
+          "effectName": "explosion",
+          "soundName": "explosion",
+          "enableEscalation": true,
+          "escalationRate": 0.92,
+          "minInterval": 1.0,
+          "maxRadius": 5,
+          "radiusGrowthInterval": 25.0,
+          "enableItemDrop": true,
+          "itemDropChance": 0.15,
+          "blastRadius": 2,
+          "directHitChance": 0.35,
+          "explosionCount": 1
+        }
+      ],
+      "descriptionJp": "観客の「注目」が初めて向けられる戦い。彼らのヤジは物理的な力となって降り注ぐ。",
+      "descriptionEn": "The first battle where the audience's 'attention' focuses on you. Their jeers manifest as physical force."
     },
     "debug_weak": {
       "stageId": "debug_weak",

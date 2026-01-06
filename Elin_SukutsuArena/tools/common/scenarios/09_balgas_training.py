@@ -127,7 +127,6 @@ def define_balgas_training(builder: DramaBuilder):
         .say("balgas_9", "魔法でも、薬でも、卑怯な手でも何でも使え。", "", actor=balgas) \
         .say("balgas_10", "戦士の哲学とは、『手段』を尽くした先にある『目的』の純粋さだ！", "", actor=balgas) \
         .say("narr_10", "（バルガスとの特別な手合わせが始まる……！）", "", actor=pc) \
-        .action("eval", param="UnityEngine.Debug.Log(\"[SukutsuArena] TODO: バルガス訓練戦闘 - 満足度システム\");") \
         .jump(scene4)
 
     # ========================================
@@ -210,6 +209,6 @@ def define_balgas_training(builder: DramaBuilder):
     builder.step(ending) \
         .complete_quest(QuestIds.BALGAS_TRAINING) \
         .mod_flag(Keys.REL_BALGAS, "+", 20) \
-        .say("sys_title", "【システム】バルガスの哲学を学びました。", "", actor=pc) \
-        .action("eval", param="UnityEngine.Debug.Log(\"[SukutsuArena] TODO: バフ付与処理 - 永続的な戦闘力向上\");") \
+        .say("sys_title", "【システム】『戦士の心得』を獲得しました。筋力+3、器用+3、PV+3 の加護を得た！", "") \
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantBalgasTrainingBonus();") \
         .finish()

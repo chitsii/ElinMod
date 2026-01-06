@@ -191,8 +191,8 @@ def add_rank_up_B_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .set_flag(Keys.RANK, 6) \
         .mod_flag(Keys.REL_BALGAS, "+", 20) \
         .mod_flag(Keys.REL_LILY, "+", 20) \
-        .say("sys_title", "【システム】称号『銀翼（Silver Wing）』を獲得しました。", "", actor=pc) \
-        .action("eval", param="UnityEngine.Debug.Log(\"[SukutsuArena] TODO: 称号付与処理 - 全ステータス+10%, 虚無耐性+50%\");") \
+        .say("sys_title", "【システム】称号『銀翼（Silver Wing）』を獲得しました。全ステータス+3、魔法耐性+10 の加護を得た！", "") \
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantRankBBonus();") \
         .jump(return_label)
 
     # ========================================

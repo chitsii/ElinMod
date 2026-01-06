@@ -332,11 +332,6 @@ class DramaBuilder:
         self.entries.append(entry)
         return self
 
-    def choice_if(self, jump_to: Union[str, DramaLabel], text_jp: str,
-                  condition: str, text_en: str = "", text_id: str = "") -> 'DramaBuilder':
-        """条件付き選択肢を追加 (choiceのエイリアス)"""
-        return self.choice(jump_to, text_jp, text_en, text_id, condition)
-
     def jump(self, jump_to: Union[str, DramaLabel]) -> 'DramaBuilder':
         """指定ステップにジャンプ"""
         key = self._resolve_key(jump_to)
@@ -414,40 +409,6 @@ class DramaBuilder:
             }
             self.entries.append(entry)
 
-        return self
-
-    def choices_with_cancel(self, choices: list, cancel_target: Union[str, DramaLabel]) -> 'DramaBuilder':
-        """
-        選択肢群とキャンセル時のジャンプ先をセットで追加。
-
-        Args:
-            choices: 選択肢のリスト。各要素は以下の形式:
-                     (jump_to, text_jp, text_en, text_id) または
-                     (jump_to, text_jp, text_en) または
-                     (jump_to, text_jp)
-            cancel_target: キャンセル時のジャンプ先
-
-        Example:
-            builder.choices_with_cancel([
-                (react_accept, "分かった", "", "c_accept"),
-                (react_refuse, "断る", "", "c_refuse"),
-                (react_silent, "（無言）", "", "c_silent"),
-            ], cancel_target=main_menu)
-        """
-        for item in choices:
-            if len(item) == 4:
-                jump_to, text_jp, text_en, text_id = item
-                self.choice(jump_to, text_jp, text_en, text_id)
-            elif len(item) == 3:
-                jump_to, text_jp, text_en = item
-                self.choice(jump_to, text_jp, text_en)
-            elif len(item) == 2:
-                jump_to, text_jp = item
-                self.choice(jump_to, text_jp)
-            else:
-                raise ValueError(f"Invalid choice format: {item}")
-
-        self.on_cancel(cancel_target)
         return self
 
     def choice_block(self, choices: List['ChoiceReaction'],

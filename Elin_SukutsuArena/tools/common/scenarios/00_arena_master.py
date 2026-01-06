@@ -6,12 +6,21 @@ from flag_definitions import (
     Motivation, Rank,
     PlayerFlags, RelFlags
 )
+import importlib
 from scenarios.rank_up.rank_g import add_rank_up_G_result_steps
 from scenarios.rank_up.rank_f import add_rank_up_F_result_steps
 from scenarios.rank_up.rank_e import add_rank_up_E_result_steps
 from scenarios.rank_up.rank_d import add_rank_up_D_result_steps
 from scenarios.rank_up.rank_c import add_rank_up_C_result_steps
 from scenarios.rank_up.rank_b import add_rank_up_B_result_steps
+from scenarios.rank_up.rank_a import add_rank_up_A_result_steps
+
+# モジュール名が数字で始まるためimportlibを使用
+_upper_existence_module = importlib.import_module('scenarios.07_upper_existence')
+add_upper_existence_result_steps = _upper_existence_module.add_upper_existence_result_steps
+
+_last_battle_module = importlib.import_module('scenarios.18_last_battle')
+add_last_battle_result_steps = _last_battle_module.add_last_battle_result_steps
 
 def define_arena_master_drama(builder: DramaBuilder):
     """
@@ -85,17 +94,27 @@ def define_arena_master_drama(builder: DramaBuilder):
     rank_up_defeat_c = builder.label("rank_up_defeat_c")
     rank_up_victory_b = builder.label("rank_up_victory_b")
     rank_up_defeat_b = builder.label("rank_up_defeat_b")
+    rank_up_victory_a = builder.label("rank_up_victory_a")
+    rank_up_defeat_a = builder.label("rank_up_defeat_a")
+
+    # Quest Battle Result Dispatch Logic
+    upper_existence_victory = builder.label("upper_existence_victory")
+    upper_existence_defeat = builder.label("upper_existence_defeat")
+    last_battle_victory = builder.label("last_battle_victory")
+    last_battle_defeat = builder.label("last_battle_defeat")
 
     # Main Step
     # ランクアップ結果の場合は勝敗フラグで分岐
+    # クエストバトル結果の場合も分岐
     builder.step(main) \
         .branch_if("sukutsu_is_rank_up_result", "==", 1, "rank_up_result_check") \
+        .branch_if("sukutsu_is_quest_battle_result", "==", 1, "quest_battle_result_check") \
         .branch_if("sukutsu_arena_result", "==", 1, victory_comment) \
         .branch_if("sukutsu_arena_result", "==", 2, defeat_comment) \
         .branch_if("sukutsu_gladiator", "==", 1, registered)
 
     # ランクアップ結果チェック（勝利/敗北を判定）
-    # sukutsu_rank_up_trial フラグで試験種別を判定: 1=G, 2=F, 3=E, 4=D, 5=C, 6=B
+    # sukutsu_rank_up_trial フラグで試験種別を判定: 1=G, 2=F, 3=E, 4=D, 5=C, 6=B, 7=A
     builder.label("rank_up_result_check")
     rank_up_result_g = builder.label("rank_up_result_g")
     rank_up_result_f = builder.label("rank_up_result_f")
@@ -103,6 +122,7 @@ def define_arena_master_drama(builder: DramaBuilder):
     rank_up_result_d = builder.label("rank_up_result_d")
     rank_up_result_c = builder.label("rank_up_result_c")
     rank_up_result_b = builder.label("rank_up_result_b")
+    rank_up_result_a = builder.label("rank_up_result_a")
 
     builder.step("rank_up_result_check") \
         .set_flag("sukutsu_is_rank_up_result", 0) \
@@ -113,6 +133,7 @@ def define_arena_master_drama(builder: DramaBuilder):
             4: rank_up_result_d,
             5: rank_up_result_c,
             6: rank_up_result_b,
+            7: rank_up_result_a,
         }, fallback=registered)
 
     # Rank G 結果分岐
@@ -157,6 +178,13 @@ def define_arena_master_drama(builder: DramaBuilder):
             2: rank_up_defeat_b,
         }, fallback=registered)
 
+    # Rank A 結果分岐
+    builder.step(rank_up_result_a) \
+        .switch_on_flag("sukutsu_arena_result", {
+            1: rank_up_victory_a,
+            2: rank_up_defeat_a,
+        }, fallback=registered)
+
     # === Rank G 昇格試験 勝利/敗北 ===
     add_rank_up_G_result_steps(builder, rank_up_victory_g, rank_up_defeat_g, registered_choices)
 
@@ -174,6 +202,44 @@ def define_arena_master_drama(builder: DramaBuilder):
 
     # === Rank B 昇格試験 勝利/敗北 ===
     add_rank_up_B_result_steps(builder, rank_up_victory_b, rank_up_defeat_b, registered_choices)
+
+    # === Rank A 昇格試験 勝利/敗北 ===
+    add_rank_up_A_result_steps(builder, rank_up_victory_a, rank_up_defeat_a, registered_choices)
+
+    # ========================================
+    # クエストバトル結果チェック
+    # ========================================
+    # sukutsu_quest_battle フラグで戦闘種別を判定: 1=upper_existence, 3=last_battle
+    builder.label("quest_battle_result_check")
+    quest_battle_result_upper_existence = builder.label("quest_battle_result_upper_existence")
+    quest_battle_result_last_battle = builder.label("quest_battle_result_last_battle")
+
+    builder.step("quest_battle_result_check") \
+        .set_flag("sukutsu_is_quest_battle_result", 0) \
+        .switch_on_flag("sukutsu_quest_battle", {
+            1: quest_battle_result_upper_existence,
+            3: quest_battle_result_last_battle,
+        }, fallback=registered)
+
+    # Upper Existence 結果分岐
+    builder.step(quest_battle_result_upper_existence) \
+        .switch_on_flag("sukutsu_arena_result", {
+            1: upper_existence_victory,
+            2: upper_existence_defeat,
+        }, fallback=registered)
+
+    # Last Battle 結果分岐
+    builder.step(quest_battle_result_last_battle) \
+        .switch_on_flag("sukutsu_arena_result", {
+            1: last_battle_victory,
+            2: last_battle_defeat,
+        }, fallback=registered)
+
+    # === Upper Existence クエスト 勝利/敗北 ===
+    add_upper_existence_result_steps(builder, upper_existence_victory, upper_existence_defeat, registered_choices)
+
+    # === Last Battle クエスト 勝利/敗北 ===
+    add_last_battle_result_steps(builder, last_battle_victory, last_battle_defeat, registered_choices)
 
 
     # Victory/Defeat Comments (Directly add choices)
@@ -202,12 +268,14 @@ def define_arena_master_drama(builder: DramaBuilder):
     start_rank_d = builder.label("start_rank_d")
     start_rank_c = builder.label("start_rank_c")
     start_rank_b = builder.label("start_rank_b")
+    start_rank_a = builder.label("start_rank_a")
     start_rank_g_confirmed = builder.label("start_rank_g_confirmed")
     start_rank_f_confirmed = builder.label("start_rank_f_confirmed")
     start_rank_e_confirmed = builder.label("start_rank_e_confirmed")
     start_rank_d_confirmed = builder.label("start_rank_d_confirmed")
     start_rank_c_confirmed = builder.label("start_rank_c_confirmed")
     start_rank_b_confirmed = builder.label("start_rank_b_confirmed")
+    start_rank_a_confirmed = builder.label("start_rank_a_confirmed")
 
     # 昇格試験チェックのエントリーポイント
     # sukutsu_quest_target_name: 11=G, 12=F, 13=E, 14=D, 15=C, 16=B
@@ -221,6 +289,7 @@ def define_arena_master_drama(builder: DramaBuilder):
             (QuestIds.RANK_UP_D, start_rank_d),
             (QuestIds.RANK_UP_C, start_rank_c),
             (QuestIds.RANK_UP_B, start_rank_b),
+            (QuestIds.RANK_UP_A, start_rank_a),
         ]) \
         .switch_on_flag("sukutsu_quest_target_name", {
             11: start_rank_g,
@@ -229,6 +298,7 @@ def define_arena_master_drama(builder: DramaBuilder):
             14: start_rank_d,
             15: start_rank_c,
             16: start_rank_b,
+            17: start_rank_a,
         }, fallback=rank_up_not_ready)
 
     # 利用可能な昇格試験がない場合
@@ -312,6 +382,19 @@ def define_arena_master_drama(builder: DramaBuilder):
     builder.step(start_rank_b_confirmed) \
         .set_flag("sukutsu_rank_up_trial", 6) \
         .say_and_start_drama("……虚空を見つめるな。飲み込まれるぞ。", DramaNames.RANK_UP_B, "sukutsu_arena_master") \
+        .jump(end)
+
+    # ランクA試験開始確認
+    builder.step(start_rank_a) \
+        .say("rank_up_confirm_a", "『影との戦い』だ。お前自身の影と戦うことになる。覚悟はいいか？", "", actor=vargus) \
+        .choice(start_rank_a_confirmed, "挑む", "", text_id="c_confirm_rup_a") \
+        .choice(registered_choices, "やめておく", "", text_id="c_cancel_rup") \
+        .on_cancel(registered_choices)
+
+    # ランクA試験実行
+    builder.step(start_rank_a_confirmed) \
+        .set_flag("sukutsu_rank_up_trial", 7) \
+        .say_and_start_drama("……行ってこい。お前の内なる敵を、打ち倒せ。", DramaNames.RANK_UP_A, "sukutsu_arena_master") \
         .jump(end)
 
 
@@ -458,6 +541,7 @@ def define_arena_master_drama(builder: DramaBuilder):
     quest_rank_up_d = builder.label("quest_rank_up_d")
     quest_rank_up_c = builder.label("quest_rank_up_c")
     quest_rank_up_b = builder.label("quest_rank_up_b")
+    quest_rank_up_a = builder.label("quest_rank_up_a")
     # ストーリー系
     quest_zek_intro = builder.label("quest_zek_intro")
     quest_lily_exp = builder.label("quest_lily_exp")
@@ -504,6 +588,7 @@ def define_arena_master_drama(builder: DramaBuilder):
             (QuestIds.RANK_UP_D, quest_rank_up_d),
             (QuestIds.RANK_UP_C, quest_rank_up_c),
             (QuestIds.RANK_UP_B, quest_rank_up_b),
+            (QuestIds.RANK_UP_A, quest_rank_up_a),
         ]) \
         .switch_on_flag("sukutsu_quest_target_name", {
             # ランクアップ系
@@ -513,6 +598,7 @@ def define_arena_master_drama(builder: DramaBuilder):
             14: quest_rank_up_d,
             15: quest_rank_up_c,
             16: quest_rank_up_b,
+            17: quest_rank_up_a,
             # ストーリー系
             21: quest_zek_intro,
             22: quest_lily_exp,
@@ -552,6 +638,10 @@ def define_arena_master_drama(builder: DramaBuilder):
 
     builder.step(quest_rank_up_b) \
         .say("quest_rank_b_info", "【昇格試験】ランクB『虚無の処刑人』が受けられるぜ。「昇格試験を受けたい」を選んでくれ。", "", actor=vargus) \
+        .jump(registered_choices)
+
+    builder.step(quest_rank_up_a) \
+        .say("quest_rank_a_info", "【昇格試験】ランクA『影との戦い』が受けられるぜ。「昇格試験を受けたい」を選んでくれ。", "", actor=vargus) \
         .jump(registered_choices)
 
     # === ストーリー系クエスト ===

@@ -4,9 +4,10 @@
 """
 
 from drama_builder import DramaBuilder
-from flag_definitions import Keys, Actors
+from arena_drama_builder import ArenaDramaBuilder
+from flag_definitions import Keys, Actors, QuestIds
 
-def define_upper_existence(builder: DramaBuilder):
+def define_upper_existence(builder: ArenaDramaBuilder):
     """
     上位存在の観察 - Rank D初戦
     シナリオ: 07_upper_existence.md
@@ -25,17 +26,6 @@ def define_upper_existence(builder: DramaBuilder):
     react1_ok = builder.label("react1_ok")
     scene2 = builder.label("scene2_announcement")
     scene3 = builder.label("scene3_battle")
-    scene4 = builder.label("scene4_aftermath")
-    reward_choice = builder.label("reward_choice")
-    reward_cloth = builder.label("reward_cloth")
-    reward_iron = builder.label("reward_iron")
-    reward_bone = builder.label("reward_bone")
-    reward_end = builder.label("reward_end")
-    final_choice = builder.label("final_choice")
-    final_next = builder.label("final_next")
-    final_stop = builder.label("final_stop")
-    final_tired = builder.label("final_tired")
-    ending = builder.label("ending")
 
     # ========================================
     # シーン1: 鉄格子の前の警告
@@ -93,87 +83,92 @@ def define_upper_existence(builder: DramaBuilder):
         .jump(scene3)
 
     # ========================================
-    # シーン3: 戦闘中の「異次元のヤジ」
+    # シーン3: 戦闘開始
     # ========================================
     builder.step(scene3) \
-        .play_bgm("BGM/Battle_Audience_Chaos") \
         .say("narr_6", "（対戦相手である「異次元の剣闘士」と刃を交えた瞬間、頭上の虚空が歪む。）", "", actor=pc) \
         .shake() \
-        .say("narr_7", "（紫色の閃光と共に、戦場に「異質な物体」が次々と降り注ぎ始めた。）", "", actor=pc) \
+        .say("narr_7", "（紫色の閃光と共に、戦場に「異質な物体」が次々と降り注ぎ始めた……！）", "", actor=pc) \
         .shake() \
-        .action("eval", param="UnityEngine.Debug.Log(\"[SukutsuArena] TODO: 観客のヤジ戦闘 - 落下物ギミック\");") \
-        .jump(scene4)
+        .set_flag("sukutsu_is_quest_battle_result", 1) \
+        .set_flag("sukutsu_quest_battle", 1) \
+        .start_battle_by_stage("upper_existence_battle", master_id="sukutsu_arena_master") \
+        .finish()
+
+
+def add_upper_existence_result_steps(builder: ArenaDramaBuilder, victory_label: str, defeat_label: str, return_label: str):
+    """
+    上位存在クエストの勝利/敗北ステップを arena_master ビルダーに追加する
+
+    Args:
+        builder: arena_master の ArenaDramaBuilder インスタンス
+        victory_label: 勝利ステップのラベル名
+        defeat_label: 敗北ステップのラベル名
+        return_label: 結果表示後にジャンプするラベル名
+    """
+    pc = Actors.PC
+    lily = Actors.LILY
+    balgas = Actors.BALGAS
 
     # ========================================
-    # シーン4: 嘲笑の中の幕引き
+    # 上位存在クエスト 勝利
     # ========================================
-    builder.step(scene4) \
+    builder.step(victory_label) \
+        .set_flag("sukutsu_arena_result", 0) \
         .play_bgm("BGM/Lobby_Normal") \
-        .say("narr_8", "（満身創痍で敵を倒した瞬間、会場を包んだのは喝采ではなく、勝者を馬鹿にするような高い笑い声だった。）", "", actor=pc) \
-        .say("narr_9", "（ロビーに戻ると、リリィがクスクスと笑いながら出迎える。）", "", actor=pc) \
+        .say("narr_v1", "（満身創痍で敵を倒した瞬間、会場を包んだのは喝采ではなく、勝者を馬鹿にするような高い笑い声だった。）", "", actor=pc) \
+        .say("narr_v2", "（ロビーに戻ると、リリィがクスクスと笑いながら出迎える。）", "", actor=pc) \
         .focus_chara(Actors.LILY) \
-        .say("lily_5", "……ふふ、見事な逃げ回りっぷりでした。", "", actor=lily) \
-        .say("lily_6", "上の方々は、あなたが重力石に足を取られた時の慌てた顔が、今日一番の傑作だったと仰っていますよ。", "", actor=lily) \
-        .say("narr_10", "（バルガスが近づいてくる。）", "", actor=pc) \
+        .say("lily_v1", "……ふふ、見事な逃げ回りっぷりでした。", "", actor=lily) \
+        .say("lily_v2", "上の方々は、あなたが重力石に足を取られた時の慌てた顔が、今日一番の傑作だったと仰っていますよ。", "", actor=lily) \
+        .say("narr_v3", "（バルガスが近づいてくる。）", "", actor=pc) \
         .focus_chara(Actors.BALGAS) \
-        .say("balgas_8", "……ケッ、笑わせておけ。", "", actor=balgas) \
-        .say("balgas_9", "生き残れば、そのヤジもいつかは『金』に変わる。", "", actor=balgas) \
-        .say("balgas_10", "だがな、次はもっと酷いもんが降ってくるぜ。連中はすぐに飽きるからな。", "", actor=balgas) \
-        .say("balgas_11", "常に奴らの想像を越える『絶望』を見せてやるか、さっさと全員を黙らせるほど強くなるか……", "", actor=balgas) \
-        .say("balgas_12", "選ぶのはお前だ。", "", actor=balgas) \
-        .say("narr_11", "（リリィは台帳を開き、報酬を記録する。）", "", actor=pc) \
+        .say("balgas_v1", "……ケッ、笑わせておけ。", "", actor=balgas) \
+        .say("balgas_v2", "生き残れば、そのヤジもいつかは『金』に変わる。", "", actor=balgas) \
+        .say("balgas_v3", "だがな、次はもっと酷いもんが降ってくるぜ。連中はすぐに飽きるからな。", "", actor=balgas) \
         .focus_chara(Actors.LILY) \
-        .say("lily_7", "では、報酬の授与です。", "", actor=lily) \
-        .say("lily_8", "観客からの投げ銭……小さなコイン10枚とプラチナコイン2枚。それと、戦闘記録として素材を一つ選んでいただけます。", "", actor=lily) \
-        .jump(reward_choice)
+        .say("lily_v3", "では、報酬の授与です。", "", actor=lily) \
+        .say("lily_v4", "観客からの投げ銭……小さなコイン10枚とプラチナコイン2枚。それと、素材を一つ選んでいただけます。", "", actor=lily)
 
     # 報酬選択肢
-    builder.choice(reward_cloth, "布の切れ端を頼む", "", text_id="c_reward_cloth") \
-           .choice(reward_iron, "鉄の欠片が欲しい", "", text_id="c_reward_iron") \
-           .choice(reward_bone, "骨を選ぶ", "", text_id="c_reward_bone")
+    reward_cloth_ue = builder.label("reward_cloth_ue")
+    reward_iron_ue = builder.label("reward_iron_ue")
+    reward_bone_ue = builder.label("reward_bone_ue")
+    reward_end_ue = builder.label("reward_end_ue")
 
-    builder.step(reward_cloth) \
-        .say("lily_rew1", "『布の切れ端×1』、記録いたしました。地味ですが、実用的ですね。", "", actor=lily) \
+    builder.choice(reward_cloth_ue, "布の切れ端を頼む", "", text_id="c_reward_cloth_ue") \
+           .choice(reward_iron_ue, "鉄の欠片が欲しい", "", text_id="c_reward_iron_ue") \
+           .choice(reward_bone_ue, "骨を選ぶ", "", text_id="c_reward_bone_ue")
+
+    builder.step(reward_cloth_ue) \
+        .say("lily_rew1_ue", "『布の切れ端×1』、記録いたしました。", "", actor=lily) \
         .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"cloth\"));") \
-        .jump(reward_end)
+        .jump(reward_end_ue)
 
-    builder.step(reward_iron) \
-        .say("lily_rew2", "『鉄の欠片×1』、記録いたしました。", "", actor=lily) \
+    builder.step(reward_iron_ue) \
+        .say("lily_rew2_ue", "『鉄の欠片×1』、記録いたしました。", "", actor=lily) \
         .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"fragment_iron\"));") \
-        .jump(reward_end)
+        .jump(reward_end_ue)
 
-    builder.step(reward_bone) \
-        .say("lily_rew3", "『骨×1』ですね。……安定の選択ですこと。", "", actor=lily) \
+    builder.step(reward_bone_ue) \
+        .say("lily_rew3_ue", "『骨×1』ですね。", "", actor=lily) \
         .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"bone\"));") \
-        .jump(reward_end)
+        .jump(reward_end_ue)
 
-    builder.step(reward_end) \
+    builder.step(reward_end_ue) \
         .action("eval", param="for(int i=0; i<10; i++) { EClass.pc.Pick(ThingGen.Create(\"coin\")); } for(int i=0; i<2; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
-        .say("lily_9", "記録完了です。", "", actor=lily) \
-        .say("lily_10", "……それと、今回の戦いで、あなたは観客の『ヤジ』を少し避けられるようになったようですね。称号も記録しておきました。", "", actor=lily) \
-        .jump(final_choice)
-
-    # 最終選択肢
-    builder.choice(final_next, "次も……同じことが起きるのか？", "", text_id="c_final_next") \
-           .choice(final_stop, "観客を黙らせる方法はないのか？", "", text_id="c_final_stop") \
-           .choice(final_tired, "（疲れた様子で頷く）", "", text_id="c_final_tired")
-
-    builder.step(final_next) \
-        .say("lily_r4", "ええ。むしろ、もっと酷くなりますよ。……楽しみにしていてくださいね？", "", actor=lily) \
-        .jump(ending)
-
-    builder.step(final_stop) \
-        .say("lily_r5", "ふふ、ありますよ。あなたが彼らの想像を絶する『絶望』を見せれば、彼らは熱狂し、ヤジは止まります。", "", actor=lily) \
-        .jump(ending)
-
-    builder.step(final_tired) \
-        .say("lily_r6", "……お疲れのようですね。ゆっくりお休みください。", "", actor=lily) \
-        .jump(ending)
+        .complete_quest(QuestIds.UPPER_EXISTENCE) \
+        .say("sys_title", "【システム】称号『笑われる者』を獲得しました。回避+3、運+3 の加護を得た！", "") \
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantUpperExistenceBonus();") \
+        .jump(return_label)
 
     # ========================================
-    # 終了処理
+    # 上位存在クエスト 敗北
     # ========================================
-    builder.step(ending) \
-        .say("sys_title", "【システム】称号『笑われる者』を獲得しました。", "", actor=pc) \
-        .action("eval", param="UnityEngine.Debug.Log(\"[SukutsuArena] TODO: 称号付与 - 落下物回避率+5%\");") \
-        .finish()
+    builder.step(defeat_label) \
+        .set_flag("sukutsu_arena_result", 0) \
+        .play_bgm("BGM/Lobby_Normal") \
+        .focus_chara(Actors.LILY) \
+        .say("lily_d1", "……あらあら、落下物に潰されてしまいましたね。", "", actor=lily) \
+        .say("lily_d2", "観客の皆様も、少し期待外れだったようです。また挑戦してくださいね。", "", actor=lily) \
+        .jump(return_label)

@@ -17,12 +17,6 @@ public class ZoneInstanceArenaBattle : ZoneInstance
     public int returnZ;
 
     [JsonProperty]
-    public int bossCount = 1;
-
-    [JsonProperty]
-    public int stage = 1;
-
-    [JsonProperty]
     public int rewardPlat = 10;
 
     [JsonProperty]
@@ -44,7 +38,7 @@ public class ZoneInstanceArenaBattle : ZoneInstance
     /// </summary>
     public override void OnLeaveZone()
     {
-        Debug.Log($"[SukutsuArena] OnLeaveZone called, stage={stage}");
+        Debug.Log($"[SukutsuArena] OnLeaveZone called, stageId={stageId}");
 
         // 勝利判定はZoneEventArenaBattleで行われ、フラグが立っているはず
         int result = EClass.player.dialogFlags.ContainsKey("sukutsu_arena_result")
@@ -63,7 +57,6 @@ public class ZoneInstanceArenaBattle : ZoneInstance
             // 既に勝利フラグがない場合のみ敗北とする
             Debug.Log("[SukutsuArena] Defeat or flee");
             EClass.player.dialogFlags["sukutsu_arena_result"] = 2;  // 敗北
-            EClass.player.dialogFlags["sukutsu_arena_failed_stage"] = stage;
             Msg.Say("アリーナから撤退した...");
 
             // 帰還後に自動会話

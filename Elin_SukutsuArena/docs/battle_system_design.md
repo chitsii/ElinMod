@@ -89,7 +89,7 @@ STAGES = {
 
 **C#側（ランタイム）**
 - JSONからステージ定義を読み込み
-- `ArenaManager.StartBattle(stageId)` で開始
+- `ArenaManager.StartBattleByStage(stageId, master)` で開始
 
 ---
 

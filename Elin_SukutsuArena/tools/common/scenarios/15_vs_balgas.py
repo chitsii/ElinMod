@@ -129,7 +129,6 @@ def define_vs_balgas(builder: DramaBuilder):
         .say("obs_2", "「英雄の魂を捧げろ！」", "", actor=pc) \
         .say("obs_3", "「屠竜者となる儀式だ！」", "", actor=pc) \
         .say("lily_voice", "（リリィの懇願の声が、闘技場に響く……「お願い……殺さないで……」）", "", actor=lily) \
-        .action("eval", param="UnityEngine.Debug.Log(\"[SukutsuArena] TODO: バルガス最終戦 - HP25%未満で一定ターン耐える\");") \
         .jump(scene4)
 
     # ========================================
@@ -287,8 +286,7 @@ def define_vs_balgas(builder: DramaBuilder):
         .set_flag(Keys.REL_BALGAS, 100) \
         .mod_flag(Keys.REL_LILY, "+", 30) \
         .set_flag(Keys.BALGAS_CHOICE, FlagValues.BalgasChoice.SPARED) \
-        .say("sys_title", "【システム】称号『理を拒む者（System Breaker）』を獲得しました。", "", actor=pc) \
-        .say("sys_buff", "【システム】バルガスの加護（永続）を獲得しました。", "", actor=pc) \
-        .action("eval", param="UnityEngine.Debug.Log(\"[SukutsuArena] TODO: 称号付与 - 状態異常耐性+30%, ピンチ時にバルガス加勢\");") \
-        .action("eval", param="UnityEngine.Debug.Log(\"[SukutsuArena] TODO: バフ付与 - 全スキル消費コスト-20%, バルガス幻影加勢\");") \
+        .say("sys_title", "【システム】称号『理を拒む者（System Breaker）』を獲得しました。", "") \
+        .say("sys_buff", "【システム】『戦鬼の証』を獲得しました。筋力+5、耐久+5、各種耐性+5 の加護を得た！", "") \
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantVsBalgasBonus();") \
         .finish()

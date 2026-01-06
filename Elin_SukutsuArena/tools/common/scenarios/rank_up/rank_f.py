@@ -148,7 +148,6 @@ def add_rank_up_F_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .focus_chara(Actors.LILY) \
         .say("lily_v1", "おめでとうございます。死体袋は、また次回まで取っておきましょう。", "", actor=lily) \
         .say("lily_v2", "この称号『泥犬』は、あなたがどれほど理不尽な環境でも生き延びる『害虫』のような生命力を持っている証です。……ふふ、褒めているのですよ？", "", actor=lily) \
-        .say("lily_v3", "さて、次は……もう少し『暑い』場所になるかもしれません。装備を整えておきなさい。……あなたの魂が、あまりに早く壊れてしまわないように。", "", actor=lily) \
         .say("lily_v4", "さて、報酬の授与です。観客からの投げ銭……**小さなコイン5枚**。それと、今回は少し難易度が高かったため、**プラチナコイン1枚**も追加されております。", "", actor=lily) \
         .say("lily_v5", "そして、戦闘記録として**素材を一つ**選んでいただけます。……氷の魔犬を倒した記念に、何か冷気に関する素材がよろしいのでは？", "", actor=lily)
 
@@ -180,6 +179,8 @@ def add_rank_up_F_result_steps(builder: DramaBuilder, victory_label: str, defeat
     builder.step(reward_end_f) \
         .action("eval", param="for(int i=0; i<5; i++) { EClass.pc.Pick(ThingGen.Create(\"coin\")); } EClass.pc.Pick(ThingGen.Create(\"plat\"));") \
         .complete_quest(QuestIds.RANK_UP_F) \
+        .say("sys_title", "【システム】称号『泥犬（Mud Dog）』を獲得しました。耐久+3、冷気耐性+5 の加護を得た！", "") \
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantRankFBonus();") \
         .say("lily_v6_f", "記録完了です。……それと、今回の戦いで、あなたの体が少し『冷気』に慣れたようですね。台帳にその変化も記録しておきました。", "", actor=lily)
 
     # 最終選択肢 (ラベル名に _f サフィックスを付けて衝突を回避)

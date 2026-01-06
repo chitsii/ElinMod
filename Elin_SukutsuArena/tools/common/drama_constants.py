@@ -35,6 +35,7 @@ class DramaIds:
     RANK_UP_D = "rank_up_D"
     RANK_UP_C = "rank_up_C"
     RANK_UP_B = "rank_up_B"
+    RANK_UP_A = "rank_up_A"
 
     # キャラクター関連
     ZEK_INTRO = "zek_intro"
@@ -75,6 +76,7 @@ class DramaNames:
     RANK_UP_D = f"drama_{DramaIds.RANK_UP_D}"
     RANK_UP_C = f"drama_{DramaIds.RANK_UP_C}"
     RANK_UP_B = f"drama_{DramaIds.RANK_UP_B}"
+    RANK_UP_A = f"drama_{DramaIds.RANK_UP_A}"
 
     # キャラクター関連
     ZEK_INTRO = f"drama_{DramaIds.ZEK_INTRO}"
@@ -109,6 +111,7 @@ ALL_DRAMA_IDS = [
     DramaIds.RANK_UP_D,
     DramaIds.RANK_UP_C,
     DramaIds.RANK_UP_B,
+    DramaIds.RANK_UP_A,
     DramaIds.ZEK_INTRO,
     DramaIds.ZEK_STEAL_BOTTLE,
     DramaIds.ZEK_STEAL_SOULGEM,

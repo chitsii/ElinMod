@@ -8,31 +8,6 @@ class ArenaDramaBuilder(DramaBuilder):
     C#側のAPI呼び出しをラップし、eval文字列の直接記述によるミスを防ぐ。
     """
 
-    def start_battle(self, stage: int, is_rank_up: bool = False, master_id: str = None) -> 'ArenaDramaBuilder':
-        """
-        戦闘を開始する
-
-        Args:
-            stage: ステージ番号 (1-4)
-            is_rank_up: 昇格試験フラグ
-            master_id: アリーナマスターのキャラクターID（省略時は tg を使用）
-                       別ドラマから呼び出す場合は明示的に指定すること
-
-        Note:
-            master_id を指定すると、C#側で EClass._zone.FindChara(id) を使ってマスターを取得します。
-            これにより、別のNPCがドラマの tg になっている場合でも正しいマスターで戦闘を開始できます。
-        """
-        bool_str = "true" if is_rank_up else "false"
-
-        if master_id:
-            # 明示的なIDが指定された場合、ゾーン内からキャラを検索して渡す
-            script = f"Elin_SukutsuArena.ArenaManager.StartBattleById(\"{master_id}\", {stage}, {bool_str});"
-        else:
-            # 従来通り tg を使用
-            script = f"Elin_SukutsuArena.ArenaManager.StartBattle(tg, {stage}, {bool_str});"
-
-        return self.action("eval", param=script)
-
     def show_rank_info_log(self) -> 'ArenaDramaBuilder':
         """
         ランク情報をログウィンドウに表示する

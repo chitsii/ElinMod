@@ -232,8 +232,7 @@ def define_lily_real_name(builder: DramaBuilder):
     builder.step(ending) \
         .set_flag(Keys.REL_LILY, 100) \
         .set_flag(Keys.LILY_TRUE_NAME, FlagValues.LilyTrueName.KNOWN) \
-        .say("sys_buff", "【システム】『真名の契約者』を獲得しました。", "", actor=pc) \
-        .say("sys_title", "【システム】称号『リリアリスの伴侶』を獲得しました。", "", actor=pc) \
-        .action("eval", param="UnityEngine.Debug.Log(\"[SukutsuArena] TODO: バフ付与 - リリィ支援魔法+50%, 召喚可能, 魅了/精神汚染無効\");") \
-        .action("eval", param="UnityEngine.Debug.Log(\"[SukutsuArena] TODO: 称号付与 - スタミナ/SAN値回復速度1.5倍\");") \
+        .say("sys_buff", "【システム】『真名の絆』を獲得しました。魔力+10、精神耐性+20、魅了耐性+20 の加護を得た！", "") \
+        .say("sys_title", "【システム】称号『リリアリスの伴侶』を獲得しました。", "") \
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantLilyRealNameBonus();") \
         .finish()

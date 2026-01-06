@@ -188,8 +188,8 @@ def add_rank_up_D_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .complete_quest(QuestIds.RANK_UP_D) \
         .set_flag(Keys.RANK, 4) \
         .mod_flag(Keys.REL_LILY, "+", 10) \
-        .say("sys_title", "【システム】称号『銅貨稼ぎ（Copper Earner）』を獲得しました。", "", actor=pc) \
-        .action("eval", param="UnityEngine.Debug.Log(\"[SukutsuArena] TODO: 称号付与処理 - 落下物回避率+10%, コイン獲得+5%\");") \
+        .say("sys_title", "【システム】称号『銅貨稼ぎ（Copper Earner）』を獲得しました。回避+5、運+3 の加護を得た！", "") \
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantRankDBonus();") \
         .jump(return_label)
 
     # ========================================

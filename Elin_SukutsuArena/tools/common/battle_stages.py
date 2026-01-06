@@ -383,6 +383,42 @@ NORMAL_STAGES: Dict[str, BattleStage] = {
             EnemyConfig("dragon", level=40, rarity="Legendary", is_boss=True),
         ],
     ),
+
+    # 上位存在クエスト: 見えざる観客の供物
+    "upper_existence_battle": BattleStage(
+        stage_id="upper_existence_battle",
+        display_name_jp="見えざる観客の供物",
+        display_name_en="Offering to the Unseen Audience",
+        zone_type="field",
+        bgm_battle="BGM/Battle_Audience_Chaos",
+        reward_plat=15,
+        enemies=[
+            # 異次元の剣闘士
+            EnemyConfig("gladiator", level=100, rarity="Superior", is_boss=True),
+            EnemyConfig("gladiator", level=80, count=2),
+        ],
+        gimmicks=[
+            GimmickConfig(
+                gimmick_type="audience_interference",
+                interval=5.0,
+                damage=20,
+                radius=3,
+                start_delay=3.0,
+                enable_escalation=True,
+                escalation_rate=0.92,
+                min_interval=1.0,
+                max_radius=5,
+                radius_growth_interval=25.0,
+                enable_item_drop=True,
+                item_drop_chance=0.15,
+                blast_radius=2,
+                direct_hit_chance=0.35,
+                explosion_count=1,
+            ),
+        ],
+        description_jp="観客の「注目」が初めて向けられる戦い。彼らのヤジは物理的な力となって降り注ぐ。",
+        description_en="The first battle where the audience's 'attention' focuses on you. Their jeers manifest as physical force.",
+    ),
 }
 
 

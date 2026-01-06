@@ -69,12 +69,15 @@ def define_debug_battle_drama(builder: DramaBuilder):
         .on_cancel(end)
 
     # === 通常バトルメニュー ===
+    battle_upper_existence = builder.label("battle_upper_existence")
+
     builder.step(menu_battle) \
         .say("battle_menu", "通常バトルを選択せよ。", "", actor=observer) \
         .choice(battle_stage1, "Stage 1: 森の狼", "", text_id="c_s1") \
         .choice(battle_stage2, "Stage 2: ケンタウロス", "", text_id="c_s2") \
         .choice(battle_stage3, "Stage 3: ミノタウロス", "", text_id="c_s3") \
         .choice(battle_stage4, "Stage 4: ドラゴン", "", text_id="c_s4") \
+        .choice(battle_upper_existence, "見えざる観客の供物", "", text_id="c_ue") \
         .choice(main, "戻る", "", text_id="c_back") \
         .on_cancel(main)
 
@@ -99,17 +102,12 @@ def define_debug_battle_drama(builder: DramaBuilder):
         .start_battle_by_stage("stage_4") \
         .finish()
 
-    # === ランクアップ試練メニュー ===
-    builder.step(menu_rank_trial) \
-        .say("trial_menu", "ランクアップ試練を選択せよ。", "", actor=observer) \
-        .choice(trial_g, "G: 屑肉の洗礼", "", text_id="c_tg") \
-        .choice(trial_f, "F: 氷獄の猟犬", "", text_id="c_tf") \
-        .choice(trial_e, "E: カインの亡霊", "", text_id="c_te") \
-        .choice(trial_d, "D: 銅貨稼ぎの洗礼", "", text_id="c_td") \
-        .choice(main, "戻る", "", text_id="c_back") \
-        .on_cancel(main)
+    builder.step(battle_upper_existence) \
+        .say("go", "見えざる観客の供物への試練へ……観客の妨害に注意せよ。", "", actor=observer) \
+        .start_battle_by_stage("upper_existence_battle") \
+        .finish()
 
-    # 追加メニュー（上位ランク）
+    # === ランクアップ試練メニュー ===
     menu_rank_trial_2 = builder.label("menu_rank_trial_2")
     builder.step(menu_rank_trial) \
         .say("trial_menu", "ランクアップ試練を選択せよ。", "", actor=observer) \
@@ -257,16 +255,6 @@ def define_debug_battle_drama(builder: DramaBuilder):
         .on_cancel(main)
 
     # ランク設定メニュー
-    builder.step(set_rank_menu) \
-        .say("rank_menu", "設定するランクを選択せよ。", "", actor=observer) \
-        .choice(set_rank_0, "Unranked (0)", "", text_id="c_r0") \
-        .choice(set_rank_1, "G (1)", "", text_id="c_r1") \
-        .choice(set_rank_2, "F (2)", "", text_id="c_r2") \
-        .choice(set_rank_3, "E (3)", "", text_id="c_r3") \
-        .choice(set_rank_4, "D (4)", "", text_id="c_r4") \
-        .choice(menu_flags, "戻る", "", text_id="c_back") \
-        .on_cancel(menu_flags)
-
     set_rank_menu_2 = builder.label("set_rank_menu_2")
     builder.step(set_rank_menu) \
         .say("rank_menu", "設定するランクを選択せよ。", "", actor=observer) \

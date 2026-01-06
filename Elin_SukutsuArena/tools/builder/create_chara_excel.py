@@ -78,6 +78,10 @@ npcs = []
 
 ZONE_ID = 'sukutsu_arena'  # カスタムゾーンID
 
+# キャラクターレンダリング用デフォルト設定
+# _idRenderData: 'chara' = バニラキャラスプライトシートを使用
+# tiles: タイルID（バニラキャラのスプライト位置）
+
 # 1. リリィ (サキュバス / 女性 / 受付嬢)
 npcs.append({
     'id': 'sukutsu_receptionist',
@@ -88,6 +92,8 @@ npcs.append({
     'aka': 'Charming Receptionist',
     'race': 'succubus',
     'job': 'shopkeeper',
+    '_idRenderData': '@chara',
+    'tiles': 340,  # succubus female
     'LV': 50,
     'hostility': 'Friend',
     'bio': 'f/1001/165/52/sexy',
@@ -109,6 +115,8 @@ npcs.append({
     'aka': 'Champion of Hundred Battles',
     'race': 'human',
     'job': 'warrior',
+    '_idRenderData': '@chara',
+    'tiles': 0,  # human male warrior
     'LV': 70,
     'hostility': 'Friend',
     'bio': 'm/1002/185/90/stern',
@@ -129,6 +137,8 @@ npcs.append({
     'aka': 'Dragon Scale Champion',
     'race': 'dragon',
     'job': 'warrior',
+    '_idRenderData': '@chara',
+    'tiles': 168,  # dragon
     'LV': 100,
     'hostility': 'Friend',
     'bio': 'm/1003/210/150/proud',
@@ -172,6 +182,8 @@ npcs.append({
     'aka': 'Dimensional Recorder',
     'race': 'spirit',
     'job': 'wizard',
+    '_idRenderData': '@chara',
+    'tiles': 478,  # spirit/wisp
     'LV': 999,
     'hostility': 'Friend',
     'bio': 'n/1005/160/0/mysterious',
@@ -197,6 +209,8 @@ npcs.append({
     'aka': 'Iron-Blooded Champion',
     'race': 'human',
     'job': 'warrior',
+    '_idRenderData': '@chara',
+    'tiles': 0,  # human male warrior
     'LV': 8000,  # Tier3: Lv.1,000-10,000
     'hostility': 'Enemy',
     'bio': 'm/1002/188/95/stern',
@@ -219,6 +233,8 @@ npcs.append({
     'aka': 'Dragon God of the Void',
     'race': 'dragon',
     'job': 'warrior',
+    '_idRenderData': '@chara',
+    'tiles': 168,  # dragon
     'LV': 50000,  # エンドコンテンツ: 次元深度
     'hostility': 'Enemy',
     'bio': 'm/1003/350/500/proud',
@@ -241,6 +257,8 @@ npcs.append({
     'aka': 'Forgotten Vice-Captain',
     'race': 'ghost',
     'job': 'warrior',
+    '_idRenderData': '@chara',
+    'tiles': 458,  # ghost
     'LV': 90,  # Tier1最終: Lv.1-100
     'hostility': 'Enemy',
     'bio': 'm/1006/180/0/melancholic',
@@ -263,6 +281,8 @@ npcs.append({
     'aka': 'Void Executioner',
     'race': 'machine',
     'job': 'thief',
+    '_idRenderData': '@chara',
+    'tiles': 536,  # machine/robot
     'LV': 800,  # Tier2最終: Lv.100-1,000
     'hostility': 'Enemy',
     'bio': 'f/1007/165/45/emotionless',
@@ -276,6 +296,7 @@ npcs.append({
 # 10. 影のドッペルゲンガー (Rank A昇格試験 / プレイヤーの影)
 # lore: 観客の「注目」がプレイヤーの影から生み出した存在
 # プレイヤーの全てを知り、全てを模倣する
+# Note: 影の自己はC#コードでPCの外見をコピーするため、tilesは仮の値
 npcs.append({
     'id': 'sukutsu_shadow_self',
     'Author': 'tishi.elin.sukutsu_arena',
@@ -285,6 +306,8 @@ npcs.append({
     'aka': 'Mirror Image',
     'race': 'shade',
     'job': 'warrior',
+    '_idRenderData': '@chara',
+    'tiles': 460,  # shade (fallback, C# will copy PC appearance)
     'LV': 2500,  # Tier3前半: Lv.1,000-10,000
     'hostility': 'Enemy',
     'bio': 'n/1008/170/60/sinister',

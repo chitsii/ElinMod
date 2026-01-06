@@ -25,6 +25,7 @@ from scenarios.rank_up.rank_e import define_rank_up_E
 from scenarios.rank_up.rank_d import define_rank_up_D
 from scenarios.rank_up.rank_c import define_rank_up_C
 from scenarios.rank_up.rank_b import define_rank_up_B
+from scenarios.rank_up.rank_a import define_rank_up_A
 
 # Import numbered scenario modules using importlib
 define_arena_master_drama = importlib.import_module('scenarios.00_arena_master').define_arena_master_drama
@@ -73,6 +74,7 @@ def main():
     process_scenario(output_dir_jp, DramaIds.RANK_UP_D, define_rank_up_D)
     process_scenario(output_dir_jp, DramaIds.RANK_UP_C, define_rank_up_C)
     process_scenario(output_dir_jp, DramaIds.RANK_UP_B, define_rank_up_B)
+    process_scenario(output_dir_jp, DramaIds.RANK_UP_A, define_rank_up_A)
 
     # --- Story Events ---
     process_scenario(output_dir_jp, DramaIds.ZEK_INTRO, define_zek_intro)
