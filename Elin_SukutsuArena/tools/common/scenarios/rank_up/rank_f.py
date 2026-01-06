@@ -113,10 +113,7 @@ def define_rank_up_F(builder: DramaBuilder):
         .say("narr_11", "（それは、体躯が氷の結晶で形成された、異形の魔犬の群れ。彼らが喉を鳴らすたび、大気が結晶化して地面に降り注ぐ。）", "", actor=pc) \
         .say("narr_12", "（中央には、ひと際巨大な影——『零度の咆哮者（ゼロ・ロアラー）』が、獲物を見定めていた。）", "", actor=pc) \
         .say("narr_13", "（その体躯は他の個体の二倍以上。背中には鋭利な氷の棘が無数に生え、吐息だけで周囲の空気を凍らせる。）", "", actor=pc) \
-        .say("obs_1", "……ふふ、新鮮な肉が凍り付く様を見るのは、何度見ても美しいわね", "", actor=pc) \
-        .say("obs_2", "賭けは『3分以内に凍死』で。", "", actor=pc) \
-        .say("obs_3", "いや、少しは抵抗するだろう。『5分』だ。", "", actor=pc) \
-        .start_battle(2, is_rank_up=True, master_id="sukutsu_arena_master") \
+        .start_battle_by_stage("rank_f_trial", master_id="sukutsu_arena_master") \
         .finish()
 
 

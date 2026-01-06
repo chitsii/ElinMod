@@ -133,9 +133,9 @@ class FlagValues:
     class Ending:
         """エンディング選択（18_last_battle）"""
         # Enum ordinals are 0-based: Ending enum has 3 values
-        RETURN_TO_SURFACE = 0     # 地上に戻る
-        REBUILD_ARENA = 1         # アリーナを再建
-        CHALLENGE_OBSERVERS = 2   # 観客に挑む
+        RESCUE = 0     # 連れ出し（皆を連れてイルヴァへ）
+        INHERIT = 1    # 継承（アリーナを純粋な闘技場として再建）
+        USURP = 2      # 簒奪（裏切りルート・孤独な王）
 
     class Motivation:
         """プレイヤーの動機"""
@@ -244,9 +244,9 @@ class KainSoulConfession(Enum):
 
 class Ending(Enum):
     """エンディング選択（scenario/18）"""
-    RETURN_TO_SURFACE = "return_to_surface"
-    REBUILD_ARENA = "rebuild_arena"
-    CHALLENGE_OBSERVERS = "challenge_observers"
+    RESCUE = "rescue"           # 連れ出し（皆を連れてイルヴァへ）
+    INHERIT = "inherit"         # 継承（アリーナを純粋な闘技場として再建）
+    USURP = "usurp"             # 簒奪（裏切りルート・孤独な王）
 
 
 class Phase(Enum):

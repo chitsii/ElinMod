@@ -32,38 +32,43 @@ def define_opening_drama(builder: DramaBuilder):
     builder.play_bgm("BGM/sukutsu_arena_opening")
 
     # ナレーション (PCの独白)
-    builder.say("narr1", "(色彩は混濁し、上下左右の感覚が溶けていく。次に足が触れたのは、石畳だ。)", actor=pc) \
+    builder.say("narr1", "(奇妙な場所に足を踏み入れると、あなたの上下左右の感覚が溶けていく。次に足が触れたのは、石畳だ。)", actor=pc) \
            .say("narr2", "(それは、数多の敗者の絶望が凝固し、永遠に熱を失ったかのような黒曜石だった。頭上を見上げれば、そこには空も太陽もない。)", actor=pc)
 
     # 画面を揺らす - 異次元の不安定さを表現
     builder.shake()
 
-    builder.say("narr3", "(ただ、紫紺の渦を巻く「虚無」が天を覆い、時折、空間の裂け目から巨大な鎖が垂れ下がっている。遠くから響くのは、雷鳴のような喝采。だが、その声には「熱」がない。\n高次元の観客たちが、ただ死を消費するために発する、冷ややかな振動だ。)", actor=pc)
+    builder.say("narr3", "(ただ、紫紺の渦を巻く「虚無」が天を覆い、時折、空間の裂け目から巨大な触手が垂れ下がっている。)", actor=pc) \
+           .say("narr3b", "(ここは**次元の狭間**——世界と世界の隙間に浮かぶ領域。確定した因果律を持たず、時間の流れすら曖昧な「無法地帯」だ。)", actor=pc) \
+           .say("narr3c", "(遠くから響くのは、雷鳴のような喝采。だが、観客の姿は見えない。姿の見えない「何か」が、この闘技場を見下ろしている——それだけは感じられる。)", actor=pc)
 
     # リリィ登場（フォーカスにウェイト内蔵）
     builder.focus_chara(Actors.LILY) \
-           .say("lily1", "……あら。珍しいこともあるものですね。召喚の儀も、空間の歪みもなしに、この『ヴォイド・コロシアム』に迷い込む『生きた肉』がいるなんて。", actor=lily) \
-           .say("lily2", "お客様、それとも……新たな『商品』かしら？ここは境界の終わり、そして絶望の始まり。", actor=lily) \
-           .say("lily3", "あなたがどこから来たのかは問いません。入られた方は皆、あそこにいる「飲んだくれ」に話を通すのが、ここの作法ですから。", actor=lily)
+           .say("lily1", "……あら。召喚の儀も、空間の歪みもなしに、この『ヴォイド・コロシアム』に迷い込む『生きた肉』がいるなんて。", actor=lily) \
+           .say("lily1b", "……おかしいですね。普通、この狭間に落ちた者は、イルヴァとの繋がりを失うはずなのに。あなた、まだ『帰り道』を持っている……？ イルヴァの神々の加護でもあるのかしら。", actor=lily) \
+           .say("lily2", "まあ、いいでしょう。お客様、それとも……新たな『商品』かしら？ここは次元の狭間、そして絶望の始まり。", actor=lily) \
+           .say("lily3", "……あなたは自由に出入りできるようですけれど、ここの『仕組み』はあそこにいる「飲んだくれ」に聞くのが作法ですから。", actor=lily)
 
     # バルガス登場（フォーカスにウェイト内蔵）
     builder.focus_chara(Actors.BALGAS) \
-           .say("vargus1", "……ケッ、シケた面してやがる。おい、サキュバス。そんなひょろいガキ、鑑定するまでもねえ。", actor=vargus) \
-           .say("vargus2", "どうせ地上でちょっとばかり魔物に追われて、運悪く次元の割れ目に滑り落ちただけの「迷い犬」だ。おい、小僧。ここは選ばれた狂人どもが、神々の暇つぶしのために殺し合う場所だ。", actor=vargus) \
-           .say("vargus3", "そう、いわば闘技場だ。故郷が恋しいなら、隅で丸まって震えてな。運が良ければ、次の次元の潮流でお前の死体くらいは地上に打ち上げられるかもしれねえぜ。\n……あ？ なんだその目は。お前になにができるってんだ？", actor=vargus)
+           .say("vargus1", "これはこれは。ちょっとばかり魔物に追われて、運悪く次元の割れ目に滑り落ちた『迷い犬』か？", actor=vargus) \
+           .say("vargus1b", "……お前、まだイルヴァの神々との繋がりが切れてねえな。こいつは珍しい。普通、この狭間に落ちりゃ、どんな加護も消し飛ぶんだが。", actor=vargus) \
+           .say("vargus2", "ここは、選ばれた狂人どもが、『観客』の暇つぶしのために、殺し合うための場所だ。お前は『帰れる』んだろう？ なら、さっさと帰んな。ここに留まる理由なんざ、正気の奴にはねえはずだ。", actor=vargus) \
+           .say("vargus3", "……あ？ なんだその目は？ 言いたいことでもあるのか？", actor=vargus)
 
     # プレイヤー決意 (選択肢)
     vargus_react = builder.label("vargus_react")
 
-    builder.choice(vargus_react, "腕には自信があるし、闘技場に興味もある", "", text_id="c_resolve_fight") \
-           .choice(vargus_react, "頼もしい仲間がいる", "", text_id="c_resolve_survive") \
-           .choice(vargus_react, "得意なことはない", "", text_id="c_resolve_drift")
+    builder.choice(vargus_react, "腕っぷしには自信がある。闘技場に参加したい", "", text_id="c_resolve_fight") \
+           .choice(vargus_react, "ここで魔法の腕試しをしたい", "", text_id="c_resolve_magic") \
+           .choice(vargus_react, "心強い仲間と一緒なら怖くはない", "", text_id="c_resolve_survive") \
+           .choice(vargus_react, "観光がてら、試合に参加したい", "", text_id="c_resolve_drift")
 
     # バルガス反応
     builder.step(vargus_react) \
            .shake() \
-           .say("vargus_react1", "……ハッ、そうかよ！ ", actor=vargus) \
-           .say("vargus_react2", "おまえのクソ度胸、安酒のツマミくらいにはなりそうだ。……だが、ただの駒で終わるか、名を刻むかはお前次第だ。\n聞かせろ、お前は何のために戦う？", actor=vargus)
+           .say("vargus_react1", "……ハッ、正気か？ 帰れるのに、自分の意志でこの地獄の底に留まりてえと言いやがったか。", actor=vargus) \
+           .say("vargus_react2", "いいぜ。囚われた奴らが生き残るために戦うのとは訳が違う。『選んで』来る奴は、最高に面白いか、最高に馬鹿か、どっちかだ。\n聞かせろ、お前は何のために戦う？", actor=vargus)
 
     # 動機選択 (フラグ管理システムのキーを使用)
     builder.choice(greed, "【強欲】富と名声、そして力が欲しい", "", text_id="c1") \
@@ -117,8 +122,8 @@ def define_opening_drama(builder: DramaBuilder):
     # --- Ending ---
     builder.step(ending) \
         .shake() \
-        .say("end_v1", "リリィ！ こいつの名前を、最低ランクの「肉屑」の列に書き加えろ！", actor=vargus) \
-        .say("end_v2", "お前がただの肉塊か、それとも多少は骨のある肉塊か……。このコロシアムが、一億の死をもって証明してやるよ。", actor=vargus) \
+        .say("end_v1", "リリィ！ こいつの名前を、剣闘士の列に書き加えろ！", actor=vargus) \
+        .say("end_v2", "お前がただの肉塊か、それとも多少は骨のある肉塊か……。このコロシアムで証明してみせな。", actor=vargus) \
         .set_flag(Keys.RANK, 0) \
         .set_flag(Keys.REL_LILY, 30) \
         .set_flag(Keys.REL_BALGAS, 20) \

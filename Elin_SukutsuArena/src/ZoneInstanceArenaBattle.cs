@@ -28,6 +28,15 @@ public class ZoneInstanceArenaBattle : ZoneInstance
     [JsonProperty]
     public bool isRankUp = false;
 
+    [JsonProperty]
+    public string stageId = "";
+
+    [JsonProperty]
+    public string bgmBattle = "";
+
+    [JsonProperty]
+    public string bgmVictory = "";
+
     public override ZoneTransition.EnterState ReturnState => ZoneTransition.EnterState.Exact;
 
     /// <summary>

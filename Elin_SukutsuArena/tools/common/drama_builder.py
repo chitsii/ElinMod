@@ -103,6 +103,154 @@ class DramaActor:
         return self.key
 
 
+class ChoiceReaction:
+    """
+    選択肢とその反応を一体化して定義するクラス。
+    choice_block()と組み合わせて使用する。
+
+    使用例:
+        builder.choice_block([
+            ChoiceReaction("闘士になりたい", "c1")
+                .say("join1", "おまえが？ハーッハッハ...", actor=vargus)
+                .set_flag("sukutsu_gladiator", 1)
+                .jump(registered),
+
+            ChoiceReaction("いや、やめておく", "c2")
+                .say("reject1", "話は終わりだ。", actor=vargus)
+                .jump(end),
+        ], cancel=end)
+    """
+
+    def __init__(self, text_jp: str, text_id: str = "", text_en: str = "", condition: str = ""):
+        """
+        Args:
+            text_jp: 選択肢テキスト（日本語）
+            text_id: テキストID（省略可）
+            text_en: 選択肢テキスト（英語、省略時は日本語と同じ）
+            condition: 表示条件（if列、省略可）
+        """
+        self.text_jp = text_jp
+        self.text_en = text_en or text_jp
+        self.text_id = text_id
+        self.condition = condition
+        self.actions: List[Dict[str, Any]] = []
+        self._label: Optional[str] = None  # choice_blockで自動設定
+
+    def _add_action(self, action: Dict[str, Any]) -> 'ChoiceReaction':
+        """アクションを追加（内部用）"""
+        self.actions.append(action)
+        return self
+
+    # === 会話系 ===
+
+    def say(self, text_id: str, text_jp: str, text_en: str = "",
+            actor: Union[str, 'DramaActor'] = None) -> 'ChoiceReaction':
+        """テキスト行を追加"""
+        actor_key = actor.key if isinstance(actor, DramaActor) else actor
+        entry = {
+            'id': text_id,
+            'text_JP': text_jp,
+            'text_EN': text_en or text_jp,
+        }
+        if actor_key:
+            entry['actor'] = actor_key
+        return self._add_action(entry)
+
+    # === フロー制御 ===
+
+    def jump(self, jump_to: Union[str, 'DramaLabel']) -> 'ChoiceReaction':
+        """指定ステップにジャンプ"""
+        key = jump_to.key if isinstance(jump_to, DramaLabel) else jump_to
+        return self._add_action({'jump': key})
+
+    def end(self) -> 'ChoiceReaction':
+        """ドラマを終了"""
+        return self._add_action({'action': 'end'})
+
+    # === フラグ操作 ===
+
+    def set_flag(self, flag: str, value: int = 1) -> 'ChoiceReaction':
+        """フラグを設定"""
+        return self._add_action({
+            'action': 'setFlag',
+            'param': f'{flag},{value}',
+        })
+
+    def mod_flag(self, flag: str, operator: str, value: int,
+                 actor: Union[str, 'DramaActor'] = None) -> 'ChoiceReaction':
+        """フラグを変更"""
+        actor_key = actor.key if isinstance(actor, DramaActor) else (actor or 'pc')
+        return self._add_action({
+            'action': 'invoke*',
+            'param': f'mod_flag({flag}, {operator}{value})',
+            'actor': actor_key,
+        })
+
+    # === 演出 ===
+
+    def shake(self) -> 'ChoiceReaction':
+        """画面を揺らす"""
+        return self._add_action({'action': 'shake'})
+
+    def wait(self, seconds: float) -> 'ChoiceReaction':
+        """待機"""
+        return self._add_action({'action': 'wait', 'param': str(seconds)})
+
+    def play_bgm(self, bgm_id: str) -> 'ChoiceReaction':
+        """BGMを再生"""
+        code = f'''
+            Debug.Log("[SukutsuArena] Attempting to play BGM: {bgm_id}");
+            var data = SoundManager.current.GetData("{bgm_id}");
+            if (data != null) {{
+                if (data is BGMData bgm) {{
+                    LayerDrama.haltPlaylist = true;
+                    LayerDrama.maxBGMVolume = true;
+                    SoundManager.current.PlayBGM(bgm);
+                }} else {{
+                    SoundManager.current.Play(data);
+                }}
+            }}
+        '''.replace('\n', ' ').strip()
+        return self._add_action({'action': 'eval', 'param': code})
+
+    def play_sound(self, sound_id: str) -> 'ChoiceReaction':
+        """効果音を再生"""
+        return self._add_action({'action': 'sound', 'param': sound_id})
+
+    # === クエスト ===
+
+    def complete_quest(self, quest_id: str, actor: Union[str, 'DramaActor'] = None) -> 'ChoiceReaction':
+        """クエストを完了"""
+        actor_key = actor.key if isinstance(actor, DramaActor) else (actor or 'pc')
+        return self._add_action({
+            'action': 'modInvoke',
+            'param': f'complete_quest({quest_id})',
+            'actor': actor_key,
+        })
+
+    # === 汎用 ===
+
+    def action(self, action_name: str, param: str = None,
+               jump: Union[str, 'DramaLabel'] = None,
+               actor: Union[str, 'DramaActor'] = None) -> 'ChoiceReaction':
+        """汎用アクションを追加"""
+        entry = {'action': action_name}
+        if param:
+            entry['param'] = param
+        if jump:
+            entry['jump'] = jump.key if isinstance(jump, DramaLabel) else jump
+        if actor:
+            entry['actor'] = actor.key if isinstance(actor, DramaActor) else actor
+        return self._add_action(entry)
+
+    def eval(self, code: str, actor: Union[str, 'DramaActor'] = None) -> 'ChoiceReaction':
+        """C#コードを実行"""
+        entry = {'action': 'eval', 'param': code}
+        if actor:
+            entry['actor'] = actor.key if isinstance(actor, DramaActor) else actor
+        return self._add_action(entry)
+
+
 class DramaBuilder:
     """
     CWLドラマファイルを構築するビルダークラス。
@@ -300,6 +448,73 @@ class DramaBuilder:
                 raise ValueError(f"Invalid choice format: {item}")
 
         self.on_cancel(cancel_target)
+        return self
+
+    def choice_block(self, choices: List['ChoiceReaction'],
+                     cancel: Union[str, DramaLabel] = None,
+                     label_prefix: str = None) -> 'DramaBuilder':
+        """
+        選択肢と反応を一体化して定義する。
+        ChoiceReactionオブジェクトのリストを受け取り、自動的にステップを生成。
+
+        Args:
+            choices: ChoiceReactionオブジェクトのリスト
+            cancel: キャンセル時のジャンプ先（省略可）
+            label_prefix: 自動生成ラベルのプレフィックス（省略時は現在のステップ名を使用）
+
+        Example:
+            builder.step("opening") \\
+                .say("greet1", "何の用だ、ひよっこ...", actor=vargus) \\
+                .choice_block([
+                    ChoiceReaction("闘士になりたい", "c1")
+                        .say("join1", "おまえが？ハーッハッハ...", actor=vargus)
+                        .set_flag("sukutsu_gladiator", 1)
+                        .jump("registered"),
+
+                    ChoiceReaction("いや、やめておく", "c2")
+                        .say("reject1", "話は終わりだ。", actor=vargus)
+                        .jump("end"),
+                ], cancel="end")
+
+        Note:
+            各ChoiceReactionに対して自動的にラベルが生成され、
+            反応のステップがchoice_block呼び出し後に追加されます。
+            ラベル形式: {prefix}_react_{index} (例: opening_react_0, opening_react_1)
+        """
+        # プレフィックス決定
+        prefix = label_prefix or self._current_step or "choice"
+
+        # 各選択肢に対してラベルを生成し、choice行を追加
+        for i, cr in enumerate(choices):
+            cr._label = f"{prefix}_react_{i}"
+
+            entry = {
+                'action': 'choice',
+                'jump': cr._label,
+                'text_JP': cr.text_jp,
+                'text_EN': cr.text_en,
+            }
+            if cr.text_id:
+                entry['id'] = cr.text_id
+            if cr.condition:
+                entry['if'] = cr.condition
+            self.entries.append(entry)
+
+        # キャンセル時のジャンプ先
+        if cancel is not None:
+            cancel_key = self._resolve_key(cancel)
+            self.entries.append({'action': 'cancel', 'jump': cancel_key})
+
+        # 各反応のステップを追加
+        for cr in choices:
+            # step行
+            self.entries.append({'step': cr._label})
+            self.registered_steps.add(cr._label)
+
+            # アクション行
+            for action in cr.actions:
+                self.entries.append(action)
+
         return self
 
     def check_quests(self, checks: list, actor: Union[str, DramaActor] = None) -> 'DramaBuilder':

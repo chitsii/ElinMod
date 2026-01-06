@@ -162,6 +162,139 @@ npcs.append({
     'chance': 0,
 })
 
+# 5. デバッグマスター (開発テスト用 / 各バトルに直接アクセス可能)
+npcs.append({
+    'id': 'sukutsu_debug_master',
+    'Author': 'tishi.elin.sukutsu_arena',
+    'name_JP': '観測者',
+    'name': 'Observer',
+    'aka_JP': '次元の記録者',
+    'aka': 'Dimensional Recorder',
+    'race': 'spirit',
+    'job': 'wizard',
+    'LV': 999,
+    'hostility': 'Friend',
+    'bio': 'n/1005/160/0/mysterious',
+    'idText': 'sukutsu_debug_master',
+    # CWL タグ: ゾーン生成、ランダム移動無効、ドラマリンク、人間らしい会話
+    'tag': f'neutral,addZone_{ZONE_ID},addFlag_StayHomeZone,addDrama_drama_debug_battle,humanSpeak',
+    'quality': 5,
+    'chance': 0,
+})
+
+# ===== ストーリーバトル用敵キャラクター =====
+# これらはアリーナゾーンには配置せず、バトル時に動的にスポーンさせる
+
+# 6. 全盛期バルガス (Rank S昇格試験 / 若返った最強の戦士)
+# lore: 68歳の現在はLv.85、全盛期（30代）はLv.120相当
+# 「若返りの薬」使用条件は「真に命を賭けた戦いの場」でのみ
+npcs.append({
+    'id': 'sukutsu_balgas_prime',
+    'Author': 'tishi.elin.sukutsu_arena',
+    'name_JP': '全盛期のバルガス',
+    'name': 'Balgas at His Prime',
+    'aka_JP': '鉄血の覇者',
+    'aka': 'Iron-Blooded Champion',
+    'race': 'human',
+    'job': 'warrior',
+    'LV': 8000,  # Tier3: Lv.1,000-10,000
+    'hostility': 'Enemy',
+    'bio': 'm/1002/188/95/stern',
+    'idText': 'sukutsu_balgas_prime',
+    # 敵キャラ: ゾーン配置なし、ランダム出現なし
+    'tag': 'boss',
+    'quality': 5,
+    'chance': 0,
+})
+
+# 7. アスタロト (最終ボス / 竜神 / グランドマスターの真の姿)
+# lore: イルヴァの神々と同格の竜神、Lv.100,000,000（システム上限）
+# 滅びた次元「カラドリウス」の唯一の生存者、アリーナ創設者
+npcs.append({
+    'id': 'sukutsu_astaroth',
+    'Author': 'tishi.elin.sukutsu_arena',
+    'name_JP': 'アスタロト',
+    'name': 'Astaroth',
+    'aka_JP': '虚空の竜神',
+    'aka': 'Dragon God of the Void',
+    'race': 'dragon',
+    'job': 'warrior',
+    'LV': 50000,  # エンドコンテンツ: 次元深度
+    'hostility': 'Enemy',
+    'bio': 'm/1003/350/500/proud',
+    'idText': 'sukutsu_astaroth',
+    # 最終ボス: ゾーン配置なし
+    'tag': 'boss,undead',
+    'quality': 5,
+    'chance': 0,
+})
+
+# 8. カインの亡霊 (Rank E昇格試験 / バルガスの元副官)
+# lore: 生前Lv.60、残留思念としてLv.40相当だが、Tier1最終関門として強化
+# 鉄血団元副団長、バルガスが息子のように愛した存在
+npcs.append({
+    'id': 'sukutsu_kain_ghost',
+    'Author': 'tishi.elin.sukutsu_arena',
+    'name_JP': '錆びついた英雄カイン',
+    'name': 'Rusted Hero Cain',
+    'aka_JP': '忘れられた副団長',
+    'aka': 'Forgotten Vice-Captain',
+    'race': 'ghost',
+    'job': 'warrior',
+    'LV': 90,  # Tier1最終: Lv.1-100
+    'hostility': 'Enemy',
+    'bio': 'm/1006/180/0/melancholic',
+    'idText': 'sukutsu_kain_ghost',
+    # 試練ボス: ゾーン配置なし
+    'tag': 'boss,undead',
+    'quality': 4,
+    'chance': 0,
+})
+
+# 9. ヌル (Rank B昇格試験 / 暗殺人形 / 人造生命体)
+# lore: 「神の孵化場」計画の失敗作、アリーナの「清掃係」
+# 透明化して一撃で仕留める暗殺者
+npcs.append({
+    'id': 'sukutsu_null',
+    'Author': 'tishi.elin.sukutsu_arena',
+    'name_JP': 'Nul',
+    'name': 'Null',
+    'aka_JP': '虚無の処刑人',
+    'aka': 'Void Executioner',
+    'race': 'machine',
+    'job': 'thief',
+    'LV': 800,  # Tier2最終: Lv.100-1,000
+    'hostility': 'Enemy',
+    'bio': 'f/1007/165/45/emotionless',
+    'idText': 'sukutsu_null',
+    # 試練ボス: ゾーン配置なし、暗殺者タイプ
+    'tag': 'boss',
+    'quality': 4,
+    'chance': 0,
+})
+
+# 10. 影のドッペルゲンガー (Rank A昇格試験 / プレイヤーの影)
+# lore: 観客の「注目」がプレイヤーの影から生み出した存在
+# プレイヤーの全てを知り、全てを模倣する
+npcs.append({
+    'id': 'sukutsu_shadow_self',
+    'Author': 'tishi.elin.sukutsu_arena',
+    'name_JP': '影の自己',
+    'name': 'Shadow Self',
+    'aka_JP': '映し身',
+    'aka': 'Mirror Image',
+    'race': 'shade',
+    'job': 'warrior',
+    'LV': 2500,  # Tier3前半: Lv.1,000-10,000
+    'hostility': 'Enemy',
+    'bio': 'n/1008/170/60/sinister',
+    'idText': 'sukutsu_shadow_self',
+    # 試練ボス: プレイヤーの影
+    'tag': 'boss,undead',
+    'quality': 4,
+    'chance': 0,
+})
+
 
 
 for npc in npcs:

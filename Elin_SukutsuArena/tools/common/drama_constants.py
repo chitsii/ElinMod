@@ -55,6 +55,9 @@ class DramaIds:
     VS_GRANDMASTER_1 = "vs_grandmaster_1"
     LAST_BATTLE = "last_battle"
 
+    # デバッグ用
+    DEBUG_BATTLE = "debug_battle"
+
 
 class DramaNames:
     """
@@ -92,6 +95,9 @@ class DramaNames:
     GRANDMASTER_1 = f"drama_{DramaIds.VS_GRANDMASTER_1}"
     LAST_BATTLE = f"drama_{DramaIds.LAST_BATTLE}"
 
+    # デバッグ用
+    DEBUG_BATTLE = f"drama_{DramaIds.DEBUG_BATTLE}"
+
 
 # 全ドラマIDのリスト（バリデーション用）
 ALL_DRAMA_IDS = [
@@ -116,4 +122,5 @@ ALL_DRAMA_IDS = [
     DramaIds.MAKUMA2,
     DramaIds.VS_GRANDMASTER_1,
     DramaIds.LAST_BATTLE,
+    DramaIds.DEBUG_BATTLE,
 ]

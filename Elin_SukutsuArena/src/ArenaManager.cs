@@ -1,17 +1,22 @@
+using System.IO;
 using UnityEngine;
 using DG.Tweening;
 
 namespace Elin_SukutsuArena
 {
     /// <summary>
-    /// アリーナのステージ設定を保持するクラス
+    /// アリーナのステージ設定を保持するクラス（旧互換用）
     /// </summary>
     public class ArenaStageConfig
     {
         public string[] MonsterIds { get; set; }
         public int[] MonsterLevels { get; set; }
+        public string[] MonsterRarities { get; set; }
         public int RewardPlat { get; set; }
         public string ZoneType { get; set; }
+        public string BgmBattle { get; set; }
+        public string BgmVictory { get; set; }
+        public string StageId { get; set; }
     }
 
     /// <summary>
@@ -247,6 +252,158 @@ namespace Elin_SukutsuArena
 
             // ドラマを開始
             StartDrama(dramaName);
+        }
+
+        /// <summary>
+        /// ステージIDを指定して戦闘を開始（新API）
+        /// JSONファイルからステージ設定を読み込んで戦闘を開始する
+        /// </summary>
+        /// <param name="stageId">ステージID</param>
+        /// <param name="master">アリーナマスター（戻り先）</param>
+        public static void StartBattleByStage(string stageId, Chara master)
+        {
+            Debug.Log($"[SukutsuArena] StartBattleByStage called: stageId={stageId}");
+
+            if (master == null)
+            {
+                Debug.LogError("[SukutsuArena] Master is null!");
+                return;
+            }
+
+            // パッケージパスを取得
+            string packagePath = GetPackagePath();
+            if (string.IsNullOrEmpty(packagePath))
+            {
+                Debug.LogError("[SukutsuArena] Could not determine package path!");
+                return;
+            }
+
+            // ステージ設定を取得
+            var stageData = BattleStageLoader.GetStage(stageId, packagePath);
+            if (stageData == null)
+            {
+                Debug.LogError($"[SukutsuArena] Stage not found: {stageId}");
+                Msg.Say($"Error: Stage '{stageId}' not found!");
+                return;
+            }
+
+            // ArenaStageConfigに変換
+            var config = ConvertToArenaStageConfig(stageData);
+
+            // 一時戦闘マップを作成
+            Zone battleZone = SpatialGen.CreateInstance(config.ZoneType, new ZoneInstanceArenaBattle
+            {
+                uidMaster = master.uid,
+                returnX = master.pos.x,
+                returnZ = master.pos.z,
+                uidZone = EClass._zone.uid,
+                bossCount = stageData.TotalEnemyCount,
+                stage = 0, // ステージID方式では使用しない
+                rewardPlat = config.RewardPlat,
+                isRankUp = stageId.StartsWith("rank_"),
+                stageId = stageId,
+                bgmBattle = config.BgmBattle,
+                bgmVictory = config.BgmVictory
+            });
+
+            // 敵配置イベントを追加
+            battleZone.events.AddPreEnter(new ZonePreEnterArenaBattle
+            {
+                stageId = stageId,
+                stageData = stageData
+            });
+
+            // 戦闘監視イベントを追加
+            battleZone.events.Add(new ZoneEventArenaBattle());
+
+            Debug.Log($"[SukutsuArena] Created battle zone for stage: {stageId}");
+
+            // ダイアログ終了後にゾーン移動
+            LayerDrama.Instance?.SetOnKill(() =>
+            {
+                Debug.Log($"[SukutsuArena] Moving to battle zone: {stageId}");
+                EClass.pc.MoveZone(battleZone, ZoneTransition.EnterState.Center);
+            });
+        }
+
+        /// <summary>
+        /// ステージIDを指定して戦闘を開始（マスターIDで検索）
+        /// </summary>
+        public static void StartBattleByStage(string stageId, string masterId)
+        {
+            var master = EClass._zone.FindChara(masterId);
+            if (master == null)
+            {
+                Debug.LogError($"[SukutsuArena] Master not found: {masterId}");
+                return;
+            }
+            StartBattleByStage(stageId, master);
+        }
+
+        /// <summary>
+        /// パッケージパスを取得
+        /// </summary>
+        private static string GetPackagePath()
+        {
+            // Pluginアセンブリの場所からパスを取得
+            var modPath = Path.GetDirectoryName(typeof(Plugin).Assembly.Location);
+            if (!string.IsNullOrEmpty(modPath))
+            {
+                var packagePath = Path.Combine(modPath, "Package");
+                if (Directory.Exists(packagePath))
+                {
+                    return packagePath;
+                }
+            }
+
+            // フォールバック: 既知のパスを試す
+            string[] possiblePaths = new[]
+            {
+                Path.Combine(Application.dataPath, "..", "Package", "Elin_SukutsuArena", "Package"),
+                Path.Combine(Application.dataPath, "..", "Mods", "Elin_SukutsuArena", "Package"),
+            };
+
+            foreach (var path in possiblePaths)
+            {
+                if (Directory.Exists(path))
+                {
+                    return path;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// BattleStageDataをArenaStageConfigに変換
+        /// </summary>
+        private static ArenaStageConfig ConvertToArenaStageConfig(BattleStageData stageData)
+        {
+            var monsterIds = new System.Collections.Generic.List<string>();
+            var monsterLevels = new System.Collections.Generic.List<int>();
+            var monsterRarities = new System.Collections.Generic.List<string>();
+
+            foreach (var enemy in stageData.Enemies)
+            {
+                for (int i = 0; i < enemy.Count; i++)
+                {
+                    monsterIds.Add(enemy.CharaId);
+                    monsterLevels.Add(enemy.Level);
+                    monsterRarities.Add(enemy.Rarity);
+                }
+            }
+
+            return new ArenaStageConfig
+            {
+                MonsterIds = monsterIds.ToArray(),
+                MonsterLevels = monsterLevels.ToArray(),
+                MonsterRarities = monsterRarities.ToArray(),
+                RewardPlat = stageData.RewardPlat,
+                ZoneType = stageData.ZoneType,
+                BgmBattle = stageData.BgmBattle,
+                BgmVictory = stageData.BgmVictory,
+                StageId = stageData.StageId
+            };
         }
     }
 }

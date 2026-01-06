@@ -115,10 +115,7 @@ def define_rank_up_B(builder: DramaBuilder):
         .say("narr_10", "（中央に立つのは、輪郭すら曖昧な、黒い霧のような人型の影。）", "", actor=pc) \
         .say("narr_11", "（それは、こちらを見ているのか、見ていないのかすら分からない。ただ、その存在が放つ『虚無』の圧力が、魂を押し潰そうとしている。）", "", actor=pc) \
         .shake() \
-        .say("obs_1", "（観客の声：「……始まるぞ。虚無の舞が」）", "", actor=pc) \
-        .say("obs_2", "（観客の声：「賭けは『3ターン以内に精神崩壊』で」）", "", actor=pc) \
-        .say("obs_3", "（観客の声：「いや、この新人は……少しは抗うだろう」）", "", actor=pc) \
-        .start_battle(6, is_rank_up=True, master_id="sukutsu_arena_master") \
+        .start_battle_by_stage("rank_b_trial", master_id="sukutsu_arena_master") \
         .finish()
 
 

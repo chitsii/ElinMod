@@ -104,10 +104,7 @@ def define_rank_up_E(builder: DramaBuilder):
         .say("narr_9", "（中央に立つのは、全身から赤黒い錆を滴らせ、顔のない兜から青い炎を揺らめかせる一人の騎士。）", "", actor=pc) \
         .say("narr_10", "（騎士は巨大な錆びた剣を地に突き立て、ゆっくりと頭を上げる。）", "", actor=pc) \
         .shake() \
-        .say("obs_1", "……ほう。あの『錆びた英雄』がまた召喚されたか", "", actor=pc) \
-        .say("obs_2", "賭けは『3ターン以内に装備が崩壊』で。", "", actor=pc) \
-        .say("obs_3", "いや、この新人は少しは保つだろう。『5ターン』だ。", "", actor=pc) \
-        .start_battle(3, is_rank_up=True, master_id="sukutsu_arena_master") \
+        .start_battle_by_stage("rank_e_trial", master_id="sukutsu_arena_master") \
         .finish()
 
 

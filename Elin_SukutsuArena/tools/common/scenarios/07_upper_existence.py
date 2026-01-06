@@ -101,9 +101,6 @@ def define_upper_existence(builder: DramaBuilder):
         .shake() \
         .say("narr_7", "（紫色の閃光と共に、戦場に「異質な物体」が次々と降り注ぎ始めた。）", "", actor=pc) \
         .shake() \
-        .say("obs_3", "「おや、当たったぞ！」", "", actor=pc) \
-        .say("obs_4", "「もっと投げろ！」", "", actor=pc) \
-        .say("obs_5", "「ふふ、あの慌てた顔……最高だ」", "", actor=pc) \
         .action("eval", param="UnityEngine.Debug.Log(\"[SukutsuArena] TODO: 観客のヤジ戦闘 - 落下物ギミック\");") \
         .jump(scene4)
 

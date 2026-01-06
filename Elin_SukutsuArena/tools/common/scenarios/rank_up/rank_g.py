@@ -1,5 +1,5 @@
 
-from drama_builder import DramaBuilder
+from drama_builder import DramaBuilder, ChoiceReaction
 from flag_definitions import (
     Keys, Actors, QuestIds,
     Motivation, Rank,
@@ -39,34 +39,23 @@ def define_rank_up_G(builder: DramaBuilder):
         .focus_chara(Actors.LILY) \
         .say("narr_1", "（薄暗いロビーに、異次元の嵐が石壁を叩く音が不気味に響いている。空気は重く、血と錆の臭いが鼻腔を突く。）", "", actor=pc) \
         .say("lily_r1", "……準備はよろしいですか？", "", actor=lily) \
-        .wait(1.0) \
         .say("narr_2", "（彼女は細長い爪で、血塗られた羊皮紙を軽く叩いた。パチン、パチンと、まるで死刑執行の秒読みのように。）", "", actor=pc) \
         .say("lily_r2", "これは単なる試合ではありません。あなたがこの『ヴォイド・コロシアム』の胃袋に放り込まれる、最初の『餌』になるための儀式です。", "", actor=lily) \
         .say("lily_r3", "対戦相手は『飢えたヴォイド・プチ』の群れ。……ああ、地上にいる愛らしい彼らだと思わないことね。敗者の絶望を啜って肥大化した、純然たる殺意の塊ですから。", "", actor=lily) \
         .say("lily_r4", "もし、五体満足で戻られたら……その時は、正式に『闘士』として登録して差し上げます。死体袋の用意は、あちらの隅に。……ご武運を。", "", actor=lily)
 
-    # プレイヤー選択肢 - 各選択肢が直接反応ラベルにジャンプ
-    # CWLでは選択肢の jump 先が直接反応ステップになるべき
-    lily_confident = builder.label("lily_confident")
-    lily_amused = builder.label("lily_amused")
-    lily_silent = builder.label("lily_silent")
-
-    builder.choice(lily_confident, "……死体袋は不要だ。俺は生きて帰る", "", text_id="c_r_1") \
-           .choice(lily_amused, "プチごときに負けるか。すぐに終わらせてやる", "", text_id="c_r_2") \
-           .choice(lily_silent, "（無言で羊皮紙を受け取る）", "", text_id="c_r_3")
-
-    # 選択肢後の反応 - 各ラベルが直接独自のステップを持つ
-    builder.step(lily_confident) \
-        .say("lily_r5_a", "ふふ、自信はおありのようで。……では、存分に。", "", actor=lily) \
-        .jump(vargus_advice)
-
-    builder.step(lily_amused) \
-        .say("lily_r5_b", "まあ。勇ましいこと。……その自信が、どこまで保つか楽しみですね。", "", actor=lily) \
-        .jump(vargus_advice)
-
-    builder.step(lily_silent) \
-        .say("lily_r5_c", "……沈黙は恐怖の裏返しか、それとも覚悟の証か。まあ、どちらでもいいのですが。", "", actor=lily) \
-        .jump(vargus_advice)
+    # プレイヤー選択肢 - choice_block で選択肢と反応を一括定義
+    builder.choice_block([
+        ChoiceReaction("……死体袋は不要だ。俺は生きて帰る", text_id="c_r_1")
+            .say("lily_r5_a", "ふふ、自信はおありのようで。……では、存分に。", actor=lily)
+            .jump(vargus_advice),
+        ChoiceReaction("プチごときに負けるか。すぐに終わらせてやる", text_id="c_r_2")
+            .say("lily_r5_b", "まあ。勇ましいこと。……その自信が、どこまで保つか楽しみですね。", actor=lily)
+            .jump(vargus_advice),
+        ChoiceReaction("（無言で羊皮紙を受け取る）", text_id="c_r_3")
+            .say("lily_r5_c", "……沈黙は恐怖の裏返しか、それとも覚悟の証か。まあ、どちらでもいいのですが。", actor=lily)
+            .jump(vargus_advice),
+    ], label_prefix="lily")
 
     # --- Vargus Advice ---
     builder.step(vargus_advice) \
@@ -79,7 +68,7 @@ def define_rank_up_G(builder: DramaBuilder):
 
     # --- Battle Start ---
     builder.step(battle_start) \
-        .start_battle(1, is_rank_up=True, master_id="sukutsu_arena_master") \
+        .start_battle_by_stage("rank_g_trial", master_id="sukutsu_arena_master") \
         .finish()
 
 

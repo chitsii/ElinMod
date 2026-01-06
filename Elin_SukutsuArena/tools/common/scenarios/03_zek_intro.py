@@ -51,7 +51,7 @@ def define_zek_intro(builder: DramaBuilder):
     builder.step(scene1) \
         .focus_chara(Actors.ZEK) \
         .say("zek_1", "……おや。失礼、驚かせるつもりはなかったのですよ。", "", actor=zek) \
-        .say("zek_2", "ただ、あまりに芳しい『敗北の予感』が漂ってきたもので……。つい、こちらの次元へ顔を出してしまいました。", "", actor=zek) \
+        .say("zek_2", "ただ、あまりに芳しい『敗北の予感』が漂ってきたもので……。つい、こちらへ顔を出してしまいました。", "", actor=zek) \
         .say("narr_5", "（彼は優雅に、しかしどこか爬虫類を思わせる動作で一礼する。）", "", actor=pc) \
         .jump(scene2)
 

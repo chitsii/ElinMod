@@ -113,13 +113,10 @@ def define_rank_up_C(builder: DramaBuilder):
         .say("narr_9", "（彼らの瞳には光がなく、ただ機械的に武器を構えている。）", "", actor=pc) \
         .say("narr_10", "（だが、その動きには……かつての『誇り』の残滓が、微かに残っているように見えた。）", "", actor=pc) \
         .shake() \
-        .say("obs_1", "（観客の声：「……堕ちた英雄たちか。哀れだな」）", "", actor=pc) \
-        .say("obs_2", "（観客の声：「賭けは『新人が感情に飲まれて敗北』で」）", "", actor=pc) \
-        .say("obs_3", "（観客の声：「いや、この新人は……冷静に戦うだろう」）", "", actor=pc) \
         .say("narr_11", "（バルガスの声が、遠くから聞こえる。）", "", actor=pc) \
         .focus_chara(Actors.BALGAS) \
         .say("balgas_echo", "……頼んだぞ。", "", actor=balgas) \
-        .start_battle(5, is_rank_up=True, master_id="sukutsu_arena_master") \
+        .start_battle_by_stage("rank_c_trial", master_id="sukutsu_arena_master") \
         .finish()
 
 

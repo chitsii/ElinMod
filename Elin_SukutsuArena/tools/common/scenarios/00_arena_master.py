@@ -1,5 +1,5 @@
 
-from drama_builder import DramaBuilder
+from drama_builder import DramaBuilder, ChoiceReaction
 from drama_constants import DramaNames
 from flag_definitions import (
     Keys, Actors, QuestIds,
@@ -25,9 +25,6 @@ def define_arena_master_drama(builder: DramaBuilder):
     main = builder.label("main")
     victory_comment = builder.label("victory_comment")
     defeat_comment = builder.label("defeat_comment")
-    defeat_stage2 = builder.label("defeat_stage2")
-    defeat_stage3 = builder.label("defeat_stage3")
-    defeat_champion = builder.label("defeat_champion")
     registered = builder.label("registered")
     registered_choices = builder.label("registered_choices")
     greet_unranked = builder.label("greet_unranked")
@@ -47,8 +44,6 @@ def define_arena_master_drama(builder: DramaBuilder):
     greet_singularity = builder.label("greet_singularity")
     greet_void_king = builder.label("greet_void_king")
     greet_default = builder.label("greet_default")
-    join_yes = builder.label("join_yes")
-    join_no = builder.label("join_no")
     battle_prep = builder.label("battle_prep")
     stage2_prep = builder.label("stage2_prep")
     stage3_prep = builder.label("stage3_prep")
@@ -180,11 +175,6 @@ def define_arena_master_drama(builder: DramaBuilder):
     # === Rank B 昇格試験 勝利/敗北 ===
     add_rank_up_B_result_steps(builder, rank_up_victory_b, rank_up_defeat_b, registered_choices)
 
-    # 未登録者挨拶
-    builder.say("greet1", "何の用だ、ひよっこ。見たところ、戦いの「せ」の字も知らなそうだな。", "", actor=vargus) \
-        .choice(join_yes, "闘士になりたい", "", text_id="c1") \
-        .choice(join_no, "いや、やめておく", "", text_id="c2") \
-        .on_cancel(end)
 
     # Victory/Defeat Comments (Directly add choices)
     b = builder.step(victory_comment) \
@@ -405,21 +395,6 @@ def define_arena_master_drama(builder: DramaBuilder):
     add_choices(b)
 
 
-    # === Join Yes ===
-    builder.step(join_yes) \
-        .say("join1", "おまえが？ハーッハッハ...まあいい、死にたいなら止めはしない。これでお前も闘士だ。戦いの準備ができたら声をかけろ。", "", actor=vargus) \
-        .set_flag("sukutsu_gladiator", 1) \
-        .set_flag("sukutsu_arena_stage", 1) \
-        .set_flag(Keys.RANK, 0) \
-        .set_flag(Keys.REL_LILY, 30) \
-        .set_flag(Keys.REL_BALGAS, 20) \
-        .action("reload", jump=main)
-
-    # === Join No ===
-    builder.step(join_no) \
-        .say("reject1", "話は終わりだ。ママのミルクでも飲んでな。", "", actor=vargus) \
-        .jump(end)
-
     # === Battle Prep ===
     builder.step(battle_prep) \
         .branch_if("sukutsu_arena_stage", ">=", 2, stage2_prep) \
@@ -454,22 +429,22 @@ def define_arena_master_drama(builder: DramaBuilder):
     # === Battle Starts ===
     builder.step(battle_start_stage1) \
         .say("sendoff1", "よし、行け！生きて戻ってこい...できればな。", "", actor=vargus) \
-        .start_battle(1) \
+        .start_battle_by_stage("stage_1") \
         .finish()
 
     builder.step(battle_start_stage2) \
         .say("sendoff2", "いい度胸だ。お前ならやれる！", "", actor=vargus) \
-        .start_battle(2) \
+        .start_battle_by_stage("stage_2") \
         .finish()
 
     builder.step(battle_start_stage3) \
         .say("sendoff3", "...無茶するなよ。お前はもうただの新人じゃない。", "", actor=vargus) \
-        .start_battle(3) \
+        .start_battle_by_stage("stage_3") \
         .finish()
 
     builder.step(battle_start_champion) \
         .say("sendoff_champ", "...見届けてやる。行って来い、闘士よ。", "", actor=vargus) \
-        .start_battle(4) \
+        .start_battle_by_stage("stage_4") \
         .finish()
 
     # === Quest System Integration ===
@@ -508,13 +483,6 @@ def define_arena_master_drama(builder: DramaBuilder):
         .set_flag("sukutsu_quest_target_name", 0) \
         .debug_log_quests() \
         .check_quests([
-            # ランクアップ系
-            (QuestIds.RANK_UP_G, quest_rank_up_g),
-            (QuestIds.RANK_UP_F, quest_rank_up_f),
-            (QuestIds.RANK_UP_E, quest_rank_up_e),
-            (QuestIds.RANK_UP_D, quest_rank_up_d),
-            (QuestIds.RANK_UP_C, quest_rank_up_c),
-            (QuestIds.RANK_UP_B, quest_rank_up_b),
             # ストーリー系
             (QuestIds.ZEK_INTRO, quest_zek_intro),
             (QuestIds.LILY_EXPERIMENT, quest_lily_exp),
@@ -529,6 +497,13 @@ def define_arena_master_drama(builder: DramaBuilder):
             (QuestIds.LILY_REAL_NAME, quest_lily_real_name),
             (QuestIds.VS_GRANDMASTER_1, quest_vs_grandmaster_1),
             (QuestIds.LAST_BATTLE, quest_last_battle),
+            # ランクアップ系（先にストーリークエストをチェックするので、後ろに配置）
+            (QuestIds.RANK_UP_G, quest_rank_up_g),
+            (QuestIds.RANK_UP_F, quest_rank_up_f),
+            (QuestIds.RANK_UP_E, quest_rank_up_e),
+            (QuestIds.RANK_UP_D, quest_rank_up_d),
+            (QuestIds.RANK_UP_C, quest_rank_up_c),
+            (QuestIds.RANK_UP_B, quest_rank_up_b),
         ]) \
         .switch_on_flag("sukutsu_quest_target_name", {
             # ランクアップ系

@@ -96,6 +96,28 @@ namespace Elin_SukutsuArena
                     { "confrontation", 4 },
                     { "climax", 5 }
                 }
+            },
+            // Choice flags (from flag_definitions.py FlagValues)
+            {
+                "chitsii.arena.player.balgas_choice", new Dictionary<string, int>
+                {
+                    { "spared", 0 },
+                    { "killed", 1 }
+                }
+            },
+            {
+                "chitsii.arena.player.bottle_choice", new Dictionary<string, int>
+                {
+                    { "kept", 0 },
+                    { "swapped", 1 }
+                }
+            },
+            {
+                "chitsii.arena.player.kain_soul_choice", new Dictionary<string, int>
+                {
+                    { "freed", 0 },
+                    { "sold", 1 }
+                }
             }
         };
 

@@ -54,7 +54,7 @@ def define_vs_grandmaster_1(builder: DramaBuilder):
         .focus_chara(Actors.LILY) \
         .say("narr_5", "（アスタロトは、絶望に震えるリリィと、彼女を庇って前に出るバルガスを一瞥し、嘲笑するように鼻を鳴らした。）", "", actor=pc) \
         .focus_chara(Actors.ASTAROTH) \
-        .say("astaroth_4", "リリアリス……お前が愛したその人間は、もはやお前の手には負えぬバケモノだ。", "", actor=astaroth) \
+        .say("astaroth_4", "リリィ……お前が愛したその人間は、もはやお前の手には負えぬバケモノだ。", "", actor=astaroth) \
         .say("astaroth_5", "そしてバルガス、老いさらばえた敗残兵の分際で、運命の書き換えを許したか。", "", actor=astaroth) \
         .say("astaroth_6", "……よかろう。システムの不備は、私の手で『焼却』し、無に帰すのが王の責務だ。", "", actor=astaroth) \
         .say("narr_6", "（アスタロトが右手を掲げると、その周囲に凝縮された虚空の炎が渦巻く。）", "", actor=pc) \
@@ -88,7 +88,7 @@ def define_vs_grandmaster_1(builder: DramaBuilder):
         .say("astaroth_8", "……ゼクか。ゴミ拾いの分際で、この私の『確定した死』を歪めたか。", "", actor=astaroth) \
         .focus_chara(Actors.ZEK) \
         .say("zek_3", "クク……歪めたのではありません。少しだけ『ページを飛ばした』のですよ。", "", actor=zek) \
-        .say("zek_4", "さあ、闘士殿！ リリアリスもバルガスも連れて、私の影に飛び込みなさい！", "", actor=zek) \
+        .say("zek_4", "さあ、闘士殿！ リリィもバルガスも連れて、私の影に飛び込みなさい！", "", actor=zek) \
         .say("zek_5", "この道具が保つのはあと数秒だ。アスタロトを倒すための『本当の力』、それを手に入れる猶予を……私が無理やり作ってあげましょう！", "", actor=zek) \
         .say("narr_15", "（あなたはバルガスとリリィを連れて、ゼクの影の中へ飛び込む。）", "", actor=pc) \
         .say("narr_16", "（背後からアスタロトの怒号に近い咆哮が聞こえるが、視界は瞬時に暗転した。）", "", actor=pc) \

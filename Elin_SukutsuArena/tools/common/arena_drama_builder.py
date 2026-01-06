@@ -78,3 +78,21 @@ class ArenaDramaBuilder(DramaBuilder):
         # C#側で一括処理
         script = f"Elin_SukutsuArena.ArenaManager.SayAndStartDrama(\"{actor_id}\", \"{message}\", \"{drama_name}\");"
         return self.action("eval", param=script)
+
+    def start_battle_by_stage(self, stage_id: str, master_id: str = None) -> 'ArenaDramaBuilder':
+        """
+        ステージIDを指定して戦闘を開始する
+
+        Args:
+            stage_id: ステージID（例: "rank_g_trial", "stage_1", "debug_weak"）
+            master_id: アリーナマスターのキャラクターID（省略時は tg を使用）
+
+        Note:
+            ステージ定義は battle_stages.json から読み込まれます。
+            JSON内の敵設定、BGM、報酬が自動適用されます。
+        """
+        if master_id:
+            script = f"Elin_SukutsuArena.ArenaManager.StartBattleByStage(\"{stage_id}\", \"{master_id}\");"
+        else:
+            script = f"Elin_SukutsuArena.ArenaManager.StartBattleByStage(\"{stage_id}\", tg);"
+        return self.action("eval", param=script)

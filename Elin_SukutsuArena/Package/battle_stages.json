@@ -1,0 +1,908 @@
+{
+  "rankUpStages": {
+    "rank_g_trial": {
+      "stageId": "rank_g_trial",
+      "displayNameJp": "屑肉の洗礼",
+      "displayNameEn": "Baptism of Scrap Meat",
+      "zoneType": "field",
+      "bgmBattle": "",
+      "bgmVictory": "",
+      "rewardPlat": 5,
+      "enemies": [
+        {
+          "charaId": "putty",
+          "level": 15,
+          "rarity": "Normal",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": false,
+          "count": 3
+        },
+        {
+          "charaId": "putty",
+          "level": 20,
+          "rarity": "Normal",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": false,
+          "count": 2
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "「動く死体」から「屑肉」へ。これがお前の第一歩だ——バルガス",
+      "descriptionEn": "'From walking corpse to scrap meat. This is your first step.' —Balgas"
+    },
+    "rank_f_trial": {
+      "stageId": "rank_f_trial",
+      "displayNameJp": "泥犬の牙",
+      "displayNameEn": "Fangs of the Mud Dog",
+      "zoneType": "field",
+      "bgmBattle": "BGM/Battle_RankE_Ice",
+      "bgmVictory": "",
+      "rewardPlat": 10,
+      "enemies": [
+        {
+          "charaId": "hound",
+          "level": 40,
+          "rarity": "Superior",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": false,
+          "count": 1
+        },
+        {
+          "charaId": "hound",
+          "level": 45,
+          "rarity": "Superior",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": false,
+          "count": 1
+        },
+        {
+          "charaId": "wolf",
+          "level": 50,
+          "rarity": "Superior",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": true,
+          "count": 1
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "次元の狭間で変異した獣たち。群れで狩りをする本能は、異次元でも健在だ。",
+      "descriptionEn": "Beasts mutated in the dimensional void. Their pack hunting instincts remain intact even in other dimensions."
+    },
+    "rank_e_trial": {
+      "stageId": "rank_e_trial",
+      "displayNameJp": "錆びついた英雄",
+      "displayNameEn": "The Rusty Hero",
+      "zoneType": "field",
+      "bgmBattle": "BGM/Battle_Kain_Requiem",
+      "bgmVictory": "",
+      "rewardPlat": 20,
+      "enemies": [
+        {
+          "charaId": "sukutsu_kain_ghost",
+          "level": 90,
+          "rarity": "Legendary",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": true,
+          "count": 1
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "鉄血団の元副団長——バルガスが息子のように愛した男。今は記憶の大半を失い、戦闘本能だけが残った残留思念。",
+      "descriptionEn": "Former vice-captain of the Iron Blood Corps—the man Balgas loved like a son. Now a lingering soul with only combat instincts remaining."
+    },
+    "rank_d_trial": {
+      "stageId": "rank_d_trial",
+      "displayNameJp": "銅貨稼ぎの洗礼",
+      "displayNameEn": "Copper Earner's Baptism",
+      "zoneType": "field",
+      "bgmBattle": "BGM/Battle_RankD_Chaos",
+      "bgmVictory": "",
+      "rewardPlat": 30,
+      "enemies": [
+        {
+          "charaId": "minotaur",
+          "level": 150,
+          "rarity": "Superior",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": true,
+          "count": 1
+        },
+        {
+          "charaId": "orc",
+          "level": 120,
+          "rarity": "Normal",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": false,
+          "count": 2
+        }
+      ],
+      "gimmicks": [
+        {
+          "gimmickType": "audience_interference",
+          "interval": 4.0,
+          "damage": 25,
+          "radius": 3,
+          "startDelay": 3.0,
+          "effectName": "explosion",
+          "soundName": "explosion",
+          "enableEscalation": true,
+          "escalationRate": 0.9,
+          "minInterval": 0.8,
+          "maxRadius": 6,
+          "radiusGrowthInterval": 30.0,
+          "enableItemDrop": true,
+          "itemDropChance": 0.12,
+          "blastRadius": 2,
+          "directHitChance": 0.35,
+          "explosionCount": 1
+        }
+      ],
+      "descriptionJp": "観客の「注目」が初めて本格的に向けられる試練。その視線は時に物理的な力となって降り注ぐ。",
+      "descriptionEn": "The first trial where the audience's 'attention' truly focuses on you. Their gaze sometimes manifests as physical force."
+    },
+    "rank_c_trial": {
+      "stageId": "rank_c_trial",
+      "displayNameJp": "闘技場の鴉",
+      "displayNameEn": "Ravens of the Coliseum",
+      "zoneType": "field",
+      "bgmBattle": "BGM/Battle_RankC_Heroic_Lament",
+      "bgmVictory": "",
+      "rewardPlat": 50,
+      "enemies": [
+        {
+          "charaId": "orc_warrior",
+          "level": 350,
+          "rarity": "Superior",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": false,
+          "count": 2
+        },
+        {
+          "charaId": "minotaur",
+          "level": 400,
+          "rarity": "Legendary",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": false,
+          "count": 1
+        },
+        {
+          "charaId": "centaur",
+          "level": 450,
+          "rarity": "Legendary",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": true,
+          "count": 1
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "アリーナに巣食う「鴉」たち——かつての挑戦者だった者たちが、今は番人として立ちはだかる。",
+      "descriptionEn": "The 'Ravens' that nest in the arena—former challengers who now stand as guardians."
+    },
+    "rank_b_trial": {
+      "stageId": "rank_b_trial",
+      "displayNameJp": "虚無の処刑人",
+      "displayNameEn": "Void Executioner Null",
+      "zoneType": "field",
+      "bgmBattle": "BGM/Battle_Null_Assassin",
+      "bgmVictory": "",
+      "rewardPlat": 80,
+      "enemies": [
+        {
+          "charaId": "sukutsu_null",
+          "level": 800,
+          "rarity": "Mythical",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": true,
+          "count": 1
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "「神の孵化場」計画の失敗作——暗殺人形ヌル。透明化し、一撃で仕留める。彼女の中には、素材となった誰かの記憶が眠っている。",
+      "descriptionEn": "A failure of the 'God Hatchery' project—the assassin doll Null. She turns invisible and kills in one strike. Memories of whoever became her material still slumber within."
+    },
+    "rank_a_trial": {
+      "stageId": "rank_a_trial",
+      "displayNameJp": "黄金の戦鬼",
+      "displayNameEn": "Golden War Demon",
+      "zoneType": "field",
+      "bgmBattle": "BGM/Battle_Shadow_Self",
+      "bgmVictory": "",
+      "rewardPlat": 120,
+      "enemies": [
+        {
+          "charaId": "sukutsu_shadow_self",
+          "level": 2500,
+          "rarity": "Mythical",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": true,
+          "count": 1
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "観客の「注目」が生み出した、お前自身の影。お前の全てを知り、お前の全てを模倣する——だが、お前には「成長」がある。",
+      "descriptionEn": "A shadow born from the audience's 'attention'—it knows everything about you. But unlike it, you can grow."
+    },
+    "rank_s_trial": {
+      "stageId": "rank_s_trial",
+      "displayNameJp": "屠竜者への道",
+      "displayNameEn": "Path to Dragon Slayer",
+      "zoneType": "field",
+      "bgmBattle": "BGM/Battle_Balgas_Prime",
+      "bgmVictory": "",
+      "rewardPlat": 200,
+      "enemies": [
+        {
+          "charaId": "sukutsu_balgas_prime",
+          "level": 8000,
+          "rarity": "Mythical",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": true,
+          "count": 1
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "「若返りの薬」を服用し、全盛期の力を取り戻したバルガス。かつて200名の精鋭を率い、竜すら屠った伝説の傭兵団長。",
+      "descriptionEn": "Balgas restored to his prime by the 'Rejuvenation Potion.' The legendary mercenary captain who once led 200 elites and slew dragons."
+    },
+    "final_astaroth": {
+      "stageId": "final_astaroth",
+      "displayNameJp": "竜神との対峙",
+      "displayNameEn": "Confrontation with the Dragon God",
+      "zoneType": "field",
+      "bgmBattle": "BGM/Battle_Astaroth_Phase1",
+      "bgmVictory": "BGM/Final_Liberation",
+      "rewardPlat": 1000,
+      "enemies": [
+        {
+          "charaId": "sukutsu_astaroth",
+          "level": 50000,
+          "rarity": "Mythical",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": true,
+          "count": 1
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "イルヴァの神々と同格の竜神。滅びた次元「カラドリウス」の唯一の生存者。3,000年間、観客の「注目」を力に変え続けてきたアリーナの創造者にして支配者。",
+      "descriptionEn": "A dragon god on par with the gods of Ilva. The sole survivor of fallen 'Caladrius.' For 3,000 years, he has converted the audience's 'attention' into power—the creator and ruler of the arena."
+    }
+  },
+  "normalStages": {
+    "stage_1": {
+      "stageId": "stage_1",
+      "displayNameJp": "森の狼",
+      "displayNameEn": "Forest Wolf",
+      "zoneType": "field",
+      "bgmBattle": "",
+      "bgmVictory": "",
+      "rewardPlat": 10,
+      "enemies": [
+        {
+          "charaId": "wolf",
+          "level": 5,
+          "rarity": "Normal",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": false,
+          "count": 1
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "",
+      "descriptionEn": ""
+    },
+    "stage_2": {
+      "stageId": "stage_2",
+      "displayNameJp": "ケンタウロス",
+      "displayNameEn": "Centaur",
+      "zoneType": "field",
+      "bgmBattle": "",
+      "bgmVictory": "",
+      "rewardPlat": 20,
+      "enemies": [
+        {
+          "charaId": "centaur",
+          "level": 15,
+          "rarity": "Superior",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": false,
+          "count": 1
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "",
+      "descriptionEn": ""
+    },
+    "stage_3": {
+      "stageId": "stage_3",
+      "displayNameJp": "ミノタウロス",
+      "displayNameEn": "Minotaur",
+      "zoneType": "field",
+      "bgmBattle": "",
+      "bgmVictory": "",
+      "rewardPlat": 30,
+      "enemies": [
+        {
+          "charaId": "minotaur",
+          "level": 25,
+          "rarity": "Superior",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": false,
+          "count": 1
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "",
+      "descriptionEn": ""
+    },
+    "stage_4": {
+      "stageId": "stage_4",
+      "displayNameJp": "竜との対峙",
+      "displayNameEn": "Dragon Confrontation",
+      "zoneType": "field",
+      "bgmBattle": "",
+      "bgmVictory": "",
+      "rewardPlat": 50,
+      "enemies": [
+        {
+          "charaId": "dragon",
+          "level": 40,
+          "rarity": "Legendary",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": true,
+          "count": 1
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "",
+      "descriptionEn": ""
+    }
+  },
+  "debugStages": {
+    "rank_g_trial": {
+      "stageId": "rank_g_trial",
+      "displayNameJp": "屑肉の洗礼",
+      "displayNameEn": "Baptism of Scrap Meat",
+      "zoneType": "field",
+      "bgmBattle": "",
+      "bgmVictory": "",
+      "rewardPlat": 5,
+      "enemies": [
+        {
+          "charaId": "putty",
+          "level": 15,
+          "rarity": "Normal",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": false,
+          "count": 3
+        },
+        {
+          "charaId": "putty",
+          "level": 20,
+          "rarity": "Normal",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": false,
+          "count": 2
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "「動く死体」から「屑肉」へ。これがお前の第一歩だ——バルガス",
+      "descriptionEn": "'From walking corpse to scrap meat. This is your first step.' —Balgas"
+    },
+    "rank_f_trial": {
+      "stageId": "rank_f_trial",
+      "displayNameJp": "泥犬の牙",
+      "displayNameEn": "Fangs of the Mud Dog",
+      "zoneType": "field",
+      "bgmBattle": "BGM/Battle_RankE_Ice",
+      "bgmVictory": "",
+      "rewardPlat": 10,
+      "enemies": [
+        {
+          "charaId": "hound",
+          "level": 40,
+          "rarity": "Superior",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": false,
+          "count": 1
+        },
+        {
+          "charaId": "hound",
+          "level": 45,
+          "rarity": "Superior",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": false,
+          "count": 1
+        },
+        {
+          "charaId": "wolf",
+          "level": 50,
+          "rarity": "Superior",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": true,
+          "count": 1
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "次元の狭間で変異した獣たち。群れで狩りをする本能は、異次元でも健在だ。",
+      "descriptionEn": "Beasts mutated in the dimensional void. Their pack hunting instincts remain intact even in other dimensions."
+    },
+    "rank_e_trial": {
+      "stageId": "rank_e_trial",
+      "displayNameJp": "錆びついた英雄",
+      "displayNameEn": "The Rusty Hero",
+      "zoneType": "field",
+      "bgmBattle": "BGM/Battle_Kain_Requiem",
+      "bgmVictory": "",
+      "rewardPlat": 20,
+      "enemies": [
+        {
+          "charaId": "sukutsu_kain_ghost",
+          "level": 90,
+          "rarity": "Legendary",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": true,
+          "count": 1
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "鉄血団の元副団長——バルガスが息子のように愛した男。今は記憶の大半を失い、戦闘本能だけが残った残留思念。",
+      "descriptionEn": "Former vice-captain of the Iron Blood Corps—the man Balgas loved like a son. Now a lingering soul with only combat instincts remaining."
+    },
+    "rank_d_trial": {
+      "stageId": "rank_d_trial",
+      "displayNameJp": "銅貨稼ぎの洗礼",
+      "displayNameEn": "Copper Earner's Baptism",
+      "zoneType": "field",
+      "bgmBattle": "BGM/Battle_RankD_Chaos",
+      "bgmVictory": "",
+      "rewardPlat": 30,
+      "enemies": [
+        {
+          "charaId": "minotaur",
+          "level": 150,
+          "rarity": "Superior",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": true,
+          "count": 1
+        },
+        {
+          "charaId": "orc",
+          "level": 120,
+          "rarity": "Normal",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": false,
+          "count": 2
+        }
+      ],
+      "gimmicks": [
+        {
+          "gimmickType": "audience_interference",
+          "interval": 4.0,
+          "damage": 25,
+          "radius": 3,
+          "startDelay": 3.0,
+          "effectName": "explosion",
+          "soundName": "explosion",
+          "enableEscalation": true,
+          "escalationRate": 0.9,
+          "minInterval": 0.8,
+          "maxRadius": 6,
+          "radiusGrowthInterval": 30.0,
+          "enableItemDrop": true,
+          "itemDropChance": 0.12,
+          "blastRadius": 2,
+          "directHitChance": 0.35,
+          "explosionCount": 1
+        }
+      ],
+      "descriptionJp": "観客の「注目」が初めて本格的に向けられる試練。その視線は時に物理的な力となって降り注ぐ。",
+      "descriptionEn": "The first trial where the audience's 'attention' truly focuses on you. Their gaze sometimes manifests as physical force."
+    },
+    "rank_c_trial": {
+      "stageId": "rank_c_trial",
+      "displayNameJp": "闘技場の鴉",
+      "displayNameEn": "Ravens of the Coliseum",
+      "zoneType": "field",
+      "bgmBattle": "BGM/Battle_RankC_Heroic_Lament",
+      "bgmVictory": "",
+      "rewardPlat": 50,
+      "enemies": [
+        {
+          "charaId": "orc_warrior",
+          "level": 350,
+          "rarity": "Superior",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": false,
+          "count": 2
+        },
+        {
+          "charaId": "minotaur",
+          "level": 400,
+          "rarity": "Legendary",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": false,
+          "count": 1
+        },
+        {
+          "charaId": "centaur",
+          "level": 450,
+          "rarity": "Legendary",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": true,
+          "count": 1
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "アリーナに巣食う「鴉」たち——かつての挑戦者だった者たちが、今は番人として立ちはだかる。",
+      "descriptionEn": "The 'Ravens' that nest in the arena—former challengers who now stand as guardians."
+    },
+    "rank_b_trial": {
+      "stageId": "rank_b_trial",
+      "displayNameJp": "虚無の処刑人",
+      "displayNameEn": "Void Executioner Null",
+      "zoneType": "field",
+      "bgmBattle": "BGM/Battle_Null_Assassin",
+      "bgmVictory": "",
+      "rewardPlat": 80,
+      "enemies": [
+        {
+          "charaId": "sukutsu_null",
+          "level": 800,
+          "rarity": "Mythical",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": true,
+          "count": 1
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "「神の孵化場」計画の失敗作——暗殺人形ヌル。透明化し、一撃で仕留める。彼女の中には、素材となった誰かの記憶が眠っている。",
+      "descriptionEn": "A failure of the 'God Hatchery' project—the assassin doll Null. She turns invisible and kills in one strike. Memories of whoever became her material still slumber within."
+    },
+    "rank_a_trial": {
+      "stageId": "rank_a_trial",
+      "displayNameJp": "黄金の戦鬼",
+      "displayNameEn": "Golden War Demon",
+      "zoneType": "field",
+      "bgmBattle": "BGM/Battle_Shadow_Self",
+      "bgmVictory": "",
+      "rewardPlat": 120,
+      "enemies": [
+        {
+          "charaId": "sukutsu_shadow_self",
+          "level": 2500,
+          "rarity": "Mythical",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": true,
+          "count": 1
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "観客の「注目」が生み出した、お前自身の影。お前の全てを知り、お前の全てを模倣する——だが、お前には「成長」がある。",
+      "descriptionEn": "A shadow born from the audience's 'attention'—it knows everything about you. But unlike it, you can grow."
+    },
+    "rank_s_trial": {
+      "stageId": "rank_s_trial",
+      "displayNameJp": "屠竜者への道",
+      "displayNameEn": "Path to Dragon Slayer",
+      "zoneType": "field",
+      "bgmBattle": "BGM/Battle_Balgas_Prime",
+      "bgmVictory": "",
+      "rewardPlat": 200,
+      "enemies": [
+        {
+          "charaId": "sukutsu_balgas_prime",
+          "level": 8000,
+          "rarity": "Mythical",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": true,
+          "count": 1
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "「若返りの薬」を服用し、全盛期の力を取り戻したバルガス。かつて200名の精鋭を率い、竜すら屠った伝説の傭兵団長。",
+      "descriptionEn": "Balgas restored to his prime by the 'Rejuvenation Potion.' The legendary mercenary captain who once led 200 elites and slew dragons."
+    },
+    "final_astaroth": {
+      "stageId": "final_astaroth",
+      "displayNameJp": "竜神との対峙",
+      "displayNameEn": "Confrontation with the Dragon God",
+      "zoneType": "field",
+      "bgmBattle": "BGM/Battle_Astaroth_Phase1",
+      "bgmVictory": "BGM/Final_Liberation",
+      "rewardPlat": 1000,
+      "enemies": [
+        {
+          "charaId": "sukutsu_astaroth",
+          "level": 50000,
+          "rarity": "Mythical",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": true,
+          "count": 1
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "イルヴァの神々と同格の竜神。滅びた次元「カラドリウス」の唯一の生存者。3,000年間、観客の「注目」を力に変え続けてきたアリーナの創造者にして支配者。",
+      "descriptionEn": "A dragon god on par with the gods of Ilva. The sole survivor of fallen 'Caladrius.' For 3,000 years, he has converted the audience's 'attention' into power—the creator and ruler of the arena."
+    },
+    "stage_1": {
+      "stageId": "stage_1",
+      "displayNameJp": "森の狼",
+      "displayNameEn": "Forest Wolf",
+      "zoneType": "field",
+      "bgmBattle": "",
+      "bgmVictory": "",
+      "rewardPlat": 10,
+      "enemies": [
+        {
+          "charaId": "wolf",
+          "level": 5,
+          "rarity": "Normal",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": false,
+          "count": 1
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "",
+      "descriptionEn": ""
+    },
+    "stage_2": {
+      "stageId": "stage_2",
+      "displayNameJp": "ケンタウロス",
+      "displayNameEn": "Centaur",
+      "zoneType": "field",
+      "bgmBattle": "",
+      "bgmVictory": "",
+      "rewardPlat": 20,
+      "enemies": [
+        {
+          "charaId": "centaur",
+          "level": 15,
+          "rarity": "Superior",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": false,
+          "count": 1
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "",
+      "descriptionEn": ""
+    },
+    "stage_3": {
+      "stageId": "stage_3",
+      "displayNameJp": "ミノタウロス",
+      "displayNameEn": "Minotaur",
+      "zoneType": "field",
+      "bgmBattle": "",
+      "bgmVictory": "",
+      "rewardPlat": 30,
+      "enemies": [
+        {
+          "charaId": "minotaur",
+          "level": 25,
+          "rarity": "Superior",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": false,
+          "count": 1
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "",
+      "descriptionEn": ""
+    },
+    "stage_4": {
+      "stageId": "stage_4",
+      "displayNameJp": "竜との対峙",
+      "displayNameEn": "Dragon Confrontation",
+      "zoneType": "field",
+      "bgmBattle": "",
+      "bgmVictory": "",
+      "rewardPlat": 50,
+      "enemies": [
+        {
+          "charaId": "dragon",
+          "level": 40,
+          "rarity": "Legendary",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": true,
+          "count": 1
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "",
+      "descriptionEn": ""
+    },
+    "debug_weak": {
+      "stageId": "debug_weak",
+      "displayNameJp": "[DEBUG] 弱い敵",
+      "displayNameEn": "[DEBUG] Weak Enemy",
+      "zoneType": "field",
+      "bgmBattle": "",
+      "bgmVictory": "",
+      "rewardPlat": 1,
+      "enemies": [
+        {
+          "charaId": "putty",
+          "level": 1,
+          "rarity": "Normal",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": false,
+          "count": 1
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "デバッグ用：レベル1のパティ",
+      "descriptionEn": ""
+    },
+    "debug_strong": {
+      "stageId": "debug_strong",
+      "displayNameJp": "[DEBUG] 強い敵",
+      "displayNameEn": "[DEBUG] Strong Enemy",
+      "zoneType": "field",
+      "bgmBattle": "",
+      "bgmVictory": "",
+      "rewardPlat": 100,
+      "enemies": [
+        {
+          "charaId": "dragon",
+          "level": 100,
+          "rarity": "Mythical",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": true,
+          "count": 1
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "デバッグ用：レベル100の神話級ドラゴン",
+      "descriptionEn": ""
+    },
+    "debug_horde": {
+      "stageId": "debug_horde",
+      "displayNameJp": "[DEBUG] 敵の群れ",
+      "displayNameEn": "[DEBUG] Enemy Horde",
+      "zoneType": "field",
+      "bgmBattle": "",
+      "bgmVictory": "",
+      "rewardPlat": 50,
+      "enemies": [
+        {
+          "charaId": "goblin",
+          "level": 10,
+          "rarity": "Normal",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": false,
+          "count": 10
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "デバッグ用：10体のゴブリン",
+      "descriptionEn": ""
+    },
+    "debug_gimmick": {
+      "stageId": "debug_gimmick",
+      "displayNameJp": "[DEBUG] ギミックテスト",
+      "displayNameEn": "[DEBUG] Gimmick Test",
+      "zoneType": "field",
+      "bgmBattle": "",
+      "bgmVictory": "",
+      "rewardPlat": 10,
+      "enemies": [
+        {
+          "charaId": "putty",
+          "level": 5,
+          "rarity": "Normal",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": false,
+          "count": 3
+        }
+      ],
+      "gimmicks": [
+        {
+          "gimmickType": "audience_interference",
+          "interval": 2.0,
+          "damage": 10,
+          "radius": 2,
+          "startDelay": 1.0,
+          "effectName": "explosion",
+          "soundName": "explosion",
+          "enableEscalation": true,
+          "escalationRate": 0.8,
+          "minInterval": 0.3,
+          "maxRadius": 10,
+          "radiusGrowthInterval": 10.0,
+          "enableItemDrop": true,
+          "itemDropChance": 0.2,
+          "blastRadius": 3,
+          "directHitChance": 0.6,
+          "explosionCount": 2
+        }
+      ],
+      "descriptionJp": "デバッグ用：高命中率ギミック確認",
+      "descriptionEn": "Debug: High hit rate gimmick test"
+    }
+  }
+}
