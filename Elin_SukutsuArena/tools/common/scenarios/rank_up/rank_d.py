@@ -6,6 +6,7 @@
 
 from drama_builder import DramaBuilder
 from flag_definitions import Keys, Rank, Actors, QuestIds
+from reward_system import add_reward_choice, get_reward_tier_for_rank
 
 def define_rank_up_D(builder: DramaBuilder):
     """
@@ -137,6 +138,8 @@ def add_rank_up_D_result_steps(builder: DramaBuilder, victory_label: str, defeat
     # ========================================
     # Rank D 昇格試験 勝利
     # ========================================
+    after_reward_label_d = f"{victory_label}_after_reward"
+
     builder.step(victory_label) \
         .set_flag("sukutsu_arena_result", 0) \
         .play_bgm("BGM/Fanfare_Audience") \
@@ -147,49 +150,26 @@ def add_rank_up_D_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .say("lily_v1", "……素晴らしい。観客の皆様も、大変お喜びでしたよ。", "", actor=lily) \
         .say("lily_v2", "落下物を巧みに避け、時には利用する。その立ち回り、まさに『銅貨稼ぎ』の名に相応しい。", "", actor=lily) \
         .focus_chara(Actors.BALGAS) \
-        .say("narr_v4", "（バルガスが酒瓶を傾けながら近づいてくる。）", "", actor=pc) \
         .say("balgas_v1", "……ケッ、やるじゃねえか。", "", actor=balgas) \
-        .say("balgas_v2", "お前は今、ただの『鉄屑』から、観客に媚びを売って生き延びる『銅貨稼ぎ』になった。", "", actor=balgas) \
-        .say("balgas_v3", "誇れることじゃねえが……生き残るためには必要なスキルだ。", "", actor=balgas) \
         .focus_chara(Actors.LILY) \
-        .say("lily_v3", "では、報酬の授与です。", "", actor=lily) \
-        .say("lily_v4", "観客からの投げ銭……小さなコイン12枚とプラチナコイン4枚。それと、戦闘記録として素材を一つ選んでいただけます。", "", actor=lily)
-
-    # 報酬選択肢 (ラベル名に _d サフィックスを付けて衝突を回避)
-    reward_stone_d = builder.label("reward_stone_d")
-    reward_potion_d = builder.label("reward_potion_d")
-    reward_iron_d = builder.label("reward_iron_d")
-    reward_end_d = builder.label("reward_end_d")
-
-    builder.choice(reward_stone_d, "石材を頼む", "", text_id="c_reward_stone_d") \
-           .choice(reward_potion_d, "ポーションが欲しい", "", text_id="c_reward_potion_d") \
-           .choice(reward_iron_d, "鉄の欠片を選ぶ", "", text_id="c_reward_iron_d")
-
-    builder.step(reward_stone_d) \
-        .say("lily_rew1_d", "『石材×1』、記録いたしました。落下物の記憶ですね。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"stone\"));") \
-        .jump(reward_end_d)
-
-    builder.step(reward_potion_d) \
-        .say("lily_rew2_d", "『ポーション×1』、記録いたしました。……次も、降ってくるといいですね。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"potion_minor\"));") \
-        .jump(reward_end_d)
-
-    builder.step(reward_iron_d) \
-        .say("lily_rew3_d", "『鉄の欠片×1』ですね。……実用的です。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"fragment_iron\"));") \
-        .jump(reward_end_d)
-
-    builder.step(reward_end_d) \
-        .action("eval", param="for(int i=0; i<12; i++) { EClass.pc.Pick(ThingGen.Create(\"coin\")); } for(int i=0; i<4; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
-        .say("lily_v5", "記録完了です。", "", actor=lily) \
-        .say("lily_v6", "……それと、今回の戦いで、あなたは観客の『ヤジ』を避けるコツを掴んだようですね。", "", actor=lily) \
-        .say("lily_v7", "次からは、もっと酷いものが降ってきます。……覚悟しておいてくださいね？", "", actor=lily) \
+        .say("lily_v3", "では、報酬を選んでください。", "", actor=lily) \
         .complete_quest(QuestIds.RANK_UP_D) \
-        .set_flag(Keys.RANK, 4) \
-        .mod_flag(Keys.REL_LILY, "+", 10) \
+        .mod_flag(Keys.REL_LILY, "+", 10)
+
+    # 3択報酬選択
+    add_reward_choice(
+        builder,
+        tier=get_reward_tier_for_rank("D"),
+        choice_label_prefix="rup_d_reward",
+        after_reward_label=after_reward_label_d,
+        lily_actor=lily,
+        pc_actor=pc
+    )
+
+    builder.step(after_reward_label_d) \
         .say("sys_title", "【システム】称号『銅貨稼ぎ（Copper Earner）』を獲得しました。回避+5、運+3 の加護を得た！", "") \
         .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantRankDBonus();") \
+        .set_flag(Keys.RANK, 4) \
         .jump(return_label)
 
     # ========================================

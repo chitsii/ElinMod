@@ -158,12 +158,12 @@ def define_balgas_training(builder: DramaBuilder):
 
     builder.step(reward_stone) \
         .say("lily_rew1", "『研磨石×1』、記録いたしました。バルガスさんの哲学を継ぐ、良い選択ですね。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"whetstone\"));") \
+        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"stone\"));") \
         .jump(reward_end)
 
     builder.step(reward_steel) \
         .say("lily_rew2", "『鋼鉄の欠片×1』、記録いたしました。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"steel\"));") \
+        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"ingot\"));") \
         .jump(reward_end)
 
     builder.step(reward_bone) \
@@ -172,7 +172,7 @@ def define_balgas_training(builder: DramaBuilder):
         .jump(reward_end)
 
     builder.step(reward_end) \
-        .action("eval", param="for(int i=0; i<12; i++) { EClass.pc.Pick(ThingGen.Create(\"coin\")); } for(int i=0; i<5; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
+        .action("eval", param="for(int i=0; i<12; i++) { EClass.pc.Pick(ThingGen.Create(\"money\")); } for(int i=0; i<5; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
         .say("lily_7", "記録完了です。", "", actor=lily) \
         .say("lily_8", "……それと、今回の戦いで、あなたは『闘技場の鴉』としての称号を獲得しました。", "", actor=lily) \
         .say("lily_9", "死肉を喰らい、戦場を飛び回る……ふふ、あなたらしいですね。", "", actor=lily) \

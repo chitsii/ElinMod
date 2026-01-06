@@ -4,6 +4,7 @@
 
 from drama_builder import DramaBuilder
 from flag_definitions import Keys, Rank, Actors, QuestIds
+from reward_system import add_reward_choice, get_reward_tier_for_rank
 
 def define_rank_up_F(builder: DramaBuilder):
     """
@@ -134,6 +135,8 @@ def add_rank_up_F_result_steps(builder: DramaBuilder, victory_label: str, defeat
     # ========================================
     # Rank F 昇格試験 勝利
     # ========================================
+    after_reward_label_f = f"{victory_label}_after_reward"
+
     builder.step(victory_label) \
         .set_flag("sukutsu_arena_result", 0) \
         .play_bgm("BGM/Lobby_Normal") \
@@ -144,66 +147,23 @@ def add_rank_up_F_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .say("narr_v3", "（彼はあなたの肩を乱暴に叩く。その手は、熱を帯びている。）", "", actor=pc) \
         .say("balgas_v2", "いいぜ、その執念深さ。今の無様な姿こそ、このアリーナに相応しい。", "", actor=balgas) \
         .say("balgas_v3", "これで『屑肉』は卒業だ。今日からお前はランクF……泥にまみれても食らいつく『泥犬（Mud Dog）』だ。", "", actor=balgas) \
-        .say("balgas_v4", "……まあ、悪くねえ。次も、その泥臭さを忘れるんじゃねえぞ。", "", actor=balgas) \
         .focus_chara(Actors.LILY) \
-        .say("lily_v1", "おめでとうございます。死体袋は、また次回まで取っておきましょう。", "", actor=lily) \
-        .say("lily_v2", "この称号『泥犬』は、あなたがどれほど理不尽な環境でも生き延びる『害虫』のような生命力を持っている証です。……ふふ、褒めているのですよ？", "", actor=lily) \
-        .say("lily_v4", "さて、報酬の授与です。観客からの投げ銭……**小さなコイン5枚**。それと、今回は少し難易度が高かったため、**プラチナコイン1枚**も追加されております。", "", actor=lily) \
-        .say("lily_v5", "そして、戦闘記録として**素材を一つ**選んでいただけます。……氷の魔犬を倒した記念に、何か冷気に関する素材がよろしいのでは？", "", actor=lily)
+        .say("lily_v1", "おめでとうございます。報酬を選んでください。", "", actor=lily) \
+        .complete_quest(QuestIds.RANK_UP_F)
 
-    # 報酬選択肢 (ラベル名に _f サフィックスを付けて衝突を回避)
-    reward_ice_f = builder.label("reward_ice_f")
-    reward_bone_f = builder.label("reward_bone_f")
-    reward_iron_f = builder.label("reward_iron_f")
-    reward_end_f = builder.label("reward_end_f")
+    # 3択報酬選択
+    add_reward_choice(
+        builder,
+        tier=get_reward_tier_for_rank("F"),
+        choice_label_prefix="rup_f_reward",
+        after_reward_label=after_reward_label_f,
+        lily_actor=lily,
+        pc_actor=pc
+    )
 
-    builder.choice(reward_ice_f, "氷の結晶を頼む", "", text_id="c_reward_ice_f") \
-           .choice(reward_bone_f, "骨を選ぶ", "", text_id="c_reward_bone_f") \
-           .choice(reward_iron_f, "鉄の欠片が欲しい", "", text_id="c_reward_iron_f")
-
-    builder.step(reward_ice_f) \
-        .say("lily_rew_1_f", "『氷の結晶×1』、記録いたしました。冷たい戦いの、良い記念になりますね。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"ice\"));") \
-        .jump(reward_end_f)
-
-    builder.step(reward_bone_f) \
-        .say("lily_rew_2_f", "『骨×1』ですね。……魔犬の骨ではなく、普通の骨ですが。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"bone\"));") \
-        .jump(reward_end_f)
-
-    builder.step(reward_iron_f) \
-        .say("lily_rew_3_f", "『鉄の欠片×1』、記録いたしました。堅実な選択ですね。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"scrap\"));") \
-        .jump(reward_end_f)
-
-    builder.step(reward_end_f) \
-        .action("eval", param="for(int i=0; i<5; i++) { EClass.pc.Pick(ThingGen.Create(\"coin\")); } EClass.pc.Pick(ThingGen.Create(\"plat\"));") \
-        .complete_quest(QuestIds.RANK_UP_F) \
+    builder.step(after_reward_label_f) \
         .say("sys_title", "【システム】称号『泥犬（Mud Dog）』を獲得しました。耐久+3、冷気耐性+5 の加護を得た！", "") \
         .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantRankFBonus();") \
-        .say("lily_v6_f", "記録完了です。……それと、今回の戦いで、あなたの体が少し『冷気』に慣れたようですね。台帳にその変化も記録しておきました。", "", actor=lily)
-
-    # 最終選択肢 (ラベル名に _f サフィックスを付けて衝突を回避)
-    final_next_f = builder.label("final_next_f")
-    final_rest_f = builder.label("final_rest_f")
-    final_silent_f = builder.label("final_silent_f")
-
-    builder.choice(final_next_f, "次も、必ず勝つ", "", text_id="c_final_next_f") \
-           .choice(final_rest_f, "……少し、休ませてくれ", "", text_id="c_final_rest_f") \
-           .choice(final_silent_f, "（無言で頷く）", "", text_id="c_final_silent_f")
-
-    builder.step(final_next_f) \
-        .say("lily_f1", "ふふ、自信がおありで結構。では、次のご依頼もお待ちしておりますね。", "", actor=lily) \
-        .set_flag(Keys.RANK, 2) \
-        .jump(return_label)
-
-    builder.step(final_rest_f) \
-        .say("lily_f2", "ええ、もちろん。無理はなさらないでくださいませ。……死なれては、困りますから。", "", actor=lily) \
-        .set_flag(Keys.RANK, 2) \
-        .jump(return_label)
-
-    builder.step(final_silent_f) \
-        .say("lily_f3", "……お疲れのようですね。ゆっくりなさってください。", "", actor=lily) \
         .set_flag(Keys.RANK, 2) \
         .jump(return_label)
 

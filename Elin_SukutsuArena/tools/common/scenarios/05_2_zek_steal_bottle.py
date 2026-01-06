@@ -133,7 +133,7 @@ def define_zek_steal_bottle(builder: DramaBuilder):
         .set_flag(Keys.BOTTLE_CHOICE, FlagValues.BottleChoice.SWAPPED) \
         .mod_flag(Keys.REL_LILY, "+", 10) \
         .mod_flag(Keys.REL_ZEK, "+", 15) \
-        .action("eval", param="for(int i=0; i<10; i++) { EClass.pc.Pick(ThingGen.Create(\"coin\")); } for(int i=0; i<3; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
+        .action("eval", param="for(int i=0; i<10; i++) { EClass.pc.Pick(ThingGen.Create(\"money\")); } for(int i=0; i<3; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
         .jump(scene4_aftermath)
 
     # ========================================

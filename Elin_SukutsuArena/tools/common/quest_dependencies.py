@@ -1,4 +1,4 @@
-"""
+﻿"""
 Quest Dependency Management System
 
 This module defines the quest flow and dependencies for the Sukutsu Arena mod.
@@ -105,7 +105,7 @@ QUEST_DEFINITIONS = [
         display_name_en="Rank G Promotion Trial (Baptism of Scraps)",
         description="最初の試練を突破し、ランクGを獲得する",
         phase=Phase.PROLOGUE,
-        quest_giver=Actors.LILY,
+        quest_giver=Actors.BALGAS,  # アリーナマスターから受注
         auto_trigger=False,
         advances_phase=Phase.INITIATION,  # 初戦勝利でフェーズ進行
         required_flags=[

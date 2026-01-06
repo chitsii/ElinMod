@@ -5,6 +5,7 @@
 
 from drama_builder import DramaBuilder
 from flag_definitions import Keys, Rank, Actors, QuestIds
+from reward_system import add_reward_choice, get_reward_tier_for_rank
 
 def define_rank_up_B(builder: DramaBuilder):
     """
@@ -136,63 +137,37 @@ def add_rank_up_B_result_steps(builder: DramaBuilder, victory_label: str, defeat
     # ========================================
     # Rank B 昇格試験 勝利
     # ========================================
+    after_reward_label_b = f"{victory_label}_after_reward"
+
     builder.step(victory_label) \
         .set_flag("sukutsu_arena_result", 0) \
         .play_bgm("BGM/Emotional_Sacred_Triumph_Special") \
         .say("narr_v1", "（ヌルの体が霧のように消え去る瞬間、あなたの耳に、かすかに音が戻ってきた。）", "", actor=pc) \
-        .say("narr_v2", "（それは、観客の歓声でも、嘲笑でもない。ただ、静かな沈黙の中に響く、あなた自身の心臓の鼓動。）", "", actor=pc) \
-        .say("narr_v3", "（ロビーに戻ると、リリィが駆け寄ってきた。）", "", actor=pc) \
+        .say("narr_v2", "（ロビーに戻ると、リリィが駆け寄ってきた。）", "", actor=pc) \
         .focus_chara(Actors.LILY) \
-        .say("lily_v1", "……おかえりなさい。", "", actor=lily) \
-        .say("narr_v4", "（彼女の目には涙。サキュバスが、二度目の涙を流している。）", "", actor=pc) \
-        .say("lily_v2", "あなたは……本当に、虚無を打ち破ったのですね。", "", actor=lily) \
-        .say("lily_v3", "信じられません。このアリーナの歴史で、ヌルを倒した闘士は……あなたが初めてです。", "", actor=lily) \
+        .say("lily_v1", "……おかえりなさい。あなたは虚無を打ち破ったのですね。", "", actor=lily) \
         .focus_chara(Actors.BALGAS) \
-        .say("narr_v5", "（バルガスが、珍しく笑顔で近づいてくる。）", "", actor=pc) \
-        .say("balgas_v1", "……ケッ、やりやがったな。", "", actor=balgas) \
-        .say("balgas_v2", "お前は、カインが持っていた以上の……いや、俺たち全員が持っていなかった『何か』を持っている。", "", actor=balgas) \
-        .say("balgas_v3", "今日からお前は、ただの『闘技場の鴉』じゃねえ。", "", actor=balgas) \
-        .say("balgas_v4", "絶望の空を飛び越え、希望を掴み取る……『銀翼（Silver Wing）』だ。", "", actor=balgas) \
+        .say("balgas_v1", "……ケッ、やりやがったな。今日からお前は『銀翼（Silver Wing）』だ。", "", actor=balgas) \
         .focus_chara(Actors.LILY) \
-        .say("lily_v4", "では、報酬の授与です。", "", actor=lily) \
-        .say("lily_v5", "観客からの祝福……小さなコイン20枚とプラチナコイン10枚。それと、戦闘記録として特別な素材を一つ選んでいただけます。", "", actor=lily)
-
-    # 報酬選択肢 (ラベル名に _b サフィックスを付けて衝突を回避)
-    reward_ether_b = builder.label("reward_ether_b")
-    reward_void_b = builder.label("reward_void_b")
-    reward_mana_b = builder.label("reward_mana_b")
-    reward_end_b = builder.label("reward_end_b")
-
-    builder.choice(reward_ether_b, "エーテルの欠片を頼む", "", text_id="c_reward_ether_b") \
-           .choice(reward_void_b, "虚無の結晶が欲しい", "", text_id="c_reward_void_b") \
-           .choice(reward_mana_b, "魔力の結晶を選ぶ", "", text_id="c_reward_mana_b")
-
-    builder.step(reward_ether_b) \
-        .say("lily_rew1_b", "『エーテルの欠片×1』、記録いたしました。虚無を超えた証ですね。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"ether\"));") \
-        .jump(reward_end_b)
-
-    builder.step(reward_void_b) \
-        .say("lily_rew2_b", "『虚無の結晶×1』、記録いたしました。……危険ですが、強力な素材です。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"void_crystal\"));") \
-        .jump(reward_end_b)
-
-    builder.step(reward_mana_b) \
-        .say("lily_rew3_b", "『魔力の結晶×1』ですね。……安定の選択ですこと。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"gem_mana\"));") \
-        .jump(reward_end_b)
-
-    builder.step(reward_end_b) \
-        .action("eval", param="for(int i=0; i<20; i++) { EClass.pc.Pick(ThingGen.Create(\"coin\")); } for(int i=0; i<10; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
-        .say("lily_v6", "記録完了です。", "", actor=lily) \
-        .say("lily_v7", "……あなたは今、このアリーナの頂点まであと僅かです。", "", actor=lily) \
-        .say("lily_v8", "次は、グランドマスター・アスタロトとの決戦。……準備が整ったら、また声をかけてくださいね？", "", actor=lily) \
+        .say("lily_v2", "では、報酬を選んでください。", "", actor=lily) \
         .complete_quest(QuestIds.RANK_UP_B) \
-        .set_flag(Keys.RANK, 6) \
         .mod_flag(Keys.REL_BALGAS, "+", 20) \
-        .mod_flag(Keys.REL_LILY, "+", 20) \
+        .mod_flag(Keys.REL_LILY, "+", 20)
+
+    # 3択報酬選択
+    add_reward_choice(
+        builder,
+        tier=get_reward_tier_for_rank("B"),
+        choice_label_prefix="rup_b_reward",
+        after_reward_label=after_reward_label_b,
+        lily_actor=lily,
+        pc_actor=pc
+    )
+
+    builder.step(after_reward_label_b) \
         .say("sys_title", "【システム】称号『銀翼（Silver Wing）』を獲得しました。全ステータス+3、魔法耐性+10 の加護を得た！", "") \
         .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantRankBBonus();") \
+        .set_flag(Keys.RANK, 6) \
         .jump(return_label)
 
     # ========================================

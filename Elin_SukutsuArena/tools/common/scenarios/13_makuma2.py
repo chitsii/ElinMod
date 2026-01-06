@@ -287,7 +287,7 @@ def define_makuma2(builder: DramaBuilder):
         .say("lily_29", "これで、ランクAへの挑戦権を授与いたします。……ふふ、あなたは既に、この異次元の一部となりました。誇っていいですよ。", "", actor=lily) \
         .say("narr_32", "（彼女は台帳に何かを書き込む。）", "", actor=pc) \
         .say("lily_30", "報酬として、**小さなコイン30枚**と**プラチナコイン15枚**を記録いたします。……それと、あなたは『虚空と共鳴する者』としての称号を獲得しました。", "", actor=lily) \
-        .action("eval", param="for(int i=0; i<30; i++) { EClass.pc.Pick(ThingGen.Create(\\\"coin\\\")); } for(int i=0; i<15; i++) { EClass.pc.Pick(ThingGen.Create(\\\"plat\\\")); }") \
+        .action("eval", param="for(int i=0; i<30; i++) { EClass.pc.Pick(ThingGen.Create(\\\"money\\\")); } for(int i=0; i<15; i++) { EClass.pc.Pick(ThingGen.Create(\\\"plat\\\")); }") \
         .jump(ending)
 
     # ========================================

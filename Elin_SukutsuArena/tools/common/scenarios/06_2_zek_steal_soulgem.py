@@ -199,7 +199,7 @@ def define_zek_steal_soulgem(builder: DramaBuilder):
         .shake() \
         .say("zek_sell4", "これで、あなたは『魂を喰らう者』となりました。……では、良い演技を。彼に気づかれないよう、お気をつけて。", "", actor=zek) \
         .say("narr_sell2", "（ゼクは影の中へと消えていく。）", "", actor=pc) \
-        .action("eval", param="for(int i=0; i<15; i++) { EClass.pc.Pick(ThingGen.Create(\"coin\")); } for(int i=0; i<5; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
+        .action("eval", param="for(int i=0; i<15; i++) { EClass.pc.Pick(ThingGen.Create(\"money\")); } for(int i=0; i<5; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
         .jump(sell_balgas)
 
     builder.step(sell_balgas) \

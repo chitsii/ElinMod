@@ -5,6 +5,7 @@
 
 from drama_builder import DramaBuilder
 from flag_definitions import Keys, Rank, Actors, QuestIds
+from reward_system import add_reward_choice, get_reward_tier_for_rank
 
 
 def define_rank_up_A(builder: DramaBuilder):
@@ -177,59 +178,38 @@ def add_rank_up_A_result_steps(builder: DramaBuilder, victory_label: str, defeat
     # ========================================
     # Rank A 昇格試験 勝利
     # ========================================
+    after_reward_label_a = f"{victory_label}_after_reward"
+
     builder.step(victory_label) \
         .set_flag("sukutsu_arena_result", 0) \
         .play_bgm("BGM/Emotional_Sacred_Triumph_Special") \
         .say("narr_v1", "（影が砕け散る瞬間、その破片はあなたの体に吸い込まれていった。）", "", actor=pc) \
-        .say("narr_v2", "（それは、あなたが自分自身を超えた証。過去の限界を打ち破り、新たな高みへ到達した瞬間だった。）", "", actor=pc) \
+        .say("narr_v2", "（それは、あなたが自分自身を超えた証。）", "", actor=pc) \
         .say("narr_v3", "（ロビーに戻ると、三人があなたを待っていた。）", "", actor=pc) \
         .focus_chara(Actors.BALGAS) \
         .say("balgas_v1", "……ケッ、やりやがったな。自分自身を超えるってのは、口で言うほど簡単じゃねえ。", "", actor=balgas) \
-        .say("balgas_v2", "だが、お前はやってのけた。……カインが生きていたら、きっと喜んだだろうよ。", "", actor=balgas) \
-        .focus_chara(Actors.ZEK) \
-        .say("zek_v1", "クク……素晴らしい。影を超えた瞬間、あなたの魂は一段と輝きを増しました。", "", actor=zek) \
-        .say("zek_v2", "私のコレクションに加えるのが惜しくなってきましたね。……冗談ですよ。", "", actor=zek) \
         .focus_chara(Actors.LILY) \
-        .say("lily_v1", "……おかえりなさい。", "", actor=lily) \
-        .say("lily_v2", "あなたは今、このアリーナで最も輝く存在になりました。", "", actor=lily) \
-        .say("lily_v3", "今日からあなたは、ランクA……『黄金の戦鬼（Golden War Demon）』です。", "", actor=lily) \
-        .say("lily_v4", "では、報酬の授与です。観客からの祝福……小さなコイン30枚とプラチナコイン15枚。それと、特別な素材を一つ選んでいただけます。", "", actor=lily)
-
-    # 報酬選択肢 (ラベル名に _a サフィックスを付けて衝突を回避)
-    reward_ether_a = builder.label("reward_ether_a")
-    reward_shadow_a = builder.label("reward_shadow_a")
-    reward_mana_a = builder.label("reward_mana_a")
-    reward_end_a = builder.label("reward_end_a")
-
-    builder.choice(reward_ether_a, "エーテルの欠片を頼む", "", text_id="c_reward_ether_a") \
-           .choice(reward_shadow_a, "影の結晶が欲しい", "", text_id="c_reward_shadow_a") \
-           .choice(reward_mana_a, "魔力の結晶を選ぶ", "", text_id="c_reward_mana_a")
-
-    builder.step(reward_ether_a) \
-        .say("lily_rew1_a", "『エーテルの欠片×1』、記録いたしました。自己超越の証ですね。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"ether\"));") \
-        .jump(reward_end_a)
-
-    builder.step(reward_shadow_a) \
-        .say("lily_rew2_a", "『影の結晶×1』、記録いたしました。……あなた自身の一部だったものですね。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"shadow_crystal\"));") \
-        .jump(reward_end_a)
-
-    builder.step(reward_mana_a) \
-        .say("lily_rew3_a", "『魔力の結晶×1』ですね。……堅実な選択ですこと。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"gem_mana\"));") \
-        .jump(reward_end_a)
-
-    builder.step(reward_end_a) \
-        .action("eval", param="for(int i=0; i<30; i++) { EClass.pc.Pick(ThingGen.Create(\"coin\")); } for(int i=0; i<15; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
-        .say("lily_v5", "記録完了です。", "", actor=lily) \
+        .say("lily_v1", "……おかえりなさい。今日からあなたは『黄金の戦鬼（Golden War Demon）』です。", "", actor=lily) \
+        .say("lily_v2", "報酬を選んでください。", "", actor=lily) \
         .complete_quest(QuestIds.RANK_UP_A) \
-        .set_flag(Keys.RANK, 7) \
         .mod_flag(Keys.REL_BALGAS, "+", 15) \
         .mod_flag(Keys.REL_LILY, "+", 15) \
-        .mod_flag(Keys.REL_ZEK, "+", 10) \
+        .mod_flag(Keys.REL_ZEK, "+", 10)
+
+    # 3択報酬選択
+    add_reward_choice(
+        builder,
+        tier=get_reward_tier_for_rank("A"),
+        choice_label_prefix="rup_a_reward",
+        after_reward_label=after_reward_label_a,
+        lily_actor=lily,
+        pc_actor=pc
+    )
+
+    builder.step(after_reward_label_a) \
         .say("sys_title", "【システム】称号『黄金の戦鬼（Golden War Demon）』を獲得しました。筋力+5、魔力+5、回避+5、PV+5 の加護を得た！", "") \
-        .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantRankABonus();")
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantRankABonus();") \
+        .set_flag(Keys.RANK, 7)
 
     # 最終選択肢
     final_next_a = builder.label("final_next_a")

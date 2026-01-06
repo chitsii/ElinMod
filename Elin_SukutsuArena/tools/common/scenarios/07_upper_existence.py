@@ -142,12 +142,12 @@ def add_upper_existence_result_steps(builder: ArenaDramaBuilder, victory_label: 
 
     builder.step(reward_cloth_ue) \
         .say("lily_rew1_ue", "『布の切れ端×1』、記録いたしました。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"cloth\"));") \
+        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"string\"));") \
         .jump(reward_end_ue)
 
     builder.step(reward_iron_ue) \
         .say("lily_rew2_ue", "『鉄の欠片×1』、記録いたしました。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"fragment_iron\"));") \
+        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"fragment\"));") \
         .jump(reward_end_ue)
 
     builder.step(reward_bone_ue) \
@@ -156,7 +156,7 @@ def add_upper_existence_result_steps(builder: ArenaDramaBuilder, victory_label: 
         .jump(reward_end_ue)
 
     builder.step(reward_end_ue) \
-        .action("eval", param="for(int i=0; i<10; i++) { EClass.pc.Pick(ThingGen.Create(\"coin\")); } for(int i=0; i<2; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
+        .action("eval", param="for(int i=0; i<10; i++) { EClass.pc.Pick(ThingGen.Create(\"money\")); } for(int i=0; i<2; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
         .complete_quest(QuestIds.UPPER_EXISTENCE) \
         .say("sys_title", "【システム】称号『笑われる者』を獲得しました。回避+3、運+3 の加護を得た！", "") \
         .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantUpperExistenceBonus();") \

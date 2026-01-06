@@ -33,7 +33,7 @@
     "description": "最初の試練を突破し、ランクGを獲得する",
     "phase": "prologue",
     "phaseOrdinal": 0,
-    "questGiver": "sukutsu_receptionist",
+    "questGiver": "sukutsu_arena_master",
     "autoTrigger": false,
     "advancesPhase": "initiation",
     "advancesPhaseOrdinal": 1,

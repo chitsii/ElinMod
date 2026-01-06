@@ -130,12 +130,12 @@ def define_lily_experiment(builder: DramaBuilder):
     # 報酬選択反応
     builder.step(reward_mana) \
         .say("lily_rew1", "『魔力の結晶×1』、記録いたしました。この器で精製した、純粋な魔力の塊ですよ。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"gem_mana\"));") \
+        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"magic_stone\"));") \
         .jump(reward_end)
 
     builder.step(reward_ether) \
         .say("lily_rew2", "『エーテルの欠片×1』、記録いたしました。……慎重にお使いくださいね。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"ether\"));") \
+        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"crystal\"));") \
         .jump(reward_end)
 
     builder.step(reward_glass) \
@@ -145,7 +145,7 @@ def define_lily_experiment(builder: DramaBuilder):
 
     # 報酬終了
     builder.step(reward_end) \
-        .action("eval", param="for(int i=0; i<7; i++) { EClass.pc.Pick(ThingGen.Create(\"coin\")); } for(int i=0; i<2; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
+        .action("eval", param="for(int i=0; i<7; i++) { EClass.pc.Pick(ThingGen.Create(\"money\")); } for(int i=0; i<2; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
         .say("lily_15", "それと……あなたの技術を評価して、称号も記録しておきました。『繊細な泥犬』。ふふ、あなたは暴力だけではないのですね。", "", actor=lily) \
         .say("lily_16", "これからも、何か特別な依頼があれば、あなたにお願いするかもしれません。……期待していますよ。", "", actor=lily)
 

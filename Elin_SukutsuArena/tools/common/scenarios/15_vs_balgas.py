@@ -232,21 +232,21 @@ def define_vs_balgas(builder: DramaBuilder):
 
     builder.step(reward_sword) \
         .say("lily_rew1", "『バルガスの剣の欠片×1』、記録いたしました。……彼の魂が宿る、大切な欠片ですね。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"fragment_balgas_sword\"));") \
+        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"fragment\"));") \
         .jump(reward_end)
 
     builder.step(reward_ether) \
         .say("lily_rew2", "『エーテルの欠片×1』、記録いたしました。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"fragment_ether\"));") \
+        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"crystal\"));") \
         .jump(reward_end)
 
     builder.step(reward_mana) \
         .say("lily_rew3", "『魔力の結晶×1』、記録いたしました。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"gem_mana\"));") \
+        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"magic_stone\"));") \
         .jump(reward_end)
 
     builder.step(reward_end) \
-        .action("eval", param="for(int i=0; i<50; i++) { EClass.pc.Pick(ThingGen.Create(\"coin\")); } for(int i=0; i<30; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
+        .action("eval", param="for(int i=0; i<50; i++) { EClass.pc.Pick(ThingGen.Create(\"money\")); } for(int i=0; i<30; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
         .say("lily_6", "記録完了です。", "", actor=lily) \
         .say("lily_7", "……それと、今回の戦いで、あなたは『理を拒む者』としての称号を獲得しました。", "", actor=lily) \
         .say("lily_8", "アリーナの命令を拒絶し、師匠を生かす……ふふ、あなたは本当に、システムの『バグ』ですね。", "", actor=lily) \

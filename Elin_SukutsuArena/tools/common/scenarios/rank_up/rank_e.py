@@ -5,6 +5,7 @@
 
 from drama_builder import DramaBuilder
 from flag_definitions import Keys, Rank, Actors, QuestIds
+from reward_system import add_reward_choice, get_reward_tier_for_rank
 
 def define_rank_up_E(builder: DramaBuilder):
     """
@@ -125,6 +126,8 @@ def add_rank_up_E_result_steps(builder: DramaBuilder, victory_label: str, defeat
     # ========================================
     # Rank E 昇格試験 勝利
     # ========================================
+    after_reward_label_e = f"{victory_label}_after_reward"
+
     builder.step(victory_label) \
         .set_flag("sukutsu_arena_result", 0) \
         .play_bgm("BGM/Emotional_Sorrow_2") \
@@ -136,45 +139,25 @@ def add_rank_up_E_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .say("balgas_v2", "あの野郎、最期まで意地っ張りな面をしてやがったな。", "", actor=balgas) \
         .say("narr_v4", "（彼は拳でこっそりと目を拭う。）", "", actor=pc) \
         .say("balgas_v3", "……ありがよ。今日からお前は、ただの『泥犬』じゃねえ。何度叩かれても折れねえ、鈍く輝く『鉄屑（Iron Scrap）』だ。", "", actor=balgas) \
-        .say("balgas_v4", "……お前は、カインが持っていた以上の、本物の『鋼の心』を持った戦士だ。", "", actor=balgas) \
         .focus_chara(Actors.LILY) \
-        .say("lily_v1", "お疲れ様でした。カインさんの魂の一部……回収いたしました。", "", actor=lily) \
-        .say("lily_v2", "バルガスさんが珍しく涙ぐんでいたのは見なかったことにしてあげますから、報酬の授与をさせていただきます。", "", actor=lily) \
-        .say("lily_v3", "観客からの報酬として、**小さなコイン8枚**と**プラチナコイン3枚**。それと、戦闘記録として**素材を一つ**選んでいただけます。", "", actor=lily)
-
-    # 報酬選択肢 (ラベル名に _e サフィックスを付けて衝突を回避)
-    reward_steel_e = builder.label("reward_steel_e")
-    reward_mana_e = builder.label("reward_mana_e")
-    reward_bone_e = builder.label("reward_bone_e")
-    reward_end_e = builder.label("reward_end_e")
-
-    builder.choice(reward_steel_e, "鋼鉄の欠片を頼む", "", text_id="c_reward_steel_e") \
-           .choice(reward_mana_e, "魔力の結晶が欲しい", "", text_id="c_reward_mana_e") \
-           .choice(reward_bone_e, "骨を選ぶ", "", text_id="c_reward_bone_e")
-
-    builder.step(reward_steel_e) \
-        .say("lily_rew1_e", "『鋼鉄の欠片×1』、記録いたしました。カインさんの意志を継ぐ、良い選択ですね。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"steel\"));") \
-        .jump(reward_end_e)
-
-    builder.step(reward_mana_e) \
-        .say("lily_rew2_e", "『魔力の結晶×1』、記録いたしました。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"gem_mana\"));") \
-        .jump(reward_end_e)
-
-    builder.step(reward_bone_e) \
-        .say("lily_rew3_e", "『骨×1』ですね。……地味ですが、実用的です。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"bone\"));") \
-        .jump(reward_end_e)
-
-    builder.step(reward_end_e) \
-        .action("eval", param="for(int i=0; i<8; i++) { EClass.pc.Pick(ThingGen.Create(\"coin\")); } for(int i=0; i<3; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
-        .say("lily_v4_e", "あなたが鉄屑から『鋼鉄』、そして『伝説』へと至るまで……私は特等席で見守らせていただきますよ。", "", actor=lily) \
+        .say("lily_v1", "お疲れ様でした。報酬を選んでください。", "", actor=lily) \
         .complete_quest(QuestIds.RANK_UP_E) \
-        .set_flag(Keys.RANK, 3) \
-        .mod_flag(Keys.REL_BALGAS, "+", 15) \
+        .mod_flag(Keys.REL_BALGAS, "+", 15)
+
+    # 3択報酬選択
+    add_reward_choice(
+        builder,
+        tier=get_reward_tier_for_rank("E"),
+        choice_label_prefix="rup_e_reward",
+        after_reward_label=after_reward_label_e,
+        lily_actor=lily,
+        pc_actor=pc
+    )
+
+    builder.step(after_reward_label_e) \
         .say("sys_title", "【システム】称号『鉄屑（Iron Scrap）』を獲得しました。筋力+3、PV+5 の加護を得た！", "") \
         .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantRankEBonus();") \
+        .set_flag(Keys.RANK, 3) \
         .jump(return_label)
 
     # ========================================

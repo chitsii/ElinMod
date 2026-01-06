@@ -6,6 +6,7 @@
 
 from drama_builder import DramaBuilder
 from flag_definitions import Keys, Rank, Actors, QuestIds
+from reward_system import add_reward_choice, get_reward_tier_for_rank
 
 def define_rank_up_C(builder: DramaBuilder):
     """
@@ -137,6 +138,8 @@ def add_rank_up_C_result_steps(builder: DramaBuilder, victory_label: str, defeat
     # ========================================
     # Rank C 昇格試験 勝利
     # ========================================
+    after_reward_label_c = f"{victory_label}_after_reward"
+
     builder.step(victory_label) \
         .set_flag("sukutsu_arena_result", 0) \
         .play_bgm("BGM/Emotional_Sacred_Triumph_Special") \
@@ -147,52 +150,27 @@ def add_rank_up_C_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .say("balgas_v1", "……終わったか。", "", actor=balgas) \
         .say("narr_v4", "（彼はゆっくりと振り返る。その目には涙の跡。）", "", actor=pc) \
         .say("balgas_v2", "……ありがよ。", "", actor=balgas) \
-        .say("balgas_v3", "あいつらは、お前のおかげでようやく……この地獄から出られた。", "", actor=balgas) \
-        .say("balgas_v4", "お前は今、ただの『銅貨稼ぎ』じゃねえ。", "", actor=balgas) \
-        .say("balgas_v5", "死肉を喰らい、戦場を飛び回り、そして仲間の魂を救う……『闘技場の鴉（Arena Crow）』だ。", "", actor=balgas) \
-        .say("narr_v5", "（リリィが近づいてくる。）", "", actor=pc) \
+        .say("balgas_v3", "お前は今、『闘技場の鴉（Arena Crow）』だ。", "", actor=balgas) \
         .focus_chara(Actors.LILY) \
-        .say("lily_v1", "……素晴らしい戦いでした。", "", actor=lily) \
-        .say("lily_v2", "観客の皆様も、あなたの『慈悲』に感動されていたようです。", "", actor=lily) \
-        .say("lily_v3", "では、報酬の授与です。", "", actor=lily) \
-        .say("lily_v4", "観客からの祝福……小さなコイン15枚とプラチナコイン6枚。それと、英雄たちが遺した素材を一つ選んでいただけます。", "", actor=lily)
-
-    # 報酬選択肢 (ラベル名に _c サフィックスを付けて衝突を回避)
-    reward_sword_c = builder.label("reward_sword_c")
-    reward_scroll_c = builder.label("reward_scroll_c")
-    reward_steel_c = builder.label("reward_steel_c")
-    reward_end_c = builder.label("reward_end_c")
-
-    builder.choice(reward_sword_c, "錆びた剣の欠片を頼む", "", text_id="c_reward_sword_c") \
-           .choice(reward_scroll_c, "古い魔導書の断片が欲しい", "", text_id="c_reward_scroll_c") \
-           .choice(reward_steel_c, "鋼鉄の欠片を選ぶ", "", text_id="c_reward_steel_c")
-
-    builder.step(reward_sword_c) \
-        .say("lily_rew1_c", "『錆びた剣の欠片×1』、記録いたしました。英雄の記憶ですね。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"fragment_rusty_sword\"));") \
-        .jump(reward_end_c)
-
-    builder.step(reward_scroll_c) \
-        .say("lily_rew2_c", "『古い魔導書の断片×1』、記録いたしました。……かつての知識の残滓です。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"scroll_ancient\"));") \
-        .jump(reward_end_c)
-
-    builder.step(reward_steel_c) \
-        .say("lily_rew3_c", "『鋼鉄の欠片×1』ですね。……実用的です。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"steel\"));") \
-        .jump(reward_end_c)
-
-    builder.step(reward_end_c) \
-        .action("eval", param="for(int i=0; i<15; i++) { EClass.pc.Pick(ThingGen.Create(\"coin\")); } for(int i=0; i<6; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
-        .say("lily_v5", "記録完了です。", "", actor=lily) \
-        .say("lily_v6", "……あなたは今、このアリーナで生き残るための『鋼の心』を手に入れました。", "", actor=lily) \
-        .say("lily_v7", "次は、さらなる試練が待っています。……準備が整ったら、また声をかけてくださいね？", "", actor=lily) \
+        .say("lily_v1", "……素晴らしい戦いでした。報酬を選んでください。", "", actor=lily) \
         .complete_quest(QuestIds.RANK_UP_C) \
-        .set_flag(Keys.RANK, 5) \
         .mod_flag(Keys.REL_BALGAS, "+", 25) \
-        .mod_flag(Keys.REL_LILY, "+", 10) \
+        .mod_flag(Keys.REL_LILY, "+", 10)
+
+    # 3択報酬選択
+    add_reward_choice(
+        builder,
+        tier=get_reward_tier_for_rank("C"),
+        choice_label_prefix="rup_c_reward",
+        after_reward_label=after_reward_label_c,
+        lily_actor=lily,
+        pc_actor=pc
+    )
+
+    builder.step(after_reward_label_c) \
         .say("sys_title", "【システム】称号『闘技場の鴉（Arena Crow）』を獲得しました。器用+5、スタミナ+10 の加護を得た！", "") \
         .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantRankCBonus();") \
+        .set_flag(Keys.RANK, 5) \
         .jump(return_label)
 
     # ========================================
