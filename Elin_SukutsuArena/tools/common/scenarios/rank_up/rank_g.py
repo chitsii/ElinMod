@@ -62,7 +62,6 @@ def define_rank_up_G(builder: DramaBuilder):
     builder.step(vargus_advice) \
         .focus_chara(Actors.BALGAS) \
         .say("narr_3", "（闘技場へ繋がる鉄格子の前で、バルガスが研ぎ澄まされた剣を無造作に弄んでいる。）", "", actor=pc) \
-        .say("vargus_r1", "おい、足が震えてんぞ。", "", actor=vargus) \
         .say("vargus_r2", "……いいか、一度だけ教えてやる。プチ共は『数』で来る。一匹一匹はゴミだが、囲まれればお前の肉は一瞬で削げ落ち、綺麗な骨の標本ができあがりだ。", "", actor=vargus) \
         .say("vargus_r3", "壁を背にしろ。そして、スタミナを切らすな。呼吸を乱した瞬間に、奴らは喉笛に吸い付いてくる。……ほら、行け。観客どもが、お前の悲鳴を心待ちにしてやがるぜ。", "", actor=vargus) \
         .jump(battle_start)

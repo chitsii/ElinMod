@@ -65,7 +65,7 @@ def define_rank_up_F(builder: DramaBuilder):
 
     # 選択肢反応: 待ってくれ
     builder.step(lily_r3) \
-        .say("lily_r3_1", "おや、足が震えていますよ。……まあ、無理もありませんが。急ぎませんから、準備が整ったらお声掛けくださいませ。", "", actor=lily) \
+        .say("lily_r3_1", "おや、少し震えていますよ。……まあ、無理もありませんが。急ぎませんから、準備が整ったらお声掛けくださいませ。", "", actor=lily) \
         .jump(scene2_balgas)
 
     # ========================================

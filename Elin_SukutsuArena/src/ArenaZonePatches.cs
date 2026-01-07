@@ -86,6 +86,15 @@ namespace Elin_SukutsuArena
 
                 Debug.Log($"[SukutsuArena] Auto-dialog triggered for master UID: {masterUid}");
 
+                // デバッグ: ドラマ開始前のフラグ状態を確認
+                int arenaResult = EClass.player.dialogFlags.ContainsKey("sukutsu_arena_result")
+                    ? EClass.player.dialogFlags["sukutsu_arena_result"] : -1;
+                int isRankUpResult = EClass.player.dialogFlags.ContainsKey("sukutsu_is_rank_up_result")
+                    ? EClass.player.dialogFlags["sukutsu_is_rank_up_result"] : -1;
+                int rankUpTrial = EClass.player.dialogFlags.ContainsKey("sukutsu_rank_up_trial")
+                    ? EClass.player.dialogFlags["sukutsu_rank_up_trial"] : -1;
+                Debug.Log($"[SukutsuArena] PRE-DIALOG FLAGS: arena_result={arenaResult}, is_rank_up_result={isRankUpResult}, rank_up_trial={rankUpTrial}");
+
                 // フラグをクリア
                 EClass.player.dialogFlags["sukutsu_auto_dialog"] = 0;
 
@@ -105,10 +114,13 @@ namespace Elin_SukutsuArena
 
                 if (master != null && master.ExistsOnMap)
                 {
-                    // 戦闘結果ダイアログを直接指定（NpcQuestDialogPatchをバイパス）
-                    // これによりクエストドラマではなく結果ダイアログが表示される
+                    // 戦闘結果ダイアログを直接指定
+                    // NpcQuestDialogPatchNoArgsがスキップするようにフラグを設定
                     Debug.Log($"[SukutsuArena] Showing battle result dialog with {master.Name}");
-                    master.ShowDialog("drama_sukutsu_arena_master");
+                    Debug.Log($"[SukutsuArena] FLAGS BEFORE DRAMA: arena_result={ArenaFlagManager.GetInt("sukutsu_arena_result")}, is_rank_up_result={ArenaFlagManager.GetInt("sukutsu_is_rank_up_result")}, rank_up_trial={ArenaFlagManager.GetInt("sukutsu_rank_up_trial")}");
+                    // 戦闘結果ダイアログ中フラグを設定（NpcQuestDialogPatchがスキップするため）
+                    ArenaFlagManager.SetBool("sukutsu_showing_battle_result", true);
+                    master.ShowDialog("drama_sukutsu_arena_master", "main");
                 }
                 else
                 {
@@ -254,6 +266,14 @@ namespace Elin_SukutsuArena
             public static bool Prefix(Chara __instance)
             {
                 Debug.Log($"[NpcQuestDialog] ShowDialog() called: NPC={__instance?.id}");
+
+                // 戦闘結果ダイアログ表示中はスキップ（HandleBattleResultDialogから呼ばれた場合）
+                if (ArenaFlagManager.GetBool("sukutsu_showing_battle_result"))
+                {
+                    Debug.Log($"[NpcQuestDialog] SKIP: Battle result dialog in progress");
+                    ArenaFlagManager.SetBool("sukutsu_showing_battle_result", false); // フラグをクリア
+                    return true; // 元のShowDialogを実行
+                }
 
                 // アリーナゾーン外ではスキップ
                 if (!IsArenaZone(EClass._zone))

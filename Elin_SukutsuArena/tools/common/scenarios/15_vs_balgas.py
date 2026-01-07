@@ -4,7 +4,8 @@ Rank S昇格試験 - バルガスとの決戦と慈悲の選択
 """
 
 from drama_builder import DramaBuilder
-from flag_definitions import Keys, Actors, FlagValues
+from arena_drama_builder import ArenaDramaBuilder
+from flag_definitions import Keys, Actors, FlagValues, QuestIds
 
 def define_vs_balgas(builder: DramaBuilder):
     """
@@ -49,7 +50,9 @@ def define_vs_balgas(builder: DramaBuilder):
     # ========================================
     # シーン1: 全盛期の幻影
     # ========================================
+    # バトル勝利後の再開時はscene4（とどめ拒絶）へ直接ジャンプ
     builder.step(main) \
+        .branch_if("sukutsu_vs_balgas_victory", "==", 1, scene4) \
         .play_bgm("BGM/Ominous_Suspense_02") \
         .say("narr_1", "（ロビーの喧騒が消え、冷たい風が吹き抜ける。）", "", actor=pc) \
         .say("narr_2", "（バルガスはいつになく整った足取りで、あなたの前に立った。）", "", actor=pc) \
@@ -117,7 +120,7 @@ def define_vs_balgas(builder: DramaBuilder):
         .jump(scene3)
 
     # ========================================
-    # シーン3: 闘技場：師弟の極致
+    # シーン3: 闘技場：師弟の極致（バトル開始）
     # ========================================
     builder.step(scene3) \
         .play_bgm("BGM/Battle_Balgas_Prime") \
@@ -129,12 +132,16 @@ def define_vs_balgas(builder: DramaBuilder):
         .say("obs_2", "「英雄の魂を捧げろ！」", "", actor=pc) \
         .say("obs_3", "「屠竜者となる儀式だ！」", "", actor=pc) \
         .say("lily_voice", "（リリィの懇願の声が、闘技場に響く……「お願い……殺さないで……」）", "", actor=lily) \
-        .jump(scene4)
+        .set_flag("sukutsu_is_quest_battle_result", 1) \
+        .set_flag("sukutsu_quest_battle", 2) \
+        .start_battle_by_stage("rank_s_trial", master_id="sukutsu_arena_master") \
+        .finish()
 
     # ========================================
     # シーン4: とどめの拒絶
     # ========================================
     builder.step(scene4) \
+        .set_flag("sukutsu_vs_balgas_victory", 0) \
         .play_bgm("BGM/Emotional_Sorrow_2") \
         .say("narr_13", "（膝をつき、肩で息をするバルガス。）", "", actor=pc) \
         .say("narr_14", "（全盛期の輝きが失われ、急速に元の老いた姿へと戻っていく。）", "", actor=pc) \
@@ -282,11 +289,51 @@ def define_vs_balgas(builder: DramaBuilder):
     # 終了処理
     # ========================================
     builder.step(ending) \
-        .set_flag(Keys.RANK, 7) \
+        .set_flag(Keys.RANK, 8) \
         .set_flag(Keys.REL_BALGAS, 100) \
         .mod_flag(Keys.REL_LILY, "+", 30) \
         .set_flag(Keys.BALGAS_CHOICE, FlagValues.BalgasChoice.SPARED) \
+        .complete_quest(QuestIds.RANK_UP_S) \
         .say("sys_title", "【システム】称号『理を拒む者（System Breaker）』を獲得しました。", "") \
         .say("sys_buff", "【システム】『戦鬼の証』を獲得しました。筋力+5、耐久+5、各種耐性+5 の加護を得た！", "") \
         .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantVsBalgasBonus();") \
         .finish()
+
+
+def add_vs_balgas_result_steps(builder: ArenaDramaBuilder, victory_label: str, defeat_label: str, return_label: str):
+    """
+    バルガス戦（ランクS昇格試験）の勝利/敗北ステップを arena_master ビルダーに追加する
+
+    Args:
+        builder: arena_master の ArenaDramaBuilder インスタンス
+        victory_label: 勝利ステップのラベル名
+        defeat_label: 敗北ステップのラベル名
+        return_label: 結果表示後にジャンプするラベル名（敗北時のみ使用）
+    """
+    from drama_constants import DramaNames
+
+    pc = Actors.PC
+    lily = Actors.LILY
+    balgas = Actors.BALGAS
+
+    # ========================================
+    # バルガス戦 勝利 - vs_balgasドラマを再開してscene4へ
+    # ========================================
+    builder.step(victory_label) \
+        .set_flag("sukutsu_arena_result", 0) \
+        .set_flag("sukutsu_quest_battle", 0) \
+        .set_flag("sukutsu_vs_balgas_victory", 1) \
+        .say_and_start_drama("……続きを見届けろ。", DramaNames.VS_BALGAS, "sukutsu_arena_master")
+
+    # ========================================
+    # バルガス戦 敗北
+    # ========================================
+    builder.step(defeat_label) \
+        .set_flag("sukutsu_arena_result", 0) \
+        .set_flag("sukutsu_quest_battle", 0) \
+        .play_bgm("BGM/Lobby_Normal") \
+        .say("narr_d1", "（全盛期のバルガスの圧倒的な力の前に、あなたは膝をついた。）", "", actor=pc) \
+        .focus_chara(Actors.BALGAS) \
+        .say("balgas_d1", "……まだだ。お前はまだ、俺を超えられちゃいねえ。", "", actor=balgas) \
+        .say("balgas_d2", "もう一度鍛え直してから来い。俺は……待ってるぜ。", "", actor=balgas) \
+        .jump(return_label)

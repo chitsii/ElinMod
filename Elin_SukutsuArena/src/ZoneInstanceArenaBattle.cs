@@ -64,13 +64,19 @@ public class ZoneInstanceArenaBattle : ZoneInstance
         }
 
         // ランクアップ戦かどうかをフラグに保存
+        int rankUpTrial = EClass.player.dialogFlags.ContainsKey("sukutsu_rank_up_trial")
+            ? EClass.player.dialogFlags["sukutsu_rank_up_trial"] : 0;
+        Debug.Log($"[SukutsuArena] isRankUp={isRankUp}, sukutsu_rank_up_trial={rankUpTrial}, sukutsu_arena_result={result}");
+
         if (isRankUp)
         {
             EClass.player.dialogFlags["sukutsu_is_rank_up_result"] = 1;
+            Debug.Log($"[SukutsuArena] Set sukutsu_is_rank_up_result=1");
         }
         else
         {
             EClass.player.dialogFlags["sukutsu_is_rank_up_result"] = 0;
+            Debug.Log($"[SukutsuArena] Set sukutsu_is_rank_up_result=0");
         }
 
         // マスターIDを使って後処理などがあればここで行う
@@ -78,6 +84,9 @@ public class ZoneInstanceArenaBattle : ZoneInstance
 
     public void LeaveZone()
     {
+        // フラグ設定などの処理を実行
+        OnLeaveZone();
+
         Zone zone = EClass.game.spatials.Find(uidZone) as Zone;
         if (zone != null)
         {

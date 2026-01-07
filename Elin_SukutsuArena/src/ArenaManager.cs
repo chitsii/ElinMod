@@ -1,9 +1,22 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using DG.Tweening;
 
 namespace Elin_SukutsuArena
 {
+    /// <summary>
+    /// ランダム戦闘の難易度
+    /// </summary>
+    public enum ArenaDifficulty
+    {
+        Easy = 1,    // 簡単: 敵少なめ、レベル低め
+        Normal = 2,  // 普通: 標準
+        Hard = 3,    // 難しい: 敵多め、レベル高め
+        VeryHard = 4 // 超難: 多数の強敵
+    }
+
     /// <summary>
     /// アリーナ管理クラス
     /// CWL eval から呼び出すためにstatic メソッドを提供
@@ -489,6 +502,141 @@ namespace Elin_SukutsuArena
 
             Msg.Say("【虚空の王の力】全ステータス+10、全耐性+10 を獲得！");
             Debug.Log("[SukutsuArena] Granted Last Battle bonus: All stats+10, All resistances+10");
+        }
+
+        // ============================================================
+        // ランダム戦闘システム
+        // ============================================================
+
+        /// <summary>
+        /// ランダム戦闘を開始（難易度指定）
+        /// </summary>
+        /// <param name="difficulty">難易度 (1=Easy, 2=Normal, 3=Hard, 4=VeryHard)</param>
+        /// <param name="masterId">アリーナマスターのID</param>
+        public static void StartRandomBattle(int difficulty, string masterId)
+        {
+            var master = EClass._zone.FindChara(masterId);
+            if (master == null)
+            {
+                Debug.LogError($"[SukutsuArena] Master not found: {masterId}");
+                return;
+            }
+            StartRandomBattle((ArenaDifficulty)difficulty, master);
+        }
+
+        /// <summary>
+        /// ランダム戦闘を開始
+        /// </summary>
+        /// <param name="difficulty">難易度</param>
+        /// <param name="master">アリーナマスター（戻り先）</param>
+        public static void StartRandomBattle(ArenaDifficulty difficulty, Chara master)
+        {
+            Debug.Log($"[SukutsuArena] StartRandomBattle: difficulty={difficulty}");
+
+            if (master == null)
+            {
+                Debug.LogError("[SukutsuArena] Master is null!");
+                return;
+            }
+
+            int pcLevel = EClass.pc.LV;
+
+            // 難易度に応じたパラメータ設定
+            var config = GetRandomBattleConfig(difficulty, pcLevel);
+
+            // 一時戦闘マップを作成
+            Zone battleZone = SpatialGen.CreateInstance("field", new ZoneInstanceArenaBattle
+            {
+                uidMaster = master.uid,
+                returnX = master.pos.x,
+                returnZ = master.pos.z,
+                uidZone = EClass._zone.uid,
+                rewardPlat = config.RewardPlat,
+                isRankUp = false,
+                stageId = $"random_{difficulty}",
+                bgmBattle = "",
+                bgmVictory = ""
+            });
+
+            // 敵配置イベントを追加（ランダム生成用）
+            battleZone.events.AddPreEnter(new ZonePreEnterRandomBattle
+            {
+                difficulty = difficulty,
+                minLevel = config.MinLevel,
+                maxLevel = config.MaxLevel,
+                enemyCount = config.EnemyCount
+            });
+
+            // 戦闘監視イベントを追加
+            battleZone.events.Add(new ZoneEventArenaBattle());
+
+            Debug.Log($"[SukutsuArena] Created random battle: enemies={config.EnemyCount}, level={config.MinLevel}-{config.MaxLevel}, reward={config.RewardPlat}");
+
+            // ダイアログ終了後にゾーン移動
+            LayerDrama.Instance?.SetOnKill(() =>
+            {
+                Debug.Log($"[SukutsuArena] Moving to random battle zone");
+                EClass.pc.MoveZone(battleZone, ZoneTransition.EnterState.Center);
+            });
+        }
+
+        /// <summary>
+        /// 難易度に応じた戦闘設定を取得
+        /// </summary>
+        private static RandomBattleConfig GetRandomBattleConfig(ArenaDifficulty difficulty, int pcLevel)
+        {
+            var config = new RandomBattleConfig();
+
+            switch (difficulty)
+            {
+                case ArenaDifficulty.Easy:
+                    config.MinLevel = Math.Max(1, pcLevel / 2);
+                    config.MaxLevel = pcLevel;
+                    config.EnemyCount = EClass.rnd(2) + 2; // 2-3体
+                    config.RewardPlat = 3 + EClass.rnd(3); // 3-5枚
+                    break;
+
+                case ArenaDifficulty.Normal:
+                    config.MinLevel = Math.Max(1, pcLevel * 2 / 3);
+                    config.MaxLevel = (int)(pcLevel * 1.3);
+                    config.EnemyCount = EClass.rnd(3) + 3; // 3-5体
+                    config.RewardPlat = 8 + EClass.rnd(5); // 8-12枚
+                    break;
+
+                case ArenaDifficulty.Hard:
+                    config.MinLevel = pcLevel;
+                    config.MaxLevel = pcLevel * 2;
+                    config.EnemyCount = EClass.rnd(3) + 4; // 4-6体
+                    config.RewardPlat = 15 + EClass.rnd(10); // 15-24枚
+                    break;
+
+                case ArenaDifficulty.VeryHard:
+                    config.MinLevel = (int)(pcLevel * 1.5);
+                    config.MaxLevel = pcLevel * 2;
+                    config.EnemyCount = EClass.rnd(4) + 5; // 5-8体
+                    config.RewardPlat = 30 + EClass.rnd(20); // 30-49枚
+                    break;
+
+                default:
+                    config.MinLevel = pcLevel / 2;
+                    config.MaxLevel = pcLevel;
+                    config.EnemyCount = 3;
+                    config.RewardPlat = 5;
+                    break;
+            }
+
+            return config;
+        }
+
+        /// <summary>
+        /// ランダム戦闘の設定データ
+        /// </summary>
+        private class RandomBattleConfig
+        {
+            public int MinLevel { get; set; }
+            public int MaxLevel { get; set; }
+            public int EnemyCount { get; set; }
+            public int RewardPlat { get; set; }
         }
     }
 }

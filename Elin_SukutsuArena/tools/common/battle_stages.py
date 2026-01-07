@@ -139,6 +139,7 @@ RANK_UP_STAGES: Dict[str, BattleStage] = {
     # ========================================
 
     # ランクG昇格試験: 屑肉の洗礼
+    # ヴォイド・プチ: 混沌のブレスを吐き、混沌属性に免疫、メタル999フィート持ちの特殊プチ
     "rank_g_trial": BattleStage(
         stage_id="rank_g_trial",
         display_name_jp="屑肉の洗礼",
@@ -147,12 +148,13 @@ RANK_UP_STAGES: Dict[str, BattleStage] = {
         bgm_battle="",  # デフォルト戦闘BGM
         reward_plat=5,
         enemies=[
-            # 最弱の試練：スライム系の群れ
-            EnemyConfig("putty", level=15, count=3),
-            EnemyConfig("putty", level=20, count=2),
+            # ヴォイド・プチ: 混沌のブレスを吐く硬いプチ
+            # 普通のプチとは異なり、非常に硬く混沌属性の攻撃を行う
+            EnemyConfig("sukutsu_void_putty", level=15, count=10),
+            EnemyConfig("sukutsu_void_putty", level=45, is_boss=True),
         ],
-        description_jp="「動く死体」から「屑肉」へ。これがお前の第一歩だ——バルガス",
-        description_en="'From walking corpse to scrap meat. This is your first step.' —Balgas",
+        description_jp="「動く死体」から「屑肉」へ。——だが、この虚無の粘体は一味違う——バルガス",
+        description_en="'From walking corpse to scrap meat. But this void slime is different.' —Balgas",
     ),
 
     # ランクF昇格試験: 泥犬の牙

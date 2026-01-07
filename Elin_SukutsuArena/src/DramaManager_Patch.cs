@@ -167,6 +167,10 @@ namespace Elin_SukutsuArena
                 case "if_flag":
                     return HandleIfFlag(manager, args, defaultJump);
 
+                // Random Battle
+                case "start_random_battle":
+                    return HandleStartRandomBattle(args);
+
                 // Debug
                 case "debug_log_flags":
                     ArenaFlagManager.DebugLogAllFlags();
@@ -300,6 +304,33 @@ namespace Elin_SukutsuArena
         }
 
         /// <summary>
+        /// start_random_battle(difficulty, masterId)
+        /// ランダム戦闘を開始
+        /// difficulty: 1=Easy, 2=Normal, 3=Hard, 4=VeryHard
+        /// masterId: アリーナマスターのキャラクターID
+        /// </summary>
+        private static bool HandleStartRandomBattle(List<string> args)
+        {
+            if (args.Count < 2)
+            {
+                Debug.LogError("[ArenaModInvoke] start_random_battle requires 2 args: difficulty, masterId");
+                return false;
+            }
+
+            if (!int.TryParse(args[0], out int difficulty))
+            {
+                Debug.LogError($"[ArenaModInvoke] Invalid difficulty: {args[0]}");
+                return false;
+            }
+
+            var masterId = args[1];
+            Debug.Log($"[ArenaModInvoke] Starting random battle: difficulty={difficulty}, master={masterId}");
+
+            ArenaManager.StartRandomBattle(difficulty, masterId);
+            return true;
+        }
+
+        /// <summary>
         /// if_flag(flagKey, operatorValue[, jumpLabel])
         /// フラグ条件が真ならjumpLabelにジャンプ
         /// operatorValue は "==1" のように演算子と値が結合された形式
@@ -375,6 +406,7 @@ namespace Elin_SukutsuArena
                     "<" => currentValue < expectedValue,
                     _ => false
                 };
+                Debug.Log($"[ArenaModInvoke] if_flag: {flagKey} {op} {expectedValue}, current={currentValue}, condition={condition}, jump={jumpLabel}");
             }
             else
             {
@@ -386,6 +418,7 @@ namespace Elin_SukutsuArena
 
             if (condition && !string.IsNullOrEmpty(jumpLabel))
             {
+                Debug.Log($"[ArenaModInvoke] Jumping to: {jumpLabel}");
                 manager.sequence.Play(jumpLabel);
             }
 

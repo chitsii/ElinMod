@@ -10,29 +10,29 @@
       "rewardPlat": 5,
       "enemies": [
         {
-          "charaId": "putty",
+          "charaId": "sukutsu_void_putty",
           "level": 15,
           "rarity": "Normal",
           "position": "random",
           "positionX": 0,
           "positionZ": 0,
           "isBoss": false,
-          "count": 3
+          "count": 10
         },
         {
-          "charaId": "putty",
-          "level": 20,
+          "charaId": "sukutsu_void_putty",
+          "level": 45,
           "rarity": "Normal",
           "position": "random",
           "positionX": 0,
           "positionZ": 0,
-          "isBoss": false,
-          "count": 2
+          "isBoss": true,
+          "count": 1
         }
       ],
       "gimmicks": [],
-      "descriptionJp": "「動く死体」から「屑肉」へ。これがお前の第一歩だ——バルガス",
-      "descriptionEn": "'From walking corpse to scrap meat. This is your first step.' —Balgas"
+      "descriptionJp": "「動く死体」から「屑肉」へ。——だが、この虚無の粘体は一味違う——バルガス",
+      "descriptionEn": "'From walking corpse to scrap meat. But this void slime is different.' —Balgas"
     },
     "rank_f_trial": {
       "stageId": "rank_f_trial",
@@ -460,29 +460,29 @@
       "rewardPlat": 5,
       "enemies": [
         {
-          "charaId": "putty",
+          "charaId": "sukutsu_void_putty",
           "level": 15,
           "rarity": "Normal",
           "position": "random",
           "positionX": 0,
           "positionZ": 0,
           "isBoss": false,
-          "count": 3
+          "count": 10
         },
         {
-          "charaId": "putty",
-          "level": 20,
+          "charaId": "sukutsu_void_putty",
+          "level": 45,
           "rarity": "Normal",
           "position": "random",
           "positionX": 0,
           "positionZ": 0,
-          "isBoss": false,
-          "count": 2
+          "isBoss": true,
+          "count": 1
         }
       ],
       "gimmicks": [],
-      "descriptionJp": "「動く死体」から「屑肉」へ。これがお前の第一歩だ——バルガス",
-      "descriptionEn": "'From walking corpse to scrap meat. This is your first step.' —Balgas"
+      "descriptionJp": "「動く死体」から「屑肉」へ。——だが、この虚無の粘体は一味違う——バルガス",
+      "descriptionEn": "'From walking corpse to scrap meat. But this void slime is different.' —Balgas"
     },
     "rank_f_trial": {
       "stageId": "rank_f_trial",

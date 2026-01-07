@@ -22,6 +22,9 @@ add_upper_existence_result_steps = _upper_existence_module.add_upper_existence_r
 _last_battle_module = importlib.import_module('scenarios.18_last_battle')
 add_last_battle_result_steps = _last_battle_module.add_last_battle_result_steps
 
+_vs_balgas_module = importlib.import_module('scenarios.15_vs_balgas')
+add_vs_balgas_result_steps = _vs_balgas_module.add_vs_balgas_result_steps
+
 def define_arena_master_drama(builder: DramaBuilder):
     """
     アリーナマスターのドラマを定義
@@ -36,6 +39,7 @@ def define_arena_master_drama(builder: DramaBuilder):
     defeat_comment = builder.label("defeat_comment")
     registered = builder.label("registered")
     registered_choices = builder.label("registered_choices")
+    random_battle_menu = builder.label("random_battle_menu")
     greet_unranked = builder.label("greet_unranked")
     greet_G = builder.label("greet_G")
     greet_F = builder.label("greet_F")
@@ -74,7 +78,8 @@ def define_arena_master_drama(builder: DramaBuilder):
 
     def add_choices(b):
         """共通の選択肢を追加する"""
-        b.choice(battle_prep, "戦いに挑む", "", text_id="c3") \
+        b.choice(random_battle_menu, "ランダム戦闘", "", text_id="c_random") \
+         .choice(battle_prep, "戦いに挑む", "", text_id="c3") \
          .choice(rank_check, "ランクを確認したい", "", text_id="c_rank_check") \
          .choice(rank_up_check, "昇格試験を受けたい", "", text_id="c_rank_up") \
          .choice(check_available_quests, "利用可能なクエストを確認", "", text_id="c_check_quests") \
@@ -100,6 +105,8 @@ def define_arena_master_drama(builder: DramaBuilder):
     # Quest Battle Result Dispatch Logic
     upper_existence_victory = builder.label("upper_existence_victory")
     upper_existence_defeat = builder.label("upper_existence_defeat")
+    vs_balgas_victory = builder.label("vs_balgas_victory")
+    vs_balgas_defeat = builder.label("vs_balgas_defeat")
     last_battle_victory = builder.label("last_battle_victory")
     last_battle_defeat = builder.label("last_battle_defeat")
 
@@ -209,15 +216,17 @@ def define_arena_master_drama(builder: DramaBuilder):
     # ========================================
     # クエストバトル結果チェック
     # ========================================
-    # sukutsu_quest_battle フラグで戦闘種別を判定: 1=upper_existence, 3=last_battle
+    # sukutsu_quest_battle フラグで戦闘種別を判定: 1=upper_existence, 2=vs_balgas, 3=last_battle
     builder.label("quest_battle_result_check")
     quest_battle_result_upper_existence = builder.label("quest_battle_result_upper_existence")
+    quest_battle_result_vs_balgas = builder.label("quest_battle_result_vs_balgas")
     quest_battle_result_last_battle = builder.label("quest_battle_result_last_battle")
 
     builder.step("quest_battle_result_check") \
         .set_flag("sukutsu_is_quest_battle_result", 0) \
         .switch_on_flag("sukutsu_quest_battle", {
             1: quest_battle_result_upper_existence,
+            2: quest_battle_result_vs_balgas,
             3: quest_battle_result_last_battle,
         }, fallback=registered)
 
@@ -226,6 +235,13 @@ def define_arena_master_drama(builder: DramaBuilder):
         .switch_on_flag("sukutsu_arena_result", {
             1: upper_existence_victory,
             2: upper_existence_defeat,
+        }, fallback=registered)
+
+    # Vs Balgas 結果分岐
+    builder.step(quest_battle_result_vs_balgas) \
+        .switch_on_flag("sukutsu_arena_result", {
+            1: vs_balgas_victory,
+            2: vs_balgas_defeat,
         }, fallback=registered)
 
     # Last Battle 結果分岐
@@ -237,6 +253,9 @@ def define_arena_master_drama(builder: DramaBuilder):
 
     # === Upper Existence クエスト 勝利/敗北 ===
     add_upper_existence_result_steps(builder, upper_existence_victory, upper_existence_defeat, registered_choices)
+
+    # === Vs Balgas クエスト 勝利/敗北 ===
+    add_vs_balgas_result_steps(builder, vs_balgas_victory, vs_balgas_defeat, registered_choices)
 
     # === Last Battle クエスト 勝利/敗北 ===
     add_last_battle_result_steps(builder, last_battle_victory, last_battle_defeat, registered_choices)
@@ -401,7 +420,7 @@ def define_arena_master_drama(builder: DramaBuilder):
     # === Registered Greeting ===
 
     builder.step(registered) \
-        .switch_on_flag("player.rank", {
+        .switch_on_flag("chitsii.arena.player.rank", {
             0: greet_unranked,
             1: greet_G,
             2: greet_F,
@@ -770,5 +789,46 @@ def define_arena_master_drama(builder: DramaBuilder):
     builder.step(quest_none) \
         .say("no_quest", "今は特に依頼はねえな。まずは実力をつけることだ。", "", actor=vargus) \
         .jump(registered_choices)
+
+    # ============================================================
+    # ランダム戦闘メニュー
+    # ============================================================
+    random_easy = builder.label("random_easy")
+    random_normal = builder.label("random_normal")
+    random_hard = builder.label("random_hard")
+    random_veryhard = builder.label("random_veryhard")
+
+    builder.step(random_battle_menu) \
+        .say("random_intro", "ランダム戦闘か。難易度を選べ。報酬は難易度に応じて変わるぜ。", "", actor=vargus) \
+        .choice(random_easy, "【簡単】腕試し（3〜5プラチナ）", "", text_id="c_rand_easy") \
+        .choice(random_normal, "【普通】本格戦闘（8〜12プラチナ）", "", text_id="c_rand_normal") \
+        .choice(random_hard, "【難しい】修羅場（15〜24プラチナ）", "", text_id="c_rand_hard") \
+        .choice(random_veryhard, "【超難】地獄（30〜49プラチナ）", "", text_id="c_rand_veryhard") \
+        .choice(registered_choices, "やめておく", "", text_id="c_rand_cancel") \
+        .on_cancel(registered_choices)
+
+    # ランダム戦闘開始（簡単）
+    builder.step(random_easy) \
+        .say("random_easy_msg", "軽いウォーミングアップだな。行ってこい。", "", actor=vargus) \
+        .start_random_battle(1, "sukutsu_arena_master") \
+        .finish()
+
+    # ランダム戦闘開始（普通）
+    builder.step(random_normal) \
+        .say("random_normal_msg", "まあまあの相手だ。油断するなよ。", "", actor=vargus) \
+        .start_random_battle(2, "sukutsu_arena_master") \
+        .finish()
+
+    # ランダム戦闘開始（難しい）
+    builder.step(random_hard) \
+        .say("random_hard_msg", "おいおい、本気か？...まあいい、やってみろ。", "", actor=vargus) \
+        .start_random_battle(3, "sukutsu_arena_master") \
+        .finish()
+
+    # ランダム戦闘開始（超難）
+    builder.step(random_veryhard) \
+        .say("random_veryhard_msg", "...正気か？死んでも知らねえぞ。", "", actor=vargus) \
+        .start_random_battle(4, "sukutsu_arena_master") \
+        .finish()
 
     builder.step(end).finish()

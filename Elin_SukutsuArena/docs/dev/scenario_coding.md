@@ -136,32 +136,11 @@ def main():
 
 ---
 
-## 🔍 トラブルシューティング・調査ガイド
+## 🔍 トラブルシューティング
 
-問題が発生した場合の調査の取っ掛かりです。
+**→ [troubleshooting.md](troubleshooting.md) を参照**
 
-### Q1. ビルドが通らない (Pythonエラー)
-- **確認場所**: コンソールのトレースバック。
-- **よくある原因**:
-    - インポートパスミス (`from common.scenarios...` が正しいか)
-    - 未定義のラベルへのジャンプ
-    - `DramaBuilder` メソッドの引数不足
-    - cd tools; uv run python ... で実行する
-
-### Q2. ゲーム内でドラマが始まらない
-- **確認場所**:
-    1. 生成されたExcelファイル (`LangMod/JP/Dialog/Drama/*.xlsx`) が存在するか。
-    2. ゲーム内の呼び出しID（`drama_rank_up_G`など）と、`create_drama_excel.py` で指定したシートIDが一致しているか。
-    3. `package.xml` の設定（通常は自動コピーされるので問題ないはず）。
-
-### Q3. ロジックが複雑で書き方がわからない
-- **参考ファイル**:
-    - **分岐・ループ**: `tools/common/scenarios/arena_master.py` (アリーナマスターのメイン分岐)
-    - **戦闘開始・結果分岐**: `tools/common/scenarios/rank_up/rank_g.py`
-
-### Q4. C#のエラーが出る (CS1501など)
-- `eval` アクションや `set_flag_eval` を使っている場合、生成されるC#コードが正しいか確認してください。
-- `DramaManager.cs` や `ArenaFlagManager.cs` の定義を確認する必要があります（デコンパイルコード参照）。
+よく引っかかるポイント（ビルド、フラグ、バトル統合など）は上記ファイルにまとめています。
 
 ---
 

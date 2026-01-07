@@ -318,6 +318,37 @@ npcs.append({
     'chance': 0,
 })
 
+# 11. ヴォイド・プチ (Rank G昇格試験 / 入門者の最初の試練)
+# 混沌のブレスを吐く、混沌属性に免疫かつメタル999フィートを持つプチ
+# 普通のプチとは異なり、非常に硬く混沌属性の攻撃を行う
+# elements仕様:
+#   - 959/20 = 混沌耐性20 (レベル4 = 免疫相当)
+#   - 1218/999 = メタルフィート999 (全耐性大幅上昇、非常に硬い)
+#   - 50210/10 = 混沌ブレス レベル10
+npcs.append({
+    'id': 'sukutsu_void_putty',
+    'Author': 'tishi.elin.sukutsu_arena',
+    'name_JP': 'ヴォイド・プチ',
+    'name': 'Void Putty',
+    'aka_JP': '虚無の粘体',
+    'aka': 'Void Slime',
+    'race': 'putit',
+    'job': 'predator',
+    '_idRenderData': '',
+    'tiles': 269,  # putit
+    'LV': 5,  # Tier1初期: Lv.1-10
+    'hostility': 'Enemy',
+    'bio': 'n/1009/50/30/',
+    'idText': 'sukutsu_void_putty',
+    # 特殊能力: 混沌耐性免疫(959/20)、メタルフィート(1218/999)、混沌ブレス(50210/10)
+    'elements': '959/20,1218/999,50210/10',
+    # 戦闘行動: 混沌ブレス
+    'actCombat': 'breathe_Chaos',
+    # 試練ボス: ゾーン配置なし
+    'tag': 'boss',
+    'quality': 2,
+    'chance': 0,
+})
 
 
 for npc in npcs:
