@@ -406,7 +406,7 @@ namespace Elin_SukutsuArena
                     "<" => currentValue < expectedValue,
                     _ => false
                 };
-                Debug.Log($"[ArenaModInvoke] if_flag: {flagKey} {op} {expectedValue}, current={currentValue}, condition={condition}, jump={jumpLabel}");
+                Debug.Log($"[ArenaModInvoke] if_flag: {flagKey} {op} {expectedValue}, current={currentValue}, condition={condition}");
             }
             else
             {

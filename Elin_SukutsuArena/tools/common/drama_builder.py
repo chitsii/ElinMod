@@ -342,15 +342,15 @@ class DramaBuilder:
                   jump_to: Union[str, DramaLabel],
                   actor: Union[str, DramaActor] = None) -> 'DramaBuilder':
         """
-        条件分岐。modInvoke + if_flag を使用。
+        条件分岐。invoke* + if_flag を使用。
 
-        modInvokeを使用することで、CWLネイティブのinvoke*処理との競合を避けます。
-        ジャンプは我々のC#コード（HandleIfFlag）によってのみ処理されます。
+        注意: 複数のbranch_ifを連続して使用する場合、最後のフォールバックjumpが
+        先に実行される可能性があります。代わりに switch_on_flag() を使用してください。
         """
         key = self._resolve_key(jump_to)
         actor_key = self._resolve_key(actor) if actor else 'pc'
         entry = {
-            'action': 'modInvoke',
+            'action': 'invoke*',
             'param': f'if_flag({flag}, {operator}{value})',
             'jump': key,
             'actor': actor_key,
@@ -364,9 +364,8 @@ class DramaBuilder:
         """
         フラグ値に基づく複数条件分岐（安全なswitch-case風API）
 
-        modInvokeを使用することで、CWLネイティブのinvoke*処理との競合を避けます。
-        条件が一致した場合のジャンプは我々のC#コード（HandleIfFlag）によって処理されます。
-        すべての条件に一致しない場合はフォールバックにジャンプします。
+        branch_ifを連続して使用する際の問題（最後のjumpが先に実行される）を
+        回避するため、フォールバックも条件付きbranch_if（値==0）として生成します。
 
         Args:
             flag: チェックするフラグキー
@@ -380,26 +379,33 @@ class DramaBuilder:
                 12: start_rank_f,
                 16: start_rank_b,
             }, fallback=rank_up_not_ready)
+
+        Note:
+            フォールバックはフラグ値が0の場合にのみ実行されます。
+            check_quest_available等でフラグが設定されなかった場合に
+            0のままになるため、これが正しい動作となります。
         """
         actor_key = self._resolve_key(actor) if actor else 'pc'
 
-        # 各ケースをmodInvoke + if_flagとして生成
+        # 各ケースをbranch_ifとして生成
         for value, jump_to in cases.items():
             key = self._resolve_key(jump_to)
             entry = {
-                'action': 'modInvoke',
+                'action': 'invoke*',
                 'param': f'if_flag({flag}, =={value})',
                 'jump': key,
                 'actor': actor_key,
             }
             self.entries.append(entry)
 
-        # フォールバックは無条件のジャンプとして生成
-        # すべてのケースの条件が不一致の場合に実行される
+        # フォールバックも条件付きで生成（値が0の場合のみ）
         if fallback is not None:
             fallback_key = self._resolve_key(fallback)
             entry = {
+                'action': 'invoke*',
+                'param': f'if_flag({flag}, ==0)',
                 'jump': fallback_key,
+                'actor': actor_key,
             }
             self.entries.append(entry)
 

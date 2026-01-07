@@ -144,8 +144,76 @@ def main():
 
 ---
 
+## ⚠️ CWLドラマエンジンの重要な動作仕様
+
+### アクションとジャンプの処理タイミング
+
+CWLドラマエンジンは、行の構成によって処理タイミングが異なります：
+
+| 行の構成 | 処理タイミング | 説明 |
+|----------|----------------|------|
+| `action` + `jump` | イベントキュー（後で実行） | アクション実行後、条件に応じてジャンプ |
+| `jump` のみ | **即座に実行（パース時）** | 無条件で即座にジャンプ |
+
+#### ❌ 危険なパターン：無条件ジャンプをフォールバックに使う
+
+```python
+# 危険！無条件ジャンプはパース時に即座に実行される
+entry = {
+    'jump': fallback_key,  # actionなし = 即座にジャンプ
+}
+```
+
+このコードを使うと、前の条件チェック（`modInvoke` + `if_flag`）が評価される**前に**フォールバックにジャンプしてしまいます。
+
+#### ✅ 正しいパターン：条件付きフォールバック
+
+```python
+# 正しい！条件付きでイベントキューに追加される
+entry = {
+    'action': 'modInvoke',
+    'param': f'if_flag({flag}, ==0)',  # フラグが0の場合のみ
+    'jump': fallback_key,
+    'actor': actor_key,
+}
+```
+
+### `invoke*` vs `modInvoke`
+
+| アクション | 処理 | 推奨 |
+|------------|------|------|
+| `invoke*` | CWLネイティブコード + 我々のパッチ両方が処理 | ❌ 競合の可能性 |
+| `modInvoke` | 我々のC#コード（`DramaManager_Patch`）のみが処理 | ✅ 推奨 |
+
+`invoke*` を使うと、CWLのネイティブコードが `jump` 列を独自に処理する可能性があり、予期しない動作の原因となります。
+
+**`branch_if` と `switch_on_flag` は内部的に `modInvoke` を使用しています。**
+
+### switch_on_flag の動作
+
+```python
+builder.switch_on_flag("my_flag", {
+    1: label_a,
+    2: label_b,
+}, fallback=label_default)
+```
+
+これは以下のように展開されます：
+
+```
+Row 1: action=modInvoke, param=if_flag(my_flag, ==1), jump=label_a
+Row 2: action=modInvoke, param=if_flag(my_flag, ==2), jump=label_b
+Row 3: action=modInvoke, param=if_flag(my_flag, ==0), jump=label_default  ← フォールバック
+```
+
+フォールバックは「フラグが0の場合」にジャンプします。これは `check_quests` などでフラグが設定されなかった場合に0のままになることを想定しています。
+
+---
+
 ## ✅ 実装の掟 (Rules)
 
 1.  **既存コードの破壊禁止**: `arena_master.py` などの基盤ロジックを修正する場合は、必ずバックアップを取るか、影響範囲を確認すること。
 2.  **IDのユニーク性**: `say` や `step` のIDはExcel内でユニークである必要があります（Builderが自動で連番を振る機能もあるが、明示的なID指定を推奨）。
 3.  **日本語コメント**: コード内には意図を説明する日本語コメントを積極的に残すこと。
+4.  **無条件ジャンプ禁止**: フォールバックや分岐には必ず `modInvoke` + `if_flag` を使用し、`jump` のみの行を使わないこと。
+5.  **`invoke*` よりも `modInvoke`**: カスタム処理には `modInvoke` を使用し、CWLネイティブとの競合を避けること。
