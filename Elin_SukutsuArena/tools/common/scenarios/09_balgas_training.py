@@ -52,7 +52,6 @@ def define_balgas_training(builder: DramaBuilder):
         .jump(scene1)
 
     builder.step(scene1) \
-        .focus_chara(Actors.BALGAS) \
         .say("balgas_1", "……おい、銅貨稼ぎ。最近の戦いぶり、悪かねえ。", "", actor=balgas) \
         .say("balgas_2", "だがな、今のままじゃランクCの壁……あそこに巣食う『本当のバケモノ』どもに、鼻歌交じりで解体されるのがオチだ。", "", actor=balgas) \
         .say("narr_4", "（彼は研石を置き、腕を組む。）", "", actor=pc) \
@@ -87,7 +86,6 @@ def define_balgas_training(builder: DramaBuilder):
         .say("balgas_6", "来い。今日はリリィの事務仕事じゃねえ。俺が直接、そのなまくらな魂を叩き直してやる。", "", actor=balgas) \
         .say("balgas_7", "……死んでも文句は言うなよ。地獄に落ちてから、俺の愚痴を肴に飲め。", "", actor=balgas) \
         .say("narr_6", "（リリィが受付から顔を上げ、クスクスと笑う。）", "", actor=pc) \
-        .focus_chara(Actors.LILY) \
         .say("lily_1", "……ふふ、バルガスさんがここまでやるなんて珍しい。", "", actor=lily) \
         .say("lily_2", "お客様、これは特別な『授業料』が必要かもしれませんね？", "", actor=lily) \
         .say("lily_3", "あ、ご心配なく。お代は、あなたがそこで流す『美しい血の雫』で十分ですから。", "", actor=lily)
@@ -99,17 +97,14 @@ def define_balgas_training(builder: DramaBuilder):
 
     # 選択肢反応2
     builder.step(react2_accept) \
-        .focus_chara(Actors.BALGAS) \
         .say("balgas_r4", "ハッ、良い返事だ。ついてこい。", "", actor=balgas) \
         .jump(scene3)
 
     builder.step(react2_death) \
-        .focus_chara(Actors.BALGAS) \
         .say("balgas_r5", "……知らねえ。だが、死ぬ気で来い。", "", actor=balgas) \
         .jump(scene3)
 
     builder.step(react2_nod) \
-        .focus_chara(Actors.BALGAS) \
         .say("balgas_r6", "……よし。じゃあ行くぞ。", "", actor=balgas) \
         .jump(scene3)
 
@@ -122,7 +117,6 @@ def define_balgas_training(builder: DramaBuilder):
         .say("narr_8", "（バルガスは武器を持たず、無造作に構えた。）", "", actor=pc) \
         .say("narr_9", "（その背後からは、歴戦の猛者だけが放つ、物理的な「圧」が空間を歪ませている。）", "", actor=pc) \
         .shake() \
-        .focus_chara(Actors.BALGAS) \
         .say("balgas_8", "さあ、構えろ。ルールは一つ……俺の足を一歩でも動かしてみせろ。", "", actor=balgas) \
         .say("balgas_9", "魔法でも、薬でも、卑怯な手でも何でも使え。", "", actor=balgas) \
         .say("balgas_10", "戦士の哲学とは、『手段』を尽くした先にある『目的』の純粋さだ！", "", actor=balgas) \
@@ -138,13 +132,11 @@ def define_balgas_training(builder: DramaBuilder):
         .say("narr_12", "（バルガスは一歩も動いていないが、その口元には満足げな笑みが浮かんでいた。）", "", actor=pc) \
         .say("narr_13", "（彼はあなたの肩を、岩のような拳で一つ叩いた。）", "", actor=pc) \
         .shake() \
-        .focus_chara(Actors.BALGAS) \
         .say("balgas_11", "……ハッ！ 少しは『意志』が剣に乗るようになったじゃねえか。", "", actor=balgas) \
         .say("balgas_12", "いいか、戦いってのはな、ただの殺し合いじゃねえ。", "", actor=balgas) \
         .say("balgas_13", "自分の命を、何のために『消費』するかを決める聖域だ。", "", actor=balgas) \
         .say("balgas_14", "その哲学を忘れるな。そうすれば、どんな異次元の闇もお前を呑み込むことはできねえ。", "", actor=balgas) \
         .say("narr_14", "（ロビーに戻ると、リリィが台帳を開いて待っている。）", "", actor=pc) \
-        .focus_chara(Actors.LILY) \
         .say("lily_4", "……素晴らしい。バルガスさんの説教を聞いて生き残るなんて、あなたは本当の意味で『闘技場の鴉』になる資格を得たようです。", "", actor=lily) \
         .say("lily_5", "カラスは死肉を喰らい、戦場を飛び回る。……今のあなたに、相応しい二つ名ですね。", "", actor=lily) \
         .say("narr_15", "（彼女は台帳に何かを書き込む。）", "", actor=pc) \
@@ -177,7 +169,6 @@ def define_balgas_training(builder: DramaBuilder):
         .say("lily_8", "……それと、今回の戦いで、あなたは『闘技場の鴉』としての称号を獲得しました。", "", actor=lily) \
         .say("lily_9", "死肉を喰らい、戦場を飛び回る……ふふ、あなたらしいですね。", "", actor=lily) \
         .say("narr_16", "（バルガスが酒瓶を傾けながら、あなたに背を向けたまま言う。）", "", actor=pc) \
-        .focus_chara(Actors.BALGAS) \
         .say("balgas_15", "……お前は、カインが持っていた以上の、本物の『鋼の心』を持った戦士だ。", "", actor=balgas) \
         .say("balgas_16", "俺がかつて率いていた『英雄の軍団』にも、お前みたいな奴がいた。", "", actor=balgas) \
         .say("balgas_17", "……あいつも、最後まで哲学を曲げなかった。", "", actor=balgas) \

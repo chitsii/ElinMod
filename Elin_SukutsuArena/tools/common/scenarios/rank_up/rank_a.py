@@ -51,7 +51,6 @@ def define_rank_up_A(builder: DramaBuilder):
         .jump(scene1)
 
     builder.step(scene1) \
-        .focus_chara(Actors.BALGAS) \
         .say("balgas_1", "……おい、銀翼。お前、自分の影をよく見てみろ。", "", actor=balgas) \
         .say("balgas_2", "観客どもの『注目』が、お前に集まりすぎたんだ。その結果、お前の影から……『もう一人のお前』が生まれようとしている。", "", actor=balgas) \
         .say("balgas_3", "『黄金の戦鬼』——それが、次の試練の名前だ。", "", actor=balgas) \
@@ -83,7 +82,6 @@ def define_rank_up_A(builder: DramaBuilder):
     # ========================================
     builder.step(scene2) \
         .play_bgm("BGM/Zek_Theme") \
-        .focus_chara(Actors.ZEK) \
         .say("narr_5", "（影の中から、ゼクが姿を現す。）", "", actor=pc) \
         .say("zek_1", "クク……影の自己との対決ですか。実に興味深い試練ですね。", "", actor=zek) \
         .say("zek_2", "あの『黄金の戦鬼』は、あなたの『現在』を完璧に写し取った鏡。技術、反射、経験……全てが同じです。", "", actor=zek) \
@@ -116,7 +114,6 @@ def define_rank_up_A(builder: DramaBuilder):
     # ========================================
     builder.step(scene3) \
         .play_bgm("BGM/Lily_Tranquil") \
-        .focus_chara(Actors.LILY) \
         .say("narr_7", "（リリィが静かに近づき、あなたの手を取る。）", "", actor=pc) \
         .say("lily_1", "……あなたの影は、確かに強い。あなたと同じだけの力を持っている。", "", actor=lily) \
         .say("lily_2", "でも、影には一つ、決定的に欠けているものがあります。", "", actor=lily) \
@@ -186,9 +183,7 @@ def add_rank_up_A_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .say("narr_v1", "（影が砕け散る瞬間、その破片はあなたの体に吸い込まれていった。）", "", actor=pc) \
         .say("narr_v2", "（それは、あなたが自分自身を超えた証。）", "", actor=pc) \
         .say("narr_v3", "（ロビーに戻ると、三人があなたを待っていた。）", "", actor=pc) \
-        .focus_chara(Actors.BALGAS) \
         .say("balgas_v1", "……ケッ、やりやがったな。自分自身を超えるってのは、口で言うほど簡単じゃねえ。", "", actor=balgas) \
-        .focus_chara(Actors.LILY) \
         .say("lily_v1", "……おかえりなさい。今日からあなたは『黄金の戦鬼（Golden War Demon）』です。", "", actor=lily) \
         .say("lily_v2", "報酬を選んでください。", "", actor=lily) \
         .complete_quest(QuestIds.RANK_UP_A) \
@@ -238,7 +233,6 @@ def add_rank_up_A_result_steps(builder: DramaBuilder, victory_label: str, defeat
     builder.step(defeat_label) \
         .set_flag("sukutsu_arena_result", 0) \
         .play_bgm("BGM/Lobby_Normal") \
-        .focus_chara(Actors.LILY) \
         .say("lily_d1", "……影に、飲み込まれてしまいましたね。", "", actor=lily) \
         .say("lily_d2", "でも、大丈夫です。影はあなた自身……いつか必ず、超えられます。", "", actor=lily) \
         .say("lily_d3", "準備が整ったら、また挑戦してください。私たちは、いつでもここにいます。", "", actor=lily) \

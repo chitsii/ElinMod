@@ -62,7 +62,6 @@ def define_makuma2(builder: DramaBuilder):
     # ========================================
     builder.step(main) \
         .play_bgm("BGM/Ominous_Tension") \
-        .focus_chara(Actors.LILY) \
         .say("narr_1", "（最近、アリーナ全体を断続的な震動が襲っている。）", "", actor=pc) \
         .shake() \
         .say("narr_2", "（それは観客の喝采によるものではなく、あなたの強大すぎる存在感に、異次元の構造自体が悲鳴を上げているのだ。）", "", actor=pc) \
@@ -189,7 +188,6 @@ def define_makuma2(builder: DramaBuilder):
     # ========================================
     builder.step(scene3) \
         .play_bgm("BGM/Ominous_Suspense_01") \
-        .focus_chara(Actors.BALGAS) \
         .say("narr_21", "（リリィとの打ち合わせを終え、素材を探しに出ようとするあなたの腕を、酒臭い、しかし岩のように力強い手が掴んだ。）", "", actor=pc) \
         .say("narr_22", "（バルガスだ。彼はあなたを人気の無い柱の影へと引きずり込み、周囲を警戒しながら低く、掠れた声で話し始めた。）", "", actor=pc) \
         .say("balgas_1", "……おい、待て。リリィの女狐に言われるがまま、あいつ（ゼク）の店へ行くつもりか？", "", actor=balgas) \
@@ -279,7 +277,6 @@ def define_makuma2(builder: DramaBuilder):
     # ========================================
     builder.step(scene4) \
         .play_bgm("BGM/Lily_Tranquil") \
-        .focus_chara(Actors.LILY) \
         .say("narr_30", "（素材を集め、虚空の心臓を完成させたあなた。それを手にしたあなたは、リリィのもとへ向かう。）", "", actor=pc) \
         .say("lily_27", "……完成したのですね。見せてください。", "", actor=lily) \
         .say("narr_31", "（リリィが虚空の心臓を手に取り、魔力を流し込む。）", "", actor=pc) \

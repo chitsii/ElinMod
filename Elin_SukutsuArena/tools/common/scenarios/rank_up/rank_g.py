@@ -37,7 +37,6 @@ def define_rank_up_G(builder: DramaBuilder):
     # このドラマは戦闘開始前の会話のみを担当する
     builder.step(main) \
         .play_bgm("BGM/sukutsu_arena_opening") \
-        .focus_chara(Actors.LILY) \
         .say("narr_1", "（薄暗いロビーに、異次元の嵐が石壁を叩く音が不気味に響いている。空気は重く、血と錆の臭いが鼻腔を突く。）", "", actor=pc) \
         .say("lily_r1", "……準備はよろしいですか？", "", actor=lily) \
         .say("narr_2", "（彼女は細長い爪で、血塗られた羊皮紙を軽く叩いた。パチン、パチンと、まるで死刑執行の秒読みのように。）", "", actor=pc) \
@@ -60,7 +59,6 @@ def define_rank_up_G(builder: DramaBuilder):
 
     # --- Vargus Advice ---
     builder.step(vargus_advice) \
-        .focus_chara(Actors.BALGAS) \
         .say("narr_3", "（闘技場へ繋がる鉄格子の前で、バルガスが研ぎ澄まされた剣を無造作に弄んでいる。）", "", actor=pc) \
         .say("vargus_r2", "……いいか、一度だけ教えてやる。プチ共は『数』で来る。一匹一匹はゴミだが、囲まれればお前の肉は一瞬で削げ落ち、綺麗な骨の標本ができあがりだ。", "", actor=vargus) \
         .say("vargus_r3", "壁を背にしろ。そして、スタミナを切らすな。呼吸を乱した瞬間に、奴らは喉笛に吸い付いてくる。……ほら、行け。観客どもが、お前の悲鳴を心待ちにしてやがるぜ。", "", actor=vargus) \
@@ -93,15 +91,13 @@ def add_rank_up_G_result_steps(builder: DramaBuilder, victory_label: str, defeat
 
     builder.step(victory_label) \
         .set_flag("sukutsu_arena_result", 0) \
-        .focus_chara(Actors.BALGAS) \
         .say("rup_vic_v1", "……ケッ、しぶとい奴だ。", "", actor=vargus) \
         .say("rup_vic_v2", "まぁ、合格だ。", "", actor=vargus) \
-        .focus_chara(Actors.LILY) \
         .say("rup_vic_l1", "お疲れ様でした。約束通り、ギルドの台帳にあなたの名を刻んでおきました。", "", actor=lily) \
         .say("rup_vic_l2", "ランクG『屑肉』。ふふ、あなたにぴったりの、美味しそうな二つ名だと思いませんか？", "", actor=lily) \
         .say("rup_vic_l3", "報酬を選んでください。", "", actor=lily) \
         .complete_quest(QuestIds.RANK_UP_G) \
-        .set_flag("chitsii.arena.player.rank", 1)
+    .set_flag("chitsii.arena.player.rank", 1)
 
     # 3択報酬選択
     add_reward_choice(
@@ -120,7 +116,6 @@ def add_rank_up_G_result_steps(builder: DramaBuilder, victory_label: str, defeat
     # === Rank G 昇格試験 敗北 ===
     builder.step(defeat_label) \
         .set_flag("sukutsu_arena_result", 0) \
-        .focus_chara(Actors.LILY) \
         .say("rup_def_l1", "あらあら……。期待外れでしたね。", "", actor=lily) \
         .say("rup_def_l2", "死体袋の用意が無駄にならなくて何よりです。……次の方、どうぞ。", "", actor=lily) \
         .jump(return_label)

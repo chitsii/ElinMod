@@ -62,7 +62,6 @@ def define_lily_real_name(builder: DramaBuilder):
         .jump(scene1)
 
     builder.step(scene1) \
-        .focus_chara(Actors.LILY) \
         .say("lily_1", "……おかえりなさい。バルガスさんは、今頃泥のように眠っています。", "", actor=lily) \
         .say("lily_2", "あんなに安らかな寝顔を見たのは、私も初めてかもしれません。……ふふ、本当に、あなたという人は。", "", actor=lily) \
         .say("narr_4", "（彼女は酒瓶を置き、あなたに近づく。）", "", actor=pc) \

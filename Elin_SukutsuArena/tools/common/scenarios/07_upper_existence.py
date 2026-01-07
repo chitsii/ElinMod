@@ -37,7 +37,6 @@ def define_upper_existence(builder: ArenaDramaBuilder):
         .jump(scene1)
 
     builder.step(scene1) \
-        .focus_chara(Actors.BALGAS) \
         .say("balgas_1", "……おい、耳を澄ませ。あの連中の笑い声が聞こえるか？", "", actor=balgas) \
         .say("balgas_2", "ランクDからは、連中はお前をただ観るだけじゃ満足しねえ。", "", actor=balgas) \
         .say("balgas_3", "お前の踊りが退屈だったり、逆に『もっと血が見たい』と思われりゃ……上から『プレゼント』が降ってくるぜ。", "", actor=balgas) \
@@ -73,7 +72,6 @@ def define_upper_existence(builder: ArenaDramaBuilder):
         .play_bgm("BGM/Fanfare_Audience") \
         .say("narr_4", "（闘技場に足を踏み入れると、姿の見えない観客たちの熱気が、肌を焼くような不快な波動となって押し寄せる。）", "", actor=pc) \
         .say("narr_5", "（リリィの声が、魔術的な拡声によって会場全体に響き渡った。）", "", actor=pc) \
-        .focus_chara(Actors.LILY) \
         .say("lily_1", "……皆様、お待たせいたしました。", "", actor=lily) \
         .say("lily_2", "本日のメインディッシュは、新たな『銅貨稼ぎ』……期待の新人による、命の切り売りでございます！", "", actor=lily) \
         .say("obs_1", "（観客の歓声と拍手のような音が響く。）", "", actor=pc) \
@@ -118,15 +116,12 @@ def add_upper_existence_result_steps(builder: ArenaDramaBuilder, victory_label: 
         .play_bgm("BGM/Lobby_Normal") \
         .say("narr_v1", "（満身創痍で敵を倒した瞬間、会場を包んだのは喝采ではなく、勝者を馬鹿にするような高い笑い声だった。）", "", actor=pc) \
         .say("narr_v2", "（ロビーに戻ると、リリィがクスクスと笑いながら出迎える。）", "", actor=pc) \
-        .focus_chara(Actors.LILY) \
         .say("lily_v1", "……ふふ、見事な逃げ回りっぷりでした。", "", actor=lily) \
         .say("lily_v2", "上の方々は、あなたが重力石に足を取られた時の慌てた顔が、今日一番の傑作だったと仰っていますよ。", "", actor=lily) \
         .say("narr_v3", "（バルガスが近づいてくる。）", "", actor=pc) \
-        .focus_chara(Actors.BALGAS) \
         .say("balgas_v1", "……ケッ、笑わせておけ。", "", actor=balgas) \
         .say("balgas_v2", "生き残れば、そのヤジもいつかは『金』に変わる。", "", actor=balgas) \
         .say("balgas_v3", "だがな、次はもっと酷いもんが降ってくるぜ。連中はすぐに飽きるからな。", "", actor=balgas) \
-        .focus_chara(Actors.LILY) \
         .say("lily_v3", "では、報酬の授与です。", "", actor=lily) \
         .say("lily_v4", "観客からの投げ銭……小さなコイン10枚とプラチナコイン2枚。それと、素材を一つ選んでいただけます。", "", actor=lily)
 
@@ -168,7 +163,6 @@ def add_upper_existence_result_steps(builder: ArenaDramaBuilder, victory_label: 
     builder.step(defeat_label) \
         .set_flag("sukutsu_arena_result", 0) \
         .play_bgm("BGM/Lobby_Normal") \
-        .focus_chara(Actors.LILY) \
         .say("lily_d1", "……あらあら、落下物に潰されてしまいましたね。", "", actor=lily) \
         .say("lily_d2", "観客の皆様も、少し期待外れだったようです。また挑戦してくださいね。", "", actor=lily) \
         .jump(return_label)

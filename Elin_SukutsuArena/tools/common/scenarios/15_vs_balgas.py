@@ -60,7 +60,6 @@ def define_vs_balgas(builder: DramaBuilder):
         .jump(scene1)
 
     builder.step(scene1) \
-        .focus_chara(Actors.BALGAS) \
         .say("balgas_1", "……おい、黄金の戦鬼。お前はもう、俺の手の届かねえ高みへ行こうとしてやがる。", "", actor=balgas) \
         .say("balgas_2", "だがな、アスタロト……あのドラゴンの首を獲るには、圧倒的な『暴力』だけじゃ足りねえ。", "", actor=balgas) \
         .say("balgas_3", "俺を、この『全盛期の俺』を越えてみせろ。それができなきゃ、お前はただの強いだけの餌だ。", "", actor=balgas) \
@@ -99,7 +98,6 @@ def define_vs_balgas(builder: DramaBuilder):
         .say("narr_fb7", "（しかし、カインの体は限界を迎えていた。アスタロトに「拾われた」時、カインは既に息絶えていた。）", "", actor=pc) \
         .play_bgm("BGM/Ominous_Suspense_02") \
         .say("narr_fb8", "（——回想が終わり、現在に戻る。）", "", actor=pc) \
-        .focus_chara(Actors.BALGAS) \
         .say("balgas_fb6", "……俺はあの時、カインを救えなかった。あいつの魂は今も、このアリーナのどこかで彷徨ってやがる。", "", actor=balgas) \
         .say("balgas_fb7", "だがな、お前は違う。お前は帰れるんだ。イルヴァに、生きている世界に。……だからこそ、俺は本気でお前を試す。中途半端な強さじゃ、アスタロトには勝てねえ。", "", actor=balgas) \
         .say("balgas_fb8", "カインに教えてやれなかったことを、今度こそお前に叩き込んでやる……！", "", actor=balgas) \
@@ -112,7 +110,6 @@ def define_vs_balgas(builder: DramaBuilder):
         .play_bgm("BGM/Lily_Seductive_Danger") \
         .say("narr_7", "（リリィが震える手で水晶を握りしめている。）", "", actor=pc) \
         .say("narr_8", "（その瞳には、事務的な冷徹さは微塵も残っていない。）", "", actor=pc) \
-        .focus_chara(Actors.LILY) \
         .say("lily_1", "……馬鹿な人。その薬は、命の火花を一度に使い果たす禁忌の炎……！", "", actor=lily) \
         .say("lily_2", "お客様、お願いです。彼を止めて……！ でも、彼を殺さないで……。", "", actor=lily) \
         .say("lily_3", "もし彼が死んだら、このアリーナにはもう、私を叱ってくれる人は誰もいなくなってしまうわ……！", "", actor=lily) \
@@ -149,7 +146,6 @@ def define_vs_balgas(builder: DramaBuilder):
         .shake() \
         .say("obs_void", "「……殺セ。英雄ノ魂ヲ捧ゲ、真ノ『屠竜者』ト成レ……。」", "", actor=pc) \
         .say("narr_16", "（あなたは剣を引き、バルガスの喉元に突きつけた刃を下ろす。）", "", actor=pc) \
-        .focus_chara(Actors.BALGAS) \
         .say("balgas_6", "……な、何をしてやがる。……刺せ。それがアリーナの、戦士のケジメだろうが……！", "", actor=balgas) \
         .jump(choice4)
 
@@ -221,13 +217,10 @@ def define_vs_balgas(builder: DramaBuilder):
         .say("narr_17", "（あなたがバルガスの手を取り、立ち上がらせる。）", "", actor=pc) \
         .say("narr_18", "（その瞬間、アリーナ全体を包んでいた不気味な魔力が霧散し、観客たちの声が落胆の溜息へと変わる。）", "", actor=pc) \
         .say("narr_19", "（リリィが駆け寄り、泣きながらバルガスに回復魔法を注ぎ込む。）", "", actor=pc) \
-        .focus_chara(Actors.LILY) \
-        .focus_chara(Actors.BALGAS) \
         .say("balgas_7", "……ハッ。甘っちょろい野郎だ。……だが、その甘さが、俺がカインに教えてやれなかった『本物の強さ』なのかもしれねえな。", "", actor=balgas) \
         .say("balgas_8", "……負けたよ。今日からお前がランクS『屠竜者（Dragon Slayer）』だ。", "", actor=balgas) \
         .say("balgas_9", "俺はもう引退だ。これからは、ただの酔いどれの『隠居』として、お前の凱旋をここで待たせてもらうぜ。", "", actor=balgas) \
         .say("narr_20", "（リリィは台帳を開き、涙を拭きながら何かを書き込む。）", "", actor=pc) \
-        .focus_chara(Actors.LILY) \
         .say("lily_4", "……ありがとう。本当に、ありがとうございます。", "", actor=lily) \
         .say("lily_5", "観客からの報酬として、小さなコイン50枚とプラチナコイン30枚。それと、戦闘記録として素材を一つ選んでいただけます。", "", actor=lily) \
         .jump(reward_choice)
@@ -258,7 +251,6 @@ def define_vs_balgas(builder: DramaBuilder):
         .say("lily_7", "……それと、今回の戦いで、あなたは『理を拒む者』としての称号を獲得しました。", "", actor=lily) \
         .say("lily_8", "アリーナの命令を拒絶し、師匠を生かす……ふふ、あなたは本当に、システムの『バグ』ですね。", "", actor=lily) \
         .say("narr_21", "（影の中から、ゼクが見つめている。）", "", actor=pc) \
-        .focus_chara(Actors.ZEK) \
         .say("zek_1", "……クク。システムの命令を拒絶しましたか。", "", actor=zek) \
         .say("zek_2", "面白い。実に面白い。あなたは『黄金』を超え、ついにこの箱庭の『バグ』として完成した。", "", actor=zek) \
         .say("zek_3", "さあ、アスタロトはすぐそこです。……あなたのその『慈悲』が、あの孤独な竜に届くのかどうか、見せてもらいましょう。", "", actor=zek) \
@@ -271,17 +263,14 @@ def define_vs_balgas(builder: DramaBuilder):
            .choice(final_nod, "（無言で頷く）", "", text_id="c_final_nod")
 
     builder.step(final_thanks) \
-        .focus_chara(Actors.BALGAS) \
         .say("balgas_r4", "……ハッ、礼はいらねえ。生き残って、アスタロトをぶっ倒せ。", "", actor=balgas) \
         .jump(ending)
 
     builder.step(final_human) \
-        .focus_chara(Actors.BALGAS) \
         .say("balgas_r5", "……ああ。少なくとも、まだ仲間を守れるだけの心がある。それが証拠だ。", "", actor=balgas) \
         .jump(ending)
 
     builder.step(final_nod) \
-        .focus_chara(Actors.BALGAS) \
         .say("balgas_r6", "……よし。じゃあ行け。俺は、ここで待ってるぜ。", "", actor=balgas) \
         .jump(ending)
 
@@ -333,7 +322,6 @@ def add_vs_balgas_result_steps(builder: ArenaDramaBuilder, victory_label: str, d
         .set_flag("sukutsu_quest_battle", 0) \
         .play_bgm("BGM/Lobby_Normal") \
         .say("narr_d1", "（全盛期のバルガスの圧倒的な力の前に、あなたは膝をついた。）", "", actor=pc) \
-        .focus_chara(Actors.BALGAS) \
         .say("balgas_d1", "……まだだ。お前はまだ、俺を超えられちゃいねえ。", "", actor=balgas) \
         .say("balgas_d2", "もう一度鍛え直してから来い。俺は……待ってるぜ。", "", actor=balgas) \
         .jump(return_label)

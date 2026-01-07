@@ -42,7 +42,6 @@ def define_rank_up_B(builder: DramaBuilder):
         .jump(scene1)
 
     builder.step(scene1) \
-        .focus_chara(Actors.BALGAS) \
         .say("balgas_1", "……おい、闘技場の鴉。", "", actor=balgas) \
         .say("balgas_2", "お前はここまで、よく戦ってきた。だが、次の相手は……今までの敵とは次元が違う。", "", actor=balgas) \
         .say("balgas_3", "『虚無の処刑人ヌル』。", "", actor=balgas) \
@@ -75,7 +74,6 @@ def define_rank_up_B(builder: DramaBuilder):
     # ========================================
     builder.step(scene2) \
         .play_bgm("BGM/Lily_Seductive_Danger") \
-        .focus_chara(Actors.LILY) \
         .say("narr_5", "（リリィが近づいてくる。その目には、珍しく真剣な光が宿っている。）", "", actor=pc) \
         .say("lily_1", "……お客様。ヌルは、このアリーナが生み出した『究極の絶望』の結晶です。", "", actor=lily) \
         .say("lily_2", "あなたがどれほど強くなっても、どれほど技術を磨いても、『虚無』の前では全てが等しく無意味。", "", actor=lily) \
@@ -144,11 +142,8 @@ def add_rank_up_B_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .play_bgm("BGM/Emotional_Sacred_Triumph_Special") \
         .say("narr_v1", "（ヌルの体が霧のように消え去る瞬間、あなたの耳に、かすかに音が戻ってきた。）", "", actor=pc) \
         .say("narr_v2", "（ロビーに戻ると、リリィが駆け寄ってきた。）", "", actor=pc) \
-        .focus_chara(Actors.LILY) \
         .say("lily_v1", "……おかえりなさい。あなたは虚無を打ち破ったのですね。", "", actor=lily) \
-        .focus_chara(Actors.BALGAS) \
         .say("balgas_v1", "……ケッ、やりやがったな。今日からお前は『銀翼（Silver Wing）』だ。", "", actor=balgas) \
-        .focus_chara(Actors.LILY) \
         .say("lily_v2", "では、報酬を選んでください。", "", actor=lily) \
         .complete_quest(QuestIds.RANK_UP_B) \
         .mod_flag(Keys.REL_BALGAS, "+", 20) \
@@ -176,7 +171,6 @@ def add_rank_up_B_result_steps(builder: DramaBuilder, victory_label: str, defeat
     builder.step(defeat_label) \
         .set_flag("sukutsu_arena_result", 0) \
         .play_bgm("BGM/Lobby_Normal") \
-        .focus_chara(Actors.LILY) \
         .say("lily_d1", "……虚無に、飲み込まれてしまいましたね。", "", actor=lily) \
         .say("lily_d2", "でも、あなたはまだ生きています。それだけで、十分に奇跡です。", "", actor=lily) \
         .say("lily_d3", "準備が整ったら、また挑戦してください。私たちは、ここで待っていますから。", "", actor=lily) \

@@ -43,7 +43,6 @@ def define_makuma(builder: DramaBuilder):
     # ========================================
     builder.step(main) \
         .play_bgm("BGM/Lily_Seductive") \
-        .focus_chara(Actors.LILY) \
         .say("narr_1", "（リリィの私室。以前よりも紫煙は濃く、甘い香りが理性を揺さぶる。）", "", actor=pc) \
         .say("narr_2", "（彼女は机の上に、銀色に輝く未知の布地と、空間を切り裂くほどに鋭い針を並べていた。）", "", actor=pc) \
         .say("narr_3", "（それは地上のどんな名工も手にしたことのない、『次元の境界線』そのものを織り込んだ素材だった。）", "", actor=pc) \
@@ -83,7 +82,6 @@ def define_makuma(builder: DramaBuilder):
         .play_bgm("BGM/Ominous_Suspense_02") \
         .say("narr_6", "（リリィの部屋を辞し、薄暗い廊下を歩くあなたの背後に、不自然な影が伸びる。）", "", actor=pc) \
         .say("narr_7", "（ゼクが、まるで壁のシミから染み出すように姿を現した。）", "", actor=pc) \
-        .focus_chara(Actors.ZEK) \
         .say("narr_8", "（その手には、先ほど倒した暗殺者『ヌル』の頭部から抜き取られた、鈍く明滅するクリスタルの破片——**『記録チップ』**が握られていた。）", "", actor=pc) \
         .say("zek_1", "……ククッ、美しい衣装ですな。", "", actor=zek) \
         .say("zek_2", "ですが、その華やかな衣の下に隠された『真実』に、あなたは耐えられますかな？ あなたが壊したあの人形……ヌル。あれが何であったか、知りたくはありませんか？", "", actor=zek) \
@@ -149,7 +147,6 @@ def define_makuma(builder: DramaBuilder):
     # ========================================
     builder.step(scene4) \
         .play_bgm("BGM/Lobby_Normal") \
-        .focus_chara(Actors.BALGAS) \
         .say("narr_15", "（バルガスが廊下に現れる。）", "", actor=pc) \
         .say("balgas_1", "……おい、何をボーッとしてる？ ゼクの野郎、また何か吹き込んでいったんじゃねえだろうな？", "", actor=balgas) \
         .say("balgas_2", "あいつの言うことは半分嘘、半分本当だ。全部を信じるなよ。……ただ、こいつだけは覚えておけ。お前が人間でいられるかどうかは、お前自身の選択次第だ。", "", actor=balgas) \

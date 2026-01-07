@@ -50,7 +50,6 @@ def define_lily_private(builder: DramaBuilder):
         .jump(scene1)
 
     builder.step(scene1) \
-        .focus_chara(Actors.LILY) \
         .say("lily_1", "……おかえりなさい。", "", actor=lily) \
         .say("lily_2", "観客席からの『供物』で、少しばかり身だしなみが乱れているようですね。ふふ、でも……今のあなたからは、とても複雑で、芳醇な香りがします。", "", actor=lily) \
         .say("narr_4", "（彼女は羽根ペンを置き、あなたに近づく。）", "", actor=pc) \

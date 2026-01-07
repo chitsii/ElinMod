@@ -44,7 +44,6 @@ def define_lily_experiment(builder: DramaBuilder):
     # ========================================
     builder.step(main) \
         .play_bgm("BGM/Lobby_Normal") \
-        .focus_chara(Actors.LILY) \
         .say("narr_1", "（ロビーは相変わらず、異次元の歪みが軋む不快な音に満ちている。）", "", actor=pc) \
         .say("narr_2", "（リリィは眉間に皺を寄せ、羽根ペンを乱暴に机に置いた。その前には、どこか禍々しい幾何学模様が描かれた、古ぼけた設計図が広げられている。）", "", actor=pc) \
         .say("lily_1", "……あぁ、忌々しい。", "", actor=lily) \

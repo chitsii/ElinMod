@@ -39,7 +39,6 @@ def define_rank_up_E(builder: DramaBuilder):
         .say("narr_1", "（ロビーの喧騒が嘘のように静まり返った深夜。）", "", actor=pc) \
         .say("narr_2", "（バルガスはいつもの酒瓶を持たず、代わりに血錆にまみれた「古い戦士の兜」を無造作に眺めていた。）", "", actor=pc) \
         .say("narr_3", "（彼がこれほどまでに静かなのは、あなたがここへ来てから初めてのことだった。）", "", actor=pc) \
-        .focus_chara(Actors.BALGAS) \
         .say("balgas_1", "……来たか。", "", actor=balgas) \
         .say("narr_4", "（彼は兜を撫でながら、低く掠れた声で話し始める。）", "", actor=pc) \
         .say("balgas_2", "おい、新入り。お前は『鉄』がなぜ錆びるか知ってるか？手入れを怠るからじゃねえ。……持ち主の心が折れた時、鉄も一緒に死ぬんだよ。", "", actor=balgas) \
@@ -133,13 +132,11 @@ def add_rank_up_E_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .play_bgm("BGM/Emotional_Sorrow_2") \
         .say("narr_v1", "（カインの体が粒子となって崩れ去る瞬間、騎士は一瞬だけバルガスの方向を見つめ、静かに首を振ったように見えた。）", "", actor=pc) \
         .say("narr_v2", "（静寂の中、ロビーに戻ると、バルガスが背を向けたまま待っている。）", "", actor=pc) \
-        .focus_chara(Actors.BALGAS) \
         .say("balgas_v1", "……終わったか。", "", actor=balgas) \
         .say("narr_v3", "（彼はゆっくりと振り返る。その目には、涙の跡。）", "", actor=pc) \
         .say("balgas_v2", "あの野郎、最期まで意地っ張りな面をしてやがったな。", "", actor=balgas) \
         .say("narr_v4", "（彼は拳でこっそりと目を拭う。）", "", actor=pc) \
         .say("balgas_v3", "……ありがよ。今日からお前は、ただの『泥犬』じゃねえ。何度叩かれても折れねえ、鈍く輝く『鉄屑（Iron Scrap）』だ。", "", actor=balgas) \
-        .focus_chara(Actors.LILY) \
         .say("lily_v1", "お疲れ様でした。報酬を選んでください。", "", actor=lily) \
         .complete_quest(QuestIds.RANK_UP_E) \
         .mod_flag(Keys.REL_BALGAS, "+", 15)
@@ -165,7 +162,6 @@ def add_rank_up_E_result_steps(builder: DramaBuilder, victory_label: str, defeat
     # ========================================
     builder.step(defeat_label) \
         .set_flag("sukutsu_arena_result", 0) \
-        .focus_chara(Actors.BALGAS) \
         .say("balgas_d1", "……チッ。終わったか。", "", actor=balgas) \
         .say("balgas_d2", "お前も、あいつと同じ錆の一部になっちまったか。", "", actor=balgas) \
         .jump(return_label)

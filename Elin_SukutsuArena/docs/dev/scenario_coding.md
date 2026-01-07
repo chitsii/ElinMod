@@ -56,7 +56,6 @@ def define_my_scenario(builder: DramaBuilder):
 
     # フローの構築
     builder.step(start) \
-        .focus_chara("sukutsu_receptionist") \
         .say("hello", "こんにちは、新しいシナリオです。", "Hello.", actor=lily) \
         .wait(0.5) \
         .jump(end)
@@ -102,8 +101,6 @@ def main():
 
 ### 会話・演出
 - `say(id, text_jp, text_en, actor)`: 台詞を表示。`actor` は登録した変数を渡す。
-- `focus_chara(chara_id)`: 指定キャラにカメラ/フォーカスを向ける。
-- `wait(seconds)`: 指定秒数待機。
 - `play_bgm("BGM/Title")`: BGM再生。
 - `play_sound("sound_id")`: SE再生。
 

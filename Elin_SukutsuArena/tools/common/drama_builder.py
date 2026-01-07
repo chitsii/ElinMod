@@ -223,7 +223,7 @@ class ChoiceReaction:
         """クエストを完了"""
         actor_key = actor.key if isinstance(actor, DramaActor) else (actor or 'pc')
         return self._add_action({
-            'action': 'modInvoke',
+            'action': 'invoke*',
             'param': f'complete_quest({quest_id})',
             'actor': actor_key,
         })
@@ -905,26 +905,6 @@ class DramaBuilder:
         return self
 
     # ============================================================================
-    # CWL 拡張機能: カメラ・フォーカス
-    # ============================================================================
-
-    def focus_chara(self, chara_id: str, wait_before: float = 0.3, wait_after: float = 0.5) -> 'DramaBuilder':
-        """
-        キャラクターにフォーカス（前後にウェイト付き）
-
-        Args:
-            chara_id: キャラクターID
-            wait_before: フォーカス前の待機秒数
-            wait_after: フォーカス後の待機秒数
-        """
-        if wait_before > 0:
-            self.entries.append({'action': 'wait', 'param': str(wait_before)})
-        self.entries.append({'action': 'focusChara', 'param': chara_id})
-        if wait_after > 0:
-            self.entries.append({'action': 'wait', 'param': str(wait_after)})
-        return self
-
-    # ============================================================================
     # CWL 拡張機能: システム
     # ============================================================================
 
@@ -1001,12 +981,12 @@ class DramaBuilder:
         return self
 
     # ============================================================================
-    # Arena Quest System: modInvoke Actions
+    # Arena Quest System: invoke* Actions
     # ============================================================================
 
-    def mod_invoke(self, method_call: str, actor: Union[str, DramaActor] = None) -> 'DramaBuilder':
+    def invoke(self, method_call: str, actor: Union[str, DramaActor] = None) -> 'DramaBuilder':
         """
-        C# メソッドを modInvoke アクションで呼び出す
+        C# メソッドを invoke* アクションで呼び出す
 
         Args:
             method_call: メソッド呼び出し文字列（例: "check_quest_available(quest_01, label)"）
@@ -1014,7 +994,7 @@ class DramaBuilder:
         """
         actor_key = self._resolve_key(actor) if actor else 'pc'
         self.entries.append({
-            'action': 'modInvoke',
+            'action': 'invoke*',
             'param': method_call,
             'actor': actor_key,
         })
@@ -1031,7 +1011,7 @@ class DramaBuilder:
             actor: アクター（デフォルト: pc）
         """
         jump_key = self._resolve_key(jump_to)
-        return self.mod_invoke(f'check_quest_available({quest_id}, {jump_key})', actor)
+        return self.invoke(f'check_quest_available({quest_id}, {jump_key})', actor)
 
     def start_quest(self, quest_id: str, actor: Union[str, DramaActor] = None) -> 'DramaBuilder':
         """
@@ -1041,7 +1021,7 @@ class DramaBuilder:
             quest_id: クエストID
             actor: アクター（デフォルト: pc）
         """
-        return self.mod_invoke(f'start_quest({quest_id})', actor)
+        return self.invoke(f'start_quest({quest_id})', actor)
 
     def complete_quest(self, quest_id: str, actor: Union[str, DramaActor] = None) -> 'DramaBuilder':
         """
@@ -1051,13 +1031,13 @@ class DramaBuilder:
             quest_id: クエストID
             actor: アクター（デフォルト: pc）
         """
-        return self.mod_invoke(f'complete_quest({quest_id})', actor)
+        return self.invoke(f'complete_quest({quest_id})', actor)
 
     def if_flag_string(self, flag: str, operator: str, value: str,
                        jump_to: Union[str, DramaLabel],
                        actor: Union[str, DramaActor] = None) -> 'DramaBuilder':
         """
-        フラグの文字列/enum値を比較してジャンプ（modInvoke版）
+        フラグの文字列/enum値を比較してジャンプ（invoke*版）
 
         Args:
             flag: フラグキー
@@ -1069,7 +1049,7 @@ class DramaBuilder:
         jump_key = self._resolve_key(jump_to)
         actor_key = self._resolve_key(actor) if actor else 'pc'
         self.entries.append({
-            'action': 'modInvoke',
+            'action': 'invoke*',
             'param': f'if_flag({flag}, {operator}, {value}, {jump_key})',
             'actor': actor_key,
         })
@@ -1082,7 +1062,7 @@ class DramaBuilder:
         Args:
             actor: アクター（デフォルト: pc）
         """
-        return self.mod_invoke('debug_log_flags()', actor)
+        return self.invoke('debug_log_flags()', actor)
 
     def debug_log_quests(self, actor: Union[str, DramaActor] = None) -> 'DramaBuilder':
         """
@@ -1091,7 +1071,7 @@ class DramaBuilder:
         Args:
             actor: アクター（デフォルト: pc）
         """
-        return self.mod_invoke('debug_log_quests()', actor)
+        return self.invoke('debug_log_quests()', actor)
 
     def start_random_battle(self, difficulty: int, master_id: str = "sukutsu_arena_master",
                             actor: Union[str, DramaActor] = None) -> 'DramaBuilder':
@@ -1103,7 +1083,7 @@ class DramaBuilder:
             master_id: アリーナマスターのキャラクターID
             actor: アクター（デフォルト: pc）
         """
-        return self.mod_invoke(f'start_random_battle({difficulty}, {master_id})', actor)
+        return self.invoke(f'start_random_battle({difficulty}, {master_id})', actor)
 
     def build(self) -> List[Dict[str, Any]]:
         """エントリーリストを返す（検証なし）"""

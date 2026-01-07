@@ -57,7 +57,6 @@ def define_zek_steal_soulgem(builder: DramaBuilder):
         .jump(scene1)
 
     builder.step(scene1) \
-        .focus_chara(Actors.ZEK) \
         .say("zek_1", "……あぁ、なんと美しい。", "", actor=zek) \
         .say("zek_2", "数千回の敗北と、最期の瞬間の安らぎが凝固した、混じり気なしの『純粋な魂』だ。", "", actor=zek) \
         .say("narr_4", "（彼は細長い指を伸ばし、魂の欠片を指し示す。）", "", actor=pc) \
@@ -178,7 +177,6 @@ def define_zek_steal_soulgem(builder: DramaBuilder):
     builder.step(refuse_balgas) \
         .play_bgm("BGM/Emotional_Sorrow") \
         .say("narr_ref2", "（あなたはロビーに戻り、バルガスにカインの魂の欠片を渡す。）", "", actor=pc) \
-        .focus_chara(Actors.BALGAS) \
         .say("balgas_ref1", "……あぁ。これでようやく、あいつもこの錆びた檻から出られる。", "", actor=balgas) \
         .say("narr_ref3", "（彼は震える手で魂の欠片を受け取る。その目には涙。）", "", actor=pc) \
         .say("narr_ref4", "（彼は魂の欠片を兜の中にそっと収める。）", "", actor=pc) \
@@ -205,7 +203,6 @@ def define_zek_steal_soulgem(builder: DramaBuilder):
     builder.step(sell_balgas) \
         .play_bgm("BGM/Lobby_Normal") \
         .say("narr_sell3", "（あなたはロビーに戻る。バルガスがあなたを待っている。）", "", actor=pc) \
-        .focus_chara(Actors.BALGAS) \
         .say("balgas_sell1", "……おい。カインの魂の欠片は見つかったか？", "", actor=balgas) \
         .say("narr_sell4", "（あなたは首を横に振る。）", "", actor=pc) \
         .say("balgas_sell2", "……そうか。見つからなかったか。", "", actor=balgas) \
@@ -220,7 +217,6 @@ def define_zek_steal_soulgem(builder: DramaBuilder):
     # ========================================
     builder.step(scene4_lily) \
         .play_bgm("BGM/Lobby_Normal") \
-        .focus_chara(Actors.LILY) \
         .say("narr_lily1", "（受付に戻ったプレイヤーに対し、リリィは全てを見透かしたような目でランクD『銅貨稼ぎ（Copper Earner）』の刻印を台帳に打つ。）", "", actor=pc) \
         .say("lily_1", "……ふふ、面白いこと。", "", actor=lily) \
         .say("lily_2", "友情を選んでも、力を選んでも、あなたの歩む先が『闘争』であることに変わりはありません。", "", actor=lily) \

@@ -43,7 +43,6 @@ def define_zek_steal_bottle(builder: DramaBuilder):
         .say("narr_2", "（その途中——灯火が不自然に揺らぎ、あなたの足元の影が、まるで意思を持った沼のように長く伸びる。）", "", actor=pc) \
         .shake() \
         .say("narr_3", "（そこから、鎖の擦れる音と共に、ゼクが音もなく這い出してきた。）", "", actor=pc) \
-        .focus_chara(Actors.ZEK) \
         .say("zek_1", "……素晴らしい。実に、溜息が出るほどに。", "", actor=zek) \
         .say("zek_2", "あのサキュバスに渡すには、あまりに惜しい『傑作』を作られましたね、闘士殿。", "", actor=zek) \
         .say("narr_4", "（彼は細長い指で、あなたが持つ器を指し示す。）", "", actor=pc) \
@@ -142,7 +141,6 @@ def define_zek_steal_bottle(builder: DramaBuilder):
     builder.step(scene4_aftermath) \
         .play_bgm("BGM/Lobby_Normal") \
         .say("narr_aft1", "（ゼクが消えた後、あなたは何食わぬ顔で受付へと向かい、その「偽物」をリリィに手渡す。）", "", actor=pc) \
-        .focus_chara(Actors.LILY) \
         .say("lily_a1", "お疲れ様でした。見せていただけますか？", "", actor=lily) \
         .say("narr_aft2", "（彼女は器を手に取り、軽く傾ける。）", "", actor=pc) \
         .say("lily_a2", "……あら、なんだか少し、器の感触が変わったかしら？", "", actor=lily) \
