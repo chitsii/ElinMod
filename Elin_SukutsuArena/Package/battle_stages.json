@@ -5,8 +5,8 @@
       "displayNameJp": "屑肉の洗礼",
       "displayNameEn": "Baptism of Scrap Meat",
       "zoneType": "field",
-      "bgmBattle": "",
-      "bgmVictory": "",
+      "bgmBattle": "BGM/Battle_RankG_VoidOoze",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 5,
       "enemies": [
         {
@@ -40,7 +40,7 @@
       "displayNameEn": "Fangs of the Mud Dog",
       "zoneType": "field",
       "bgmBattle": "BGM/Battle_RankE_Ice",
-      "bgmVictory": "",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 10,
       "enemies": [
         {
@@ -84,7 +84,7 @@
       "displayNameEn": "The Rusty Hero",
       "zoneType": "field",
       "bgmBattle": "BGM/Battle_Kain_Requiem",
-      "bgmVictory": "",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 20,
       "enemies": [
         {
@@ -108,7 +108,7 @@
       "displayNameEn": "Copper Earner's Baptism",
       "zoneType": "field",
       "bgmBattle": "BGM/Battle_RankD_Chaos",
-      "bgmVictory": "",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 30,
       "enemies": [
         {
@@ -162,7 +162,7 @@
       "displayNameEn": "Ravens of the Coliseum",
       "zoneType": "field",
       "bgmBattle": "BGM/Battle_RankC_Heroic_Lament",
-      "bgmVictory": "",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 50,
       "enemies": [
         {
@@ -206,7 +206,7 @@
       "displayNameEn": "Void Executioner Null",
       "zoneType": "field",
       "bgmBattle": "BGM/Battle_Null_Assassin",
-      "bgmVictory": "",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 80,
       "enemies": [
         {
@@ -230,7 +230,7 @@
       "displayNameEn": "Golden War Demon",
       "zoneType": "field",
       "bgmBattle": "BGM/Battle_Shadow_Self",
-      "bgmVictory": "",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 120,
       "enemies": [
         {
@@ -254,7 +254,7 @@
       "displayNameEn": "Path to Dragon Slayer",
       "zoneType": "field",
       "bgmBattle": "BGM/Battle_Balgas_Prime",
-      "bgmVictory": "",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 200,
       "enemies": [
         {
@@ -304,7 +304,7 @@
       "displayNameEn": "Forest Wolf",
       "zoneType": "field",
       "bgmBattle": "",
-      "bgmVictory": "",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 10,
       "enemies": [
         {
@@ -328,7 +328,7 @@
       "displayNameEn": "Centaur",
       "zoneType": "field",
       "bgmBattle": "",
-      "bgmVictory": "",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 20,
       "enemies": [
         {
@@ -352,7 +352,7 @@
       "displayNameEn": "Minotaur",
       "zoneType": "field",
       "bgmBattle": "",
-      "bgmVictory": "",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 30,
       "enemies": [
         {
@@ -376,7 +376,7 @@
       "displayNameEn": "Dragon Confrontation",
       "zoneType": "field",
       "bgmBattle": "",
-      "bgmVictory": "",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 50,
       "enemies": [
         {
@@ -399,8 +399,8 @@
       "displayNameJp": "見えざる観客の供物",
       "displayNameEn": "Offering to the Unseen Audience",
       "zoneType": "field",
-      "bgmBattle": "BGM/Battle_Audience_Chaos",
-      "bgmVictory": "",
+      "bgmBattle": "BGM/ProgressiveDance",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 15,
       "enemies": [
         {
@@ -455,8 +455,8 @@
       "displayNameJp": "屑肉の洗礼",
       "displayNameEn": "Baptism of Scrap Meat",
       "zoneType": "field",
-      "bgmBattle": "",
-      "bgmVictory": "",
+      "bgmBattle": "BGM/Battle_RankG_VoidOoze",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 5,
       "enemies": [
         {
@@ -490,7 +490,7 @@
       "displayNameEn": "Fangs of the Mud Dog",
       "zoneType": "field",
       "bgmBattle": "BGM/Battle_RankE_Ice",
-      "bgmVictory": "",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 10,
       "enemies": [
         {
@@ -534,7 +534,7 @@
       "displayNameEn": "The Rusty Hero",
       "zoneType": "field",
       "bgmBattle": "BGM/Battle_Kain_Requiem",
-      "bgmVictory": "",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 20,
       "enemies": [
         {
@@ -558,7 +558,7 @@
       "displayNameEn": "Copper Earner's Baptism",
       "zoneType": "field",
       "bgmBattle": "BGM/Battle_RankD_Chaos",
-      "bgmVictory": "",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 30,
       "enemies": [
         {
@@ -612,7 +612,7 @@
       "displayNameEn": "Ravens of the Coliseum",
       "zoneType": "field",
       "bgmBattle": "BGM/Battle_RankC_Heroic_Lament",
-      "bgmVictory": "",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 50,
       "enemies": [
         {
@@ -656,7 +656,7 @@
       "displayNameEn": "Void Executioner Null",
       "zoneType": "field",
       "bgmBattle": "BGM/Battle_Null_Assassin",
-      "bgmVictory": "",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 80,
       "enemies": [
         {
@@ -680,7 +680,7 @@
       "displayNameEn": "Golden War Demon",
       "zoneType": "field",
       "bgmBattle": "BGM/Battle_Shadow_Self",
-      "bgmVictory": "",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 120,
       "enemies": [
         {
@@ -704,7 +704,7 @@
       "displayNameEn": "Path to Dragon Slayer",
       "zoneType": "field",
       "bgmBattle": "BGM/Battle_Balgas_Prime",
-      "bgmVictory": "",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 200,
       "enemies": [
         {
@@ -752,7 +752,7 @@
       "displayNameEn": "Forest Wolf",
       "zoneType": "field",
       "bgmBattle": "",
-      "bgmVictory": "",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 10,
       "enemies": [
         {
@@ -776,7 +776,7 @@
       "displayNameEn": "Centaur",
       "zoneType": "field",
       "bgmBattle": "",
-      "bgmVictory": "",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 20,
       "enemies": [
         {
@@ -800,7 +800,7 @@
       "displayNameEn": "Minotaur",
       "zoneType": "field",
       "bgmBattle": "",
-      "bgmVictory": "",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 30,
       "enemies": [
         {
@@ -824,7 +824,7 @@
       "displayNameEn": "Dragon Confrontation",
       "zoneType": "field",
       "bgmBattle": "",
-      "bgmVictory": "",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 50,
       "enemies": [
         {
@@ -847,8 +847,8 @@
       "displayNameJp": "見えざる観客の供物",
       "displayNameEn": "Offering to the Unseen Audience",
       "zoneType": "field",
-      "bgmBattle": "BGM/Battle_Audience_Chaos",
-      "bgmVictory": "",
+      "bgmBattle": "BGM/ProgressiveDance",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 15,
       "enemies": [
         {
@@ -902,7 +902,7 @@
       "displayNameEn": "[DEBUG] Weak Enemy",
       "zoneType": "field",
       "bgmBattle": "",
-      "bgmVictory": "",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 1,
       "enemies": [
         {
@@ -926,7 +926,7 @@
       "displayNameEn": "[DEBUG] Strong Enemy",
       "zoneType": "field",
       "bgmBattle": "",
-      "bgmVictory": "",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 100,
       "enemies": [
         {
@@ -950,7 +950,7 @@
       "displayNameEn": "[DEBUG] Enemy Horde",
       "zoneType": "field",
       "bgmBattle": "",
-      "bgmVictory": "",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 50,
       "enemies": [
         {
@@ -974,7 +974,7 @@
       "displayNameEn": "[DEBUG] Gimmick Test",
       "zoneType": "field",
       "bgmBattle": "",
-      "bgmVictory": "",
+      "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 10,
       "enemies": [
         {

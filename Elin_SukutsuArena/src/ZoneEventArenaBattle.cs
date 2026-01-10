@@ -75,7 +75,7 @@ public class ZoneEventArenaBattle : ZoneEvent
                 Msg.Say("敵を殲滅した！");
 
                 EClass.Sound.Play("quest_complete");
-                EClass._zone.SetBGM(106); // 勝利BGM (Home)
+                PlayVictoryBGM(arenaInstance);
 
                 // 少し待ってから帰還 (3秒後にタイマーで実行)
                 victoryTimer = 3.0f;
@@ -108,5 +108,32 @@ public class ZoneEventArenaBattle : ZoneEvent
                 arenaInstance.LeaveZone();
             }
         }
+    }
+
+    /// <summary>
+    /// 勝利BGMを再生（カスタムBGM対応）
+    /// </summary>
+    private void PlayVictoryBGM(ZoneInstanceArenaBattle arenaInstance)
+    {
+        if (arenaInstance != null && !string.IsNullOrEmpty(arenaInstance.bgmVictory))
+        {
+            try
+            {
+                Debug.Log($"[SukutsuArena] Playing victory BGM: {arenaInstance.bgmVictory}");
+                var data = SoundManager.current.GetData(arenaInstance.bgmVictory);
+                if (data != null && data is BGMData bgm)
+                {
+                    LayerDrama.haltPlaylist = true;  // ゾーンBGMによる上書きを防止
+                    SoundManager.current.PlayBGM(bgm);
+                    return;
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"[SukutsuArena] Failed to play victory BGM: {ex.Message}");
+            }
+        }
+        // フォールバック
+        EClass._zone.SetBGM(106);
     }
 }

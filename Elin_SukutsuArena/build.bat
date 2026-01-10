@@ -164,7 +164,7 @@ xcopy "%~dp0Package\battle_stages.json" "%~dp0elin_link\Package\%MOD_NAME%\Packa
 xcopy "%~dp0LangMod" "%~dp0elin_link\Package\%MOD_NAME%\LangMod\" /E /Y /I /Q >nul 2>&1
 xcopy "%~dp0Texture" "%~dp0elin_link\Package\%MOD_NAME%\Texture\" /E /Y /I /Q >nul 2>&1
 xcopy "%~dp0Portrait" "%~dp0elin_link\Package\%MOD_NAME%\Portrait\" /E /Y /I /Q >nul 2>&1
-xcopy "%~dp0Sound" "%~dp0elin_link\Package\%MOD_NAME%\Sound\" /E /Y /I /Q >nul 2>&1
+xcopy "%~dp0Media" "%~dp0elin_link\Package\%MOD_NAME%\Media\" /E /Y /I /Q >nul 2>&1
 
 REM Steam folder
 if not exist "%STEAM_PACKAGE_DIR%" mkdir "%STEAM_PACKAGE_DIR%" >nul 2>&1
@@ -175,7 +175,7 @@ xcopy "%~dp0Package\battle_stages.json" "%STEAM_PACKAGE_DIR%\Package\" /Y /I /Q 
 xcopy "%~dp0LangMod" "%STEAM_PACKAGE_DIR%\LangMod\" /E /Y /I /Q >nul 2>&1
 xcopy "%~dp0Texture" "%STEAM_PACKAGE_DIR%\Texture\" /E /Y /I /Q >nul 2>&1
 xcopy "%~dp0Portrait" "%STEAM_PACKAGE_DIR%\Portrait\" /E /Y /I /Q >nul 2>&1
-xcopy "%~dp0Sound" "%STEAM_PACKAGE_DIR%\Sound\" /E /Y /I /Q >nul 2>&1
+xcopy "%~dp0Media" "%STEAM_PACKAGE_DIR%\Media\" /E /Y /I /Q >nul 2>&1
 echo OK
 
 echo.

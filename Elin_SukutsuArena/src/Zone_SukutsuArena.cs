@@ -32,6 +32,9 @@ public class Zone_SukutsuArena : Zone_Civilized
     {
         base.OnBeforeSimulate();
 
+        // アリーナロビーBGMを設定
+        SetLobbyBGM();
+
         // 初回訪問時のみオープニングドラマを再生
         // dialogFlags でフラグを管理（CWLと同じ）
         bool openingSeen = EClass.player.dialogFlags.ContainsKey("sukutsu_opening_seen")
@@ -41,6 +44,26 @@ public class Zone_SukutsuArena : Zone_Civilized
         {
             Debug.Log("[SukutsuArena] First visit detected. Triggering opening drama...");
             TriggerOpeningDrama();
+        }
+    }
+
+    /// <summary>
+    /// ロビーBGMを設定
+    /// </summary>
+    private void SetLobbyBGM()
+    {
+        try
+        {
+            var data = SoundManager.current.GetData("BGM/Lobby_Normal");
+            if (data != null && data is BGMData bgm)
+            {
+                Debug.Log("[SukutsuArena] Setting lobby BGM: BGM/Lobby_Normal");
+                SoundManager.current.PlayBGM(bgm);
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogWarning($"[SukutsuArena] Failed to set lobby BGM: {ex.Message}");
         }
     }
 

@@ -105,7 +105,7 @@ class BattleStage:
     display_name_en: str        # 英語表示名
     zone_type: str = "field"    # マップタイプ
     bgm_battle: str = ""        # 戦闘BGM (空なら102)
-    bgm_victory: str = ""       # 勝利BGM (空なら106)
+    bgm_victory: str = "BGM/Fanfare_Audience"  # 勝利BGM（デフォルト）
     reward_plat: int = 10       # プラチナコイン報酬
     enemies: List[EnemyConfig] = field(default_factory=list)
     gimmicks: List[GimmickConfig] = field(default_factory=list)  # ギミック設定
@@ -144,7 +144,7 @@ RANK_UP_STAGES: Dict[str, BattleStage] = {
         display_name_jp="屑肉の洗礼",
         display_name_en="Baptism of Scrap Meat",
         zone_type="field",
-        bgm_battle="",  # デフォルト戦闘BGM
+        bgm_battle="BGM/Battle_RankG_VoidOoze",  # 初戦BGM
         reward_plat=5,
         enemies=[
             # 最弱の試練：スライム系の群れ
@@ -390,7 +390,7 @@ NORMAL_STAGES: Dict[str, BattleStage] = {
         display_name_jp="見えざる観客の供物",
         display_name_en="Offering to the Unseen Audience",
         zone_type="field",
-        bgm_battle="BGM/Battle_Audience_Chaos",
+        bgm_battle="BGM/ProgressiveDance",  # 上位存在戦BGM
         reward_plat=15,
         enemies=[
             # 異次元の剣闘士

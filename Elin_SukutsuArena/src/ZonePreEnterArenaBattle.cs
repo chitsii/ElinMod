@@ -460,7 +460,8 @@ public class ZonePreEnterArenaBattle : ZonePreEnterEvent
                 Debug.Log($"[SukutsuArena] Found BGM data, type: {data.GetType().Name}");
                 if (data is BGMData bgm)
                 {
-                    Debug.Log($"[SukutsuArena] Playing as BGM");
+                    Debug.Log($"[SukutsuArena] Playing as BGM with haltPlaylist");
+                    LayerDrama.haltPlaylist = true;  // ゾーンBGMによる上書きを防止
                     SoundManager.current.PlayBGM(bgm);
                 }
                 else
