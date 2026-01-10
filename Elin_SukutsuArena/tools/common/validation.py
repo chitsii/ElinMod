@@ -439,6 +439,18 @@ def run_all_validations(quiet: bool = False) -> bool:
         if not quiet:
             print(f"WARNING: Could not import quest definitions: {e}")
 
+    # 3. 報酬定義チェック
+    try:
+        from rewards import validate_all as validate_rewards
+        reward_errors = validate_rewards()
+        if reward_errors:
+            all_passed = False
+            for err in reward_errors:
+                all_errors.append(ValidationError("REWARD_VALIDATION", err))
+    except ImportError as e:
+        if not quiet:
+            print(f"WARNING: Could not import rewards for validation: {e}")
+
     # 結果出力
     if not all_passed:
         # エラーがある場合は詳細を表示

@@ -44,7 +44,7 @@ define_vs_balgas = importlib.import_module('scenarios.15_vs_balgas').define_vs_b
 define_lily_real_name = importlib.import_module('scenarios.16_lily_real_name').define_lily_real_name
 define_vs_grandmaster_1 = importlib.import_module('scenarios.17_vs_grandmaster_1').define_vs_grandmaster_1
 define_last_battle = importlib.import_module('scenarios.18_last_battle').define_last_battle
-define_debug_battle = importlib.import_module('scenarios.debug_battle').define_debug_battle_drama
+define_debug_menu = importlib.import_module('scenarios.99_debug_menu').define_debug_menu
 
 PROJECT_ROOT = os.path.dirname(TOOLS_DIR)
 MASTER_OUTPUT_PATH = os.path.join(PROJECT_ROOT, 'LangMod', 'JP', 'Dialog', 'Drama', 'drama_sukutsu_arena_master.xlsx')
@@ -107,8 +107,8 @@ def main():
     process_scenario(output_dir_jp, DramaIds.VS_GRANDMASTER_1, define_vs_grandmaster_1)
     process_scenario(output_dir_jp, DramaIds.LAST_BATTLE, define_last_battle)
 
-    # --- Debug ---
-    process_scenario(output_dir_jp, DramaIds.DEBUG_BATTLE, define_debug_battle)
+    # --- Debug Menu ---
+    process_scenario(output_dir_jp, DramaIds.DEBUG_MENU, define_debug_menu)
 
     print("\n[INFO] Drama Excel generation successful.")
 

@@ -36,6 +36,9 @@ add_upper_existence_result_steps = _upper_existence_module.add_upper_existence_r
 _last_battle_module = importlib.import_module('scenarios.18_last_battle')
 add_last_battle_result_steps = _last_battle_module.add_last_battle_result_steps
 
+_vs_balgas_module = importlib.import_module('scenarios.15_vs_balgas')
+add_vs_balgas_result_steps = _vs_balgas_module.add_vs_balgas_result_steps
+
 
 # ============================================================================
 # データ定義
@@ -460,18 +463,21 @@ def define_arena_master_drama(builder: DramaBuilder):
     upper_existence_defeat = builder.label("upper_existence_defeat")
     last_battle_victory = builder.label("last_battle_victory")
     last_battle_defeat = builder.label("last_battle_defeat")
+    vs_balgas_victory = builder.label("vs_balgas_victory")
+    vs_balgas_defeat = builder.label("vs_balgas_defeat")
 
     quest_battle_result_upper = builder.label("quest_battle_result_upper_existence")
     quest_battle_result_last = builder.label("quest_battle_result_last_battle")
+    quest_battle_result_vs_balgas = builder.label("quest_battle_result_vs_balgas")
 
-    # sukutsu_quest_battle: 0=なし, 1=upper_existence, 2=未使用, 3=last_battle
+    # sukutsu_quest_battle: 0=なし, 1=upper_existence, 2=vs_balgas, 3=last_battle
     builder.step(quest_battle_result_check) \
         .set_flag("sukutsu_is_quest_battle_result", 0) \
         .switch_flag("sukutsu_quest_battle", [
-            registered,                  # 0: なし
-            quest_battle_result_upper,   # 1: upper_existence
-            registered,                  # 2: 未使用
-            quest_battle_result_last,    # 3: last_battle
+            registered,                    # 0: なし
+            quest_battle_result_upper,     # 1: upper_existence
+            quest_battle_result_vs_balgas, # 2: vs_balgas
+            quest_battle_result_last,      # 3: last_battle
         ])
 
     # sukutsu_arena_result: 0=未設定, 1=勝利, 2=敗北
@@ -489,9 +495,17 @@ def define_arena_master_drama(builder: DramaBuilder):
             last_battle_defeat,   # 2: 敗北
         ])
 
+    builder.step(quest_battle_result_vs_balgas) \
+        .switch_flag("sukutsu_arena_result", [
+            registered,          # 0: 未設定
+            vs_balgas_victory,   # 1: 勝利
+            vs_balgas_defeat,    # 2: 敗北
+        ])
+
     # クエストバトル勝利/敗北ステップ
     add_upper_existence_result_steps(builder, upper_existence_victory, upper_existence_defeat, registered_choices)
     add_last_battle_result_steps(builder, last_battle_victory, last_battle_defeat, registered_choices)
+    add_vs_balgas_result_steps(builder, vs_balgas_victory, vs_balgas_defeat, registered_choices)
 
     # ========================================
     # 通常戦闘結果

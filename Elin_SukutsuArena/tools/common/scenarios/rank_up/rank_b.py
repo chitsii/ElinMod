@@ -3,6 +3,7 @@
 ヌルとの戦い - 感情と虚無の対決
 """
 
+from arena_drama_builder import ArenaDramaBuilder
 from drama_builder import DramaBuilder
 from flag_definitions import Keys, Rank, Actors, QuestIds
 
@@ -119,12 +120,12 @@ def define_rank_up_B(builder: DramaBuilder):
         .finish()
 
 
-def add_rank_up_B_result_steps(builder: DramaBuilder, victory_label: str, defeat_label: str, return_label: str):
+def add_rank_up_B_result_steps(builder: ArenaDramaBuilder, victory_label: str, defeat_label: str, return_label: str):
     """
     Rank B 昇格試験の勝利/敗北ステップを arena_master ビルダーに追加する
 
     Args:
-        builder: arena_master の DramaBuilder インスタンス
+        builder: arena_master の ArenaDramaBuilder インスタンス
         victory_label: 勝利ステップのラベル名
         defeat_label: 敗北ステップのラベル名
         return_label: 結果表示後にジャンプするラベル名
@@ -155,14 +156,7 @@ def add_rank_up_B_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .say("balgas_v4", "絶望の空を飛び越え、希望を掴み取る……『銀翼（Silver Wing）』だ。", "", actor=balgas) \
         .focus_chara(Actors.LILY) \
         .say("lily_v4", "では、報酬の授与です。", "", actor=lily) \
-        .say("lily_v5", "報酬として、小さなメダル4枚、エーテル抗体3本、媚薬3本をお渡しします。", "", actor=lily) \
-        .action("eval", param="for(int i=0; i<4; i++) { EClass.pc.Pick(ThingGen.Create(\"medal\")); } for(int i=0; i<3; i++) { EClass.pc.Pick(ThingGen.Create(\"1165\")); EClass.pc.Pick(ThingGen.Create(\"lovepotion\")); }") \
-        .complete_quest(QuestIds.RANK_UP_B) \
-        .set_flag(Keys.RANK, 6) \
-        .mod_flag(Keys.REL_BALGAS, "+", 20) \
-        .mod_flag(Keys.REL_LILY, "+", 20) \
-        .say("sys_title", "【システム】称号『銀翼（Silver Wing）』を獲得しました。全ステータス+3、魔法耐性+10 の加護を得た！", "") \
-        .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantRankBBonus();") \
+        .grant_rank_reward("B", actor=lily) \
         .finish()
 
     # ========================================

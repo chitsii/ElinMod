@@ -20,13 +20,15 @@ public class Plugin : BaseUnityPlugin
     {
         new Harmony(ModGuid).PatchAll();
         Debug.Log("[SukutsuArena] Plugin loaded.");
+#if DEBUG
         Debug.Log("[SukutsuArena] Debug Keys:");
         Debug.Log("[SukutsuArena]   F9: Arena status (rank/flags/quests)");
         Debug.Log("[SukutsuArena]   F11: Complete next available quest");
         Debug.Log("[SukutsuArena]   F12: Cycle rank up");
-
+#endif
     }
 
+#if DEBUG
     private void Update()
     {
         // ゲームがロードされていない場合はスキップ
@@ -50,6 +52,7 @@ public class Plugin : BaseUnityPlugin
             CycleRankUp();
         }
     }
+#endif
 
     /// <summary>
     /// CWLのManagedゾーンからSourceZone.Rowを取得
@@ -149,6 +152,7 @@ public class Plugin : BaseUnityPlugin
         EMono.player.MoveZone(zone);
     }
 
+#if DEBUG
     private void ShowArenaStatus()
     {
         Debug.Log("[SukutsuArena] === Arena Status ===");
@@ -268,6 +272,7 @@ public class Plugin : BaseUnityPlugin
         Msg.Say($"[Arena] Completed: {quest.QuestId}");
         Msg.Say($"[Arena] ({quest.DisplayNameJP})");
     }
+#endif
 
     /// <summary>
     /// Region.CheckRandomSites でゾーンが存在しなければ生成する

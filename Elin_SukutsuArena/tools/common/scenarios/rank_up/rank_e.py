@@ -3,6 +3,7 @@
 カインとの戦い
 """
 
+from arena_drama_builder import ArenaDramaBuilder
 from drama_builder import DramaBuilder
 from flag_definitions import Keys, Rank, Actors, QuestIds
 
@@ -108,12 +109,12 @@ def define_rank_up_E(builder: DramaBuilder):
         .finish()
 
 
-def add_rank_up_E_result_steps(builder: DramaBuilder, victory_label: str, defeat_label: str, return_label: str):
+def add_rank_up_E_result_steps(builder: ArenaDramaBuilder, victory_label: str, defeat_label: str, return_label: str):
     """
     Rank E 昇格試験の勝利/敗北ステップを arena_master ビルダーに追加する
 
     Args:
-        builder: arena_master の DramaBuilder インスタンス
+        builder: arena_master の ArenaDramaBuilder インスタンス
         victory_label: 勝利ステップのラベル名
         defeat_label: 敗北ステップのラベル名
         return_label: 結果表示後にジャンプするラベル名
@@ -140,13 +141,7 @@ def add_rank_up_E_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .focus_chara(Actors.LILY) \
         .say("lily_v1", "お疲れ様でした。カインさんの魂の一部……回収いたしました。", "", actor=lily) \
         .say("lily_v2", "バルガスさんが珍しく涙ぐんでいたのは見なかったことにしてあげますから、報酬の授与をさせていただきます。", "", actor=lily) \
-        .say("lily_v3", "報酬として、小さなメダル2枚、エーテル抗体1本、媚薬1本をお渡しします。", "", actor=lily) \
-        .action("eval", param="for(int i=0; i<2; i++) { EClass.pc.Pick(ThingGen.Create(\"medal\")); } EClass.pc.Pick(ThingGen.Create(\"1165\")); EClass.pc.Pick(ThingGen.Create(\"lovepotion\"));") \
-        .complete_quest(QuestIds.RANK_UP_E) \
-        .set_flag(Keys.RANK, 3) \
-        .mod_flag(Keys.REL_BALGAS, "+", 15) \
-        .say("sys_title", "【システム】称号『鉄屑（Iron Scrap）』を獲得しました。筋力+3、PV+5 の加護を得た！", "") \
-        .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantRankEBonus();") \
+        .grant_rank_reward("E", actor=lily) \
         .finish()
 
     # ========================================

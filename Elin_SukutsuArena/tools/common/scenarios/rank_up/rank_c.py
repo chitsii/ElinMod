@@ -4,6 +4,7 @@
 英雄の残党との戦い
 """
 
+from arena_drama_builder import ArenaDramaBuilder
 from drama_builder import DramaBuilder
 from flag_definitions import Keys, Rank, Actors, QuestIds
 
@@ -120,12 +121,12 @@ def define_rank_up_C(builder: DramaBuilder):
         .finish()
 
 
-def add_rank_up_C_result_steps(builder: DramaBuilder, victory_label: str, defeat_label: str, return_label: str):
+def add_rank_up_C_result_steps(builder: ArenaDramaBuilder, victory_label: str, defeat_label: str, return_label: str):
     """
     Rank C 昇格試験の勝利/敗北ステップを arena_master ビルダーに追加する
 
     Args:
-        builder: arena_master の DramaBuilder インスタンス
+        builder: arena_master の ArenaDramaBuilder インスタンス
         victory_label: 勝利ステップのラベル名
         defeat_label: 敗北ステップのラベル名
         return_label: 結果表示後にジャンプするラベル名
@@ -155,14 +156,7 @@ def add_rank_up_C_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .say("lily_v1", "……素晴らしい戦いでした。", "", actor=lily) \
         .say("lily_v2", "観客の皆様も、あなたの『慈悲』に感動されていたようです。", "", actor=lily) \
         .say("lily_v3", "では、報酬の授与です。", "", actor=lily) \
-        .say("lily_v4", "報酬として、小さなメダル3枚、エーテル抗体2本、媚薬2本をお渡しします。", "", actor=lily) \
-        .action("eval", param="for(int i=0; i<3; i++) { EClass.pc.Pick(ThingGen.Create(\"medal\")); } for(int i=0; i<2; i++) { EClass.pc.Pick(ThingGen.Create(\"1165\")); EClass.pc.Pick(ThingGen.Create(\"lovepotion\")); }") \
-        .complete_quest(QuestIds.RANK_UP_C) \
-        .set_flag(Keys.RANK, 5) \
-        .mod_flag(Keys.REL_BALGAS, "+", 25) \
-        .mod_flag(Keys.REL_LILY, "+", 10) \
-        .say("sys_title", "【システム】称号『闘技場の鴉（Arena Crow）』を獲得しました。器用+5、スタミナ+10 の加護を得た！", "") \
-        .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantRankCBonus();") \
+        .grant_rank_reward("C", actor=lily) \
         .finish()
 
     # ========================================

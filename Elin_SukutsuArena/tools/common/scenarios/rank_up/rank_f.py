@@ -2,6 +2,7 @@
 04_rank_up_02.md - ランクF昇格試験『凍土の魔犬と凍てつく咆哮』
 """
 
+from arena_drama_builder import ArenaDramaBuilder
 from drama_builder import DramaBuilder
 from flag_definitions import Keys, Rank, Actors, QuestIds
 
@@ -130,12 +131,12 @@ def define_rank_up_F(builder: DramaBuilder):
         .finish()
 
 
-def add_rank_up_F_result_steps(builder: DramaBuilder, victory_label: str, defeat_label: str, return_label: str):
+def add_rank_up_F_result_steps(builder: ArenaDramaBuilder, victory_label: str, defeat_label: str, return_label: str):
     """
     Rank F 昇格試験の勝利/敗北ステップを arena_master ビルダーに追加する
 
     Args:
-        builder: arena_master の DramaBuilder インスタンス
+        builder: arena_master の ArenaDramaBuilder インスタンス
         victory_label: 勝利ステップのラベル名
         defeat_label: 敗北ステップのラベル名
         return_label: 結果表示後にジャンプするラベル名
@@ -161,12 +162,7 @@ def add_rank_up_F_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .focus_chara(Actors.LILY) \
         .say("lily_v1", "おめでとうございます。死体袋は、また次回まで取っておきましょう。", "", actor=lily) \
         .say("lily_v2", "この称号『泥犬』は、あなたがどれほど理不尽な環境でも生き延びる『害虫』のような生命力を持っている証です。……ふふ、褒めているのですよ？", "", actor=lily) \
-        .say("lily_v4", "報酬として、小さなメダル1枚、エーテル抗体1本、媚薬1本をお渡しします。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"medal\")); EClass.pc.Pick(ThingGen.Create(\"1165\")); EClass.pc.Pick(ThingGen.Create(\"lovepotion\"));") \
-        .complete_quest(QuestIds.RANK_UP_F) \
-        .set_flag(Keys.RANK, 2) \
-        .say("sys_title", "【システム】称号『泥犬（Mud Dog）』を獲得しました。耐久+3、冷気耐性+5 の加護を得た！", "") \
-        .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantRankFBonus();") \
+        .grant_rank_reward("F", actor=lily) \
         .finish()
 
     # ========================================

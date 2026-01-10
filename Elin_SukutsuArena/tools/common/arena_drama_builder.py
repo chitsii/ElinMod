@@ -1,6 +1,10 @@
 
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Tuple, Union, TYPE_CHECKING
 from drama_builder import DramaBuilder, DramaActor
+from flag_definitions import Keys
+
+if TYPE_CHECKING:
+    from rewards import Reward, RankReward
 
 
 class ArenaDramaBuilder(DramaBuilder):
@@ -236,3 +240,196 @@ class ArenaDramaBuilder(DramaBuilder):
         """
         script = f"Elin_SukutsuArena.ArenaManager.SayAndStartDrama(\"{actor_id}\", \"{message}\", \"{drama_name}\");"
         return self.action("eval", param=script)
+
+    # =========================================================================
+    # 報酬システムAPI
+    # =========================================================================
+
+    def grant_reward(
+        self,
+        reward: 'Reward',
+        actor: Union[str, DramaActor] = None,
+        text_id_prefix: str = "reward"
+    ) -> 'ArenaDramaBuilder':
+        """
+        汎用報酬付与API
+
+        Args:
+            reward: Reward定義
+            actor: メッセージの発言者（省略時はメッセージなし）
+            text_id_prefix: text_idのプレフィックス
+
+        処理順序:
+        1. NPCメッセージ（あれば）
+        2. アイテム付与
+        3. バフ付与
+        4. 関係値変更
+        5. フラグ設定
+        6. システムメッセージ（あれば）
+        """
+        # 1. NPCメッセージ
+        if reward.message_jp and actor:
+            self.say(f"{text_id_prefix}_msg", reward.message_jp, reward.message_en, actor=actor)
+
+        # 2. アイテム付与
+        if reward.items:
+            self._grant_items(reward.items)
+
+        # 3. バフ付与
+        if reward.buff_method:
+            script = f"Elin_SukutsuArena.ArenaManager.{reward.buff_method}();"
+            self.action("eval", param=script)
+
+        # 4. 関係値変更
+        self._apply_relations(reward.relations)
+
+        # 5. フラグ設定
+        self._apply_flags(reward.flags)
+
+        # 6. システムメッセージ
+        if reward.system_message_jp:
+            self.say(f"{text_id_prefix}_sys", reward.system_message_jp, reward.system_message_en)
+
+        return self
+
+    def grant_rank_reward(
+        self,
+        rank: str,
+        actor: Union[str, DramaActor] = None
+    ) -> 'ArenaDramaBuilder':
+        """
+        ランク報酬を付与し、クエスト完了とランク設定も行う
+
+        Args:
+            rank: ランク（"G", "F", "E", "D", "C", "B", "A"）
+            actor: メッセージの発言者
+
+        処理順序:
+        1. アイテム付与
+        2. クエスト完了
+        3. ランク設定
+        4. 関係値変更
+        5. システムメッセージ
+        6. バフ付与
+        """
+        from rewards import RANK_REWARDS
+
+        rank_upper = rank.upper()
+        if rank_upper not in RANK_REWARDS:
+            raise ValueError(f"Unknown rank: {rank}")
+
+        reward = RANK_REWARDS[rank_upper]
+        text_id_prefix = f"rup_{rank.lower()}"
+
+        # 1. NPCメッセージ
+        if reward.message_jp and actor:
+            self.say(f"{text_id_prefix}_msg", reward.message_jp, reward.message_en, actor=actor)
+
+        # 2. アイテム付与
+        if reward.items:
+            self._grant_items(reward.items)
+
+        # 3. クエスト完了
+        if reward.quest_id:
+            self.complete_quest(reward.quest_id)
+
+        # 4. ランク設定
+        if reward.rank_value > 0:
+            self.set_flag(Keys.RANK, reward.rank_value)
+
+        # 5. 関係値変更
+        self._apply_relations(reward.relations)
+
+        # 6. システムメッセージ
+        if reward.system_message_jp:
+            self.say(f"{text_id_prefix}_sys", reward.system_message_jp, reward.system_message_en)
+
+        # 7. バフ付与（システムメッセージの後）
+        if reward.buff_method:
+            script = f"Elin_SukutsuArena.ArenaManager.{reward.buff_method}();"
+            self.action("eval", param=script)
+
+        return self
+
+    def grant_quest_reward(
+        self,
+        quest_key: str,
+        actor: Union[str, DramaActor] = None
+    ) -> 'ArenaDramaBuilder':
+        """
+        クエスト報酬を付与
+
+        Args:
+            quest_key: クエストキー（QUEST_REWARDSのキー）
+            actor: メッセージの発言者
+        """
+        from rewards import QUEST_REWARDS
+
+        if quest_key not in QUEST_REWARDS:
+            raise ValueError(f"Unknown quest reward key: {quest_key}")
+
+        reward = QUEST_REWARDS[quest_key]
+        return self.grant_reward(reward, actor, f"qr_{quest_key}")
+
+    # =========================================================================
+    # 内部ヘルパーメソッド
+    # =========================================================================
+
+    def _grant_items(self, items: list) -> 'ArenaDramaBuilder':
+        """
+        アイテムリストを付与
+
+        Args:
+            items: RewardItemのリスト
+        """
+        # 効率的なアイテム生成コードを生成
+        # 同じアイテムは1つのforループでまとめる
+        item_counts = {}
+        for item in items:
+            if item.item_id not in item_counts:
+                item_counts[item.item_id] = 0
+            item_counts[item.item_id] += item.count
+
+        # C#コード生成
+        parts = []
+        for item_id, count in item_counts.items():
+            if count == 1:
+                parts.append(f'EClass.pc.Pick(ThingGen.Create("{item_id}"));')
+            else:
+                parts.append(f'for(int i=0; i<{count}; i++) {{ EClass.pc.Pick(ThingGen.Create("{item_id}")); }}')
+
+        script = " ".join(parts)
+        return self.action("eval", param=script)
+
+    def _apply_relations(self, relations: Dict[str, int]) -> 'ArenaDramaBuilder':
+        """
+        関係値を変更
+
+        Args:
+            relations: {フラグキー: 変更量}
+        """
+        if not relations:
+            return self
+
+        for flag_key, value in relations.items():
+            if value >= 0:
+                self.mod_flag(flag_key, "+", value)
+            else:
+                self.mod_flag(flag_key, "-", abs(value))
+
+        return self
+
+    def _apply_flags(self, flags: Dict[str, int]) -> 'ArenaDramaBuilder':
+        """
+        フラグを設定
+
+        Args:
+            flags: {フラグキー: 値}
+        """
+        if not flags:
+            return self
+
+        for flag_key, value in flags.items():
+            self.set_flag(flag_key, value)
+
+        return self

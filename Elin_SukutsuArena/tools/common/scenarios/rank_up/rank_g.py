@@ -1,4 +1,5 @@
 
+from arena_drama_builder import ArenaDramaBuilder
 from drama_builder import DramaBuilder, ChoiceReaction
 from flag_definitions import (
     Keys, Actors, QuestIds,
@@ -71,17 +72,16 @@ def define_rank_up_G(builder: DramaBuilder):
         .finish()
 
 
-def add_rank_up_G_result_steps(builder: DramaBuilder, victory_label: str, defeat_label: str, return_label: str):
+def add_rank_up_G_result_steps(builder: ArenaDramaBuilder, victory_label: str, defeat_label: str, return_label: str):
     """
     Rank G 昇格試験の勝利/敗北ステップを arena_master ビルダーに追加する
 
     Args:
-        builder: arena_master の DramaBuilder インスタンス
+        builder: arena_master の ArenaDramaBuilder インスタンス
         victory_label: 勝利ステップのラベル名
         defeat_label: 敗北ステップのラベル名
         return_label: 結果表示後にジャンプするラベル名
     """
-    # アクターは arena_master 側で既に登録済みのはず
     pc = Actors.PC
     lily = Actors.LILY
     vargus = Actors.BALGAS
@@ -95,10 +95,7 @@ def add_rank_up_G_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .focus_chara(Actors.LILY) \
         .say("rup_vic_l1", "お疲れ様でした。約束通り、ギルドの台帳にあなたの名を刻んでおきました。", "", actor=lily) \
         .say("rup_vic_l2", "ランクG『屑肉』。ふふ、あなたにぴったりの、美味しそうな二つ名だと思いませんか？", "", actor=lily) \
-        .say("rup_vic_l3", "報酬として、小さなメダル1枚、エーテル抗体1本、媚薬1本をお渡しします。", "", actor=lily) \
-        .complete_quest(QuestIds.RANK_UP_G) \
-        .set_flag("chitsii.arena.player.rank", 1) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"medal\")); EClass.pc.Pick(ThingGen.Create(\"1165\")); EClass.pc.Pick(ThingGen.Create(\"lovepotion\"));") \
+        .grant_rank_reward("G", actor=lily) \
         .say("rup_vic_sys", "報酬を受け取った。", "", actor=pc) \
         .finish()
 

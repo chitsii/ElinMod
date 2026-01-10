@@ -58,6 +58,7 @@ class DramaIds:
 
     # デバッグ用
     DEBUG_BATTLE = "debug_battle"
+    DEBUG_MENU = "debug_menu"
 
 
 class DramaNames:
@@ -98,7 +99,53 @@ class DramaNames:
     LAST_BATTLE = f"drama_{DramaIds.LAST_BATTLE}"
 
     # デバッグ用
-    DEBUG_BATTLE = f"drama_{DramaIds.DEBUG_BATTLE}"
+    DEBUG_MENU = f"drama_{DramaIds.DEBUG_MENU}"
+
+
+def get_drama_category(drama_id: str) -> str:
+    """
+    ドラマIDからカテゴリを自動判定
+
+    Returns:
+        'rank': ランクアップ試練関連
+        'character': キャラクター個別イベント
+        'story': ストーリー進行
+    """
+    # ランクアップ・対戦系
+    if drama_id.startswith(('rank_up_', 'vs_')):
+        return 'rank'
+    # キャラクター個別
+    if any(drama_id.startswith(p) for p in ('lily_', 'zek_', 'balgas_')):
+        return 'character'
+    # それ以外はストーリー
+    return 'story'
+
+
+# ドラマ表示名マッピング（デバッグメニュー用）
+DRAMA_DISPLAY_NAMES = {
+    DramaIds.SUKUTSU_OPENING: ("オープニング", "Opening"),
+    DramaIds.SUKUTSU_ARENA_MASTER: ("アリーナマスター", "Arena Master"),
+    DramaIds.RANK_UP_G: ("ランクG昇格", "Rank G Trial"),
+    DramaIds.RANK_UP_F: ("ランクF昇格", "Rank F Trial"),
+    DramaIds.RANK_UP_E: ("ランクE昇格", "Rank E Trial"),
+    DramaIds.RANK_UP_D: ("ランクD昇格", "Rank D Trial"),
+    DramaIds.RANK_UP_C: ("ランクC昇格", "Rank C Trial"),
+    DramaIds.RANK_UP_B: ("ランクB昇格", "Rank B Trial"),
+    DramaIds.RANK_UP_A: ("ランクA昇格", "Rank A Trial"),
+    DramaIds.VS_BALGAS: ("vsバルガス", "vs Balgas"),
+    DramaIds.ZEK_INTRO: ("ゼク登場", "Zek Intro"),
+    DramaIds.ZEK_STEAL_BOTTLE: ("ボトル交換", "Bottle Swap"),
+    DramaIds.ZEK_STEAL_SOULGEM: ("魂宝石選択", "Soul Gem Choice"),
+    DramaIds.LILY_EXPERIMENT: ("リリィ実験", "Lily Experiment"),
+    DramaIds.LILY_PRIVATE: ("リリィ私室", "Lily Private"),
+    DramaIds.LILY_REAL_NAME: ("リリィ真名", "Lily Real Name"),
+    DramaIds.BALGAS_TRAINING: ("バルガス訓練", "Balgas Training"),
+    DramaIds.UPPER_EXISTENCE: ("上位存在", "Upper Existence"),
+    DramaIds.MAKUMA: ("マクマ", "Makuma"),
+    DramaIds.MAKUMA2: ("マクマ2", "Makuma 2"),
+    DramaIds.VS_GRANDMASTER_1: ("vsグランドマスター", "vs Grandmaster"),
+    DramaIds.LAST_BATTLE: ("最終決戦", "Last Battle"),
+}
 
 
 # 全ドラマIDのリスト（バリデーション用）
@@ -125,5 +172,5 @@ ALL_DRAMA_IDS = [
     DramaIds.MAKUMA2,
     DramaIds.VS_GRANDMASTER_1,
     DramaIds.LAST_BATTLE,
-    DramaIds.DEBUG_BATTLE,
+    DramaIds.DEBUG_MENU,
 ]

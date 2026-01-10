@@ -3,8 +3,9 @@
 Rank S昇格試験 - バルガスとの決戦と慈悲の選択
 """
 
+from arena_drama_builder import ArenaDramaBuilder
 from drama_builder import DramaBuilder
-from flag_definitions import Keys, Actors, FlagValues
+from flag_definitions import Keys, Actors, FlagValues, QuestIds
 
 def define_vs_balgas(builder: DramaBuilder):
     """
@@ -117,7 +118,7 @@ def define_vs_balgas(builder: DramaBuilder):
         .jump(scene3)
 
     # ========================================
-    # シーン3: 闘技場：師弟の極致
+    # シーン3: 闘技場：師弟の極致 → バトル開始
     # ========================================
     builder.step(scene3) \
         .play_bgm("BGM/Battle_Balgas_Prime") \
@@ -129,7 +130,9 @@ def define_vs_balgas(builder: DramaBuilder):
         .say("obs_2", "「英雄の魂を捧げろ！」", "", actor=pc) \
         .say("obs_3", "「屠竜者となる儀式だ！」", "", actor=pc) \
         .say("lily_voice", "（リリィの懇願の声が、闘技場に響く……「お願い……殺さないで……」）", "", actor=lily) \
-        .jump(scene4)
+        .set_flag("sukutsu_quest_battle", 2) \
+        .start_battle_by_stage("rank_s_trial", master_id="sukutsu_arena_master") \
+        .finish()
 
     # ========================================
     # シーン4: とどめの拒絶
@@ -281,14 +284,147 @@ def define_vs_balgas(builder: DramaBuilder):
         .jump(ending)
 
     # ========================================
-    # 終了処理
+    # 終了処理（見逃しルート）
     # ========================================
     builder.step(ending) \
-        .set_flag(Keys.RANK, 7) \
+        .set_flag(Keys.RANK, 8) \
         .set_flag(Keys.REL_BALGAS, 100) \
         .mod_flag(Keys.REL_LILY, "+", 30) \
         .set_flag(Keys.BALGAS_CHOICE, FlagValues.BalgasChoice.SPARED) \
+        .complete_quest(QuestIds.RANK_UP_S) \
         .say("sys_title", "【システム】称号『理を拒む者（System Breaker）』を獲得しました。", "") \
         .say("sys_buff", "【システム】『戦鬼の証』を獲得しました。筋力+5、耐久+5、各種耐性+5 の加護を得た！", "") \
         .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantVsBalgasBonus();") \
+        .finish()
+
+
+def add_vs_balgas_result_steps(builder: ArenaDramaBuilder, victory_label: str, defeat_label: str, return_label: str):
+    """
+    バルガス戦の勝利/敗北ステップを arena_master ビルダーに追加する
+
+    Args:
+        builder: arena_master の ArenaDramaBuilder インスタンス
+        victory_label: 勝利ステップのラベル名
+        defeat_label: 敗北ステップのラベル名
+        return_label: 結果表示後にジャンプするラベル名
+    """
+    pc = Actors.PC
+    lily = Actors.LILY
+    balgas = Actors.BALGAS
+
+    # 勝利後の選択ラベル
+    post_victory_choice = builder.label("vs_balgas_post_victory_choice")
+    spare_balgas = builder.label("vs_balgas_spare")
+    kill_balgas = builder.label("vs_balgas_kill")
+    killed_ending = builder.label("vs_balgas_killed_ending")
+
+    # ========================================
+    # 勝利: 選択肢表示
+    # ========================================
+    builder.step(victory_label) \
+        .set_flag("sukutsu_arena_result", 0) \
+        .set_flag("sukutsu_quest_battle", 0) \
+        .play_bgm("BGM/Emotional_Sorrow_2") \
+        .say("narr_v1", "（膝をつき、肩で息をするバルガス。）", "", actor=pc) \
+        .say("narr_v2", "（全盛期の輝きが失われ、急速に元の老いた姿へと戻っていく。）", "", actor=pc) \
+        .say("narr_v3", "（上空からは、観客たちの残酷な「処刑」を促す喝采が響き渡る。）", "", actor=pc) \
+        .shake() \
+        .say("obs_void", "「……殺セ。英雄ノ魂ヲ捧ゲ、真ノ『屠竜者』ト成レ……。」", "", actor=pc) \
+        .focus_chara(Actors.BALGAS) \
+        .say("balgas_v1", "……な、何をしてやがる。……刺せ。それがアリーナの、戦士のケジメだろうが……！", "", actor=balgas) \
+        .jump(post_victory_choice)
+
+    # 選択肢: 見逃す or 殺す
+    builder.choice(spare_balgas, "（武器を下ろし、手を差し伸べる）", "", text_id="c_spare_balgas") \
+           .choice(kill_balgas, "（観客の命令に従い、とどめを刺す）", "", text_id="c_kill_balgas")
+
+    # ========================================
+    # 見逃すルート: 慈悲の選択
+    # ========================================
+    spare_choice = builder.label("vs_balgas_spare_choice")
+    react_philosophy = builder.label("vs_balgas_react_philosophy")
+    react_rule = builder.label("vs_balgas_react_rule")
+    react_hand = builder.label("vs_balgas_react_hand")
+    spare_ending = builder.label("vs_balgas_spare_ending")
+
+    builder.step(spare_balgas) \
+        .say("narr_s1", "（あなたは剣を引き、バルガスの喉元に突きつけた刃を下ろす。）", "", actor=pc) \
+        .say("balgas_s1", "……な、何をしてやがる。……刺せ。それがアリーナの、戦士のケジメだろうが……！", "", actor=balgas) \
+        .jump(spare_choice)
+
+    # 選択肢: なぜ見逃すのか
+    builder.choice(react_philosophy, "俺の哲学には、師匠を殺すという項目はない", "", text_id="c_spare_philosophy") \
+           .choice(react_rule, "アリーナのルールに従うつもりはない。俺がルールだ", "", text_id="c_spare_rule") \
+           .choice(react_hand, "（無言で手を差し伸べる）", "", text_id="c_spare_hand")
+
+    builder.step(react_philosophy) \
+        .say("balgas_rp", "……ハッ。甘っちょろい野郎だ……。", "", actor=balgas) \
+        .jump(spare_ending)
+
+    builder.step(react_rule) \
+        .say("balgas_rr", "……傲慢な野郎だ。……だが、その傲慢が、俺が求めていた強さなのかもしれねえな……。", "", actor=balgas) \
+        .jump(spare_ending)
+
+    builder.step(react_hand) \
+        .say("balgas_rh", "……無口な野郎だ。……だが、その手は……温かいな……。", "", actor=balgas) \
+        .jump(spare_ending)
+
+    builder.step(spare_ending) \
+        .play_bgm("BGM/Emotional_Sacred_Triumph_Special") \
+        .say("narr_s2", "（あなたがバルガスの手を取り、立ち上がらせる。）", "", actor=pc) \
+        .say("narr_s3", "（リリィが駆け寄り、泣きながらバルガスに回復魔法を注ぎ込む。）", "", actor=pc) \
+        .focus_chara(Actors.LILY) \
+        .say("lily_s1", "……ありがとう。本当に、ありがとうございます。", "", actor=lily) \
+        .focus_chara(Actors.BALGAS) \
+        .say("balgas_s2", "……ハッ。甘っちょろい野郎だ。……だが、その甘さが、俺がカインに教えてやれなかった『本物の強さ』なのかもしれねえな。", "", actor=balgas) \
+        .say("balgas_s3", "……負けたよ。今日からお前がランクS『屠竜者（Dragon Slayer）』だ。", "", actor=balgas) \
+        .set_flag(Keys.RANK, 8) \
+        .set_flag(Keys.REL_BALGAS, 100) \
+        .mod_flag(Keys.REL_LILY, "+", 30) \
+        .set_flag(Keys.BALGAS_CHOICE, FlagValues.BalgasChoice.SPARED) \
+        .complete_quest(QuestIds.RANK_UP_S) \
+        .say("sys_title_s", "【システム】称号『理を拒む者（System Breaker）』を獲得しました。", "") \
+        .say("sys_buff_s", "【システム】『戦鬼の証』を獲得しました。筋力+5、耐久+5、各種耐性+5 の加護を得た！", "") \
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantVsBalgasBonus();") \
+        .finish()
+
+    # ========================================
+    # 殺すルート: 観客に従う
+    # ========================================
+    builder.step(kill_balgas) \
+        .play_bgm("BGM/Ominous_Suspense_02") \
+        .shake() \
+        .say("narr_k1", "（あなたは剣を振り下ろした。）", "", actor=pc) \
+        .say("narr_k2", "（バルガスは最後まで、あなたを見つめていた。その瞳には……失望と、どこか安堵のような光があった。）", "", actor=pc) \
+        .say("narr_k3", "（観客席から、狂喜の叫びが轟く。「魂を捧げよ！ 屠竜者よ！」）", "", actor=pc) \
+        .shake() \
+        .say("narr_k4", "（リリィが悲鳴を上げて駆け寄るが、もう遅い。）", "", actor=pc) \
+        .focus_chara(Actors.LILY) \
+        .say("lily_k1", "……バルガスさん……！ どうして……！", "", actor=lily) \
+        .say("lily_k2", "（リリィはあなたを見る。その瞳には、恐怖と悲しみが入り混じっている。）", "", actor=pc) \
+        .say("lily_k3", "……あなたは……観客に魂を売ったのね……。", "", actor=lily) \
+        .jump(killed_ending)
+
+    builder.step(killed_ending) \
+        .set_flag(Keys.RANK, 8) \
+        .set_flag(Keys.REL_BALGAS, 0) \
+        .mod_flag(Keys.REL_LILY, "+", -20) \
+        .set_flag(Keys.BALGAS_CHOICE, FlagValues.BalgasChoice.KILLED) \
+        .complete_quest(QuestIds.RANK_UP_S) \
+        .say("sys_title_k", "【システム】称号『観客の傀儡（Audience's Puppet）』を獲得しました。", "") \
+        .say("sys_buff_k", "【システム】『血塗られた称号』を獲得しました。筋力+10、魔力+10……しかし、何かを失った気がする。", "") \
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantVsBalgasBonus();") \
+        .finish()
+
+    # ========================================
+    # 敗北
+    # ========================================
+    builder.step(defeat_label) \
+        .set_flag("sukutsu_arena_result", 0) \
+        .set_flag("sukutsu_quest_battle", 0) \
+        .play_bgm("BGM/Lobby_Normal") \
+        .focus_chara(Actors.LILY) \
+        .say("lily_d1", "……バルガスさんには、まだ勝てなかったようですね。", "", actor=lily) \
+        .say("lily_d2", "でも、生きているだけで十分です。彼は本気であなたを試したのですから。", "", actor=lily) \
+        .say("lily_d3", "準備が整ったら、また挑戦してください。", "", actor=lily) \
         .finish()
