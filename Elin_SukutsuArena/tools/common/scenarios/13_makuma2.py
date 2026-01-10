@@ -97,12 +97,14 @@ def define_makuma2(builder: DramaBuilder):
 
     # ========================================
     # 条件分岐: 瓶の暴走イベント (bottle_choice == SWAPPED)
-    # switch_on_flagで安全に分岐
     # ========================================
+    # BottleChoice: 0=REFUSED, 1=SWAPPED
     builder.step(check_bottle) \
-        .switch_on_flag(Keys.BOTTLE_CHOICE, {
-            FlagValues.BottleChoice.SWAPPED: bottle_event,
-        }, fallback=scene2)
+        .switch_flag(Keys.BOTTLE_CHOICE, [
+            scene2,        # 0: 拒否した場合
+            bottle_event,  # 1: すり替えた場合
+            scene2,        # fallback
+        ])
 
     builder.step(bottle_event) \
         .play_bgm("BGM/Ominous_Suspense_02") \
@@ -201,12 +203,14 @@ def define_makuma2(builder: DramaBuilder):
 
     # ========================================
     # 条件分岐: カインの魂について (kain_soul_choice == SOLD)
-    # switch_on_flagで安全に分岐
     # ========================================
+    # KainSoulChoice: 0=RETURNED, 1=SOLD
     builder.step(check_kain) \
-        .switch_on_flag(Keys.KAIN_SOUL_CHOICE, {
-            FlagValues.KainSoulChoice.SOLD: kain_event,
-        }, fallback=after_kain)
+        .switch_flag(Keys.KAIN_SOUL_CHOICE, [
+            after_kain,  # 0: バルガスに返した場合
+            kain_event,  # 1: ゼクに売った場合
+            after_kain,  # fallback
+        ])
 
     builder.step(kain_event) \
         .say("narr_23", "（バルガスは一瞬、言葉を止め、あなたを鋭く見つめる。）", "", actor=pc) \

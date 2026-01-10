@@ -165,15 +165,17 @@ def define_vs_balgas(builder: DramaBuilder):
         .jump(introspection)
 
     # ========================================
-    # 内省：動機に応じた独白（switch_on_flagで安全に分岐）
+    # 内省：動機に応じた独白
     # ========================================
+    # Motivation: 0=GREED, 1=BATTLE_LUST, 2=NIHILISM, 3=ARROGANCE
     builder.step(introspection) \
-        .switch_on_flag(Keys.MOTIVATION, {
-            FlagValues.Motivation.GREED: introspect_greed,
-            FlagValues.Motivation.BATTLE_LUST: introspect_battle,
-            FlagValues.Motivation.NIHILISM: introspect_void,
-            FlagValues.Motivation.ARROGANCE: introspect_pride,
-        }, fallback=introspect_done)
+        .switch_flag(Keys.MOTIVATION, [
+            introspect_greed,   # 0: 強欲
+            introspect_battle,  # 1: 戦闘狂
+            introspect_void,    # 2: 虚無
+            introspect_pride,   # 3: 傲慢
+            introspect_done,    # fallback
+        ])
 
     # 強欲ルート
     builder.step(introspect_greed) \

@@ -1,0 +1,151 @@
+
+[ArenaQuest] Checking 21 quests, 2 completed, Phase: Initiation
+[ArenaQuest] Enum comparison: chitsii.arena.player.rank current=1 expected=1 ('G')
+[ArenaQuest] 06_rank_up_E: SKIP (phase Rising > current Initiation)
+[ArenaQuest] 09_rank_up_C: SKIP (phase Awakening > current Initiation)
+[ArenaQuest] 15_vs_balgas: SKIP (phase Confrontation > current Initiation)
+[ArenaQuest] Enum comparison: chitsii.arena.player.rank current=1 expected=1 ('G')
+[ArenaQuest] 07_upper_existence: SKIP (phase Awakening > current Initiation)
+[ArenaQuest] 09_balgas_training: SKIP (phase Awakening > current Initiation)
+[ArenaQuest] Checking 21 quests, 2 completed, Phase: Initiation
+[ArenaQuest] Enum comparison: chitsii.arena.player.rank current=1 expected=1 ('G')
+[ArenaQuest] 06_rank_up_E: SKIP (phase Rising > current Initiation)
+[ArenaQuest] 09_rank_up_C: SKIP (phase Awakening > current Initiation)
+[ArenaQuest] 15_vs_balgas: SKIP (phase Confrontation > current Initiation)
+[ArenaQuest] Enum comparison: chitsii.arena.player.rank current=1 expected=1 ('G')
+[ArenaQuest] 07_upper_existence: SKIP (phase Awakening > current Initiation)
+[ArenaQuest] 09_balgas_training: SKIP (phase Awakening > current Initiation)
+[ArenaMarker] Available quests (2): 04_rank_up_F[giver=sukutsu_receptionist], 03_zek_intro[giver=sukutsu_shady_merchant]
+[ArenaMarker] NPCs with quests: [sukutsu_receptionist, sukutsu_shady_merchant], Currently marked: [sukutsu_receptionist, sukutsu_shady_merchant]
+[ArenaMarker] Refresh complete. Final marked NPCs: [sukutsu_receptionist, sukutsu_shady_merchant]
+[SukutsuArena] Attempting to play BGM: BGM/Ominous_Suspense_02
+[SukutsuArena] Found BGM data, type: BGMData
+[SukutsuArena] Playing as BGM
+[SukutsuArena] Attempting to play BGM: BGM/Ominous_Heartbeat
+[SukutsuArena] Found BGM data, type: BGMData
+[SukutsuArena] Playing as BGM
+[CWL][INFO] System.NullReferenceException: Object reference not set to an instance of an object
+  at Cwl.Helper.Exceptions.DramaException.GetLineDetail (Cwl.API.Drama.DramaExpansion+ActionCookie cookie) [0x0005f] in <31df0c96e8b946fba0a5e5a70b967445>:0
+  at Cwl.Helper.Exceptions.DramaException..ctor (System.String exceptionMessage) [0x0000c] in <31df0c96e8b946fba0a5e5a70b967445>:0
+  at Cwl.API.Drama.DramaExpansion.SafeInvoke (Cwl.API.Drama.DramaExpansion+ActionWrapper action, DramaManager dm, System.Collections.Generic.Dictionary`2[TKey,TValue] item, System.String[] pack) [0x00055] in <31df0c96e8b946fba0a5e5a70b967445>:0
+  at Cwl.API.Drama.DramaExpansion+<>c__DisplayClass6_0.<BuildExpression>b__1 (DramaManager dm, System.Collections.Generic.Dictionary`2[TKey,TValue] line) [0x00013] in <31df0c96e8b946fba0a5e5a70b967445>:0
+  at Cwl.API.Drama.DramaExpansion+<>c__DisplayClass39_1.<ProcessInvokeAction>b__1 () [0x00000] in <31df0c96e8b946fba0a5e5a70b967445>:0
+  at (wrapper dynamic-method) DramaEventMethod.DMD<DramaEventMethod::Play>(DramaEventMethod)
+[ArenaMarker] Drama layer closed, refreshing markers
+[ArenaMarker] Drama layer closed, refreshing markers
+[ArenaMarker] Drama layer closed, refreshing markers
+[CWL][INFO] [ExceptionProfile] //エラーが発生した時点でのアプリの動作 (最も新しいものが一番上です):
+(Stable) CustomWhateverLoader::DramaException.GetLineDetail
+Cwl.Helper.Exceptions.DramaException..ctor
+(Stable) CustomWhateverLoader::DramaExpansion.SafeInvoke
+(Stable) CustomWhateverLoader::<>c__DisplayClass6_0.<BuildExpression>b__1
+(Stable) CustomWhateverLoader::<>c__DisplayClass39_1.<ProcessInvokeAction>b__1
+DramaEventMethod.Play
+[ArenaMarker] RefreshAllMarkers called. Stack:   at Elin_SukutsuArena.ArenaZonePatches+DramaEndMarkerRefreshPatch+<>c.<Postfix>b__0_0 () [0x00000] in <9a42456f5ada45b6a260a2e9436cf42f>:0
+
+[ArenaQuest] Checking 21 quests, 2 completed, Phase: Initiation
+[ArenaQuest] Enum comparison: chitsii.arena.player.rank current=1 expected=1 ('G')
+[ArenaQuest] 06_rank_up_E: SKIP (phase Rising > current Initiation)
+[ArenaQuest] 09_rank_up_C: SKIP (phase Awakening > current Initiation)
+[ArenaQuest] 15_vs_balgas: SKIP (phase Confrontation > current Initiation)
+[ArenaQuest] Enum comparison: chitsii.arena.player.rank current=1 expected=1 ('G')
+[ArenaQuest] 07_upper_existence: SKIP (phase Awakening > current Initiation)
+[ArenaQuest] 09_balgas_training: SKIP (phase Awakening > current Initiation)
+[ArenaQuest] Checking 21 quests, 2 completed, Phase: Initiation
+[ArenaQuest] Enum comparison: chitsii.arena.player.rank current=1 expected=1 ('G')
+[ArenaQuest] 06_rank_up_E: SKIP (phase Rising > current Initiation)
+[ArenaQuest] 09_rank_up_C: SKIP (phase Awakening > current Initiation)
+[ArenaQuest] 15_vs_balgas: SKIP (phase Confrontation > current Initiation)
+[ArenaQuest] Enum comparison: chitsii.arena.player.rank current=1 expected=1 ('G')
+[ArenaQuest] 07_upper_existence: SKIP (phase Awakening > current Initiation)
+[ArenaQuest] 09_balgas_training: SKIP (phase Awakening > current Initiation)
+[ArenaMarker] Available quests (2): 04_rank_up_F[giver=sukutsu_receptionist], 03_zek_intro[giver=sukutsu_shady_merchant]
+[ArenaMarker] NPCs with quests: [sukutsu_receptionist, sukutsu_shady_merchant], Currently marked: [sukutsu_receptionist, sukutsu_shady_merchant]
+[ArenaMarker] Refresh complete. Final marked NPCs: [sukutsu_receptionist, sukutsu_shady_merchant]
+[ArenaMarker] RefreshAllMarkers called. Stack:   at Elin_SukutsuArena.ArenaZonePatches+DramaEndMarkerRefreshPatch+<>c.<Postfix>b__0_0 () [0x00000] in <9a42456f5ada45b6a260a2e9436cf42f>:0
+
+[ArenaQuest] Checking 21 quests, 2 completed, Phase: Initiation
+[ArenaQuest] Enum comparison: chitsii.arena.player.rank current=1 expected=1 ('G')
+[ArenaQuest] 06_rank_up_E: SKIP (phase Rising > current Initiation)
+[ArenaQuest] 09_rank_up_C: SKIP (phase Awakening > current Initiation)
+[ArenaQuest] 15_vs_balgas: SKIP (phase Confrontation > current Initiation)
+[ArenaQuest] Enum comparison: chitsii.arena.player.rank current=1 expected=1 ('G')
+[ArenaQuest] 07_upper_existence: SKIP (phase Awakening > current Initiation)
+[ArenaQuest] 09_balgas_training: SKIP (phase Awakening > current Initiation)
+[ArenaQuest] Checking 21 quests, 2 completed, Phase: Initiation
+[ArenaQuest] Enum comparison: chitsii.arena.player.rank current=1 expected=1 ('G')
+[ArenaQuest] 06_rank_up_E: SKIP (phase Rising > current Initiation)
+[ArenaQuest] 09_rank_up_C: SKIP (phase Awakening > current Initiation)
+[ArenaQuest] 15_vs_balgas: SKIP (phase Confrontation > current Initiation)
+[ArenaQuest] Enum comparison: chitsii.arena.player.rank current=1 expected=1 ('G')
+[ArenaQuest] 07_upper_existence: SKIP (phase Awakening > current Initiation)
+[ArenaQuest] 09_balgas_training: SKIP (phase Awakening > current Initiation)
+[ArenaMarker] Available quests (2): 04_rank_up_F[giver=sukutsu_receptionist], 03_zek_intro[giver=sukutsu_shady_merchant]
+[ArenaMarker] NPCs with quests: [sukutsu_receptionist, sukutsu_shady_merchant], Currently marked: [sukutsu_receptionist, sukutsu_shady_merchant]
+[ArenaMarker] Refresh complete. Final marked NPCs: [sukutsu_receptionist, sukutsu_shady_merchant]
+[ArenaMarker] RefreshAllMarkers called. Stack:   at Elin_SukutsuArena.ArenaZonePatches+DramaEndMarkerRefreshPatch+<>c.<Postfix>b__0_0 () [0x00000] in <9a42456f5ada45b6a260a2e9436cf42f>:0
+
+[ArenaQuest] Checking 21 quests, 2 completed, Phase: Initiation
+[ArenaQuest] Enum comparison: chitsii.arena.player.rank current=1 expected=1 ('G')
+[ArenaQuest] 06_rank_up_E: SKIP (phase Rising > current Initiation)
+[ArenaQuest] 09_rank_up_C: SKIP (phase Awakening > current Initiation)
+[ArenaQuest] 15_vs_balgas: SKIP (phase Confrontation > current Initiation)
+[ArenaQuest] Enum comparison: chitsii.arena.player.rank current=1 expected=1 ('G')
+[ArenaQuest] 07_upper_existence: SKIP (phase Awakening > current Initiation)
+[ArenaQuest] 09_balgas_training: SKIP (phase Awakening > current Initiation)
+[ArenaQuest] Checking 21 quests, 2 completed, Phase: Initiation
+[ArenaQuest] Enum comparison: chitsii.arena.player.rank current=1 expected=1 ('G')
+[ArenaQuest] 06_rank_up_E: SKIP (phase Rising > current Initiation)
+[ArenaQuest] 09_rank_up_C: SKIP (phase Awakening > current Initiation)
+[ArenaQuest] 15_vs_balgas: SKIP (phase Confrontation > current Initiation)
+[ArenaQuest] Enum comparison: chitsii.arena.player.rank current=1 expected=1 ('G')
+[ArenaQuest] 07_upper_existence: SKIP (phase Awakening > current Initiation)
+[ArenaQuest] 09_balgas_training: SKIP (phase Awakening > current Initiation)
+[ArenaMarker] Available quests (2): 04_rank_up_F[giver=sukutsu_receptionist], 03_zek_intro[giver=sukutsu_shady_merchant]
+[ArenaMarker] NPCs with quests: [sukutsu_receptionist, sukutsu_shady_merchant], Currently marked: [sukutsu_receptionist, sukutsu_shady_merchant]
+[ArenaMarker] Refresh complete. Final marked NPCs: [sukutsu_receptionist, sukutsu_shady_merchant]
+[SukutsuArena] === Arena Status ===
+  Rank: G
+  Phase: Initiation
+  Karma: 0
+  Contribution: 0
+  Rel.Lily: 30
+  Rel.Balgas: 20
+  Rel.Zek: 0
+[ArenaQuest] === Quest State ===
+  Total Quests: 21
+  Current Phase: Initiation
+  Completed: 2
+    [DONE] 01_opening
+    [DONE] 02_rank_up_G
+[ArenaQuest] Checking 21 quests, 2 completed, Phase: Initiation
+[ArenaQuest] Enum comparison: chitsii.arena.player.rank current=1 expected=1 ('G')
+[ArenaQuest] 06_rank_up_E: SKIP (phase Rising > current Initiation)
+[ArenaQuest] 09_rank_up_C: SKIP (phase Awakening > current Initiation)
+[ArenaQuest] 15_vs_balgas: SKIP (phase Confrontation > current Initiation)
+[ArenaQuest] Enum comparison: chitsii.arena.player.rank current=1 expected=1 ('G')
+[ArenaQuest] 07_upper_existence: SKIP (phase Awakening > current Initiation)
+[ArenaQuest] 09_balgas_training: SKIP (phase Awakening > current Initiation)
+  Available: 2
+    - 04_rank_up_F (Initiation) [sukutsu_receptionist] [Priority: 900]
+    - 03_zek_intro (Initiation) [sukutsu_shady_merchant] [Priority: 800]
+[ArenaQuest] Checking 21 quests, 2 completed, Phase: Initiation
+[ArenaQuest] Enum comparison: chitsii.arena.player.rank current=1 expected=1 ('G')
+[ArenaQuest] 06_rank_up_E: SKIP (phase Rising > current Initiation)
+[ArenaQuest] 09_rank_up_C: SKIP (phase Awakening > current Initiation)
+[ArenaQuest] 15_vs_balgas: SKIP (phase Confrontation > current Initiation)
+[ArenaQuest] Enum comparison: chitsii.arena.player.rank current=1 expected=1 ('G')
+[ArenaQuest] 07_upper_existence: SKIP (phase Awakening > current Initiation)
+[ArenaQuest] 09_balgas_training: SKIP (phase Awakening > current Initiation)
+  NPCs with quests: sukutsu_receptionist, sukutsu_shady_merchant
+[ArenaQuest] === End ===
+[ArenaQuest] Checking 21 quests, 2 completed, Phase: Initiation
+[ArenaQuest] Enum comparison: chitsii.arena.player.rank current=1 expected=1 ('G')
+[ArenaQuest] 06_rank_up_E: SKIP (phase Rising > current Initiation)
+[ArenaQuest] 09_rank_up_C: SKIP (phase Awakening > current Initiation)
+[ArenaQuest] 15_vs_balgas: SKIP (phase Confrontation > current Initiation)
+[ArenaQuest] Enum comparison: chitsii.arena.player.rank current=1 expected=1 ('G')
+[ArenaQuest] 07_upper_existence: SKIP (phase Awakening > current Initiation)
+[ArenaQuest] 09_balgas_training: SKIP (phase Awakening > current Initiation)
+Unloading 3 Unused Serialized files (Serialized files now loaded: 1)
+Unloading 4124 unused Assets to reduce memory usage. Loaded Objects now: 11782.

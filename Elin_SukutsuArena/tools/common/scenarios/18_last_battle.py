@@ -288,7 +288,8 @@ def add_last_battle_result_steps(builder: ArenaDramaBuilder, victory_label: str,
         .say("narr_v2", "（アスタロトが柔らかな光となって霧散し、そのレベル（重さ）が残された四人へと分散して吸収されていく。）", "", actor=pc) \
         .say("sys_title", "【システム】アスタロトの力の一部を吸収しました！全ステータス+10、全耐性+10 を獲得！", "") \
         .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantLastBattleBonus();") \
-        .say_and_start_drama("……続きがある。", DramaNames.LAST_BATTLE, "sukutsu_arena_master")
+        .say_and_start_drama("……続きがある。", DramaNames.LAST_BATTLE, "sukutsu_arena_master") \
+        .finish()
 
     # ========================================
     # 最終決戦 敗北

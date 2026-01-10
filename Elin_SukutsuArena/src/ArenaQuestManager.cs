@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using UnityEngine;
+using Elin_SukutsuArena.Core;
 
 namespace Elin_SukutsuArena
 {
@@ -126,7 +127,7 @@ namespace Elin_SukutsuArena
         /// </summary>
         public StoryPhase GetCurrentPhase()
         {
-            int phaseValue = ArenaFlagManager.GetInt(CurrentPhaseFlagKey, 0);
+            int phaseValue = ArenaContext.I.Storage.GetInt(CurrentPhaseFlagKey, 0);
             if (Enum.IsDefined(typeof(StoryPhase), phaseValue))
             {
                 return (StoryPhase)phaseValue;
@@ -139,12 +140,12 @@ namespace Elin_SukutsuArena
         /// </summary>
         public void SetCurrentPhase(StoryPhase phase)
         {
-            int oldPhase = ArenaFlagManager.GetInt(CurrentPhaseFlagKey, 0);
+            int oldPhase = ArenaContext.I.Storage.GetInt(CurrentPhaseFlagKey, 0);
             int newPhase = (int)phase;
 
             if (oldPhase != newPhase)
             {
-                ArenaFlagManager.SetInt(CurrentPhaseFlagKey, newPhase);
+                ArenaContext.I.Storage.SetInt(CurrentPhaseFlagKey, newPhase);
                 Debug.Log($"[ArenaQuest] Phase advanced: {(StoryPhase)oldPhase} -> {phase}");
                 OnQuestStateChanged?.Invoke();
             }
@@ -443,12 +444,11 @@ namespace Elin_SukutsuArena
         }
 
         /// <summary>
-        /// フラグ値を取得 (ArenaFlagManagerのラッパー)
+        /// フラグ値を取得
         /// </summary>
         private object GetFlagValueAsObject(string flagKey)
         {
-            // Use ArenaFlagManager to get the raw int value
-            return ArenaFlagManager.GetInt(flagKey, 0);
+            return ArenaContext.I.Storage.GetInt(flagKey, 0);
         }
 
         /// <summary>
@@ -456,13 +456,15 @@ namespace Elin_SukutsuArena
         /// </summary>
         private void SetFlagFromJson(string flagKey, object value)
         {
+            var storage = ArenaContext.I.Storage;
+
             if (value is long || value is int)
             {
-                ArenaFlagManager.SetInt(flagKey, Convert.ToInt32(value));
+                storage.SetInt(flagKey, Convert.ToInt32(value));
             }
             else if (value is bool)
             {
-                ArenaFlagManager.SetBool(flagKey, (bool)value);
+                storage.SetInt(flagKey, (bool)value ? 1 : 0);
             }
             else if (value is string)
             {
@@ -476,7 +478,7 @@ namespace Elin_SukutsuArena
                     {
                         int intValue = mapping[strValue];
                         Debug.Log($"[ArenaQuest] Setting enum flag: {flagKey} = {intValue} ('{strValue}')");
-                        ArenaFlagManager.SetInt(flagKey, intValue);
+                        storage.SetInt(flagKey, intValue);
                         return;
                     }
                 }

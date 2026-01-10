@@ -122,15 +122,15 @@ namespace Elin_SukutsuArena
             private static void CheckAndTriggerAutoQuest()
             {
                 // 闘士未登録なら何もしない
-                if (!ArenaFlagManager.GetBool("sukutsu_gladiator"))
+                if (Core.ArenaContext.I.Storage.GetInt("sukutsu_gladiator") == 0)
                     return;
 
                 // 戦闘結果表示中はスキップ
-                if (ArenaFlagManager.GetInt("sukutsu_arena_result") != 0)
+                if (Core.ArenaContext.I.Storage.GetInt("sukutsu_arena_result") != 0)
                     return;
 
                 // ランクアップ結果表示中はスキップ
-                if (ArenaFlagManager.GetInt("sukutsu_is_rank_up_result") != 0)
+                if (Core.ArenaContext.I.Storage.GetInt("sukutsu_is_rank_up_result") != 0)
                     return;
 
                 // 自動発動クエストを取得（フェーズと条件でフィルタリング済み）
@@ -233,91 +233,9 @@ namespace Elin_SukutsuArena
             }
         }
 
-        /// <summary>
-        /// NPC会話開始時（引数なし）にクエストを持っているかチェックし、クエストドラマを優先するパッチ
-        /// ShowDialog()オーバーロードをパッチ（プレイヤーがNPCをクリックした時に呼ばれる）
-        ///
-        /// 注意: character_eventタイプのクエストのみ強制開始する
-        /// rank_upクエストは通常のNPCダイアログで選択できるようにする
-        /// </summary>
-        [HarmonyPatch(typeof(Chara), nameof(Chara.ShowDialog), new Type[] { })]
-        public static class NpcQuestDialogPatchNoArgs
-        {
-            // NPCクリックで自動開始すべきクエストタイプ
-            private static readonly HashSet<string> AutoStartQuestTypes = new HashSet<string>
-            {
-                "character_event",  // キャラクターイベント（ゼク初遭遇など）
-                "side_quest"        // サイドクエスト
-            };
-
-            [HarmonyPrefix]
-            public static bool Prefix(Chara __instance)
-            {
-                Debug.Log($"[NpcQuestDialog] ShowDialog() called: NPC={__instance?.id}");
-
-                // アリーナゾーン外ではスキップ
-                if (!IsArenaZone(EClass._zone))
-                {
-                    Debug.Log($"[NpcQuestDialog] SKIP: Not in arena zone (zone={EClass._zone?.id})");
-                    return true;
-                }
-
-                // アリーナNPCかチェック
-                string npcId = __instance.id;
-                if (!IsArenaNpc(npcId))
-                {
-                    Debug.Log($"[NpcQuestDialog] SKIP: Not an arena NPC ({npcId})");
-                    return true;
-                }
-
-                // このNPCが利用可能なクエストを持っているかチェック
-                Debug.Log($"[NpcQuestDialog] Checking quests for NPC: {npcId}");
-                var allQuests = ArenaQuestManager.Instance.GetQuestsForNpc(npcId);
-                Debug.Log($"[NpcQuestDialog] GetQuestsForNpc returned: {allQuests?.Count ?? 0} quests");
-
-                if (allQuests == null || allQuests.Count == 0)
-                {
-                    Debug.Log($"[NpcQuestDialog] SKIP: No quests for NPC {npcId}");
-                    return true;
-                }
-
-                // 自動開始すべきクエストタイプのみフィルタリング
-                // rank_up, main_storyなどはNPCダイアログ内で選択させる
-                var autoStartQuests = allQuests
-                    .Where(q => AutoStartQuestTypes.Contains(q.QuestType))
-                    .OrderByDescending(q => q.Priority)
-                    .ToList();
-
-                Debug.Log($"[NpcQuestDialog] Auto-start eligible quests: {autoStartQuests.Count} (types: {string.Join(",", AutoStartQuestTypes)})");
-
-                if (autoStartQuests.Count == 0)
-                {
-                    Debug.Log($"[NpcQuestDialog] SKIP: No auto-start quests for NPC {npcId}");
-                    return true;
-                }
-
-                var quest = autoStartQuests.First();
-                Debug.Log($"[SukutsuArena] NPC {npcId} has auto-start quest: {quest.QuestId} (type: {quest.QuestType}), starting quest drama");
-
-                // クエストドラマを開始（通常会話をスキップ）
-                string dramaName = $"drama_{quest.DramaId}";
-                Debug.Log($"[NpcQuestDialog] Starting drama: {dramaName}");
-                __instance.ShowDialog(dramaName);
-
-                return false; // 通常会話をスキップ
-            }
-        }
-
-        /// <summary>
-        /// アリーナNPCかどうかを判定（共通メソッド）
-        /// </summary>
-        private static bool IsArenaNpc(string npcId)
-        {
-            return npcId == "sukutsu_receptionist" ||
-                   npcId == "sukutsu_arena_master" ||
-                   npcId == "sukutsu_shady_merchant" ||
-                   npcId == "sukutsu_grandmaster";
-        }
+        // NpcQuestDialogPatchNoArgs は削除されました
+        // クエスト選択はドラマファイル内の選択肢で対応します
+        // 理由: return false で他Modと競合するリスクが高いため
 
         /// <summary>
         /// アリーナ戦闘ゾーンでは自動復活（ゲームオーバー回避）を有効にするパッチ

@@ -121,14 +121,16 @@ def define_zek_steal_soulgem(builder: DramaBuilder):
         .say("narr_7", "（プレイヤーの脳裏に、自分の選んだ「動機」が蘇る。）", "", actor=pc) \
         .jump(introspection)
 
-    # 動機別の内省分岐（switch_on_flagで安全に分岐）
+    # 動機別の内省分岐
+    # Motivation: 0=GREED, 1=BATTLE_LUST, 2=NIHILISM, 3=ARROGANCE
     builder.step(introspection) \
-        .switch_on_flag(Keys.MOTIVATION, {
-            FlagValues.Motivation.GREED: introspect_greed,
-            FlagValues.Motivation.BATTLE_LUST: introspect_battle,
-            FlagValues.Motivation.NIHILISM: introspect_void,
-            FlagValues.Motivation.ARROGANCE: introspect_pride,
-        }, fallback=introspect_done)
+        .switch_flag(Keys.MOTIVATION, [
+            introspect_greed,   # 0: 強欲
+            introspect_battle,  # 1: 戦闘狂
+            introspect_void,    # 2: 虚無
+            introspect_pride,   # 3: 傲慢
+            introspect_done,    # fallback
+        ])
 
     # 強欲の場合
     builder.step(introspect_greed) \

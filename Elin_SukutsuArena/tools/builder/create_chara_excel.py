@@ -165,8 +165,8 @@ npcs.append({
     '_idRenderData': '',
     'bio': 'm/1004/170/65/sly',
     'idText': 'sukutsu_shady_merchant',
-    # CWL タグ: ゾーン生成、ランダム移動無効、商人在庫
-    'tag': f'neutral,addZone_{ZONE_ID},addFlag_StayHomeZone,addStock',
+    # CWL タグ: ゾーン生成、ランダム移動無効、商人在庫、ドラマリンク、人間らしい会話
+    'tag': f'neutral,addZone_{ZONE_ID},addFlag_StayHomeZone,addStock,addDrama_drama_sukutsu_shady_merchant,humanSpeak',
     'trait': 'Merchant',
     'quality': 4,
     'chance': 0,

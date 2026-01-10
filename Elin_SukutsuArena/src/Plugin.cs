@@ -3,6 +3,7 @@ using HarmonyLib;
 using UnityEngine;
 using System.Reflection;
 using System.Collections;
+using Elin_SukutsuArena.Core;
 
 namespace Elin_SukutsuArena;
 
@@ -20,12 +21,9 @@ public class Plugin : BaseUnityPlugin
         new Harmony(ModGuid).PatchAll();
         Debug.Log("[SukutsuArena] Plugin loaded.");
         Debug.Log("[SukutsuArena] Debug Keys:");
-        Debug.Log("[SukutsuArena]   F6: Zone debug info");
-        Debug.Log("[SukutsuArena]   F7: Force create zone");
-        Debug.Log("[SukutsuArena]   F8: Enter zone");
         Debug.Log("[SukutsuArena]   F9: Arena status (rank/flags/quests)");
-        Debug.Log("[SukutsuArena]   F10: Cycle rank up");
         Debug.Log("[SukutsuArena]   F11: Complete next available quest");
+        Debug.Log("[SukutsuArena]   F12: Cycle rank up");
 
     }
 
@@ -34,34 +32,10 @@ public class Plugin : BaseUnityPlugin
         // ゲームがロードされていない場合はスキップ
         if (EMono.core == null || EMono.game == null) return;
 
-        // F6: デバッグ情報表示
-        if (Input.GetKeyDown(KeyCode.F6))
-        {
-            ShowDebugInfo();
-        }
-
-        // F7: 強制ゾーン生成
-        if (Input.GetKeyDown(KeyCode.F7))
-        {
-            ForceCreateZone();
-        }
-
-        // F8: ゾーンに入場
-        if (Input.GetKeyDown(KeyCode.F8))
-        {
-            EnterZone();
-        }
-
         // F9: アリーナステータス表示
         if (Input.GetKeyDown(KeyCode.F9))
         {
             ShowArenaStatus();
-        }
-
-        // F10: ランクを1つ上げる
-        if (Input.GetKeyDown(KeyCode.F10))
-        {
-            CycleRankUp();
         }
 
         // F11: 次の利用可能なクエストを完了
@@ -69,123 +43,73 @@ public class Plugin : BaseUnityPlugin
         {
             CompleteNextQuest();
         }
-    }
 
-    private void ShowDebugInfo()
-    {
-        var zone = EMono.world?.region?.FindZone(ZoneId);
-        if (zone == null)
+        // F12: ランクを1つ上げる
+        if (Input.GetKeyDown(KeyCode.F12))
         {
-            Debug.Log($"[SukutsuArena] Zone '{ZoneId}' NOT FOUND in world.region.");
-            Debug.Log($"[SukutsuArena] SourceZone in map: {EMono.sources.zones.map.ContainsKey(ZoneId)}");
-
-            // rows も確認
-            var inRows = false;
-            foreach (var row in EMono.sources.zones.rows)
-            {
-                if (row.id == ZoneId)
-                {
-                    inRows = true;
-                    Debug.Log($"[SukutsuArena] Found in rows: id={row.id}, type={row.type}");
-                    break;
-                }
-            }
-            if (!inRows)
-            {
-                Debug.Log($"[SukutsuArena] NOT FOUND in rows either.");
-            }
-
-            // CWL Managed 確認
-            CheckCwlManaged();
-
-            Msg.Say($"[SukutsuArena] ゾーン '{ZoneId}' が見つかりません。F7で生成を試してください。");
-        }
-        else
-        {
-            Debug.Log($"[SukutsuArena] Zone Debug Info:");
-            Debug.Log($"  ID: {zone.id}");
-            Debug.Log($"  Name: {zone.Name}");
-            Debug.Log($"  Position: ({zone.x}, {zone.y})");
-            Debug.Log($"  UID: {zone.uid}");
-            Debug.Log($"  Type: {zone.GetType().Name}");
-
-            Msg.Say($"[SukutsuArena] ゾーン発見: {zone.Name} ({zone.x}, {zone.y})");
+            CycleRankUp();
         }
     }
 
-    private void CheckCwlManaged()
+    /// <summary>
+    /// CWLのManagedゾーンからSourceZone.Rowを取得
+    /// 公開APIを優先し、非公開フィールドはフォールバックとして使用
+    /// </summary>
+    private static bool TryGetCwlManagedZone(string zoneId, out SourceZone.Row row)
     {
+        row = null;
         try
         {
             var customZoneType = AccessTools.TypeByName("Cwl.API.Custom.CustomZone");
-            if (customZoneType != null)
+            if (customZoneType == null)
             {
-                var managedField = customZoneType.GetField("Managed", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
-                if (managedField != null)
+                Debug.Log("[SukutsuArena] CWL CustomZone type not found");
+                return false;
+            }
+
+            // 1. 公開プロパティを優先
+            var managedProp = customZoneType.GetProperty("Managed", BindingFlags.Static | BindingFlags.Public);
+            if (managedProp != null)
+            {
+                var managed = managedProp.GetValue(null) as IDictionary;
+                if (managed != null && managed.Contains(zoneId))
                 {
-                    var managed = managedField.GetValue(null) as IDictionary;
-                    if (managed != null && managed.Contains(ZoneId))
-                    {
-                        Debug.Log($"[SukutsuArena] Found in CWL Managed!");
-                    }
-                    else
-                    {
-                        Debug.Log($"[SukutsuArena] NOT FOUND in CWL Managed.");
-                    }
+                    row = managed[zoneId] as SourceZone.Row;
+                    return row != null;
                 }
             }
+
+            // 2. 公開フィールドを試す
+            var managedFieldPublic = customZoneType.GetField("Managed", BindingFlags.Static | BindingFlags.Public);
+            if (managedFieldPublic != null)
+            {
+                var managed = managedFieldPublic.GetValue(null) as IDictionary;
+                if (managed != null && managed.Contains(zoneId))
+                {
+                    row = managed[zoneId] as SourceZone.Row;
+                    return row != null;
+                }
+            }
+
+            // 3. フォールバック: 非公開フィールド（警告付き）
+            var managedFieldNonPublic = customZoneType.GetField("Managed", BindingFlags.Static | BindingFlags.NonPublic);
+            if (managedFieldNonPublic != null)
+            {
+                Debug.LogWarning("[SukutsuArena] Using non-public CWL field - may break with CWL updates");
+                var managed = managedFieldNonPublic.GetValue(null) as IDictionary;
+                if (managed != null && managed.Contains(zoneId))
+                {
+                    row = managed[zoneId] as SourceZone.Row;
+                    return row != null;
+                }
+            }
+
+            return false;
         }
         catch (System.Exception ex)
         {
-            Debug.LogError($"[SukutsuArena] Failed to check CWL Managed: {ex}");
-        }
-    }
-
-    private void ForceCreateZone()
-    {
-        // 生成前にデータ注入を試みる
-        InjectZoneData();
-
-        var region = EMono.world?.region;
-        if (region == null)
-        {
-            Debug.LogError("[SukutsuArena] World region not available.");
-            Msg.Say("[SukutsuArena] ワールドリージョンが利用できません。");
-            return;
-        }
-
-        var existingZone = region.FindZone(ZoneId);
-        if (existingZone != null)
-        {
-            Debug.Log($"[SukutsuArena] Zone already exists at ({existingZone.x}, {existingZone.y}).");
-            Msg.Say($"[SukutsuArena] ゾーンは既に存在します: ({existingZone.x}, {existingZone.y})");
-            return;
-        }
-
-        try
-        {
-            Debug.Log("[SukutsuArena] Attempting to create zone...");
-            SpatialGen.Create(ZoneId, region, register: true, x: -99999, y: -99999, 0);
-
-            var newZone = region.FindZone(ZoneId);
-            if (newZone != null)
-            {
-                Debug.Log($"[SukutsuArena] Zone created successfully at ({newZone.x}, {newZone.y})!");
-                Msg.Say($"[SukutsuArena] ゾーン生成成功: ({newZone.x}, {newZone.y})");
-
-                // マップを更新
-                EMono.scene.elomap?.objmap?.UpdateMeshImmediate();
-            }
-            else
-            {
-                Debug.LogError("[SukutsuArena] SpatialGen.Create returned but zone not found.");
-                Msg.Say("[SukutsuArena] ゾーン生成失敗: SpatialGen は返ったが見つかりません。");
-            }
-        }
-        catch (System.Exception ex)
-        {
-            Debug.LogError($"[SukutsuArena] Failed to create zone: {ex}");
-            Msg.Say($"[SukutsuArena] ゾーン生成エラー: {ex.Message}");
+            Debug.LogError($"[SukutsuArena] CWL access failed: {ex.Message}");
+            return false;
         }
     }
 
@@ -197,35 +121,16 @@ public class Plugin : BaseUnityPlugin
         }
 
         Debug.Log($"[SukutsuArena] Injecting zone data from CWL Managed...");
-        try
+
+        if (TryGetCwlManagedZone(ZoneId, out var row))
         {
-            var customZoneType = AccessTools.TypeByName("Cwl.API.Custom.CustomZone");
-            if (customZoneType != null)
-            {
-                var managedField = customZoneType.GetField("Managed", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
-                if (managedField != null)
-                {
-                    var managed = managedField.GetValue(null) as IDictionary;
-                    if (managed != null && managed.Contains(ZoneId))
-                    {
-                        var row = managed[ZoneId] as SourceZone.Row;
-                        if (row != null)
-                        {
-                            EMono.sources.zones.rows.Add(row);
-                            EMono.sources.zones.map[ZoneId] = row;
-                            Debug.Log($"[SukutsuArena] Successfully injected {ZoneId} from CustomZone!");
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogError($"[SukutsuArena] Failed to inject: ZoneId not in CWL Managed.");
-                    }
-                }
-            }
+            EMono.sources.zones.rows.Add(row);
+            EMono.sources.zones.map[ZoneId] = row;
+            Debug.Log($"[SukutsuArena] Successfully injected {ZoneId} from CustomZone!");
         }
-        catch (System.Exception ex)
+        else
         {
-            Debug.LogError($"[SukutsuArena] Failed to inject zone data: {ex}");
+            Debug.LogError($"[SukutsuArena] Failed to inject: ZoneId not in CWL Managed.");
         }
     }
 
@@ -249,16 +154,23 @@ public class Plugin : BaseUnityPlugin
         Debug.Log("[SukutsuArena] === Arena Status ===");
 
         // フラグ状態を表示
-        ArenaFlagManager.DebugLogAllFlags();
+        var ctx = ArenaContext.I;
+        Debug.Log($"  Rank: {ctx.Player.Rank}");
+        Debug.Log($"  Phase: {ctx.Player.CurrentPhase}");
+        Debug.Log($"  Karma: {ctx.Player.Karma}");
+        Debug.Log($"  Contribution: {ctx.Player.Contribution}");
+        Debug.Log($"  Rel.Lily: {ctx.Rel.Lily}");
+        Debug.Log($"  Rel.Balgas: {ctx.Rel.Balgas}");
+        Debug.Log($"  Rel.Zek: {ctx.Rel.Zek}");
 
         // クエスト状態を表示
         ArenaQuestManager.Instance.DebugLogQuestState();
 
         // 画面にも表示
-        var rank = ArenaFlagManager.Player.GetRank();
-        var gladiator = ArenaFlagManager.GetBool("sukutsu_gladiator");
+        var rank = ctx.Player.Rank;
+        var gladiator = ctx.Storage.GetInt("sukutsu_gladiator") != 0;
         Msg.Say($"[Arena] Rank: {rank}, Gladiator: {gladiator}");
-        Msg.Say($"[Arena] Lily: {ArenaFlagManager.Rel.Lily}, Balgas: {ArenaFlagManager.Rel.Balgas}");
+        Msg.Say($"[Arena] Lily: {ctx.Rel.Lily}, Balgas: {ctx.Rel.Balgas}");
 
         var available = ArenaQuestManager.Instance.GetAvailableQuests();
         if (available.Count > 0)
@@ -277,7 +189,8 @@ public class Plugin : BaseUnityPlugin
 
     private void CycleRankUp()
     {
-        var currentRank = ArenaFlagManager.Player.GetRank();
+        var ctx = ArenaContext.I;
+        var currentRank = ctx.Player.Rank;
         var nextRank = currentRank + 1;
 
         // 最大ランクを超えないようにする
@@ -286,14 +199,14 @@ public class Plugin : BaseUnityPlugin
             nextRank = Flags.Rank.Unranked;
         }
 
-        ArenaFlagManager.Player.SetRank(nextRank);
+        ctx.Player.Rank = nextRank;
         Debug.Log($"[SukutsuArena] Rank changed: {currentRank} -> {nextRank}");
         Msg.Say($"[Arena] Rank: {currentRank} -> {nextRank}");
 
         // 闘士登録も確認
-        if (!ArenaFlagManager.GetBool("sukutsu_gladiator"))
+        if (ctx.Storage.GetInt("sukutsu_gladiator") == 0)
         {
-            ArenaFlagManager.SetBool("sukutsu_gladiator", true);
+            ctx.Storage.SetInt("sukutsu_gladiator", 1);
             Msg.Say("[Arena] Gladiator status set to true");
         }
 

@@ -364,8 +364,8 @@ class DramaBuilder:
         """
         フラグ値に基づく複数条件分岐（安全なswitch-case風API）
 
-        branch_ifを連続して使用する際の問題（最後のjumpが先に実行される）を
-        回避するため、フォールバックも条件付きbranch_if（値==0）として生成します。
+        modInvokeのif_flagコマンドを使用して条件分岐を実現。
+        各ケースは独立して評価され、条件が一致した場合のみジャンプします。
 
         Args:
             flag: チェックするフラグキー
@@ -387,11 +387,12 @@ class DramaBuilder:
         """
         actor_key = self._resolve_key(actor) if actor else 'pc'
 
-        # 各ケースをbranch_ifとして生成
+        # 各ケースをmodInvokeのif_flagとして生成
+        # ジャンプ先はjumpカラムで指定（CWLのjumpFuncパターンに対応）
         for value, jump_to in cases.items():
             key = self._resolve_key(jump_to)
             entry = {
-                'action': 'invoke*',
+                'action': 'modInvoke',
                 'param': f'if_flag({flag}, =={value})',
                 'jump': key,
                 'actor': actor_key,
@@ -402,13 +403,47 @@ class DramaBuilder:
         if fallback is not None:
             fallback_key = self._resolve_key(fallback)
             entry = {
-                'action': 'invoke*',
+                'action': 'modInvoke',
                 'param': f'if_flag({flag}, ==0)',
                 'jump': fallback_key,
                 'actor': actor_key,
             }
             self.entries.append(entry)
 
+        return self
+
+    def switch_flag(self, flag: str, cases: List[Union[str, DramaLabel]],
+                    fallback: Union[str, DramaLabel] = None,
+                    actor: Union[str, DramaActor] = None) -> 'DramaBuilder':
+        """
+        フラグ値に基づいて直接ジャンプ（switch_flagコマンド使用）
+
+        switch_on_flagと異なり、drama.sequence.Play()を直接呼び出す。
+        jumpFuncに依存しないため、より確実に動作する。
+
+        Args:
+            flag: チェックするフラグキー
+            cases: [flag=0のジャンプ先, flag=1のジャンプ先, ...]
+            fallback: どれにも該当しない場合のジャンプ先（省略可）
+            actor: アクター（デフォルト: pc）
+
+        Example:
+            builder.switch_flag("chitsii.arena.player.rank", [
+                rank_labels["start_rank_g"],  # rank=0 (unranked)
+                rank_labels["start_rank_f"],  # rank=1 (G)
+                rank_labels["start_rank_e"],  # rank=2 (F)
+            ], fallback=rank_up_not_ready)
+        """
+        actor_key = self._resolve_key(actor) if actor else 'pc'
+        jump_targets = [self._resolve_key(c) for c in cases]
+        if fallback:
+            jump_targets.append(self._resolve_key(fallback))
+
+        self.entries.append({
+            'action': 'modInvoke',
+            'param': f'switch_flag({flag}, {", ".join(jump_targets)})',
+            'actor': actor_key,
+        })
         return self
 
     def choice_block(self, choices: List['ChoiceReaction'],
@@ -1093,9 +1128,115 @@ class DramaBuilder:
         """
         return self.mod_invoke('debug_log_quests()', actor)
 
+    def check_available_quests_for_npc(self, npc_id: str,
+                                        actor: Union[str, DramaActor] = None) -> 'DramaBuilder':
+        """
+        NPCごとの利用可能クエストをチェックしフラグを設定
+
+        設定されるフラグ:
+        - sukutsu_available_quest_count: クエスト数
+        - sukutsu_has_rank_up: ランクアップクエストの有無 (0/1)
+        - sukutsu_has_character_event: キャラクターイベントの有無 (0/1)
+        - sukutsu_has_sub_quest: サブクエストの有無 (0/1)
+        - sukutsu_top_quest_id: 最優先クエストのハッシュ
+
+        Args:
+            npc_id: NPCのID（例: "sukutsu_arena_master"）
+            actor: アクター（デフォルト: pc）
+        """
+        return self.mod_invoke(f'check_available_quests({npc_id})', actor)
+
     def build(self) -> List[Dict[str, Any]]:
         """エントリーリストを返す（検証なし）"""
         return self.entries
+
+    def _validate_drama_structure(self) -> List[str]:
+        """
+        ドラマ構造を検証し、警告メッセージのリストを返す
+
+        検出ルール:
+        1. 終端なしステップ: step後にend/jump/choiceがないステップ
+        2. 孤立ステップ: 他から参照されていないステップ（mainを除く）
+        3. 未定義ジャンプ: 存在しないラベルへのjump
+        """
+        import re
+        warnings = []
+
+        # ステップとその終端情報を収集
+        steps = {}  # {step_name: {'has_terminator': bool, 'index': int}}
+        jump_targets = set()  # 参照されているラベル
+        current_step = None
+        current_step_has_terminator = False
+        current_step_has_fallback = False  # フォールバックジャンプがあるか
+
+        for i, entry in enumerate(self.entries):
+            if entry.get('step'):
+                # 前のステップの終端チェック
+                if current_step and not current_step_has_terminator:
+                    # switch_on_flagパターン: 複数のmodInvoke + フォールバック（==0）がある場合は終端とみなす
+                    if not current_step_has_fallback:
+                        steps[current_step]['has_terminator'] = False
+
+                current_step = entry['step']
+                current_step_has_terminator = False
+                current_step_has_fallback = False
+                steps[current_step] = {'has_terminator': True, 'index': i}
+
+            # 終端アクションのチェック
+            action = entry.get('action')
+            jump = entry.get('jump')
+            param = entry.get('param', '')
+
+            if action in ('end', 'choice', 'cancel'):
+                current_step_has_terminator = True
+            if jump:
+                current_step_has_terminator = True
+                jump_targets.add(jump)
+
+            # modInvoke内のif_flagジャンプターゲットを抽出
+            if action in ('modInvoke', 'invoke*') and param:
+                # if_flag(flag, ==value, target) パターンを検出
+                match = re.search(r'if_flag\([^,]+,\s*[^,]+,\s*([^)]+)\)', param)
+                if match:
+                    target = match.group(1).strip()
+                    jump_targets.add(target)
+                    # ==0のフォールバックがある場合、このステップは終端とみなす
+                    if '==0' in param:
+                        current_step_has_fallback = True
+
+                # check_quest_available(quest_id, target) パターンを検出
+                match = re.search(r'check_quest_available\([^,]+,\s*([^)]+)\)', param)
+                if match:
+                    target = match.group(1).strip()
+                    jump_targets.add(target)
+
+        # 最後のステップのチェック
+        if current_step and not current_step_has_terminator and not current_step_has_fallback:
+            steps[current_step]['has_terminator'] = False
+
+        # 警告生成
+        for step_name, info in steps.items():
+            if not info['has_terminator']:
+                warnings.append(f"Step '{step_name}' has no terminator (end/jump/choice)")
+
+        # 孤立ステップのチェック（main以外）
+        for step_name in steps:
+            if step_name != 'main' and step_name not in jump_targets:
+                # choice_blockで生成される_reactステップは除外
+                if '_react_' not in step_name:
+                    warnings.append(f"Step '{step_name}' is never referenced (orphan)")
+
+        # 未定義ジャンプのチェック
+        defined_steps = set(steps.keys())
+        # 組み込みステップは除外
+        builtin_steps = {'_trade', '_buy', '_joinParty', '_leaveParty', '_train',
+                        '_heal', '_investShop', '_sellFame', '_copyItem', '_give',
+                        '_whore', '_tail', '_suck', '_bout', '_rumor', '_news'}
+        for target in jump_targets:
+            if target not in defined_steps and target not in builtin_steps:
+                warnings.append(f"Jump target '{target}' is not defined")
+
+        return warnings
 
     def save(self, filepath: str, sheet_name: str = "main") -> None:
         """
@@ -1105,6 +1246,11 @@ class DramaBuilder:
             filepath: 出力ファイルパス
             sheet_name: シート名（キャラクターIDなどを推奨）
         """
+        # バリデーション実行
+        warnings = self._validate_drama_structure()
+        for w in warnings:
+            print(f"[DramaBuilder] WARNING: {w}")
+
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
 
         wb = openpyxl.Workbook()

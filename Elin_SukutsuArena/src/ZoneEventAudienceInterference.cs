@@ -68,7 +68,7 @@ namespace Elin_SukutsuArena
             // 開始遅延
             if (!started)
             {
-                delayTimer += Core.delta;
+                delayTimer += global::Core.delta;
                 if (delayTimer >= startDelay)
                 {
                     started = true;
@@ -82,7 +82,7 @@ namespace Elin_SukutsuArena
             }
 
             // 経過時間追跡
-            totalTime += Core.delta;
+            totalTime += global::Core.delta;
 
             // エスカレーション処理
             if (enableEscalation && radiusGrowthInterval > 0)
@@ -108,7 +108,7 @@ namespace Elin_SukutsuArena
                 }
             }
 
-            timer += Core.delta;
+            timer += global::Core.delta;
             if (timer < currentInterval) return;
             timer = 0f;
 

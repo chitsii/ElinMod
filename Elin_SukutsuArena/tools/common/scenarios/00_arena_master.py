@@ -1,3 +1,8 @@
+"""
+アリーナマスター（バルガス）のメインダイアログ
+
+高レベルAPIを使用した宣言的定義
+"""
 
 from drama_builder import DramaBuilder, ChoiceReaction
 from drama_constants import DramaNames
@@ -6,7 +11,16 @@ from flag_definitions import (
     Motivation, Rank,
     PlayerFlags, RelFlags
 )
+from arena_high_level_api import (
+    RankDefinition, GreetingDefinition, QuestEntry,
+    BattleStageDefinition, MenuItem, QuestInfoDefinition, QuestStartDefinition,
+    build_rank_system, build_greetings, build_greeting_dispatcher,
+    build_battle_stages, build_quest_dispatcher, add_menu,
+    build_quest_info_steps, build_quest_start_steps,
+)
 import importlib
+
+# ランクアップ結果ステップ関数のインポート
 from scenarios.rank_up.rank_g import add_rank_up_G_result_steps
 from scenarios.rank_up.rank_f import add_rank_up_F_result_steps
 from scenarios.rank_up.rank_e import add_rank_up_E_result_steps
@@ -22,227 +36,466 @@ add_upper_existence_result_steps = _upper_existence_module.add_upper_existence_r
 _last_battle_module = importlib.import_module('scenarios.18_last_battle')
 add_last_battle_result_steps = _last_battle_module.add_last_battle_result_steps
 
+
+# ============================================================================
+# データ定義
+# ============================================================================
+
+# ランクアップ試験定義
+RANK_DEFINITIONS = [
+    RankDefinition(
+        rank="g",
+        quest_id=QuestIds.RANK_UP_G,
+        drama_name=DramaNames.RANK_UP_G,
+        confirm_msg="ほう…『屑肉の洗礼』を受けるつもりか？死んでも文句は言えんぞ。",
+        confirm_button="問題ない",
+        sendoff_msg="いい度胸だ！",
+        trial_flag_value=1,
+        quest_flag_value=11,
+        result_steps_func=add_rank_up_G_result_steps,
+    ),
+    RankDefinition(
+        rank="f",
+        quest_id=QuestIds.RANK_UP_F,
+        drama_name=DramaNames.RANK_UP_F,
+        confirm_msg="『凍土の魔犬』との戦いだな。覚悟はいいか？",
+        confirm_button="いくぞ",
+        sendoff_msg="行ってこい！",
+        trial_flag_value=2,
+        quest_flag_value=12,
+        result_steps_func=add_rank_up_F_result_steps,
+    ),
+    RankDefinition(
+        rank="e",
+        quest_id=QuestIds.RANK_UP_E,
+        drama_name=DramaNames.RANK_UP_E,
+        confirm_msg="『カイン亡霊戦』だな。あいつは……俺が知る中でも最強の剣闘士だった。覚悟はいいか？",
+        confirm_button="挑む",
+        sendoff_msg="……あいつの魂を、解放してやれ。",
+        trial_flag_value=3,
+        quest_flag_value=13,
+        result_steps_func=add_rank_up_E_result_steps,
+    ),
+    RankDefinition(
+        rank="d",
+        quest_id=QuestIds.RANK_UP_D,
+        drama_name=DramaNames.RANK_UP_D,
+        confirm_msg="『銅貨稼ぎの洗礼』だな。観客のヤジが降ってくる。避けながら戦えるか？",
+        confirm_button="やってみる",
+        sendoff_msg="観客を楽しませてやれ！",
+        trial_flag_value=4,
+        quest_flag_value=14,
+        result_steps_func=add_rank_up_D_result_steps,
+    ),
+    RankDefinition(
+        rank="c",
+        quest_id=QuestIds.RANK_UP_C,
+        drama_name=DramaNames.RANK_UP_C,
+        confirm_msg="『闘技場の鴉』への試練だな……俺のかつての仲間たちと戦ってもらう。",
+        confirm_button="分かった",
+        sendoff_msg="……頼んだぞ。あいつらを、この地獄から解放してやってくれ。",
+        trial_flag_value=5,
+        quest_flag_value=15,
+        result_steps_func=add_rank_up_C_result_steps,
+    ),
+    RankDefinition(
+        rank="b",
+        quest_id=QuestIds.RANK_UP_B,
+        drama_name=DramaNames.RANK_UP_B,
+        confirm_msg="『虚無の処刑人』……ヌルとの戦いだ。あいつは、虚空そのものだ。覚悟はいいか？",
+        confirm_button="挑む",
+        sendoff_msg="……虚空を見つめるな。飲み込まれるぞ。",
+        trial_flag_value=6,
+        quest_flag_value=16,
+        result_steps_func=add_rank_up_B_result_steps,
+    ),
+    RankDefinition(
+        rank="a",
+        quest_id=QuestIds.RANK_UP_A,
+        drama_name=DramaNames.RANK_UP_A,
+        confirm_msg="『影との戦い』だ。お前自身の影と戦うことになる。覚悟はいいか？",
+        confirm_button="挑む",
+        sendoff_msg="……行ってこい。お前の内なる敵を、打ち倒せ。",
+        trial_flag_value=7,
+        quest_flag_value=17,
+        result_steps_func=add_rank_up_A_result_steps,
+    ),
+]
+
+# 挨拶定義
+GREETINGS = [
+    GreetingDefinition(0, "greet_u", "おう、ひよっこ。今日は何の用だ？"),
+    GreetingDefinition(1, "greet_G", "おう、『屑肉』よ。今日は何の用だ？"),
+    GreetingDefinition(2, "greet_F", "おう、『泥犬』よ。今日は何の用だ？"),
+    GreetingDefinition(3, "greet_E", "おう、『鉄屑』よ。今日は何の用だ？"),
+    GreetingDefinition(4, "greet_D", "おう、『銅貨稼ぎ』よ。今日は何の用だ？"),
+    GreetingDefinition(5, "greet_C", "おう、『鴉』よ。今日は何の用だ？"),
+    GreetingDefinition(6, "greet_B", "おう、『銀翼』よ。今日は何の用だ？"),
+    GreetingDefinition(7, "greet_A", "おう、『戦鬼』よ。今日は何の用だ？"),
+    GreetingDefinition(8, "greet_S", "……待っていたぞ、『屠竜者』！何の用だ？"),
+    GreetingDefinition(9, "greet_SS", "……『覇者』か。相変わらず凄まじい覇気だ。今日は何用だ？"),
+    GreetingDefinition(10, "greet_SSS", "……よお、『因果を断つ者』よ。酒でも飲みに来たか？"),
+    GreetingDefinition(11, "greet_U", "……ははっ、『星砕き』よ。今日はどの星を落とすつもりだ？"),
+    GreetingDefinition(12, "greet_Z", "……『終末の観測者』よ。お前の瞳には、この世界の最期が見えているのか？"),
+    GreetingDefinition(13, "greet_gs", "……『神殺し』よ。その翼、どこまで広げるつもりだ？"),
+    GreetingDefinition(14, "greet_sg", "……『特異点』よ。お前の存在だけで空間が歪む音がするぜ。用件を聞こうか。"),
+    GreetingDefinition(15, "greet_vk", "……『虚空の王』よ。この俺に命令があるのか？それとも、ただの気まぐれか？"),
+]
+
+DEFAULT_GREETING = GreetingDefinition(0, "greet_def", "おう、闘士よ。今日は何の用だ？")
+
+# バトルステージ定義
+BATTLE_STAGES = [
+    BattleStageDefinition(
+        stage_num=1,
+        stage_id="stage_1",
+        advice="お前の最初の相手は「森の狼」だ。素早い攻撃には気をつけろ。武器と防具は整えたか？回復アイテムもあると安心だぞ。",
+        advice_id="stage1_advice",
+        sendoff="よし、行け！生きて戻ってこい...できればな。",
+        sendoff_id="sendoff1",
+        go_button="準備できた、行く！",
+        cancel_button="もう少し準備してくる",
+        next_stage_flag=2,
+    ),
+    BattleStageDefinition(
+        stage_num=2,
+        stage_id="stage_2",
+        advice="次の相手は「ケンタウロス」だ。奴の突進は威力があるぞ。",
+        advice_id="stage2_advice",
+        sendoff="いい度胸だ。お前ならやれる！",
+        sendoff_id="sendoff2",
+        go_button="準備できた！",
+        cancel_button="待ってくれ",
+        next_stage_flag=3,
+    ),
+    BattleStageDefinition(
+        stage_num=3,
+        stage_id="stage_3",
+        advice="ここからが本番だ。「ミノタウロス」...奴は俺も手こずった相手だ。力任せに攻めるな。奴の隙を狙え。",
+        advice_id="stage3_advice",
+        sendoff="...無茶するなよ。お前はもうただの新人じゃない。",
+        sendoff_id="sendoff3",
+        go_button="挑む！",
+        cancel_button="...もう少し鍛えてくる",
+        next_stage_flag=4,
+    ),
+    BattleStageDefinition(
+        stage_num=4,
+        stage_id="stage_4",
+        advice="よくぞここまで来た。最後の相手は...グランドマスターだ。覚悟はいいか？あれは...俺でも勝てるかわからん相手だ。",
+        advice_id="champion_advice",
+        sendoff="...見届けてやる。行って来い、闘士よ。",
+        sendoff_id="sendoff_champ",
+        go_button="俺は負けない",
+        cancel_button="...考え直す",
+        next_stage_flag=None,  # 最後のステージ
+    ),
+]
+
+# クエスト情報定義（ゼク・リリィ関連 - 情報提供のみ）
+QUEST_INFOS = [
+    # ゼク関連
+    QuestInfoDefinition(
+        "quest_zek_intro",
+        "quest_zek_info",
+        ["おい、見慣れねえ商人が来てるぞ。『ゼク』って名乗る怪しい野郎だ。", "ロビーの隅にいるはずだ。興味があるなら話しかけてみろ。"],
+    ),
+    QuestInfoDefinition(
+        "quest_zek_steal_bottle",
+        "quest_zek_bottle_info",
+        ["ゼクの野郎が何やら企んでやがる。あいつに話しかけてみろ。", "……俺は関わらねえが、お前の判断だ。"],
+    ),
+    QuestInfoDefinition(
+        "quest_zek_steal_soulgem",
+        "quest_zek_soulgem_info",
+        ["ゼクがカインの『魂宝石』について何か言いたいことがあるらしい。", "あいつのところへ行け。……慎重に選べよ。"],
+    ),
+    # リリィ関連
+    QuestInfoDefinition(
+        "quest_lily_exp",
+        "quest_lily_info",
+        ["リリィが何やら困ってるらしいぜ。『虚空の共鳴瓶』とかいう怪しげなアイテムを作りたいとか。", "あいつのところへ行って話を聞いてやれ。"],
+    ),
+    QuestInfoDefinition(
+        "quest_lily_private",
+        "quest_lily_priv_info",
+        ["リリィが『自分の過去』について話したいらしい。……珍しいな。", "興味があるならあいつに話しかけてやれ。"],
+    ),
+    QuestInfoDefinition(
+        "quest_makuma",
+        "quest_makuma_info",
+        ["怪しい連中が闘技場をうろついてる。『マクマ』とかいう組織らしい。", "リリィが詳しく知ってるかもしれねえ。あいつに聞いてみろ。"],
+    ),
+    QuestInfoDefinition(
+        "quest_lily_real_name",
+        "quest_lily_name_info",
+        ["リリィが『真の名』を教えてくれるらしい。", "……あいつを本気で信用するのか？　あいつに話しかけろ。"],
+    ),
+    # 自動発動系
+    QuestInfoDefinition(
+        "quest_makuma2",
+        "quest_makuma2_info",
+        ["マクマの連中が何か企んでやがる。リリィも巻き込まれてるかもしれねえ。", "……気をつけろ。"],
+    ),
+    QuestInfoDefinition(
+        "quest_vs_grandmaster_1",
+        "quest_gm_info",
+        ["……いよいよだな。グランドマスターとの戦いが近い。", "覚悟しておけ。"],
+    ),
+    QuestInfoDefinition(
+        "quest_last_battle",
+        "quest_last_info",
+        ["……これが最後の戦いだ。", "お前は何のために戦う？　答えを見つけておけ。"],
+    ),
+    # ランクアップ情報
+    QuestInfoDefinition(
+        "quest_rank_up_g",
+        "quest_rank_g_info",
+        ["【昇格試験】ランクG『屑肉の洗礼』が受けられるぜ。「昇格試験を受けたい」を選んでくれ。"],
+    ),
+    QuestInfoDefinition(
+        "quest_rank_up_f",
+        "quest_rank_f_info",
+        ["【昇格試験】ランクF『凍土の魔犬』が受けられるぜ。「昇格試験を受けたい」を選んでくれ。"],
+    ),
+    QuestInfoDefinition(
+        "quest_rank_up_e",
+        "quest_rank_e_info",
+        ["【昇格試験】ランクE『カイン亡霊戦』が受けられるぜ。「昇格試験を受けたい」を選んでくれ。"],
+    ),
+    QuestInfoDefinition(
+        "quest_rank_up_d",
+        "quest_rank_d_info",
+        ["【昇格試験】ランクD『銅貨稼ぎの洗礼』が受けられるぜ。「昇格試験を受けたい」を選んでくれ。"],
+    ),
+    QuestInfoDefinition(
+        "quest_rank_up_c",
+        "quest_rank_c_info",
+        ["【昇格試験】ランクC『闘技場の鴉』が受けられるぜ。「昇格試験を受けたい」を選んでくれ。"],
+    ),
+    QuestInfoDefinition(
+        "quest_rank_up_b",
+        "quest_rank_b_info",
+        ["【昇格試験】ランクB『虚無の処刑人』が受けられるぜ。「昇格試験を受けたい」を選んでくれ。"],
+    ),
+    QuestInfoDefinition(
+        "quest_rank_up_a",
+        "quest_rank_a_info",
+        ["【昇格試験】ランクA『影との戦い』が受けられるぜ。「昇格試験を受けたい」を選んでくれ。"],
+    ),
+]
+
+# バルガスから直接開始可能なクエスト
+QUEST_STARTS = [
+    QuestStartDefinition(
+        info_step="quest_upper_existence",
+        start_step="start_upper_existence",
+        info_messages=["……お前には『観客』の正体を教えておく必要がある。", "聞く覚悟はあるか？　真実は重いぞ。"],
+        info_id_prefix="quest_upper_info",
+        accept_button="聞く",
+        accept_id="c_accept_upper",
+        decline_button="今はいい",
+        decline_id="c_decline_upper",
+        start_message="……いいだろう。座れ。",
+        drama_name=DramaNames.UPPER_EXISTENCE,
+    ),
+    QuestStartDefinition(
+        info_step="quest_balgas_training",
+        start_step="start_balgas_training",
+        info_messages=["……おい。俺が直接、お前を鍛えてやろうと思ってる。", "死にたくなければ付いてこい。どうだ？"],
+        info_id_prefix="quest_balgas_info",
+        accept_button="ついていく",
+        accept_id="c_accept_balgas",
+        decline_button="今はやめておく",
+        decline_id="c_decline_balgas",
+        start_message="よし、来い！",
+        drama_name=DramaNames.BALGAS_TRAINING,
+    ),
+    QuestStartDefinition(
+        info_step="quest_vs_balgas",
+        start_step="start_vs_balgas",
+        info_messages=["……おい。俺と本気で戦う気はあるか？", "これは試験じゃねえ。俺の『決着』だ。"],
+        info_id_prefix="quest_vs_balgas_info",
+        accept_button="受けて立つ",
+        accept_id="c_accept_vs_balgas",
+        decline_button="今は遠慮する",
+        decline_id="c_decline_vs_balgas",
+        start_message="……覚悟はいいな。",
+        drama_name=DramaNames.VS_BALGAS,
+    ),
+]
+
+# クエストディスパッチャー用エントリ
+AVAILABLE_QUESTS = [
+    # ストーリー系（優先）
+    QuestEntry(QuestIds.ZEK_INTRO, 21, "quest_zek_intro"),
+    QuestEntry(QuestIds.LILY_EXPERIMENT, 22, "quest_lily_exp"),
+    QuestEntry(QuestIds.ZEK_STEAL_BOTTLE, 23, "quest_zek_steal_bottle"),
+    QuestEntry(QuestIds.ZEK_STEAL_SOULGEM, 24, "quest_zek_steal_soulgem"),
+    QuestEntry(QuestIds.UPPER_EXISTENCE, 25, "quest_upper_existence"),
+    QuestEntry(QuestIds.LILY_PRIVATE, 26, "quest_lily_private"),
+    QuestEntry(QuestIds.BALGAS_TRAINING, 27, "quest_balgas_training"),
+    QuestEntry(QuestIds.MAKUMA, 28, "quest_makuma"),
+    QuestEntry(QuestIds.MAKUMA2, 29, "quest_makuma2"),
+    QuestEntry(QuestIds.RANK_UP_S, 30, "quest_vs_balgas"),
+    QuestEntry(QuestIds.LILY_REAL_NAME, 31, "quest_lily_real_name"),
+    QuestEntry(QuestIds.VS_GRANDMASTER_1, 32, "quest_vs_grandmaster_1"),
+    QuestEntry(QuestIds.LAST_BATTLE, 33, "quest_last_battle"),
+    # ランクアップ系
+    QuestEntry(QuestIds.RANK_UP_G, 11, "quest_rank_up_g"),
+    QuestEntry(QuestIds.RANK_UP_F, 12, "quest_rank_up_f"),
+    QuestEntry(QuestIds.RANK_UP_E, 13, "quest_rank_up_e"),
+    QuestEntry(QuestIds.RANK_UP_D, 14, "quest_rank_up_d"),
+    QuestEntry(QuestIds.RANK_UP_C, 15, "quest_rank_up_c"),
+    QuestEntry(QuestIds.RANK_UP_B, 16, "quest_rank_up_b"),
+    QuestEntry(QuestIds.RANK_UP_A, 17, "quest_rank_up_a"),
+]
+
+# 昇格試験用クエストエントリ（rank_up_checkで使用）
+RANK_UP_QUESTS = [
+    QuestEntry(QuestIds.RANK_UP_G, 11, "start_rank_g"),
+    QuestEntry(QuestIds.RANK_UP_F, 12, "start_rank_f"),
+    QuestEntry(QuestIds.RANK_UP_E, 13, "start_rank_e"),
+    QuestEntry(QuestIds.RANK_UP_D, 14, "start_rank_d"),
+    QuestEntry(QuestIds.RANK_UP_C, 15, "start_rank_c"),
+    QuestEntry(QuestIds.RANK_UP_B, 16, "start_rank_b"),
+    QuestEntry(QuestIds.RANK_UP_A, 17, "start_rank_a"),
+]
+
+
+# ============================================================================
+# ドラマ定義
+# ============================================================================
+
 def define_arena_master_drama(builder: DramaBuilder):
     """
     アリーナマスターのドラマを定義
-    フラグ管理システムを使用（ランク/関係値チェック）
+    高レベルAPIを使用した宣言的記述
     """
+    # アクター登録
     pc = builder.register_actor(Actors.PC, "あなた", "You")
     vargus = builder.register_actor(Actors.BALGAS, "バルガス", "Vargus")
     lily = builder.register_actor(Actors.LILY, "リリィ", "Lily")
 
+    # 基本ラベル定義
     main = builder.label("main")
     victory_comment = builder.label("victory_comment")
     defeat_comment = builder.label("defeat_comment")
     registered = builder.label("registered")
+    pre_registered = builder.label("pre_registered")
     registered_choices = builder.label("registered_choices")
-    greet_unranked = builder.label("greet_unranked")
-    greet_G = builder.label("greet_G")
-    greet_F = builder.label("greet_F")
-    greet_E = builder.label("greet_E")
-    greet_D = builder.label("greet_D")
-    greet_C = builder.label("greet_C")
-    greet_B = builder.label("greet_B")
-    greet_A = builder.label("greet_A")
-    greet_S = builder.label("greet_S")
-    greet_SS = builder.label("greet_SS")
-    greet_SSS = builder.label("greet_SSS")
-    greet_U = builder.label("greet_U")
-    greet_Z = builder.label("greet_Z")
-    greet_god_slayer = builder.label("greet_god_slayer")
-    greet_singularity = builder.label("greet_singularity")
-    greet_void_king = builder.label("greet_void_king")
-    greet_default = builder.label("greet_default")
-    battle_prep = builder.label("battle_prep")
-    stage2_prep = builder.label("stage2_prep")
-    stage3_prep = builder.label("stage3_prep")
-    stage_champion = builder.label("stage_champion")
-    battle_start_stage1 = builder.label("battle_start_stage1")
-    battle_start_stage2 = builder.label("battle_start_stage2")
-    battle_start_stage3 = builder.label("battle_start_stage3")
-    battle_start_champion = builder.label("battle_start_champion")
     end = builder.label("end")
 
+    # 機能ラベル
+    battle_prep = builder.label("battle_prep")
     rank_check = builder.label("rank_check")
     rank_up_check = builder.label("rank_up_check")
-    to_rank_up = builder.label("to_rank_up")
-
-    # --- Helper Function for Common Choices ---
+    rank_up_not_ready = builder.label("rank_up_not_ready")
     check_available_quests = builder.label("check_available_quests")
-    quest_info = builder.label("quest_info")
     quest_none = builder.label("quest_none")
 
+    # ========================================
+    # 共通選択肢ヘルパー
+    # ========================================
     def add_choices(b):
-        """共通の選択肢を追加する"""
-        b.choice(battle_prep, "戦いに挑む", "", text_id="c3") \
-         .choice(rank_check, "ランクを確認したい", "", text_id="c_rank_check") \
-         .choice(rank_up_check, "昇格試験を受けたい", "", text_id="c_rank_up") \
-         .choice(check_available_quests, "利用可能なクエストを確認", "", text_id="c_check_quests") \
-         .choice(end, "また今度", "", text_id="c4") \
-         .on_cancel(end)
+        """共通の選択肢を追加"""
+        add_menu(b, [
+            MenuItem("戦いに挑む", battle_prep, text_id="c3"),
+            MenuItem("ランクを確認したい", rank_check, text_id="c_rank_check"),
+            MenuItem("昇格試験を受けたい", rank_up_check, text_id="c_rank_up"),
+            MenuItem("利用可能なクエストを確認", check_available_quests, text_id="c_check_quests"),
+            MenuItem("また今度", end, text_id="c4"),
+        ], cancel=end)
 
-    # Rank Up Result Dispatch Logic
-    rank_up_victory_g = builder.label("rank_up_victory_g")
-    rank_up_defeat_g = builder.label("rank_up_defeat_g")
-    rank_up_victory_f = builder.label("rank_up_victory_f")
-    rank_up_defeat_f = builder.label("rank_up_defeat_f")
-    rank_up_victory_e = builder.label("rank_up_victory_e")
-    rank_up_defeat_e = builder.label("rank_up_defeat_e")
-    rank_up_victory_d = builder.label("rank_up_victory_d")
-    rank_up_defeat_d = builder.label("rank_up_defeat_d")
-    rank_up_victory_c = builder.label("rank_up_victory_c")
-    rank_up_defeat_c = builder.label("rank_up_defeat_c")
-    rank_up_victory_b = builder.label("rank_up_victory_b")
-    rank_up_defeat_b = builder.label("rank_up_defeat_b")
-    rank_up_victory_a = builder.label("rank_up_victory_a")
-    rank_up_defeat_a = builder.label("rank_up_defeat_a")
 
-    # Quest Battle Result Dispatch Logic
-    upper_existence_victory = builder.label("upper_existence_victory")
-    upper_existence_defeat = builder.label("upper_existence_defeat")
-    last_battle_victory = builder.label("last_battle_victory")
-    last_battle_defeat = builder.label("last_battle_defeat")
+    # ========================================
+    # メインエントリーポイント
+    # ========================================
+    # 未登録プレイヤー用のオープニング開始
+    opening_start = builder.label("opening_start")
 
-    # Main Step
-    # ランクアップ結果の場合は勝敗フラグで分岐
-    # クエストバトル結果の場合も分岐
     builder.step(main) \
         .branch_if("sukutsu_is_rank_up_result", "==", 1, "rank_up_result_check") \
         .branch_if("sukutsu_is_quest_battle_result", "==", 1, "quest_battle_result_check") \
         .branch_if("sukutsu_arena_result", "==", 1, victory_comment) \
         .branch_if("sukutsu_arena_result", "==", 2, defeat_comment) \
-        .branch_if("sukutsu_gladiator", "==", 1, registered)
+        .branch_if("sukutsu_gladiator", "==", 1, pre_registered) \
+        .jump(opening_start)
 
-    # ランクアップ結果チェック（勝利/敗北を判定）
-    # sukutsu_rank_up_trial フラグで試験種別を判定: 1=G, 2=F, 3=E, 4=D, 5=C, 6=B, 7=A
-    builder.label("rank_up_result_check")
-    rank_up_result_g = builder.label("rank_up_result_g")
-    rank_up_result_f = builder.label("rank_up_result_f")
-    rank_up_result_e = builder.label("rank_up_result_e")
-    rank_up_result_d = builder.label("rank_up_result_d")
-    rank_up_result_c = builder.label("rank_up_result_c")
-    rank_up_result_b = builder.label("rank_up_result_b")
-    rank_up_result_a = builder.label("rank_up_result_a")
+    # 未登録プレイヤー: オープニングドラマを開始
+    builder.step(opening_start) \
+        ._start_drama(DramaNames.OPENING) \
+        .finish()
 
-    builder.step("rank_up_result_check") \
+    # ========================================
+    # ランクアップ結果チェック
+    # ========================================
+    rank_up_result_check = builder.label("rank_up_result_check")
+    # sukutsu_rank_up_trial: 1=G, 2=F, 3=E, 4=D, 5=C, 6=B, 7=A
+    trial_cases = [registered]  # 0: フォールバック
+    for rank_def in RANK_DEFINITIONS:
+        # trial_flag_value順に追加
+        trial_cases.append(builder.label(f"rank_up_result_{rank_def.rank}"))
+    trial_cases.append(registered)  # 末尾フォールバック
+
+    builder.step(rank_up_result_check) \
         .set_flag("sukutsu_is_rank_up_result", 0) \
-        .switch_on_flag("sukutsu_rank_up_trial", {
-            1: rank_up_result_g,
-            2: rank_up_result_f,
-            3: rank_up_result_e,
-            4: rank_up_result_d,
-            5: rank_up_result_c,
-            6: rank_up_result_b,
-            7: rank_up_result_a,
-        }, fallback=registered)
+        .switch_flag("sukutsu_rank_up_trial", trial_cases)
 
-    # Rank G 結果分岐
-    builder.step(rank_up_result_g) \
-        .switch_on_flag("sukutsu_arena_result", {
-            1: rank_up_victory_g,
-            2: rank_up_defeat_g,
-        }, fallback=registered)
-
-    # Rank F 結果分岐
-    builder.step(rank_up_result_f) \
-        .switch_on_flag("sukutsu_arena_result", {
-            1: rank_up_victory_f,
-            2: rank_up_defeat_f,
-        }, fallback=registered)
-
-    # Rank E 結果分岐
-    builder.step(rank_up_result_e) \
-        .switch_on_flag("sukutsu_arena_result", {
-            1: rank_up_victory_e,
-            2: rank_up_defeat_e,
-        }, fallback=registered)
-
-    # Rank D 結果分岐
-    builder.step(rank_up_result_d) \
-        .switch_on_flag("sukutsu_arena_result", {
-            1: rank_up_victory_d,
-            2: rank_up_defeat_d,
-        }, fallback=registered)
-
-    # Rank C 結果分岐
-    builder.step(rank_up_result_c) \
-        .switch_on_flag("sukutsu_arena_result", {
-            1: rank_up_victory_c,
-            2: rank_up_defeat_c,
-        }, fallback=registered)
-
-    # Rank B 結果分岐
-    builder.step(rank_up_result_b) \
-        .switch_on_flag("sukutsu_arena_result", {
-            1: rank_up_victory_b,
-            2: rank_up_defeat_b,
-        }, fallback=registered)
-
-    # Rank A 結果分岐
-    builder.step(rank_up_result_a) \
-        .switch_on_flag("sukutsu_arena_result", {
-            1: rank_up_victory_a,
-            2: rank_up_defeat_a,
-        }, fallback=registered)
-
-    # === Rank G 昇格試験 勝利/敗北 ===
-    add_rank_up_G_result_steps(builder, rank_up_victory_g, rank_up_defeat_g, registered_choices)
-
-    # === Rank F 昇格試験 勝利/敗北 ===
-    add_rank_up_F_result_steps(builder, rank_up_victory_f, rank_up_defeat_f, registered_choices)
-
-    # === Rank E 昇格試験 勝利/敗北 ===
-    add_rank_up_E_result_steps(builder, rank_up_victory_e, rank_up_defeat_e, registered_choices)
-
-    # === Rank D 昇格試験 勝利/敗北 ===
-    add_rank_up_D_result_steps(builder, rank_up_victory_d, rank_up_defeat_d, registered_choices)
-
-    # === Rank C 昇格試験 勝利/敗北 ===
-    add_rank_up_C_result_steps(builder, rank_up_victory_c, rank_up_defeat_c, registered_choices)
-
-    # === Rank B 昇格試験 勝利/敗北 ===
-    add_rank_up_B_result_steps(builder, rank_up_victory_b, rank_up_defeat_b, registered_choices)
-
-    # === Rank A 昇格試験 勝利/敗北 ===
-    add_rank_up_A_result_steps(builder, rank_up_victory_a, rank_up_defeat_a, registered_choices)
+    # ランクアップシステムを自動生成
+    rank_labels = build_rank_system(
+        builder,
+        RANK_DEFINITIONS,
+        actor=vargus,
+        fallback_step=registered,
+        cancel_step=registered_choices,
+        end_step=end,
+    )
 
     # ========================================
     # クエストバトル結果チェック
     # ========================================
-    # sukutsu_quest_battle フラグで戦闘種別を判定: 1=upper_existence, 3=last_battle
-    builder.label("quest_battle_result_check")
-    quest_battle_result_upper_existence = builder.label("quest_battle_result_upper_existence")
-    quest_battle_result_last_battle = builder.label("quest_battle_result_last_battle")
+    quest_battle_result_check = builder.label("quest_battle_result_check")
+    upper_existence_victory = builder.label("upper_existence_victory")
+    upper_existence_defeat = builder.label("upper_existence_defeat")
+    last_battle_victory = builder.label("last_battle_victory")
+    last_battle_defeat = builder.label("last_battle_defeat")
 
-    builder.step("quest_battle_result_check") \
+    quest_battle_result_upper = builder.label("quest_battle_result_upper_existence")
+    quest_battle_result_last = builder.label("quest_battle_result_last_battle")
+
+    # sukutsu_quest_battle: 0=なし, 1=upper_existence, 2=未使用, 3=last_battle
+    builder.step(quest_battle_result_check) \
         .set_flag("sukutsu_is_quest_battle_result", 0) \
-        .switch_on_flag("sukutsu_quest_battle", {
-            1: quest_battle_result_upper_existence,
-            3: quest_battle_result_last_battle,
-        }, fallback=registered)
+        .switch_flag("sukutsu_quest_battle", [
+            registered,                  # 0: なし
+            quest_battle_result_upper,   # 1: upper_existence
+            registered,                  # 2: 未使用
+            quest_battle_result_last,    # 3: last_battle
+        ])
 
-    # Upper Existence 結果分岐
-    builder.step(quest_battle_result_upper_existence) \
-        .switch_on_flag("sukutsu_arena_result", {
-            1: upper_existence_victory,
-            2: upper_existence_defeat,
-        }, fallback=registered)
+    # sukutsu_arena_result: 0=未設定, 1=勝利, 2=敗北
+    builder.step(quest_battle_result_upper) \
+        .switch_flag("sukutsu_arena_result", [
+            registered,               # 0: 未設定
+            upper_existence_victory,  # 1: 勝利
+            upper_existence_defeat,   # 2: 敗北
+        ])
 
-    # Last Battle 結果分岐
-    builder.step(quest_battle_result_last_battle) \
-        .switch_on_flag("sukutsu_arena_result", {
-            1: last_battle_victory,
-            2: last_battle_defeat,
-        }, fallback=registered)
+    builder.step(quest_battle_result_last) \
+        .switch_flag("sukutsu_arena_result", [
+            registered,           # 0: 未設定
+            last_battle_victory,  # 1: 勝利
+            last_battle_defeat,   # 2: 敗北
+        ])
 
-    # === Upper Existence クエスト 勝利/敗北 ===
+    # クエストバトル勝利/敗北ステップ
     add_upper_existence_result_steps(builder, upper_existence_victory, upper_existence_defeat, registered_choices)
-
-    # === Last Battle クエスト 勝利/敗北 ===
     add_last_battle_result_steps(builder, last_battle_victory, last_battle_defeat, registered_choices)
 
-
-    # Victory/Defeat Comments (Directly add choices)
+    # ========================================
+    # 通常戦闘結果
+    # ========================================
     b = builder.step(victory_comment) \
         .set_flag("sukutsu_arena_result", 0) \
         .say("vic_msg", "やるじゃねえか。だが調子に乗るなよ。", "", actor=vargus)
@@ -253,522 +506,113 @@ def define_arena_master_drama(builder: DramaBuilder):
         .say("def_msg", "無様だな。出直してこい。", "", actor=vargus)
     add_choices(b)
 
-    # === Rank Check Logic ===
-    # ランク確認表示 (ログに詳細を表示)
+    # ========================================
+    # ランク確認
+    # ========================================
     b = builder.step(rank_check) \
         .show_rank_info_log() \
         .say("rank_info", "現在のステータスをログに表示したぜ。確認しな。", "", actor=vargus)
-    add_choices(b) # Jumpではなく直接追加
+    add_choices(b)
 
-    # 昇格試験への分岐（クエストシステムベース）
-    rank_up_not_ready = builder.label("rank_up_not_ready")
-    start_rank_g = builder.label("start_rank_g")
-    start_rank_f = builder.label("start_rank_f")
-    start_rank_e = builder.label("start_rank_e")
-    start_rank_d = builder.label("start_rank_d")
-    start_rank_c = builder.label("start_rank_c")
-    start_rank_b = builder.label("start_rank_b")
-    start_rank_a = builder.label("start_rank_a")
-    start_rank_g_confirmed = builder.label("start_rank_g_confirmed")
-    start_rank_f_confirmed = builder.label("start_rank_f_confirmed")
-    start_rank_e_confirmed = builder.label("start_rank_e_confirmed")
-    start_rank_d_confirmed = builder.label("start_rank_d_confirmed")
-    start_rank_c_confirmed = builder.label("start_rank_c_confirmed")
-    start_rank_b_confirmed = builder.label("start_rank_b_confirmed")
-    start_rank_a_confirmed = builder.label("start_rank_a_confirmed")
-
-    # 昇格試験チェックのエントリーポイント
-    # sukutsu_quest_target_name: 11=G, 12=F, 13=E, 14=D, 15=C, 16=B
+    # ========================================
+    # 昇格試験チェック
+    # ========================================
+    # シンプル化: ランク値のみで判定
+    # switch_flag を使用 - drama.sequence.Play() を直接呼び出す
+    # rank=0(unranked)→G, rank=1(G)→F, rank=2(F)→E, ...
     builder.step(rank_up_check) \
-        .set_flag("sukutsu_quest_found", 0) \
-        .set_flag("sukutsu_quest_target_name", 0) \
-        .check_quests([
-            (QuestIds.RANK_UP_G, start_rank_g),
-            (QuestIds.RANK_UP_F, start_rank_f),
-            (QuestIds.RANK_UP_E, start_rank_e),
-            (QuestIds.RANK_UP_D, start_rank_d),
-            (QuestIds.RANK_UP_C, start_rank_c),
-            (QuestIds.RANK_UP_B, start_rank_b),
-            (QuestIds.RANK_UP_A, start_rank_a),
-        ]) \
-        .switch_on_flag("sukutsu_quest_target_name", {
-            11: start_rank_g,
-            12: start_rank_f,
-            13: start_rank_e,
-            14: start_rank_d,
-            15: start_rank_c,
-            16: start_rank_b,
-            17: start_rank_a,
-        }, fallback=rank_up_not_ready)
+        .switch_flag("chitsii.arena.player.rank", [
+            rank_labels["start_rank_g"],  # rank=0 (unranked) → Gランクアップ
+            rank_labels["start_rank_f"],  # rank=1 (G) → Fランクアップ
+            rank_labels["start_rank_e"],  # rank=2 (F) → Eランクアップ
+            rank_labels["start_rank_d"],  # rank=3 (E) → Dランクアップ
+            rank_labels["start_rank_c"],  # rank=4 (D) → Cランクアップ
+            rank_labels["start_rank_b"],  # rank=5 (C) → Bランクアップ
+            rank_labels["start_rank_a"],  # rank=6 (B) → Aランクアップ
+        ], fallback=rank_up_not_ready)
 
-    # 利用可能な昇格試験がない場合
     b = builder.step(rank_up_not_ready) \
         .say("rank_up_error", "まだお前には早い。条件を満たしていないか、すでに昇格済みだ。", "", actor=vargus)
     add_choices(b)
 
-    # ランクG試験開始確認
-    builder.step(start_rank_g) \
-        .say("rank_up_confirm_g", "ほう…『屑肉の洗礼』を受けるつもりか？死んでも文句は言えんぞ。", "", actor=vargus) \
-        .choice(start_rank_g_confirmed, "問題ない", "", text_id="c_confirm_rup_g") \
-        .choice(registered_choices, "やめておく", "", text_id="c_cancel_rup") \
-        .on_cancel(registered_choices)
+    # ========================================
+    # 登録済みプレイヤーフロー
+    # ========================================
+    # 直接挨拶へ遷移（挨拶後すぐに選択肢を表示）
+    builder.step(pre_registered) \
+        .jump(registered)
 
-    # ランクG試験実行
-    builder.step(start_rank_g_confirmed) \
-        .set_flag("sukutsu_rank_up_trial", 1) \
-        .say_and_start_drama("いい度胸だ！", DramaNames.RANK_UP_G, "sukutsu_arena_master") \
-        .jump(end)
+    # ========================================
+    # 挨拶システム
+    # ========================================
+    greeting_labels = build_greetings(
+        builder,
+        GREETINGS,
+        actor=vargus,
+        add_choices_func=add_choices,
+        default_greeting=DEFAULT_GREETING,
+    )
 
-    # ランクF試験開始確認
-    builder.step(start_rank_f) \
-        .say("rank_up_confirm_f", "『凍土の魔犬』との戦いだな。覚悟はいいか？", "", actor=vargus) \
-        .choice(start_rank_f_confirmed, "いくぞ", "", text_id="c_confirm_rup_f") \
-        .choice(registered_choices, "やめておく", "", text_id="c_cancel_rup") \
-        .on_cancel(registered_choices)
+    build_greeting_dispatcher(
+        builder,
+        greeting_labels,
+        entry_step=registered,
+        flag_key="player.rank",
+        default_label=greeting_labels.get('default'),
+    )
 
-    # ランクF試験実行
-    builder.step(start_rank_f_confirmed) \
-        .set_flag("sukutsu_rank_up_trial", 2) \
-        .say_and_start_drama("行ってこい！", DramaNames.RANK_UP_F, "sukutsu_arena_master") \
-        .jump(end)
-
-    # ランクE試験開始確認
-    builder.step(start_rank_e) \
-        .say("rank_up_confirm_e", "『カイン亡霊戦』だな。あいつは……俺が知る中でも最強の剣闘士だった。覚悟はいいか？", "", actor=vargus) \
-        .choice(start_rank_e_confirmed, "挑む", "", text_id="c_confirm_rup_e") \
-        .choice(registered_choices, "やめておく", "", text_id="c_cancel_rup") \
-        .on_cancel(registered_choices)
-
-    # ランクE試験実行
-    builder.step(start_rank_e_confirmed) \
-        .set_flag("sukutsu_rank_up_trial", 3) \
-        .say_and_start_drama("……あいつの魂を、解放してやれ。", DramaNames.RANK_UP_E, "sukutsu_arena_master") \
-        .jump(end)
-
-    # ランクD試験開始確認
-    builder.step(start_rank_d) \
-        .say("rank_up_confirm_d", "『銅貨稼ぎの洗礼』だな。観客のヤジが降ってくる。避けながら戦えるか？", "", actor=vargus) \
-        .choice(start_rank_d_confirmed, "やってみる", "", text_id="c_confirm_rup_d") \
-        .choice(registered_choices, "やめておく", "", text_id="c_cancel_rup") \
-        .on_cancel(registered_choices)
-
-    # ランクD試験実行
-    builder.step(start_rank_d_confirmed) \
-        .set_flag("sukutsu_rank_up_trial", 4) \
-        .say_and_start_drama("観客を楽しませてやれ！", DramaNames.RANK_UP_D, "sukutsu_arena_master") \
-        .jump(end)
-
-    # ランクC試験開始確認
-    builder.step(start_rank_c) \
-        .say("rank_up_confirm_c", "『闘技場の鴉』への試練だな……俺のかつての仲間たちと戦ってもらう。", "", actor=vargus) \
-        .choice(start_rank_c_confirmed, "分かった", "", text_id="c_confirm_rup_c") \
-        .choice(registered_choices, "やめておく", "", text_id="c_cancel_rup") \
-        .on_cancel(registered_choices)
-
-    # ランクC試験実行
-    builder.step(start_rank_c_confirmed) \
-        .set_flag("sukutsu_rank_up_trial", 5) \
-        .say_and_start_drama("……頼んだぞ。あいつらを、この地獄から解放してやってくれ。", DramaNames.RANK_UP_C, "sukutsu_arena_master") \
-        .jump(end)
-
-    # ランクB試験開始確認
-    builder.step(start_rank_b) \
-        .say("rank_up_confirm_b", "『虚無の処刑人』……ヌルとの戦いだ。あいつは、虚空そのものだ。覚悟はいいか？", "", actor=vargus) \
-        .choice(start_rank_b_confirmed, "挑む", "", text_id="c_confirm_rup_b") \
-        .choice(registered_choices, "やめておく", "", text_id="c_cancel_rup") \
-        .on_cancel(registered_choices)
-
-    # ランクB試験実行
-    builder.step(start_rank_b_confirmed) \
-        .set_flag("sukutsu_rank_up_trial", 6) \
-        .say_and_start_drama("……虚空を見つめるな。飲み込まれるぞ。", DramaNames.RANK_UP_B, "sukutsu_arena_master") \
-        .jump(end)
-
-    # ランクA試験開始確認
-    builder.step(start_rank_a) \
-        .say("rank_up_confirm_a", "『影との戦い』だ。お前自身の影と戦うことになる。覚悟はいいか？", "", actor=vargus) \
-        .choice(start_rank_a_confirmed, "挑む", "", text_id="c_confirm_rup_a") \
-        .choice(registered_choices, "やめておく", "", text_id="c_cancel_rup") \
-        .on_cancel(registered_choices)
-
-    # ランクA試験実行
-    builder.step(start_rank_a_confirmed) \
-        .set_flag("sukutsu_rank_up_trial", 7) \
-        .say_and_start_drama("……行ってこい。お前の内なる敵を、打ち倒せ。", DramaNames.RANK_UP_A, "sukutsu_arena_master") \
-        .jump(end)
-
-
-    # === Registered Greeting ===
-
-    builder.step(registered) \
-        .switch_on_flag("player.rank", {
-            0: greet_unranked,
-            1: greet_G,
-            2: greet_F,
-            3: greet_E,
-            4: greet_D,
-            5: greet_C,
-            6: greet_B,
-            7: greet_A,
-            8: greet_S,
-            9: greet_SS,
-            10: greet_SSS,
-            11: greet_U,
-            12: greet_Z,
-            13: greet_god_slayer,
-            14: greet_singularity,
-            15: greet_void_king,
-        }, fallback=greet_default)
-
-    # 戻り先として確保(on_cancel等用)
+    # 選択肢のみのステップ
     b = builder.step(registered_choices)
     add_choices(b)
 
+    # ========================================
+    # バトルステージシステム
+    # ========================================
+    build_battle_stages(
+        builder,
+        BATTLE_STAGES,
+        actor=vargus,
+        entry_step=battle_prep,
+        cancel_step=registered_choices,
+        stage_flag="sukutsu_arena_stage",
+    )
 
-    # 各ランク挨拶 + 選択肢インライン展開
-    b = builder.step(greet_unranked).say("greet_u", "おう、ひよっこ。今日は何の用だ？", "", actor=vargus)
-    add_choices(b)
+    # ========================================
+    # クエストディスパッチャー
+    # ========================================
+    quest_labels = build_quest_dispatcher(
+        builder,
+        AVAILABLE_QUESTS,
+        entry_step=check_available_quests,
+        fallback_step=quest_none,
+        actor=vargus,
+        intro_message="利用可能なクエストがあるか確認するぜ...",
+        intro_id="quest_check",
+    )
 
-    b = builder.step(greet_G).say("greet_G", "おう、『屑肉』よ。今日は何の用だ？", "", actor=vargus)
-    add_choices(b)
+    # クエスト情報ステップ（情報提供のみ）
+    build_quest_info_steps(
+        builder,
+        QUEST_INFOS,
+        actor=vargus,
+        return_step=registered_choices,
+    )
 
-    b = builder.step(greet_F).say("greet_F", "おう、『泥犬』よ。今日は何の用だ？", "", actor=vargus)
-    add_choices(b)
+    # 直接開始可能なクエスト
+    build_quest_start_steps(
+        builder,
+        QUEST_STARTS,
+        actor=vargus,
+        cancel_step=registered_choices,
+        end_step=end,
+    )
 
-    b = builder.step(greet_E).say("greet_E", "おう、『鉄屑』よ。今日は何の用だ？", "", actor=vargus)
-    add_choices(b)
-
-    b = builder.step(greet_D).say("greet_D", "おう、『銅貨稼ぎ』よ。今日は何の用だ？", "", actor=vargus)
-    add_choices(b)
-
-    b = builder.step(greet_C).say("greet_C", "おう、『鴉』よ。今日は何の用だ？", "", actor=vargus)
-    add_choices(b)
-
-    b = builder.step(greet_B).say("greet_B", "おう、『銀翼』よ。今日は何の用だ？", "", actor=vargus)
-    add_choices(b)
-
-    b = builder.step(greet_A).say("greet_A", "おう、『戦鬼』よ。今日は何の用だ？", "", actor=vargus)
-    add_choices(b)
-
-    b = builder.step(greet_S).say("greet_S", "……待っていたぞ、『屠竜者』！何の用だ？", "", actor=vargus)
-    add_choices(b)
-
-    b = builder.step(greet_SS).say("greet_SS", "……『覇者』か。相変わらず凄まじい覇気だ。今日は何用だ？", "", actor=vargus)
-    add_choices(b)
-
-    b = builder.step(greet_SSS).say("greet_SSS", "……よお、『因果を断つ者』よ。酒でも飲みに来たか？", "", actor=vargus)
-    add_choices(b)
-
-    b = builder.step(greet_U).say("greet_U", "……ははっ、『星砕き』よ。今日はどの星を落とすつもりだ？", "", actor=vargus)
-    add_choices(b)
-
-    b = builder.step(greet_Z).say("greet_Z", "……『終末の観測者』よ。お前の瞳には、この世界の最期が見えているのか？", "", actor=vargus)
-    add_choices(b)
-
-    b = builder.step(greet_god_slayer).say("greet_gs", "……『神殺し』よ。その翼、どこまで広げるつもりだ？", "", actor=vargus)
-    add_choices(b)
-
-    b = builder.step(greet_singularity).say("greet_sg", "……『特異点』よ。お前の存在だけで空間が歪む音がするぜ。用件を聞こうか。", "", actor=vargus)
-    add_choices(b)
-
-    b = builder.step(greet_void_king).say("greet_vk", "……『虚空の王』よ。この俺に命令があるのか？ それとも、ただの気まぐれか？", "", actor=vargus)
-    add_choices(b)
-
-    b = builder.step(greet_default).say("greet_def", "おう、闘士よ。今日は何の用だ？", "", actor=vargus)
-    add_choices(b)
-
-
-    # === Battle Prep ===
-    builder.step(battle_prep) \
-        .branch_if("sukutsu_arena_stage", ">=", 2, stage2_prep) \
-        .say("stage1_advice", "お前の最初の相手は「森の狼」だ。素早い攻撃には気をつけろ。武器と防具は整えたか？回復アイテムもあると安心だぞ。", "", actor=vargus) \
-        .choice(battle_start_stage1, "準備できた、行く！", "", text_id="c_go1") \
-        .choice(registered_choices, "もう少し準備してくる", "", text_id="c_cancel1") \
-        .on_cancel(registered_choices)
-
-    # Stage 2 Prep
-    builder.step(stage2_prep) \
-        .branch_if("sukutsu_arena_stage", ">=", 3, stage3_prep) \
-        .say("stage2_advice", "次の相手は「ケンタウロス」だ。奴の突進は威力があるぞ。", "", actor=vargus) \
-        .choice(battle_start_stage2, "準備できた！", "", text_id="c_go2") \
-        .choice(registered_choices, "待ってくれ", "", text_id="c_cancel2") \
-        .on_cancel(registered_choices)
-
-    # Stage 3 Prep
-    builder.step(stage3_prep) \
-        .branch_if("sukutsu_arena_stage", ">=", 4, stage_champion) \
-        .say("stage3_advice", "ここからが本番だ。「ミノタウロス」...奴は俺も手こずった相手だ。力任せに攻めるな。奴の隙を狙え。", "", actor=vargus) \
-        .choice(battle_start_stage3, "挑む！", "", text_id="c_go3") \
-        .choice(registered_choices, "...もう少し鍛えてくる", "", text_id="c_cancel3") \
-        .on_cancel(registered_choices)
-
-    # Champion Prep
-    builder.step(stage_champion) \
-        .say("champion_advice", "よくぞここまで来た。最後の相手は...グランドマスターだ。覚悟はいいか？あれは...俺でも勝てるかわからん相手だ。", "", actor=vargus) \
-        .choice(battle_start_champion, "俺は負けない", "", text_id="c_go_champ") \
-        .choice(registered_choices, "...考え直す", "", text_id="c_cancel_champ") \
-        .on_cancel(registered_choices)
-
-    # === Battle Starts ===
-    builder.step(battle_start_stage1) \
-        .say("sendoff1", "よし、行け！生きて戻ってこい...できればな。", "", actor=vargus) \
-        .start_battle_by_stage("stage_1") \
-        .finish()
-
-    builder.step(battle_start_stage2) \
-        .say("sendoff2", "いい度胸だ。お前ならやれる！", "", actor=vargus) \
-        .start_battle_by_stage("stage_2") \
-        .finish()
-
-    builder.step(battle_start_stage3) \
-        .say("sendoff3", "...無茶するなよ。お前はもうただの新人じゃない。", "", actor=vargus) \
-        .start_battle_by_stage("stage_3") \
-        .finish()
-
-    builder.step(battle_start_champion) \
-        .say("sendoff_champ", "...見届けてやる。行って来い、闘士よ。", "", actor=vargus) \
-        .start_battle_by_stage("stage_4") \
-        .finish()
-
-    # === Quest System Integration ===
-
-    # クエスト確認 - 利用可能なクエストをチェック
-    # ラベル定義（使用前に定義が必要）
-    # ランクアップ系
-    quest_rank_up_g = builder.label("quest_rank_up_g")
-    quest_rank_up_f = builder.label("quest_rank_up_f")
-    quest_rank_up_e = builder.label("quest_rank_up_e")
-    quest_rank_up_d = builder.label("quest_rank_up_d")
-    quest_rank_up_c = builder.label("quest_rank_up_c")
-    quest_rank_up_b = builder.label("quest_rank_up_b")
-    quest_rank_up_a = builder.label("quest_rank_up_a")
-    # ストーリー系
-    quest_zek_intro = builder.label("quest_zek_intro")
-    quest_lily_exp = builder.label("quest_lily_exp")
-    quest_zek_steal_bottle = builder.label("quest_zek_steal_bottle")
-    quest_zek_steal_soulgem = builder.label("quest_zek_steal_soulgem")
-    quest_upper_existence = builder.label("quest_upper_existence")
-    quest_lily_private = builder.label("quest_lily_private")
-    quest_balgas_training = builder.label("quest_balgas_training")
-    quest_makuma = builder.label("quest_makuma")
-    quest_makuma2 = builder.label("quest_makuma2")
-    quest_vs_balgas = builder.label("quest_vs_balgas")
-    quest_lily_real_name = builder.label("quest_lily_real_name")
-    quest_vs_grandmaster_1 = builder.label("quest_vs_grandmaster_1")
-    quest_last_battle = builder.label("quest_last_battle")
-
-    # クエスト確認開始（フラグをクリアしてからチェック）
-    # sukutsu_quest_target_name マッピング:
-    # 11-16: ランクアップ (G, F, E, D, C, B)
-    # 21-33: ストーリークエスト
-    builder.step(check_available_quests) \
-        .say("quest_check", "利用可能なクエストがあるか確認するぜ...", "", actor=vargus) \
-        .set_flag("sukutsu_quest_found", 0) \
-        .set_flag("sukutsu_quest_target_name", 0) \
-        .debug_log_quests() \
-        .check_quests([
-            # ストーリー系
-            (QuestIds.ZEK_INTRO, quest_zek_intro),
-            (QuestIds.LILY_EXPERIMENT, quest_lily_exp),
-            (QuestIds.ZEK_STEAL_BOTTLE, quest_zek_steal_bottle),
-            (QuestIds.ZEK_STEAL_SOULGEM, quest_zek_steal_soulgem),
-            (QuestIds.UPPER_EXISTENCE, quest_upper_existence),
-            (QuestIds.LILY_PRIVATE, quest_lily_private),
-            (QuestIds.BALGAS_TRAINING, quest_balgas_training),
-            (QuestIds.MAKUMA, quest_makuma),
-            (QuestIds.MAKUMA2, quest_makuma2),
-            (QuestIds.RANK_UP_S, quest_vs_balgas),
-            (QuestIds.LILY_REAL_NAME, quest_lily_real_name),
-            (QuestIds.VS_GRANDMASTER_1, quest_vs_grandmaster_1),
-            (QuestIds.LAST_BATTLE, quest_last_battle),
-            # ランクアップ系（先にストーリークエストをチェックするので、後ろに配置）
-            (QuestIds.RANK_UP_G, quest_rank_up_g),
-            (QuestIds.RANK_UP_F, quest_rank_up_f),
-            (QuestIds.RANK_UP_E, quest_rank_up_e),
-            (QuestIds.RANK_UP_D, quest_rank_up_d),
-            (QuestIds.RANK_UP_C, quest_rank_up_c),
-            (QuestIds.RANK_UP_B, quest_rank_up_b),
-            (QuestIds.RANK_UP_A, quest_rank_up_a),
-        ]) \
-        .switch_on_flag("sukutsu_quest_target_name", {
-            # ランクアップ系
-            11: quest_rank_up_g,
-            12: quest_rank_up_f,
-            13: quest_rank_up_e,
-            14: quest_rank_up_d,
-            15: quest_rank_up_c,
-            16: quest_rank_up_b,
-            17: quest_rank_up_a,
-            # ストーリー系
-            21: quest_zek_intro,
-            22: quest_lily_exp,
-            23: quest_zek_steal_bottle,
-            24: quest_zek_steal_soulgem,
-            25: quest_upper_existence,
-            26: quest_lily_private,
-            27: quest_balgas_training,
-            28: quest_makuma,
-            29: quest_makuma2,
-            30: quest_vs_balgas,
-            31: quest_lily_real_name,
-            32: quest_vs_grandmaster_1,
-            33: quest_last_battle,
-        }, fallback=quest_none)
-
-    # === ランクアップ系クエスト情報 ===
-    builder.step(quest_rank_up_g) \
-        .say("quest_rank_g_info", "【昇格試験】ランクG『屑肉の洗礼』が受けられるぜ。「昇格試験を受けたい」を選んでくれ。", "", actor=vargus) \
-        .jump(registered_choices)
-
-    builder.step(quest_rank_up_f) \
-        .say("quest_rank_f_info", "【昇格試験】ランクF『凍土の魔犬』が受けられるぜ。「昇格試験を受けたい」を選んでくれ。", "", actor=vargus) \
-        .jump(registered_choices)
-
-    builder.step(quest_rank_up_e) \
-        .say("quest_rank_e_info", "【昇格試験】ランクE『カイン亡霊戦』が受けられるぜ。「昇格試験を受けたい」を選んでくれ。", "", actor=vargus) \
-        .jump(registered_choices)
-
-    builder.step(quest_rank_up_d) \
-        .say("quest_rank_d_info", "【昇格試験】ランクD『銅貨稼ぎの洗礼』が受けられるぜ。「昇格試験を受けたい」を選んでくれ。", "", actor=vargus) \
-        .jump(registered_choices)
-
-    builder.step(quest_rank_up_c) \
-        .say("quest_rank_c_info", "【昇格試験】ランクC『闘技場の鴉』が受けられるぜ。「昇格試験を受けたい」を選んでくれ。", "", actor=vargus) \
-        .jump(registered_choices)
-
-    builder.step(quest_rank_up_b) \
-        .say("quest_rank_b_info", "【昇格試験】ランクB『虚無の処刑人』が受けられるぜ。「昇格試験を受けたい」を選んでくれ。", "", actor=vargus) \
-        .jump(registered_choices)
-
-    builder.step(quest_rank_up_a) \
-        .say("quest_rank_a_info", "【昇格試験】ランクA『影との戦い』が受けられるぜ。「昇格試験を受けたい」を選んでくれ。", "", actor=vargus) \
-        .jump(registered_choices)
-
-    # === ストーリー系クエスト ===
-    # バルガス（アリーナマスター）直接開始用ラベル
-    start_upper_existence = builder.label("start_upper_existence")
-    start_balgas_training = builder.label("start_balgas_training")
-    start_vs_balgas = builder.label("start_vs_balgas")
-
-    # -------------------------------------------
-    # ゼクのクエスト（情報提供のみ、ゼクに話しかけて開始）
-    # -------------------------------------------
-    # クエスト: ゼクとの出会い
-    builder.step(quest_zek_intro) \
-        .say("quest_zek_info", "おい、見慣れねえ商人が来てるぞ。『ゼク』って名乗る怪しい野郎だ。", "", actor=vargus) \
-        .say("quest_zek_info2", "ロビーの隅にいるはずだ。興味があるなら話しかけてみろ。", "", actor=vargus) \
-        .jump(registered_choices)
-
-    # クエスト: ゼクの瓶すり替え提案
-    builder.step(quest_zek_steal_bottle) \
-        .say("quest_zek_bottle_info", "ゼクの野郎が何やら企んでやがる。あいつに話しかけてみろ。", "", actor=vargus) \
-        .say("quest_zek_bottle_info2", "……俺は関わらねえが、お前の判断だ。", "", actor=vargus) \
-        .jump(registered_choices)
-
-    # クエスト: カインの魂の選択
-    builder.step(quest_zek_steal_soulgem) \
-        .say("quest_zek_soulgem_info", "ゼクがカインの『魂宝石』について何か言いたいことがあるらしい。", "", actor=vargus) \
-        .say("quest_zek_soulgem_info2", "あいつのところへ行け。……慎重に選べよ。", "", actor=vargus) \
-        .jump(registered_choices)
-
-    # -------------------------------------------
-    # リリィのクエスト（情報提供のみ、リリィに話しかけて開始）
-    # -------------------------------------------
-    # クエスト: リリィの実験
-    builder.step(quest_lily_exp) \
-        .say("quest_lily_info", "リリィが何やら困ってるらしいぜ。『虚空の共鳴瓶』とかいう怪しげなアイテムを作りたいとか。", "", actor=vargus) \
-        .say("quest_lily_info2", "あいつのところへ行って話を聞いてやれ。", "", actor=vargus) \
-        .jump(registered_choices)
-
-    # クエスト: リリィの私室
-    builder.step(quest_lily_private) \
-        .say("quest_lily_priv_info", "リリィが『自分の過去』について話したいらしい。……珍しいな。", "", actor=vargus) \
-        .say("quest_lily_priv_info2", "興味があるならあいつに話しかけてやれ。", "", actor=vargus) \
-        .jump(registered_choices)
-
-    # クエスト: マクマ登場
-    builder.step(quest_makuma) \
-        .say("quest_makuma_info", "怪しい連中が闘技場をうろついてる。『マクマ』とかいう組織らしい。", "", actor=vargus) \
-        .say("quest_makuma_info2", "リリィが詳しく知ってるかもしれねえ。あいつに聞いてみろ。", "", actor=vargus) \
-        .jump(registered_choices)
-
-    # クエスト: リリィの真名
-    builder.step(quest_lily_real_name) \
-        .say("quest_lily_name_info", "リリィが『真の名』を教えてくれるらしい。", "", actor=vargus) \
-        .say("quest_lily_name_info2", "……あいつを本気で信用するのか？　あいつに話しかけろ。", "", actor=vargus) \
-        .jump(registered_choices)
-
-    # -------------------------------------------
-    # バルガス（アリーナマスター）のクエスト（直接開始可能）
-    # -------------------------------------------
-    # クエスト: 高次元存在の真実
-    builder.step(quest_upper_existence) \
-        .say("quest_upper_info", "……お前には『観客』の正体を教えておく必要がある。", "", actor=vargus) \
-        .say("quest_upper_info2", "聞く覚悟はあるか？　真実は重いぞ。", "", actor=vargus) \
-        .choice(start_upper_existence, "聞く", "", text_id="c_accept_upper") \
-        .choice(registered_choices, "今はいい", "", text_id="c_decline_upper") \
-        .on_cancel(registered_choices)
-
-    # 高次元存在ドラマ開始
-    builder.step(start_upper_existence) \
-        .say_and_start_drama("……いいだろう。座れ。", DramaNames.UPPER_EXISTENCE, "sukutsu_arena_master") \
-        .jump(end)
-
-    # クエスト: バルガスの訓練
-    builder.step(quest_balgas_training) \
-        .say("quest_balgas_info", "……おい。俺が直接、お前を鍛えてやろうと思ってる。", "", actor=vargus) \
-        .say("quest_balgas_info2", "死にたくなければ付いてこい。どうだ？", "", actor=vargus) \
-        .choice(start_balgas_training, "ついていく", "", text_id="c_accept_balgas") \
-        .choice(registered_choices, "今はやめておく", "", text_id="c_decline_balgas") \
-        .on_cancel(registered_choices)
-
-    # バルガス訓練ドラマ開始
-    builder.step(start_balgas_training) \
-        .say_and_start_drama("よし、来い！", DramaNames.BALGAS_TRAINING, "sukutsu_arena_master") \
-        .jump(end)
-
-    # クエスト: バルガス戦（ランクS昇格）
-    builder.step(quest_vs_balgas) \
-        .say("quest_vs_balgas_info", "……おい。俺と本気で戦う気はあるか？", "", actor=vargus) \
-        .say("quest_vs_balgas_info2", "これは試験じゃねえ。俺の『決着』だ。", "", actor=vargus) \
-        .choice(start_vs_balgas, "受けて立つ", "", text_id="c_accept_vs_balgas") \
-        .choice(registered_choices, "今は遠慮する", "", text_id="c_decline_vs_balgas") \
-        .on_cancel(registered_choices)
-
-    # バルガス戦ドラマ開始
-    builder.step(start_vs_balgas) \
-        .say_and_start_drama("……覚悟はいいな。", DramaNames.VS_BALGAS, "sukutsu_arena_master") \
-        .jump(end)
-
-    # -------------------------------------------
-    # 自動発動クエスト（情報提供のみ）
-    # -------------------------------------------
-    # クエスト: マクマの陰謀（自動発動のため情報のみ）
-    builder.step(quest_makuma2) \
-        .say("quest_makuma2_info", "マクマの連中が何か企んでやがる。リリィも巻き込まれてるかもしれねえ。", "", actor=vargus) \
-        .say("quest_makuma2_info2", "……気をつけろ。", "", actor=vargus) \
-        .jump(registered_choices)
-
-    # クエスト: グランドマスター戦（自動発動のため情報のみ）
-    builder.step(quest_vs_grandmaster_1) \
-        .say("quest_gm_info", "……いよいよだな。グランドマスターとの戦いが近い。", "", actor=vargus) \
-        .say("quest_gm_info2", "覚悟しておけ。", "", actor=vargus) \
-        .jump(registered_choices)
-
-    # クエスト: 最終決戦（自動発動のため情報のみ）
-    builder.step(quest_last_battle) \
-        .say("quest_last_info", "……これが最後の戦いだ。", "", actor=vargus) \
-        .say("quest_last_info2", "お前は何のために戦う？　答えを見つけておけ。", "", actor=vargus) \
-        .jump(registered_choices)
-
-    # 汎用クエスト受諾（現在は未使用、将来の拡張用）
-    builder.step(quest_info) \
-        .say("quest_accepted", "よし、頑張れよ。報酬は期待できるかもしれねえぞ。", "", actor=vargus) \
-        .jump(registered_choices)
-
-    # 利用可能なクエストがない場合
+    # クエストなし
     builder.step(quest_none) \
         .say("no_quest", "今は特に依頼はねえな。まずは実力をつけることだ。", "", actor=vargus) \
         .jump(registered_choices)
 
+    # ========================================
+    # 終了
+    # ========================================
     builder.step(end).finish()

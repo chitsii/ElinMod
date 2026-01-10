@@ -1,6 +1,7 @@
 using System.IO;
 using UnityEngine;
 using DG.Tweening;
+using Elin_SukutsuArena.Core;
 
 namespace Elin_SukutsuArena
 {
@@ -15,8 +16,8 @@ namespace Elin_SukutsuArena
         /// </summary>
         public static void ShowRankInfoLog()
         {
-            int rank = (int)ArenaFlagManager.Player.GetRank();
-            int contribution = ArenaFlagManager.Player.GetContribution();
+            int rank = (int)ArenaContext.I.Player.Rank;
+            int contribution = ArenaContext.I.Player.Contribution;
 
             string rankName = rank switch
             {
