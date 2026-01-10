@@ -13,8 +13,6 @@ def define_zek_intro(builder: DramaBuilder):
     """
     # アクター登録
     pc = builder.register_actor(Actors.PC, "あなた", "You")
-    lily = builder.register_actor(Actors.LILY, "リリィ", "Lily")
-    balgas = builder.register_actor(Actors.BALGAS, "バルガス", "Balgas")
     zek = builder.register_actor(Actors.ZEK, "ゼク", "Zek")
 
     # ラベル定義
@@ -29,8 +27,6 @@ def define_zek_intro(builder: DramaBuilder):
     price_refuse = builder.label("price_refuse")
     price_consider = builder.label("price_consider")
     scene4 = builder.label("scene4_return_shadow")
-    balgas_reaction = builder.label("balgas_reaction")
-    lily_reaction = builder.label("lily_reaction")
     ending = builder.label("ending")
 
     # ========================================
@@ -103,7 +99,7 @@ def define_zek_intro(builder: DramaBuilder):
 
     # 選択肢反応: 代償とは？
     builder.step(price_ask) \
-        .say("zek_p1", "ふふ、慎重なこと。ええ、あなたの運が少し悪くなる程度です。……まあ、『少し』がどの程度かは、使ってみてのお楽しみということで。", "", actor=zek) \
+        .say("zek_p1", "ふふ、慎重なこと。ええ、あなたの善性……いわゆる『カルマ』を少々捧げていただくだけです。……まあ、『少々』がどの程度かは、使ってみてのお楽しみということで。", "", actor=zek) \
         .jump(scene4)
 
     # 選択肢反応: 断る
@@ -124,26 +120,6 @@ def define_zek_intro(builder: DramaBuilder):
         .say("zek_9", "さあ、賢明な選択を。私は常に、この歪んだ影の中に潜んでおりますよ。", "", actor=zek) \
         .say("zek_10", "あなたが『力』を、あるいは『救い』を求めたくなったら……いつでもお声掛けください。あなたの魂が、完熟した果実のように弾けるその時まで、ね。", "", actor=zek) \
         .say("narr_9", "（ゼクの姿が薄れ、影に溶けるように消えていく。空間の裂け目が閉じ、ロビーの喧騒が一気に戻る。まるで、先ほどの出来事が幻だったかのように。）", "", actor=pc) \
-        .jump(balgas_reaction)
-
-    # ========================================
-    # バルガスの反応
-    # ========================================
-    builder.step(balgas_reaction) \
-        .focus_chara(Actors.BALGAS) \
-        .say("balgas_1", "……ゼクの野郎と話しやがったか。", "", actor=balgas) \
-        .say("balgas_2", "あいつから物を買うのは、悪魔に魂の切り売りをしてるのと同じだ。……まぁ、勝てば官軍だがな。せいぜい、干からびる前に使い倒してやれ。", "", actor=balgas) \
-        .say("balgas_3", "ただな……あいつは『力』を売ってるんじゃねえ。『絶望の瞬間』を集めてやがるんだ。お前が最期に何を感じるか、それを観察してやがる。……気をつけろよ。", "", actor=balgas) \
-        .jump(lily_reaction)
-
-    # ========================================
-    # リリィの反応
-    # ========================================
-    builder.step(lily_reaction) \
-        .focus_chara(Actors.LILY) \
-        .say("lily_1", "ゼクと話をされたのですね。", "", actor=lily) \
-        .say("lily_2", "……彼は、このアリーナでも特別な存在です。グランドマスターですら、彼を完全には制御できていません。", "", actor=lily) \
-        .say("lily_3", "ただ、彼の品が闘士の生存率を上げているのも事実。……使うか使わないかは、あなた次第ですが。", "", actor=lily) \
         .jump(ending)
 
     # ========================================

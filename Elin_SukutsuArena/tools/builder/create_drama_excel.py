@@ -30,6 +30,7 @@ from scenarios.rank_up.rank_a import define_rank_up_A
 # Import numbered scenario modules using importlib
 define_arena_master_drama = importlib.import_module('scenarios.00_arena_master').define_arena_master_drama
 define_zek_main_drama = importlib.import_module('scenarios.00_zek').define_zek_main_drama
+define_lily_main_drama = importlib.import_module('scenarios.00_lily').define_lily_main_drama
 define_zek_intro = importlib.import_module('scenarios.03_zek_intro').define_zek_intro
 define_lily_experiment = importlib.import_module('scenarios.05_1_lily_experiment').define_lily_experiment
 define_zek_steal_bottle = importlib.import_module('scenarios.05_2_zek_steal_bottle').define_zek_steal_bottle
@@ -74,6 +75,13 @@ def main():
     define_zek_main_drama(builder_zek)
     builder_zek.save(zek_output_path, sheet_name="sukutsu_shady_merchant")
     print(f"Generated: {zek_output_path}")
+
+    # Sukutsu Receptionist (Lily)
+    lily_output_path = os.path.join(output_dir_jp, 'drama_sukutsu_receptionist.xlsx')
+    builder_lily = ArenaDramaBuilder()
+    define_lily_main_drama(builder_lily)
+    builder_lily.save(lily_output_path, sheet_name="sukutsu_receptionist")
+    print(f"Generated: {lily_output_path}")
 
     # --- Rank Up Trials ---
     process_scenario(output_dir_jp, DramaIds.RANK_UP_G, define_rank_up_G)

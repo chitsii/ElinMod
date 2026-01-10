@@ -1,5 +1,5 @@
 """
-00_zek.py - ゼク（怪しい商人）のメインダイアログ
+00_lily.py - リリィ（受付嬢）のメインダイアログ
 NPCクリック時の会話処理
 """
 
@@ -9,22 +9,22 @@ from flag_definitions import Keys, Actors, QuestIds
 from arena_high_level_api import QuestEntry, build_quest_dispatcher
 
 
-# ゼクのクエストエントリ定義
-ZEK_QUESTS = [
-    QuestEntry(QuestIds.ZEK_INTRO, 21, "start_zek_intro"),
-    QuestEntry(QuestIds.ZEK_STEAL_BOTTLE, 23, "start_zek_steal_bottle"),
-    QuestEntry(QuestIds.ZEK_STEAL_SOULGEM, 24, "start_zek_steal_soulgem"),
+# リリィのクエストエントリ定義
+LILY_QUESTS = [
+    QuestEntry(QuestIds.LILY_EXPERIMENT, 22, "start_lily_experiment"),
+    QuestEntry(QuestIds.LILY_PRIVATE, 26, "start_lily_private"),
+    QuestEntry(QuestIds.LILY_REAL_NAME, 31, "start_lily_real_name"),
 ]
 
 
-def define_zek_main_drama(builder: ArenaDramaBuilder):
+def define_lily_main_drama(builder: ArenaDramaBuilder):
     """
-    ゼクのメインダイアログ
+    リリィのメインダイアログ
     NPCクリック時に表示される会話
     """
     # アクター登録
     pc = builder.register_actor(Actors.PC, "あなた", "You")
-    zek = builder.register_actor(Actors.ZEK, "ゼク", "Zek")
+    lily = builder.register_actor(Actors.LILY, "リリィ", "Lily")
 
     # ラベル定義
     main = builder.label("main")
@@ -43,7 +43,7 @@ def define_zek_main_drama(builder: ArenaDramaBuilder):
     # 挨拶
     # ========================================
     builder.step(greeting) \
-        .say("greet", "おや……何か御用でしょうか？", "", actor=zek) \
+        .say("greet", "いらっしゃいませ。何かお手伝いできることはありますか？", "", actor=lily) \
         .jump(choices)
 
     # ========================================
@@ -60,26 +60,26 @@ def define_zek_main_drama(builder: ArenaDramaBuilder):
     # ========================================
     quest_labels = build_quest_dispatcher(
         builder,
-        ZEK_QUESTS,
+        LILY_QUESTS,
         entry_step=check_quests,
         fallback_step=quest_none,
-        actor=zek,
+        actor=lily,
     )
 
     # クエストが見つからなかった場合 → 選択肢に戻る
     builder.step(quest_none) \
-        .say("quest_none", "……おや、今は特にお伝えすることがないようです。", "", actor=zek) \
+        .say("quest_none", "……あら、今は特にお伝えすることがないみたいです。", "", actor=lily) \
         .jump(choices)
 
     # 各クエスト開始 → ドラマ遷移
-    builder.step(quest_labels["start_zek_intro"]) \
-        .start_quest_drama(QuestIds.ZEK_INTRO, DramaNames.ZEK_INTRO)
+    builder.step(quest_labels["start_lily_experiment"]) \
+        .start_quest_drama(QuestIds.LILY_EXPERIMENT, DramaNames.LILY_EXPERIMENT)
 
-    builder.step(quest_labels["start_zek_steal_bottle"]) \
-        .start_quest_drama(QuestIds.ZEK_STEAL_BOTTLE, DramaNames.ZEK_STEAL_BOTTLE)
+    builder.step(quest_labels["start_lily_private"]) \
+        .start_quest_drama(QuestIds.LILY_PRIVATE, DramaNames.LILY_PRIVATE)
 
-    builder.step(quest_labels["start_zek_steal_soulgem"]) \
-        .start_quest_drama(QuestIds.ZEK_STEAL_SOULGEM, DramaNames.ZEK_STEAL_SOULGEM)
+    builder.step(quest_labels["start_lily_real_name"]) \
+        .start_quest_drama(QuestIds.LILY_REAL_NAME, DramaNames.LILY_REAL_NAME)
 
     # ========================================
     # 終了

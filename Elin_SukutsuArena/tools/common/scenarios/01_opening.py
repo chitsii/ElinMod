@@ -31,16 +31,16 @@ def define_opening_drama(builder: DramaBuilder):
     # BGM開始 (CWL仕様: Sound/BGM/ファイル名 → "BGM/sukutsu_arena_opening")
     builder.play_bgm("BGM/sukutsu_arena_opening")
 
-    # ナレーション (PCの独白)
-    builder.say("narr1", "(奇妙な場所に足を踏み入れると、あなたの上下左右の感覚が溶けていく。次に足が触れたのは、石畳だ。)", actor=pc) \
-           .say("narr2", "(それは、数多の敗者の絶望が凝固し、永遠に熱を失ったかのような黒曜石だった。頭上を見上げれば、そこには空も太陽もない。)", actor=pc)
+    # ナレーション (PCの独白 - 主観的な感覚のみ)
+    builder.say("narr1", "(……どこだ、ここは。上も下も分からない。体が浮いているような、沈んでいるような……)", actor=pc) \
+           .say("narr2", "(足が何かに触れた。冷たい。石……？)", actor=pc)
 
     # 画面を揺らす - 異次元の不安定さを表現
     builder.shake()
 
-    builder.say("narr3", "(ただ、紫紺の渦を巻く「虚無」が天を覆い、時折、空間の裂け目から巨大な触手が垂れ下がっている。)", actor=pc) \
-           .say("narr3b", "(ここは**次元の狭間**——世界と世界の隙間に浮かぶ領域。確定した因果律を持たず、時間の流れすら曖昧な「無法地帯」だ。)", actor=pc) \
-           .say("narr3c", "(遠くから響くのは、雷鳴のような喝采。だが、観客の姿は見えない。姿の見えない「何か」が、この闘技場を見下ろしている——それだけは感じられる。)", actor=pc)
+    builder.say("narr3", "(頭上には……空がない。ただ、渦を巻く紫の闇。何か巨大なものが、そこから垂れ下がっている気がする。)", actor=pc) \
+           .say("narr3b", "(奇妙な場所だ。時間の流れすら曖昧に感じる。)", actor=pc) \
+           .say("narr3c", "(遠くから響く、雷鳴のような音……歓声か？ だが、誰もいない。見えないだけか。何かに見られている——その感覚だけは確かだ。)", actor=pc)
 
     # リリィ登場（フォーカスにウェイト内蔵）
     builder.focus_chara(Actors.LILY) \
@@ -74,16 +74,16 @@ def define_opening_drama(builder: DramaBuilder):
     builder.choice(greed, "【強欲】富と名声、そして力が欲しい", "", text_id="c1") \
            .choice(battle, "【求道】己の限界を知りたい。強い奴と戦わせろ", "", text_id="c2") \
            .choice(void, "【虚無】帰る場所などない。ここが終着点だ", "", text_id="c3") \
-           .choice(pride, "【傲慢】この闘技場も、あのドラゴンも、いずれ配下に置いてやる", "", text_id="c4") \
+           .choice(pride, "【傲慢】この闘技場もいずれ配下に置いてやる", "", text_id="c4") \
            .choice(drift, "【狂人】理由はない", "", text_id="c5") \
            .on_cancel(drift)
 
     # --- Greed Route ---
     builder.step(greed) \
         .set_flag(Keys.MOTIVATION, FlagValues.Motivation.GREED) \
-        .say("greed_v1", "ハッ！ わかりやすくていいぜ。金と権力……地上のクズどもが一生かけて追いまわすゴミ屑だ。だがいいか、ここでは金などただの石ころだ。", actor=vargus) \
+        .say("greed_v1", "ハッ！ わかりやすくていいぜ。金と権力、そして力……地上のクズどもが一生かけて追いまわす、人を魅了してやまないゴミ屑だ。ここでゲロゲロ程も価値がないとしてもな。", actor=vargus) \
         .say("greed_v2", "お前が手にするのは、神々すら平伏させる「圧倒的な階位」……。それが欲しけりゃ、他人の内臓を積み上げて階段を作るんだな。", actor=vargus) \
-        .say("greed_l1", "ふふ、強欲な魂は好物ですよ。あなたが稼ぐ賞金……その何割を私が手数料としていただくことになるのか、楽しみです。精々、死なずに稼いでくださいね？", actor=lily) \
+        .say("greed_l1", "ふふ、強欲な魂は好物ですよ。あなたの掛け金……その何割を私が手数料としていただくことになるのか、楽しみです。精々、死なずに稼いでくださいね？", actor=lily) \
         .jump(ending)
 
     # --- Battle Route ---
@@ -98,7 +98,7 @@ def define_opening_drama(builder: DramaBuilder):
     # --- Void Route ---
     builder.step(void) \
         .set_flag(Keys.MOTIVATION, FlagValues.Motivation.NIHILISM) \
-        .say("void_v1", "……（沈黙）フン、訳ありか。だがな小僧、ここは逃げ込むための掃き溜めじゃねえ。生への執着を捨てた奴から死んでいく場所だ。", actor=vargus) \
+        .say("void_v1", "……フン、訳ありか。だがな小僧、ここは逃げ込むための掃き溜めじゃねえ。生への執着を捨てた奴から死んでいく。", actor=vargus) \
         .say("void_v2", "……いいか、戦いの中でしか己の輪郭を保てねえってんなら、死に物狂いで剣を振れ。そうすりゃ、その虚無も少しは埋まるかもしれねえぜ。", actor=vargus) \
         .say("void_l1", "……居場所を求めて、わざわざ異次元まで。少し同情してしまいますね。ですが、事務手続きに私情は挟みませんよ？", actor=lily) \
         .jump(ending)
@@ -108,13 +108,13 @@ def define_opening_drama(builder: DramaBuilder):
         .set_flag(Keys.MOTIVATION, FlagValues.Motivation.ARROGANCE) \
         .shake() \
         .say("pride_v1", "……ハハハ！傑作だ！聞こえたかリリィ？ この新入り、初日から『王』を気取ってやがる！", actor=vargus) \
-        .say("pride_v2", "だがな、その傲慢さが武器になることもある。神を殺すのはいつだって、己の身の程を知らぬ大馬鹿野郎だ。", actor=vargus) \
-        .say("pride_l1", "……まぁ。グランドマスターの座を狙うなんて。ふふ、夢物語でも期待しておきましょう。", actor=lily) \
+        .say("pride_v2", "その青臭さには反吐が出るが、傲慢さが武器になることもある。神を殺すのはいつだって、己の身の程を知らぬ大馬鹿野郎だ。", actor=vargus) \
+        .say("pride_l1", "グランドマスターの座を狙うなんて。ふふ、夢物語でも期待しておきましょう。", actor=lily) \
         .jump(ending)
 
     # --- Drift (Madman) Route ---
     builder.step(drift) \
-        .say("drift_v1", "……チッ。ヤク中か、それとも脳みそまで混沌に冒されたか。会話もできねえ壊れた玩具に用はねえんだがな。", actor=vargus) \
+        .say("drift_v1", "……ヤク中か、それとも脳みそまで混沌に冒されたか。会話もできねえ壊れた玩具に用はねえんだがな。", actor=vargus) \
         .say("drift_l1", "あら、私は嫌いではありませんよ？ 理由なき衝動ほど、純粋で美しいものはありません。あなたのその濁った瞳……何を見るのか楽しみです。", actor=lily) \
         .jump(ending)
 

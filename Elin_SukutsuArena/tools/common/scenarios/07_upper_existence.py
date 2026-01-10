@@ -160,7 +160,7 @@ def add_upper_existence_result_steps(builder: ArenaDramaBuilder, victory_label: 
         .complete_quest(QuestIds.UPPER_EXISTENCE) \
         .say("sys_title", "【システム】称号『笑われる者』を獲得しました。回避+3、運+3 の加護を得た！", "") \
         .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantUpperExistenceBonus();") \
-        .jump(return_label)
+        .finish()
 
     # ========================================
     # 上位存在クエスト 敗北
@@ -171,4 +171,4 @@ def add_upper_existence_result_steps(builder: ArenaDramaBuilder, victory_label: 
         .focus_chara(Actors.LILY) \
         .say("lily_d1", "……あらあら、落下物に潰されてしまいましたね。", "", actor=lily) \
         .say("lily_d2", "観客の皆様も、少し期待外れだったようです。また挑戦してくださいね。", "", actor=lily) \
-        .jump(return_label)
+        .finish()

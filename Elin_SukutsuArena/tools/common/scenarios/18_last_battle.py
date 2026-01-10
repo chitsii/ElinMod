@@ -302,4 +302,4 @@ def add_last_battle_result_steps(builder: ArenaDramaBuilder, victory_label: str,
         .say("astaroth_d1", "……まだ、足りないな。お前の中に宿る可能性は、未だ開花していない。", "", actor=astaroth) \
         .say("astaroth_d2", "……出直して来い。私は、お前が『完成形』に至るまで待っていよう。", "", actor=astaroth) \
         .say("narr_d2", "（あなたは闘技場の入口へと戻された。再び挑戦するには、さらなる鍛錬が必要だ……。）", "", actor=pc) \
-        .jump(return_label)
+        .finish()

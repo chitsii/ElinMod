@@ -193,64 +193,16 @@ def add_rank_up_A_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .say("lily_v1", "……おかえりなさい。", "", actor=lily) \
         .say("lily_v2", "あなたは今、このアリーナで最も輝く存在になりました。", "", actor=lily) \
         .say("lily_v3", "今日からあなたは、ランクA……『黄金の戦鬼（Golden War Demon）』です。", "", actor=lily) \
-        .say("lily_v4", "では、報酬の授与です。観客からの祝福……小さなコイン30枚とプラチナコイン15枚。それと、特別な素材を一つ選んでいただけます。", "", actor=lily)
-
-    # 報酬選択肢 (ラベル名に _a サフィックスを付けて衝突を回避)
-    reward_ether_a = builder.label("reward_ether_a")
-    reward_shadow_a = builder.label("reward_shadow_a")
-    reward_mana_a = builder.label("reward_mana_a")
-    reward_end_a = builder.label("reward_end_a")
-
-    builder.choice(reward_ether_a, "エーテルの欠片を頼む", "", text_id="c_reward_ether_a") \
-           .choice(reward_shadow_a, "影の結晶が欲しい", "", text_id="c_reward_shadow_a") \
-           .choice(reward_mana_a, "魔力の結晶を選ぶ", "", text_id="c_reward_mana_a")
-
-    builder.step(reward_ether_a) \
-        .say("lily_rew1_a", "『エーテルの欠片×1』、記録いたしました。自己超越の証ですね。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"ether\"));") \
-        .jump(reward_end_a)
-
-    builder.step(reward_shadow_a) \
-        .say("lily_rew2_a", "『影の結晶×1』、記録いたしました。……あなた自身の一部だったものですね。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"shadow_crystal\"));") \
-        .jump(reward_end_a)
-
-    builder.step(reward_mana_a) \
-        .say("lily_rew3_a", "『魔力の結晶×1』ですね。……堅実な選択ですこと。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"gem_mana\"));") \
-        .jump(reward_end_a)
-
-    builder.step(reward_end_a) \
-        .action("eval", param="for(int i=0; i<30; i++) { EClass.pc.Pick(ThingGen.Create(\"coin\")); } for(int i=0; i<15; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
-        .say("lily_v5", "記録完了です。", "", actor=lily) \
+        .say("lily_v4", "報酬として、小さなメダル5枚、エーテル抗体4本、媚薬4本をお渡しします。", "", actor=lily) \
+        .action("eval", param="for(int i=0; i<5; i++) { EClass.pc.Pick(ThingGen.Create(\"medal\")); } for(int i=0; i<4; i++) { EClass.pc.Pick(ThingGen.Create(\"1165\")); EClass.pc.Pick(ThingGen.Create(\"lovepotion\")); }") \
         .complete_quest(QuestIds.RANK_UP_A) \
         .set_flag(Keys.RANK, 7) \
         .mod_flag(Keys.REL_BALGAS, "+", 15) \
         .mod_flag(Keys.REL_LILY, "+", 15) \
         .mod_flag(Keys.REL_ZEK, "+", 10) \
         .say("sys_title", "【システム】称号『黄金の戦鬼（Golden War Demon）』を獲得しました。筋力+5、魔力+5、回避+5、PV+5 の加護を得た！", "") \
-        .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantRankABonus();")
-
-    # 最終選択肢
-    final_next_a = builder.label("final_next_a")
-    final_rest_a = builder.label("final_rest_a")
-    final_silent_a = builder.label("final_silent_a")
-
-    builder.choice(final_next_a, "次は……アスタロトか", "", text_id="c_final_next_a") \
-           .choice(final_rest_a, "少し、休ませてくれ", "", text_id="c_final_rest_a") \
-           .choice(final_silent_a, "（無言で頷く）", "", text_id="c_final_silent_a")
-
-    builder.step(final_next_a) \
-        .say("lily_f1_a", "ええ。……その前に、バルガスさんとの『最後の試練』があります。準備ができたら、声をかけてくださいね。", "", actor=lily) \
-        .jump(return_label)
-
-    builder.step(final_rest_a) \
-        .say("lily_f2_a", "もちろんです。十分に休んでください。……次の戦いは、今までで最も過酷なものになりますから。", "", actor=lily) \
-        .jump(return_label)
-
-    builder.step(final_silent_a) \
-        .say("lily_f3_a", "……お疲れ様でした。ゆっくりなさってください。", "", actor=lily) \
-        .jump(return_label)
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantRankABonus();") \
+        .finish()
 
     # ========================================
     # Rank A 昇格試験 敗北
@@ -262,4 +214,4 @@ def add_rank_up_A_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .say("lily_d1", "……影に、飲み込まれてしまいましたね。", "", actor=lily) \
         .say("lily_d2", "でも、大丈夫です。影はあなた自身……いつか必ず、超えられます。", "", actor=lily) \
         .say("lily_d3", "準備が整ったら、また挑戦してください。私たちは、いつでもここにいます。", "", actor=lily) \
-        .jump(return_label)
+        .finish()

@@ -17,11 +17,10 @@ namespace Elin_SukutsuArena
         public static void ShowRankInfoLog()
         {
             int rank = (int)ArenaContext.I.Player.Rank;
-            int contribution = ArenaContext.I.Player.Contribution;
 
             string rankName = rank switch
             {
-                0 => "Unranked (ランクなし)",
+                0 => "ランク外",
                 1 => "G - 屑肉",
                 2 => "F - 泥犬",
                 3 => "E - 鉄屑",
@@ -33,8 +32,7 @@ namespace Elin_SukutsuArena
                 _ => $"Rank {rank} (Unknown)"
             };
 
-            Msg.Say($"現在のランク: {rankName}");
-            Msg.Say($"貢献度: {contribution}");
+            Msg.Say($"現在のランク: 『{rankName}』 ");
         }
 
         /// <summary>

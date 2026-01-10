@@ -155,45 +155,15 @@ def add_rank_up_B_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .say("balgas_v4", "絶望の空を飛び越え、希望を掴み取る……『銀翼（Silver Wing）』だ。", "", actor=balgas) \
         .focus_chara(Actors.LILY) \
         .say("lily_v4", "では、報酬の授与です。", "", actor=lily) \
-        .say("lily_v5", "観客からの祝福……小さなコイン20枚とプラチナコイン10枚。それと、戦闘記録として特別な素材を一つ選んでいただけます。", "", actor=lily)
-
-    # 報酬選択肢 (ラベル名に _b サフィックスを付けて衝突を回避)
-    reward_ether_b = builder.label("reward_ether_b")
-    reward_void_b = builder.label("reward_void_b")
-    reward_mana_b = builder.label("reward_mana_b")
-    reward_end_b = builder.label("reward_end_b")
-
-    builder.choice(reward_ether_b, "エーテルの欠片を頼む", "", text_id="c_reward_ether_b") \
-           .choice(reward_void_b, "虚無の結晶が欲しい", "", text_id="c_reward_void_b") \
-           .choice(reward_mana_b, "魔力の結晶を選ぶ", "", text_id="c_reward_mana_b")
-
-    builder.step(reward_ether_b) \
-        .say("lily_rew1_b", "『エーテルの欠片×1』、記録いたしました。虚無を超えた証ですね。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"ether\"));") \
-        .jump(reward_end_b)
-
-    builder.step(reward_void_b) \
-        .say("lily_rew2_b", "『虚無の結晶×1』、記録いたしました。……危険ですが、強力な素材です。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"void_crystal\"));") \
-        .jump(reward_end_b)
-
-    builder.step(reward_mana_b) \
-        .say("lily_rew3_b", "『魔力の結晶×1』ですね。……安定の選択ですこと。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"gem_mana\"));") \
-        .jump(reward_end_b)
-
-    builder.step(reward_end_b) \
-        .action("eval", param="for(int i=0; i<20; i++) { EClass.pc.Pick(ThingGen.Create(\"coin\")); } for(int i=0; i<10; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
-        .say("lily_v6", "記録完了です。", "", actor=lily) \
-        .say("lily_v7", "……あなたは今、このアリーナの頂点まであと僅かです。", "", actor=lily) \
-        .say("lily_v8", "次は、グランドマスター・アスタロトとの決戦。……準備が整ったら、また声をかけてくださいね？", "", actor=lily) \
+        .say("lily_v5", "報酬として、小さなメダル4枚、エーテル抗体3本、媚薬3本をお渡しします。", "", actor=lily) \
+        .action("eval", param="for(int i=0; i<4; i++) { EClass.pc.Pick(ThingGen.Create(\"medal\")); } for(int i=0; i<3; i++) { EClass.pc.Pick(ThingGen.Create(\"1165\")); EClass.pc.Pick(ThingGen.Create(\"lovepotion\")); }") \
         .complete_quest(QuestIds.RANK_UP_B) \
         .set_flag(Keys.RANK, 6) \
         .mod_flag(Keys.REL_BALGAS, "+", 20) \
         .mod_flag(Keys.REL_LILY, "+", 20) \
         .say("sys_title", "【システム】称号『銀翼（Silver Wing）』を獲得しました。全ステータス+3、魔法耐性+10 の加護を得た！", "") \
         .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantRankBBonus();") \
-        .jump(return_label)
+        .finish()
 
     # ========================================
     # Rank B 昇格試験 敗北
@@ -205,4 +175,4 @@ def add_rank_up_B_result_steps(builder: DramaBuilder, victory_label: str, defeat
         .say("lily_d1", "……虚無に、飲み込まれてしまいましたね。", "", actor=lily) \
         .say("lily_d2", "でも、あなたはまだ生きています。それだけで、十分に奇跡です。", "", actor=lily) \
         .say("lily_d3", "準備が整ったら、また挑戦してください。私たちは、ここで待っていますから。", "", actor=lily) \
-        .jump(return_label)
+        .finish()
