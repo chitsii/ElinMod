@@ -5,12 +5,13 @@
       "displayNameJp": "屑肉の洗礼",
       "displayNameEn": "Baptism of Scrap Meat",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "BGM/Battle_RankG_VoidOoze",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 5,
       "enemies": [
         {
-          "charaId": "putty",
+          "charaId": "sukutsu_void_ooze",
           "level": 15,
           "rarity": "Normal",
           "position": "random",
@@ -20,53 +21,34 @@
           "count": 3
         },
         {
-          "charaId": "putty",
+          "charaId": "sukutsu_void_ooze",
           "level": 20,
           "rarity": "Normal",
           "position": "random",
           "positionX": 0,
           "positionZ": 0,
-          "isBoss": false,
+          "isBoss": true,
           "count": 2
         }
       ],
       "gimmicks": [],
-      "descriptionJp": "「動く死体」から「屑肉」へ。これがお前の第一歩だ——バルガス",
-      "descriptionEn": "'From walking corpse to scrap meat. This is your first step.' —Balgas"
+      "descriptionJp": "混沌の落とし子たち——彼らのブレスは魂を蝕む。耐性なくして生き残れない。",
+      "descriptionEn": "Children of Chaos—their breath corrodes the soul. Without resistance, you cannot survive."
     },
     "rank_f_trial": {
       "stageId": "rank_f_trial",
-      "displayNameJp": "泥犬の牙",
-      "displayNameEn": "Fangs of the Mud Dog",
+      "displayNameJp": "霜牙の試練",
+      "displayNameEn": "Trial of the Frostfang",
       "zoneType": "field",
+      "biome": "Snow",
       "bgmBattle": "BGM/Battle_RankE_Ice",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 10,
       "enemies": [
         {
-          "charaId": "hound",
-          "level": 40,
-          "rarity": "Superior",
-          "position": "random",
-          "positionX": 0,
-          "positionZ": 0,
-          "isBoss": false,
-          "count": 1
-        },
-        {
-          "charaId": "hound",
+          "charaId": "sukutsu_frost_hound",
           "level": 45,
-          "rarity": "Superior",
-          "position": "random",
-          "positionX": 0,
-          "positionZ": 0,
-          "isBoss": false,
-          "count": 1
-        },
-        {
-          "charaId": "wolf",
-          "level": 50,
-          "rarity": "Superior",
+          "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
           "positionZ": 0,
@@ -74,15 +56,36 @@
           "count": 1
         }
       ],
-      "gimmicks": [],
-      "descriptionJp": "次元の狭間で変異した獣たち。群れで狩りをする本能は、異次元でも健在だ。",
-      "descriptionEn": "Beasts mutated in the dimensional void. Their pack hunting instincts remain intact even in other dimensions."
+      "gimmicks": [
+        {
+          "gimmickType": "elemental_scar",
+          "interval": 8.0,
+          "damage": 15,
+          "radius": 3,
+          "startDelay": 5.0,
+          "effectName": "explosion",
+          "soundName": "explosion",
+          "enableEscalation": true,
+          "escalationRate": 0.85,
+          "minInterval": 3.0,
+          "maxRadius": 8,
+          "radiusGrowthInterval": 30.0,
+          "enableItemDrop": true,
+          "itemDropChance": 0.15,
+          "blastRadius": 2,
+          "directHitChance": 0.4,
+          "explosionCount": 1
+        }
+      ],
+      "descriptionJp": "姿なき牙——見えぬ敵に怯えるな。透明視を得よ、さもなくば凍え死ぬのみ。極寒の氷原は容赦なくお前の耐性を蝕む。",
+      "descriptionEn": "The Invisible Fang—do not fear an unseen enemy. Gain true sight, or freeze to death. The frozen tundra mercilessly erodes your resistance."
     },
     "rank_e_trial": {
       "stageId": "rank_e_trial",
       "displayNameJp": "錆びついた英雄",
       "displayNameEn": "The Rusty Hero",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "BGM/Battle_Kain_Requiem",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 20,
@@ -104,32 +107,23 @@
     },
     "rank_d_trial": {
       "stageId": "rank_d_trial",
-      "displayNameJp": "銅貨稼ぎの洗礼",
-      "displayNameEn": "Copper Earner's Baptism",
+      "displayNameJp": "観客の代弁者",
+      "displayNameEn": "Voice of the Audience",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "BGM/Battle_RankD_Chaos",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 30,
       "enemies": [
         {
-          "charaId": "minotaur",
+          "charaId": "sukutsu_greed",
           "level": 150,
-          "rarity": "Superior",
+          "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
           "positionZ": 0,
           "isBoss": true,
           "count": 1
-        },
-        {
-          "charaId": "orc",
-          "level": 120,
-          "rarity": "Normal",
-          "position": "random",
-          "positionX": 0,
-          "positionZ": 0,
-          "isBoss": false,
-          "count": 2
         }
       ],
       "gimmicks": [
@@ -153,30 +147,31 @@
           "explosionCount": 1
         }
       ],
-      "descriptionJp": "観客の「注目」が初めて本格的に向けられる試練。その視線は時に物理的な力となって降り注ぐ。",
-      "descriptionEn": "The first trial where the audience's 'attention' truly focuses on you. Their gaze sometimes manifests as physical force."
+      "descriptionJp": "観客の「注目」に魅せられ、その力を取り込んだ傀儡——グリード。彼の轟音は観客の喝采、混沌は観客の狂気。",
+      "descriptionEn": "Greed—a puppet who absorbed the audience's power. His sonic blasts are their cheers, his chaos their madness."
     },
     "rank_c_trial": {
       "stageId": "rank_c_trial",
       "displayNameJp": "闘技場の鴉",
       "displayNameEn": "Ravens of the Coliseum",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "BGM/Battle_RankC_Heroic_Lament",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 50,
       "enemies": [
         {
-          "charaId": "orc_warrior",
+          "charaId": "sukutsu_crow_shadow",
           "level": 350,
-          "rarity": "Superior",
+          "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
           "positionZ": 0,
           "isBoss": false,
-          "count": 2
+          "count": 1
         },
         {
-          "charaId": "minotaur",
+          "charaId": "sukutsu_raven_blade",
           "level": 400,
           "rarity": "Legendary",
           "position": "random",
@@ -186,7 +181,7 @@
           "count": 1
         },
         {
-          "charaId": "centaur",
+          "charaId": "sukutsu_karasu_venom",
           "level": 450,
           "rarity": "Legendary",
           "position": "random",
@@ -205,6 +200,7 @@
       "displayNameJp": "虚無の処刑人",
       "displayNameEn": "Void Executioner Null",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "BGM/Battle_Null_Assassin",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 80,
@@ -229,6 +225,7 @@
       "displayNameJp": "黄金の戦鬼",
       "displayNameEn": "Golden War Demon",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "BGM/Battle_Shadow_Self",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 120,
@@ -253,6 +250,7 @@
       "displayNameJp": "屠竜者への道",
       "displayNameEn": "Path to Dragon Slayer",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "BGM/Battle_Balgas_Prime",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 200,
@@ -277,6 +275,7 @@
       "displayNameJp": "竜神との対峙",
       "displayNameEn": "Confrontation with the Dragon God",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "BGM/Battle_Astaroth_Phase1",
       "bgmVictory": "BGM/Final_Liberation",
       "rewardPlat": 10000,
@@ -303,6 +302,7 @@
       "displayNameJp": "森の狼",
       "displayNameEn": "Forest Wolf",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 10,
@@ -327,6 +327,7 @@
       "displayNameJp": "ケンタウロス",
       "displayNameEn": "Centaur",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 20,
@@ -351,6 +352,7 @@
       "displayNameJp": "ミノタウロス",
       "displayNameEn": "Minotaur",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 30,
@@ -375,6 +377,7 @@
       "displayNameJp": "竜との対峙",
       "displayNameEn": "Dragon Confrontation",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 50,
@@ -394,11 +397,37 @@
       "descriptionJp": "",
       "descriptionEn": ""
     },
+    "balgas_training_battle": {
+      "stageId": "balgas_training_battle",
+      "displayNameJp": "戦士の哲学",
+      "displayNameEn": "Warrior's Philosophy",
+      "zoneType": "field",
+      "biome": "",
+      "bgmBattle": "BGM/Battle_Balgas_Training",
+      "bgmVictory": "BGM/Fanfare_Audience",
+      "rewardPlat": 0,
+      "enemies": [
+        {
+          "charaId": "sukutsu_balgas_training",
+          "level": 200,
+          "rarity": "Legendary",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": true,
+          "count": 1
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "「俺の足を一歩でも動かしてみせろ」——バルガスによる特別訓練。",
+      "descriptionEn": "'Try to make me move even one step.'—Special training by Balgas."
+    },
     "upper_existence_battle": {
       "stageId": "upper_existence_battle",
       "displayNameJp": "見えざる観客の供物",
       "displayNameEn": "Offering to the Unseen Audience",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "BGM/ProgressiveDance",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 15,
@@ -455,12 +484,13 @@
       "displayNameJp": "屑肉の洗礼",
       "displayNameEn": "Baptism of Scrap Meat",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "BGM/Battle_RankG_VoidOoze",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 5,
       "enemies": [
         {
-          "charaId": "putty",
+          "charaId": "sukutsu_void_ooze",
           "level": 15,
           "rarity": "Normal",
           "position": "random",
@@ -470,53 +500,34 @@
           "count": 3
         },
         {
-          "charaId": "putty",
+          "charaId": "sukutsu_void_ooze",
           "level": 20,
           "rarity": "Normal",
           "position": "random",
           "positionX": 0,
           "positionZ": 0,
-          "isBoss": false,
+          "isBoss": true,
           "count": 2
         }
       ],
       "gimmicks": [],
-      "descriptionJp": "「動く死体」から「屑肉」へ。これがお前の第一歩だ——バルガス",
-      "descriptionEn": "'From walking corpse to scrap meat. This is your first step.' —Balgas"
+      "descriptionJp": "混沌の落とし子たち——彼らのブレスは魂を蝕む。耐性なくして生き残れない。",
+      "descriptionEn": "Children of Chaos—their breath corrodes the soul. Without resistance, you cannot survive."
     },
     "rank_f_trial": {
       "stageId": "rank_f_trial",
-      "displayNameJp": "泥犬の牙",
-      "displayNameEn": "Fangs of the Mud Dog",
+      "displayNameJp": "霜牙の試練",
+      "displayNameEn": "Trial of the Frostfang",
       "zoneType": "field",
+      "biome": "Snow",
       "bgmBattle": "BGM/Battle_RankE_Ice",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 10,
       "enemies": [
         {
-          "charaId": "hound",
-          "level": 40,
-          "rarity": "Superior",
-          "position": "random",
-          "positionX": 0,
-          "positionZ": 0,
-          "isBoss": false,
-          "count": 1
-        },
-        {
-          "charaId": "hound",
+          "charaId": "sukutsu_frost_hound",
           "level": 45,
-          "rarity": "Superior",
-          "position": "random",
-          "positionX": 0,
-          "positionZ": 0,
-          "isBoss": false,
-          "count": 1
-        },
-        {
-          "charaId": "wolf",
-          "level": 50,
-          "rarity": "Superior",
+          "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
           "positionZ": 0,
@@ -524,15 +535,36 @@
           "count": 1
         }
       ],
-      "gimmicks": [],
-      "descriptionJp": "次元の狭間で変異した獣たち。群れで狩りをする本能は、異次元でも健在だ。",
-      "descriptionEn": "Beasts mutated in the dimensional void. Their pack hunting instincts remain intact even in other dimensions."
+      "gimmicks": [
+        {
+          "gimmickType": "elemental_scar",
+          "interval": 8.0,
+          "damage": 15,
+          "radius": 3,
+          "startDelay": 5.0,
+          "effectName": "explosion",
+          "soundName": "explosion",
+          "enableEscalation": true,
+          "escalationRate": 0.85,
+          "minInterval": 3.0,
+          "maxRadius": 8,
+          "radiusGrowthInterval": 30.0,
+          "enableItemDrop": true,
+          "itemDropChance": 0.15,
+          "blastRadius": 2,
+          "directHitChance": 0.4,
+          "explosionCount": 1
+        }
+      ],
+      "descriptionJp": "姿なき牙——見えぬ敵に怯えるな。透明視を得よ、さもなくば凍え死ぬのみ。極寒の氷原は容赦なくお前の耐性を蝕む。",
+      "descriptionEn": "The Invisible Fang—do not fear an unseen enemy. Gain true sight, or freeze to death. The frozen tundra mercilessly erodes your resistance."
     },
     "rank_e_trial": {
       "stageId": "rank_e_trial",
       "displayNameJp": "錆びついた英雄",
       "displayNameEn": "The Rusty Hero",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "BGM/Battle_Kain_Requiem",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 20,
@@ -554,32 +586,23 @@
     },
     "rank_d_trial": {
       "stageId": "rank_d_trial",
-      "displayNameJp": "銅貨稼ぎの洗礼",
-      "displayNameEn": "Copper Earner's Baptism",
+      "displayNameJp": "観客の代弁者",
+      "displayNameEn": "Voice of the Audience",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "BGM/Battle_RankD_Chaos",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 30,
       "enemies": [
         {
-          "charaId": "minotaur",
+          "charaId": "sukutsu_greed",
           "level": 150,
-          "rarity": "Superior",
+          "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
           "positionZ": 0,
           "isBoss": true,
           "count": 1
-        },
-        {
-          "charaId": "orc",
-          "level": 120,
-          "rarity": "Normal",
-          "position": "random",
-          "positionX": 0,
-          "positionZ": 0,
-          "isBoss": false,
-          "count": 2
         }
       ],
       "gimmicks": [
@@ -603,30 +626,31 @@
           "explosionCount": 1
         }
       ],
-      "descriptionJp": "観客の「注目」が初めて本格的に向けられる試練。その視線は時に物理的な力となって降り注ぐ。",
-      "descriptionEn": "The first trial where the audience's 'attention' truly focuses on you. Their gaze sometimes manifests as physical force."
+      "descriptionJp": "観客の「注目」に魅せられ、その力を取り込んだ傀儡——グリード。彼の轟音は観客の喝采、混沌は観客の狂気。",
+      "descriptionEn": "Greed—a puppet who absorbed the audience's power. His sonic blasts are their cheers, his chaos their madness."
     },
     "rank_c_trial": {
       "stageId": "rank_c_trial",
       "displayNameJp": "闘技場の鴉",
       "displayNameEn": "Ravens of the Coliseum",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "BGM/Battle_RankC_Heroic_Lament",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 50,
       "enemies": [
         {
-          "charaId": "orc_warrior",
+          "charaId": "sukutsu_crow_shadow",
           "level": 350,
-          "rarity": "Superior",
+          "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
           "positionZ": 0,
           "isBoss": false,
-          "count": 2
+          "count": 1
         },
         {
-          "charaId": "minotaur",
+          "charaId": "sukutsu_raven_blade",
           "level": 400,
           "rarity": "Legendary",
           "position": "random",
@@ -636,7 +660,7 @@
           "count": 1
         },
         {
-          "charaId": "centaur",
+          "charaId": "sukutsu_karasu_venom",
           "level": 450,
           "rarity": "Legendary",
           "position": "random",
@@ -655,6 +679,7 @@
       "displayNameJp": "虚無の処刑人",
       "displayNameEn": "Void Executioner Null",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "BGM/Battle_Null_Assassin",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 80,
@@ -679,6 +704,7 @@
       "displayNameJp": "黄金の戦鬼",
       "displayNameEn": "Golden War Demon",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "BGM/Battle_Shadow_Self",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 120,
@@ -703,6 +729,7 @@
       "displayNameJp": "屠竜者への道",
       "displayNameEn": "Path to Dragon Slayer",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "BGM/Battle_Balgas_Prime",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 200,
@@ -727,6 +754,7 @@
       "displayNameJp": "竜神との対峙",
       "displayNameEn": "Confrontation with the Dragon God",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "BGM/Battle_Astaroth_Phase1",
       "bgmVictory": "BGM/Final_Liberation",
       "rewardPlat": 10000,
@@ -751,6 +779,7 @@
       "displayNameJp": "森の狼",
       "displayNameEn": "Forest Wolf",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 10,
@@ -775,6 +804,7 @@
       "displayNameJp": "ケンタウロス",
       "displayNameEn": "Centaur",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 20,
@@ -799,6 +829,7 @@
       "displayNameJp": "ミノタウロス",
       "displayNameEn": "Minotaur",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 30,
@@ -823,6 +854,7 @@
       "displayNameJp": "竜との対峙",
       "displayNameEn": "Dragon Confrontation",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 50,
@@ -842,11 +874,37 @@
       "descriptionJp": "",
       "descriptionEn": ""
     },
+    "balgas_training_battle": {
+      "stageId": "balgas_training_battle",
+      "displayNameJp": "戦士の哲学",
+      "displayNameEn": "Warrior's Philosophy",
+      "zoneType": "field",
+      "biome": "",
+      "bgmBattle": "BGM/Battle_Balgas_Training",
+      "bgmVictory": "BGM/Fanfare_Audience",
+      "rewardPlat": 0,
+      "enemies": [
+        {
+          "charaId": "sukutsu_balgas_training",
+          "level": 200,
+          "rarity": "Legendary",
+          "position": "random",
+          "positionX": 0,
+          "positionZ": 0,
+          "isBoss": true,
+          "count": 1
+        }
+      ],
+      "gimmicks": [],
+      "descriptionJp": "「俺の足を一歩でも動かしてみせろ」——バルガスによる特別訓練。",
+      "descriptionEn": "'Try to make me move even one step.'—Special training by Balgas."
+    },
     "upper_existence_battle": {
       "stageId": "upper_existence_battle",
       "displayNameJp": "見えざる観客の供物",
       "displayNameEn": "Offering to the Unseen Audience",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "BGM/ProgressiveDance",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 15,
@@ -901,6 +959,7 @@
       "displayNameJp": "[DEBUG] 弱い敵",
       "displayNameEn": "[DEBUG] Weak Enemy",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 1,
@@ -925,6 +984,7 @@
       "displayNameJp": "[DEBUG] 強い敵",
       "displayNameEn": "[DEBUG] Strong Enemy",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 100,
@@ -949,6 +1009,7 @@
       "displayNameJp": "[DEBUG] 敵の群れ",
       "displayNameEn": "[DEBUG] Enemy Horde",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 50,
@@ -973,6 +1034,7 @@
       "displayNameJp": "[DEBUG] ギミックテスト",
       "displayNameEn": "[DEBUG] Gimmick Test",
       "zoneType": "field",
+      "biome": "",
       "bgmBattle": "",
       "bgmVictory": "BGM/Fanfare_Audience",
       "rewardPlat": 10,

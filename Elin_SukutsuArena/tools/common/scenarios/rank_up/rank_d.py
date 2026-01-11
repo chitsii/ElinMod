@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-10_rank_up_D.md - Rank D 昇格試験『銅貨稼ぎの洗礼』
-観客の介入が本格化する戦い
+10_rank_up_D.md - Rank D 昇格試験『観客の代弁者』
+観客の介入が本格化する戦い - グリードとの対決
 """
 
 from arena_drama_builder import ArenaDramaBuilder
@@ -10,8 +10,8 @@ from flag_definitions import Keys, Rank, Actors, QuestIds
 
 def define_rank_up_D(builder: DramaBuilder):
     """
-    Rank D 昇格試験「銅貨稼ぎの洗礼」
-    シナリオ: 10_rank_up_D.md
+    Rank D 昇格試験「観客の代弁者」
+    シナリオ: 10_rank_up_D.md - グリードとの対決
     """
     # アクター登録
     pc = builder.register_actor(Actors.PC, "あなた", "You")
@@ -46,11 +46,11 @@ def define_rank_up_D(builder: DramaBuilder):
         .say("lily_1", "……お疲れ様でした。カインさんの魂を巡る選択、興味深く拝見させていただきました。", "", actor=lily) \
         .say("lily_2", "さて、次はRank D『銅貨稼ぎ（Copper Earner）』への昇格試験です。", "", actor=lily) \
         .say("lily_3", "ここからは、ただ敵を倒すだけでは不十分。観客の皆様を『満足』させる必要があります。", "", actor=lily) \
-        .say("lily_4", "彼らが退屈すれば、あなたに『プレゼント』が降ってきます。", "", actor=lily) \
+        .say("lily_4", "彼らが退屈すれば、あなたに『プレゼント』が投げ込まれます。", "", actor=lily) \
         .say("narr_3", "（彼女は指を鳴らす。すると、ロビーの天井から突如、石塊が落下してきた。）", "", actor=pc) \
         .shake() \
         .say("lily_5", "……ふふ、驚きました？ これが『観客の介入』です。", "", actor=lily) \
-        .say("lily_6", "戦闘中、あなたの頭上から様々な物が降ってきます。石、薬、武器……時には爆発物も。", "", actor=lily) \
+        .say("lily_6", "戦闘中、高次元から爆風とともに様々な物が投げ込まれます。石、薬、武器……次元を超えた衝撃も伴います。", "", actor=lily) \
         .say("lily_7", "それらを避けながら、あるいは利用しながら戦う……それがRank Dの『芸』ですよ。", "", actor=lily)
 
     # プレイヤーの選択肢1
@@ -64,7 +64,7 @@ def define_rank_up_D(builder: DramaBuilder):
         .jump(scene2)
 
     builder.step(react1_items) \
-        .say("lily_r2", "ランダムです。ポーションが降ってくることもあれば、鉄の塊が頭に直撃することも。……運を祈ってくださいね？", "", actor=lily) \
+        .say("lily_r2", "何が来るかは分かりません。ポーションが爆風とともに飛んでくることもあれば、鉄の塊が直撃することも。……運を祈ってくださいね？", "", actor=lily) \
         .jump(scene2)
 
     builder.step(react1_silent) \
@@ -110,12 +110,13 @@ def define_rank_up_D(builder: DramaBuilder):
     builder.step(battle_start) \
         .play_bgm("BGM/Battle_Audience_Chaos") \
         .say("narr_5", "（闘技場の門を潜ると、既に観客たちの熱気が空気を震わせている。）", "", actor=pc) \
-        .say("narr_6", "（砂地の中央には、今回の対戦相手『次元の剣闘士』が三体、武器を構えて待ち構えていた。）", "", actor=pc) \
+        .say("narr_6", "（砂地の中央に立つのは、ただ一人の男。だが、その眼は虚ろで、口元には不自然な笑みが張り付いている。）", "", actor=pc) \
+        .say("narr_6b", "（男の名は『グリード』——かつて『闘技場の鴉』の一員だったが、観客の力に魅せられ、自らその傀儡となった者。）", "", actor=pc) \
         .say("narr_7", "（リリィの声が、魔術的な拡声によって会場全体に響き渡る。）", "", actor=pc) \
         .focus_chara(Actors.LILY) \
         .say("lily_ann1", "……皆様、本日のメインディッシュです！", "", actor=lily) \
-        .say("lily_ann2", "新たな『銅貨稼ぎ』候補による、命懸けのサーカスをお楽しみください！", "", actor=lily) \
-        .say("narr_8", "（戦いが始まった瞬間、頭上の虚空が紫色に光り、何かが降ってくる音が響いた……！）", "", actor=pc) \
+        .say("lily_ann2", "『観客の代弁者』グリードと、新たな『銅貨稼ぎ』候補の命懸けの舞踏をお楽しみください！", "", actor=lily) \
+        .say("narr_8", "（グリードの口から、観客の歓声を模した轟音が響く。戦いが始まった瞬間、頭上の虚空が紫色に光った……！）", "", actor=pc) \
         .shake() \
         .start_battle_by_stage("rank_d_trial", master_id="sukutsu_arena_master") \
         .finish()

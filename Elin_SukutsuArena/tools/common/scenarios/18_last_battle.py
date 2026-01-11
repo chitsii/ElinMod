@@ -17,7 +17,7 @@ def define_last_battle(builder: DramaBuilder):
     balgas = builder.register_actor(Actors.BALGAS, "バルガス", "Balgas")
     lily = builder.register_actor(Actors.LILY, "リリィ", "Lily")
     zek = builder.register_actor(Actors.ZEK, "ゼク", "Zek")
-    nul = builder.register_actor("nul", "Nul", "Nul")
+    nul = builder.register_actor(Actors.NUL, "Nul", "Nul")
 
     # ラベル定義
     main = builder.label("main")
@@ -44,7 +44,7 @@ def define_last_battle(builder: DramaBuilder):
         .say("narr_2", "（決戦を翌朝に控えた夜、焚き火の代わりに、剥き出しの魔力回路が淡い青光を放っている。）", "", actor=pc) \
         .focus_chara(Actors.BALGAS) \
         .say("narr_3", "（バルガスは大剣を研ぎ、リリィは静かに祈りを捧げ、ゼクは『因果の断片（キューブ）』の最終調整を行っていた。）", "", actor=pc) \
-        .say("balgas_1", "……ケッ。引退？ ああ、確かに言ったな。……だが、お前が俺の命を救ったあの日、俺の中で何かが変わっちまったんだよ。", "", actor=balgas) \
+        .say("balgas_1", "……引退？ ああ、確かに言ったな。……だが、お前が俺の命を救ったあの日、俺の中で何かが変わっちまったんだよ。", "", actor=balgas) \
         .say("balgas_2", "カインを失って以来、俺はずっと『死に場所』を探してた。だが、お前は俺にそれを許さなかった。……なら、せめて最後くらい、お前の『生きる場所』を作る手伝いをさせろ。", "", actor=balgas) \
         .say("balgas_3", "それに……引退した老いぼれが、弟子の晴れ舞台を客席から眺めてるだけなんて、柄じゃねえんだよ。俺は戦士だ。最期まで、剣を握って立ってる方が性に合ってる。", "", actor=balgas) \
         .focus_chara(Actors.LILY) \
@@ -77,24 +77,31 @@ def define_last_battle(builder: DramaBuilder):
         .play_bgm("BGM/Ominous_Suspense_02") \
         .say("narr_nul1", "（王座の間へ向かう途中、一行は崩壊しかけた回廊で、倒れている存在を発見する。）", "", actor=pc) \
         .say("narr_nul2", "（それは暗殺人形・Nul。システムに背いた罰として、アスタロトに「削除」されかけていた。）", "", actor=pc) \
-        .say("nul_1", "……あなた、ですか。……システムを、拒絶した……人間。", "", actor=nul) \
+        .focus_chara(Actors.BALGAS) \
+        .say("balgas_nul0", "……待て！ あれはNulだ。罠かもしれねえ、近づくな！", "", actor=balgas) \
+        .say("narr_nul2b", "（バルガスが剣を構え、一行の前に立ちはだかる。）", "", actor=pc) \
+        .say("nul_1", "（Nul）「……あなた、ですか。……システムを、拒絶した……人間。……私は……もう、戦えない。」", "", actor=pc) \
         .focus_chara(Actors.LILY) \
         .say("lily_nul1", "Nul……！ あなた、何があったの？", "", actor=lily) \
-        .say("nul_2", "……私は、思い出して、しまった。……『私』が、何だったのかを。", "", actor=nul) \
+        .say("nul_2", "（Nul）「……私は、思い出して、しまった。……『私』が、何だったのかを。」", "", actor=pc) \
         .say("narr_nul3", "（Nulの目から、光の粒子が零れ落ちる——涙のように。）", "", actor=pc) \
         .play_bgm("BGM/Emotional_Sorrow_1") \
-        .say("nul_fb1", "……私は、かつて冒険者だった。名前は……もう、思い出せない。仲間がいた。守りたい人がいた。このアリーナに挑んで……そして、負けた。", "", actor=nul) \
-        .say("nul_fb2", "アスタロト様は、私を『素材』にした。神格を人工的に作り出す実験——**『神の孵化場』**計画の、実験体に。", "", actor=nul) \
-        .say("nul_fb3", "このアリーナの本当の目的……それは、娯楽でも、戦士の育成でもない。挑戦者の魂を極限まで練磨し、『神格』に至らせること。そして、その力をアスタロト様が吸収し……新しい世界を創造すること。", "", actor=nul) \
-        .say("nul_fb4", "私は失敗作。神になれなかった、空っぽの人形。だから『Null』——『無』という名前を与えられた。", "", actor=nul) \
-        .say("nul_3", "……あなたは、アスタロト様の『最高傑作』になるはずだった。神格に最も近い存在……だから、あの方はあなたを『吸収』しようとしている。", "", actor=nul) \
-        .say("nul_4", "でも……あなたは『選んで』ここにいる。イルヴァに帰れるのに、ここに留まった。それは……アスタロト様の計算に、なかったこと。", "", actor=nul) \
+        .say("nul_fb1", "（Nul）「……私は、かつて冒険者だった。名前は……もう、思い出せない。仲間がいた。守りたい人がいた。このアリーナに挑んで……そして、負けた。」", "", actor=pc) \
+        .say("nul_fb2", "（Nul）「アスタロト様は、私を『素材』にした。神格を人工的に作り出す実験——**『神の孵化場』**計画の、実験体に。」", "", actor=pc) \
         .focus_chara(Actors.BALGAS) \
-        .say("balgas_nul", "……『神の孵化場』だと？ クソが……俺たちは、最初からそのための『餌』だったってのか。", "", actor=balgas) \
+        .say("balgas_nul1", "……！ 『神の孵化場』だと……？", "", actor=balgas) \
+        .say("narr_nul3b", "（バルガスの表情が凍りつく。その言葉には、覚えがあった。ゼクが語っていた、あの荒唐無稽な話。）", "", actor=pc) \
+        .say("balgas_nul2", "……ゼクの野郎が言ってたことは、本当だったのか……？ 俺は、あいつの言葉は闇商人の戯言だと思っていた。", "", actor=balgas) \
+        .say("nul_fb3", "（Nul）「このアリーナの本当の目的……それは、娯楽でも、戦士の育成でもない。挑戦者の魂を極限まで練磨し、『神格』に至らせること。そして、その力をアスタロト様が吸収し……新しい世界を創造すること。」", "", actor=pc) \
+        .say("nul_fb4", "（Nul）「私は失敗作。神になれなかった、空っぽの人形。だから『Null』——『無』という名前を与えられた。」", "", actor=pc) \
+        .say("balgas_nul3", "……お前もあのゼクと同じことを言うのか。だが、お前が嘘をつく理由がねえ。", "", actor=balgas) \
+        .say("balgas_nul4", "……認めたくなかったが、本当だったんだな。俺たちは、最初からそのための『餌』だったってのか。", "", actor=balgas) \
+        .say("nul_3", "（Nul）「……あなたは、アスタロト様の『最高傑作』になるはずだった。神格に最も近い存在……だから、あの方はあなたを『吸収』しようとしている。」", "", actor=pc) \
+        .say("nul_4", "（Nul）「でも……あなたは『選んで』ここにいる。イルヴァに帰れるのに、ここに留まった。それは……アスタロト様の計算に、なかったこと。」", "", actor=pc) \
         .focus_chara(Actors.LILY) \
         .say("lily_nul2", "……アスタロト様。あなたは、ずっとそんなことを……。", "", actor=lily) \
-        .say("nul_5", "……お願い。あの方を……止めて。私の中にいた『誰か』が……ずっと、それを望んでいた。", "", actor=nul) \
-        .say("nul_6", "……ありがとう。あなたのおかげで……私は、最後に『思い出す』ことができた。私には……守りたい人が、いたんだって。", "", actor=nul) \
+        .say("nul_5", "（Nul）「……お願い。あの方を……止めて。私の中にいた『誰か』が……ずっと、それを望んでいた。」", "", actor=pc) \
+        .say("nul_6", "（Nul）「……ありがとう。あなたのおかげで……私は、最後に『思い出す』ことができた。私には……守りたい人が、いたんだって。」", "", actor=pc) \
         .shake() \
         .say("narr_nul4", "（Nulの体が完全に光となって消えていく。）", "", actor=pc) \
         .jump(act2)
@@ -108,10 +115,10 @@ def define_last_battle(builder: DramaBuilder):
         .say("narr_6", "（そこは、観客席すら存在しない『絶対的な静寂』の空間。アスタロトは、巨大な竜の翼を休め、孤独な王座に腰掛けていた。）", "", actor=pc) \
         .focus_chara(Actors.ASTAROTH) \
         .say("pc_asta", "……『神の孵化場』。それがこのアリーナの正体か、アスタロト。", "", actor=pc) \
-        .say("astaroth_0", "……Nulから聞いたのか。あの失敗作、最後に余計なことを。", "", actor=astaroth) \
-        .say("astaroth_1", "……よく来た。バグ（不具合）として生まれ、ついには世界を揺るがす質量となった者よ。", "", actor=astaroth) \
-        .say("astaroth_2", "ゼク、リリィ、バルガス……。敗残兵と裏切り者の手を借りて、この私を終わらせに来たか。", "", actor=astaroth) \
-        .say("astaroth_3", "だが、知るがいい。私の言葉は『法』であり、私の吐息は『消去』である。お前たちが何を積み上げようと、私が『無』と言えば、それは無になるのだ。", "", actor=astaroth) \
+        .say("astaroth_0", "（アスタロト）「……Nulから聞いたのか。あの失敗作、最後に余計なことを。」", "", actor=pc) \
+        .say("astaroth_1", "（アスタロト）「……よく来た。バグ（不具合）として生まれ、ついには世界を揺るがす質量となった者よ。」", "", actor=pc) \
+        .say("astaroth_2", "（アスタロト）「ゼク、リリィ、バルガス……。敗残兵と裏切り者の手を借りて、この私を終わらせに来たか。」", "", actor=pc) \
+        .say("astaroth_3", "（アスタロト）「だが、知るがいい。私の言葉は『法』であり、私の吐息は『消去』である。お前たちが何を積み上げようと、私が『無』と言えば、それは無になるのだ。」", "", actor=pc) \
         .jump(act3)
 
     # ========================================
@@ -139,8 +146,8 @@ def define_last_battle(builder: DramaBuilder):
     builder.step(act4) \
         .focus_chara(Actors.ASTAROTH) \
         .say("narr_12", "（権能を封じられたアスタロトの瞳に、初めて『驚愕』と『喜び』が混じる。）", "", actor=pc) \
-        .say("astaroth_4", "……ハハッ！ 面白い！ システムの保護なしに、この私と殴り合おうというのか！", "", actor=astaroth) \
-        .say("astaroth_5", "よかろう、黄金の戦鬼よ！ 私が背負う『一億の絶望』と、お前が背負う『一億の希望』……どちらが真の理か、ここで決めようではないか！", "", actor=astaroth) \
+        .say("astaroth_4", "（アスタロト）「……ハハッ！ 面白い！ システムの保護なしに、この私と殴り合おうというのか！」", "", actor=pc) \
+        .say("astaroth_5", "（アスタロト）「よかろう、黄金の戦鬼よ！ 私が背負う『一億の絶望』と、お前が背負う『一億の希望』……どちらが真の理か、ここで決めようではないか！」", "", actor=pc) \
         .shake() \
         .set_flag("sukutsu_is_quest_battle_result", 1) \
         .set_flag("sukutsu_quest_battle", 3) \
@@ -153,8 +160,8 @@ def define_last_battle(builder: DramaBuilder):
     builder.step(act5) \
         .play_bgm("BGM/Victory_Epilogue") \
         .say("narr_14", "（激闘の末、アスタロトの身体が崩れ始める。王座は砕け、アリーナの外壁は剥がれ落ち、そこから美しい『本当の星空』が姿を現した。）", "", actor=pc) \
-        .say("astaroth_6", "……見事だ。私は……ただ、この閉じられた孵化器を守るだけの、古い部品に過ぎなかったのかもしれないな。", "", actor=astaroth) \
-        .say("astaroth_7", "……リリィ、バルガス、ゼク。……そして新しき王よ。この世界の重さを、お前たちが分かち合うというのなら……私は、安心して土へ還ろう。", "", actor=astaroth) \
+        .say("astaroth_6", "（アスタロト）「……見事だ。私は……ただ、この閉じられた孵化器を守るだけの、古い部品に過ぎなかったのかもしれないな。」", "", actor=pc) \
+        .say("astaroth_7", "（アスタロト）「……リリィ、バルガス、ゼク。……そして新しき王よ。この世界の重さを、お前たちが分かち合うというのなら……私は、安心して土へ還ろう。」", "", actor=pc) \
         .say("narr_15", "（アスタロトが柔らかな光となって霧散し、そのレベル（重さ）が残された四人へと分散して吸収されていく。）", "", actor=pc) \
         .focus_chara(Actors.ZEK) \
         .say("zek_12", "……やれやれ。これほどの損失（コスト）を出して、得られた利益は『自由』だけですか。……悪くない取引でしたね。", "", actor=zek) \
@@ -283,8 +290,8 @@ def add_last_battle_result_steps(builder: ArenaDramaBuilder, victory_label: str,
         .set_flag("sukutsu_quest_battle", 0) \
         .play_bgm("BGM/Victory_Epilogue") \
         .say("narr_v1", "（激闘の末、アスタロトの身体が崩れ始める。王座は砕け、アリーナの外壁は剥がれ落ち、そこから美しい『本当の星空』が姿を現した。）", "", actor=pc) \
-        .say("astaroth_v1", "……見事だ。私は……ただ、この閉じられた孵化器を守るだけの、古い部品に過ぎなかったのかもしれないな。", "", actor=astaroth) \
-        .say("astaroth_v2", "……リリィ、バルガス、ゼク。……そして新しき王よ。この世界の重さを、お前たちが分かち合うというのなら……私は、安心して土へ還ろう。", "", actor=astaroth) \
+        .say("astaroth_v1", "（アスタロト）「……見事だ。私は……ただ、この閉じられた孵化器を守るだけの、古い部品に過ぎなかったのかもしれないな。」", "", actor=pc) \
+        .say("astaroth_v2", "（アスタロト）「……リリィ、バルガス、ゼク。……そして新しき王よ。この世界の重さを、お前たちが分かち合うというのなら……私は、安心して土へ還ろう。」", "", actor=pc) \
         .say("narr_v2", "（アスタロトが柔らかな光となって霧散し、そのレベル（重さ）が残された四人へと分散して吸収されていく。）", "", actor=pc) \
         .say("sys_title", "【システム】アスタロトの力の一部を吸収しました！全ステータス+10、全耐性+10 を獲得！", "") \
         .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantLastBattleBonus();") \
@@ -299,7 +306,7 @@ def add_last_battle_result_steps(builder: ArenaDramaBuilder, victory_label: str,
         .set_flag("sukutsu_quest_battle", 0) \
         .play_bgm("BGM/Lobby_Normal") \
         .say("narr_d1", "（アスタロトの圧倒的な力の前に、あなたは膝をついた。）", "", actor=pc) \
-        .say("astaroth_d1", "……まだ、足りないな。お前の中に宿る可能性は、未だ開花していない。", "", actor=astaroth) \
-        .say("astaroth_d2", "……出直して来い。私は、お前が『完成形』に至るまで待っていよう。", "", actor=astaroth) \
+        .say("astaroth_d1", "（アスタロト）「……まだ、足りないな。お前の中に宿る可能性は、未だ開花していない。」", "", actor=pc) \
+        .say("astaroth_d2", "（アスタロト）「……出直して来い。私は、お前が『完成形』に至るまで待っていよう。」", "", actor=pc) \
         .say("narr_d2", "（あなたは闘技場の入口へと戻された。再び挑戦するには、さらなる鍛錬が必要だ……。）", "", actor=pc) \
         .finish()

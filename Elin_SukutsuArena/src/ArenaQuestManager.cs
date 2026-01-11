@@ -496,6 +496,27 @@ namespace Elin_SukutsuArena
         }
 
         /// <summary>
+        /// デバッグ: 全クエストを完了済みにする
+        /// </summary>
+        public void DebugCompleteAllQuests()
+        {
+            Debug.Log("[ArenaQuest] DEBUG: Completing all quests...");
+            int count = 0;
+            foreach (var quest in allQuests)
+            {
+                if (!IsQuestCompleted(quest.QuestId))
+                {
+                    MarkQuestCompleted(quest.QuestId);
+                    count++;
+                }
+            }
+            // フェーズを最終段階に
+            SetCurrentPhase(StoryPhase.Climax);
+            Debug.Log($"[ArenaQuest] DEBUG: Completed {count} quests, set phase to Climax");
+            OnQuestStateChanged?.Invoke();
+        }
+
+        /// <summary>
         /// デバッグ: 全クエスト状態をログ出力
         /// </summary>
         public void DebugLogQuestState()

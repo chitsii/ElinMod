@@ -489,5 +489,195 @@ namespace Elin_SukutsuArena
             Msg.Say("【虚空の王の力】全ステータス+10、全耐性+10 を獲得！");
             Debug.Log("[SukutsuArena] Granted Last Battle bonus: All stats+10, All resistances+10");
         }
+
+        /// <summary>
+        /// マクマ（ランクB後イベント）報酬: 関係値+10
+        /// </summary>
+        public static void GrantMakumaReward()
+        {
+            var storage = Core.ArenaContext.I?.Storage;
+            if (storage == null) return;
+
+            // リリィとの関係値+10
+            string lilyKey = "chitsii.arena.rel.lily";
+            int lilyRel = storage.GetInt(lilyKey, 30);
+            storage.SetInt(lilyKey, System.Math.Min(100, lilyRel + 10));
+
+            // ゼクとの関係値+10
+            string zekKey = "chitsii.arena.rel.zek";
+            int zekRel = storage.GetInt(zekKey, 30);
+            storage.SetInt(zekKey, System.Math.Min(100, zekRel + 10));
+
+            Debug.Log($"[SukutsuArena] Granted Makuma reward: Lily rel +10, Zek rel +10");
+        }
+
+        /// <summary>
+        /// マクマ2（ランクA前イベント）報酬: コインとプラチナ
+        /// </summary>
+        public static void GrantMakuma2Reward()
+        {
+            var pc = EClass.pc;
+            if (pc == null) return;
+
+            // 小さなコイン30枚
+            for (int i = 0; i < 30; i++)
+            {
+                pc.Pick(ThingGen.Create("coin"));
+            }
+
+            // プラチナコイン15枚
+            for (int i = 0; i < 15; i++)
+            {
+                pc.Pick(ThingGen.Create("plat"));
+            }
+
+            Msg.Say("【虚空の心臓】小さなコイン30枚、プラチナコイン15枚 を獲得！");
+            Debug.Log("[SukutsuArena] Granted Makuma2 reward: 30 coins, 15 plat");
+        }
+
+        /// <summary>
+        /// ゼクの共鳴瓶すり替えイベント完了処理
+        /// </summary>
+        public static void CompleteZekStealBottleQuest()
+        {
+            try
+            {
+                ArenaQuestManager.Instance.CompleteQuest("05_2_zek_steal_bottle");
+                Debug.Log("[SukutsuArena] Completed Zek Steal Bottle quest");
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"[SukutsuArena] Error completing Zek Steal Bottle quest: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// バルガス訓練クエスト完了処理
+        /// </summary>
+        public static void CompleteBalgasTrainingQuest()
+        {
+            try
+            {
+                ArenaQuestManager.Instance.CompleteQuest("09_balgas_training");
+
+                // 関係値+20
+                var storage = Core.ArenaContext.I?.Storage;
+                if (storage != null)
+                {
+                    string balgasKey = "chitsii.arena.rel.balgas";
+                    int balgasRel = storage.GetInt(balgasKey, 20);
+                    storage.SetInt(balgasKey, System.Math.Min(100, balgasRel + 20));
+                }
+
+                // ステータスボーナス付与
+                GrantBalgasTrainingBonus();
+
+                Debug.Log("[SukutsuArena] Completed Balgas Training quest");
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"[SukutsuArena] Error completing Balgas Training quest: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// マクマ2: 共鳴瓶告白 - リリィに正直に話した
+        /// </summary>
+        public static void Makuma2ConfessToLily()
+        {
+            var storage = Core.ArenaContext.I?.Storage;
+            if (storage != null)
+            {
+                storage.SetInt("chitsii.arena.rel.lily", 20);
+                storage.SetInt("chitsii.arena.lily_trust_rebuild", 1);
+            }
+            // カルマ+5
+            EClass.player.ModKarma(5);
+            Debug.Log("[SukutsuArena] Makuma2: Confessed to Lily (Karma+5, Lily rel=20)");
+        }
+
+        /// <summary>
+        /// マクマ2: 共鳴瓶告白 - ゼクのせいにした
+        /// </summary>
+        public static void Makuma2BlameZek()
+        {
+            // 関係値変更なし
+            Debug.Log("[SukutsuArena] Makuma2: Blamed Zek");
+        }
+
+        /// <summary>
+        /// マクマ2: 共鳴瓶告白 - 関与を否定した
+        /// </summary>
+        public static void Makuma2DenyInvolvement()
+        {
+            var storage = Core.ArenaContext.I?.Storage;
+            if (storage != null)
+            {
+                storage.SetInt("chitsii.arena.rel.lily", 0);
+                storage.SetInt("chitsii.arena.lily_hostile", 1);
+            }
+            // カルマ-30
+            EClass.player.ModKarma(-30);
+            Debug.Log("[SukutsuArena] Makuma2: Denied involvement (Karma-30, Lily rel=0, hostile)");
+        }
+
+        /// <summary>
+        /// マクマ2: カインの魂告白 - 正直に話した
+        /// </summary>
+        public static void Makuma2ConfessAboutKain()
+        {
+            var storage = Core.ArenaContext.I?.Storage;
+            if (storage != null)
+            {
+                storage.SetInt("chitsii.arena.rel.balgas", 0);
+                storage.SetInt("chitsii.arena.balgas_trust_broken", 1);
+            }
+            // カルマ-20
+            EClass.player.ModKarma(-20);
+            Debug.Log("[SukutsuArena] Makuma2: Confessed about Kain (Karma-20, Balgas rel=0)");
+        }
+
+        /// <summary>
+        /// マクマ2: カインの魂告白 - 嘘をついた
+        /// </summary>
+        public static void Makuma2LieAboutKain()
+        {
+            var storage = Core.ArenaContext.I?.Storage;
+            if (storage != null)
+            {
+                storage.SetInt("chitsii.arena.rel.balgas", 30);
+            }
+            Debug.Log("[SukutsuArena] Makuma2: Lied about Kain (Balgas rel=30)");
+        }
+
+        /// <summary>
+        /// マクマ2: 最終選択 - 信頼を選んだ
+        /// </summary>
+        public static void Makuma2ChooseTrust()
+        {
+            var storage = Core.ArenaContext.I?.Storage;
+            if (storage != null)
+            {
+                string balgasKey = "chitsii.arena.rel.balgas";
+                int balgasRel = storage.GetInt(balgasKey, 30);
+                storage.SetInt(balgasKey, System.Math.Min(100, balgasRel + 10));
+            }
+            Debug.Log("[SukutsuArena] Makuma2: Chose trust (Balgas rel+10)");
+        }
+
+        /// <summary>
+        /// マクマ2: 最終選択 - 知識を選んだ
+        /// </summary>
+        public static void Makuma2ChooseKnowledge()
+        {
+            var storage = Core.ArenaContext.I?.Storage;
+            if (storage != null)
+            {
+                string balgasKey = "chitsii.arena.rel.balgas";
+                int balgasRel = storage.GetInt(balgasKey, 30);
+                storage.SetInt(balgasKey, System.Math.Max(0, balgasRel - 5));
+            }
+            Debug.Log("[SukutsuArena] Makuma2: Chose knowledge (Balgas rel-5)");
+        }
     }
 }

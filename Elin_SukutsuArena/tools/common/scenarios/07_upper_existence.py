@@ -40,10 +40,10 @@ def define_upper_existence(builder: ArenaDramaBuilder):
         .focus_chara(Actors.BALGAS) \
         .say("balgas_1", "……おい、耳を澄ませ。あの連中の笑い声が聞こえるか？", "", actor=balgas) \
         .say("balgas_2", "ランクDからは、連中はお前をただ観るだけじゃ満足しねえ。", "", actor=balgas) \
-        .say("balgas_3", "お前の踊りが退屈だったり、逆に『もっと血が見たい』と思われりゃ……上から『プレゼント』が降ってくるぜ。", "", actor=balgas) \
+        .say("balgas_3", "お前の踊りが退屈だったり、逆に『もっと血が見たい』と思われりゃ……次元の向こうから『プレゼント』が投げ込まれるぜ。", "", actor=balgas) \
         .say("narr_3", "（彼は武器を叩き、続ける。）", "", actor=pc) \
         .say("balgas_4", "ヤジ（物理的な嫌がらせ）だ。", "", actor=balgas) \
-        .say("balgas_5", "空から降ってくるのは、ポーションかもしれねえし、鈍器かもしれねえ。あるいは地上の物理法則を無視した『異次元のゴミ』だ。", "", actor=balgas) \
+        .say("balgas_5", "爆風とともに飛んでくるのは、ポーションかもしれねえし、鈍器かもしれねえ。あるいは地上の物理法則を無視した『異次元のゴミ』だ。", "", actor=balgas) \
         .say("balgas_6", "敵だけを見てりゃ、頭を割られて終わりだぞ。", "", actor=balgas) \
         .say("balgas_7", "空の機嫌も伺いながら戦え……クソッタレな商売だろう？", "", actor=balgas) \
         .jump(choice1)
@@ -78,7 +78,7 @@ def define_upper_existence(builder: ArenaDramaBuilder):
         .say("lily_2", "本日のメインディッシュは、新たな『銅貨稼ぎ』……期待の新人による、命の切り売りでございます！", "", actor=lily) \
         .say("obs_1", "（観客の歓声と拍手のような音が響く。）", "", actor=pc) \
         .say("lily_3", "さあ、皆様。もしこの闘士の戦いぶりがお気に召さない、あるいは『もっと刺激が欲しい』と感じられましたら……", "", actor=lily) \
-        .say("lily_4", "どうぞ、お手元の『慈悲』を投げ込んであげてくださいな！", "", actor=lily) \
+        .say("lily_4", "どうぞ、お手元の『慈悲』を……次元を超えて投げ込んであげてくださいな！", "", actor=lily) \
         .say("obs_2", "（観客の笑い声、何かが飛んでくる音。）", "", actor=pc) \
         .jump(scene3)
 

@@ -32,7 +32,8 @@ class Actors:
     LILY = "sukutsu_receptionist"       # リリィ（受付嬢）
     BALGAS = "sukutsu_arena_master"     # バルガス（アリーナマスター）
     ZEK = "sukutsu_shady_merchant"      # ゼク（怪しい商人）
-    ASTAROTH = "sukutsu_grandmaster"    # アスタロト（グランドマスター）
+    ASTAROTH = "sukutsu_astaroth"       # アスタロト（グランドマスター）
+    NUL = "sukutsu_null"                # Nul（暗殺人形）
 
 
 # ============================================================================

@@ -60,15 +60,16 @@ def define_vs_balgas(builder: DramaBuilder):
     builder.step(scene1) \
         .focus_chara(Actors.BALGAS) \
         .say("balgas_1", "……おい、黄金の戦鬼。お前はもう、俺の手の届かねえ高みへ行こうとしてやがる。", "", actor=balgas) \
-        .say("balgas_2", "だがな、アスタロト……あのドラゴンの首を獲るには、圧倒的な『暴力』だけじゃ足りねえ。", "", actor=balgas) \
-        .say("balgas_3", "俺を、この『全盛期の俺』を越えてみせろ。それができなきゃ、お前はただの強いだけの餌だ。", "", actor=balgas) \
+        .say("balgas_2", "だがな、それでもアスタロト……あの竜神は、別格なんだ。", "", actor=balgas) \
+        .say("balgas_2_1", "だからこそ、ここで俺が試金石になってやる。おまえを倒すために、対戦させてもらう。冗談じゃねえぞ。", "", actor=balgas) \
+        .say("balgas_3", "俺を、この『全盛期の俺』を越えてみせろ。それができなきゃ、お前は犠牲になっちまうだけだ。", "", actor=balgas) \
         .say("narr_4", "（バルガスは一気に薬を煽った。）", "", actor=pc) \
         .shake() \
         .say("narr_5", "（瞬間、彼の全身を覆っていた古い傷跡が消え、萎みかけていた筋肉が鋼のように膨れ上がる。）", "", actor=pc) \
         .say("narr_6", "（白髪は黒々とした輝きを取り戻し、放たれる闘気だけでアリーナの石壁に亀裂が入った。）", "", actor=pc) \
         .shake() \
-        .say("balgas_4", "……あぁ、いい気分だ。これなら、一度くらいはお前を本気で殺しにいける。", "", actor=balgas) \
-        .say("balgas_5", "来い！ 手加減は無しだ！ 俺を殺すつもりで打ってこい！", "", actor=balgas) \
+        .say("balgas_4", "……あぁ、いい気分だ。これなら、一度くらいはお前を本気で『殺し』にいける。", "", actor=balgas) \
+        .say("balgas_5", "来い！ 手加減は無しだ！ 殺すつもりで打ってこい！", "", actor=balgas) \
         .jump(scene1_5)
 
     # ========================================
@@ -76,7 +77,7 @@ def define_vs_balgas(builder: DramaBuilder):
     # ========================================
     builder.step(scene1_5) \
         .play_bgm("BGM/Emotional_Sorrow_1") \
-        .say("narr_fb1", "（——35年前、ティリス世界。）", "", actor=pc) \
+        .say("narr_fb1", "（——35年前、ノースティリス。）", "", actor=pc) \
         .say("narr_fb2", "（若き日のバルガスが、傭兵団「鉄血団」を率いていた頃の記憶。）", "", actor=pc) \
         .say("balgas_fb1", "おい、ガキ。俺の懐に手を突っ込もうってのか？", "", actor=balgas) \
         .say("narr_fb3", "（10歳の孤児——後のカインは、バルガスの財布を盗もうとして捕まった。痩せこけた体、汚れた衣服、しかしその目だけは諦めていなかった。）", "", actor=pc) \
@@ -84,7 +85,7 @@ def define_vs_balgas(builder: DramaBuilder):
         .say("balgas_fb2", "……盗むしかなかったんだろう。なら、正しく戦う術を教えてやる。明日から俺の部下だ。飯は食わせてやる。その代わり、死ぬほど鍛えてやるからな。", "", actor=balgas) \
         .say("narr_fb4", "（——18年後。カインは鉄血団の副団長となった。バルガスの右腕として、誰よりも信頼された戦士。）", "", actor=pc) \
         .say("kain_fb2", "団長、次の依頼……『禁断の遺跡』の調査だそうです。報酬は破格ですが、嫌な予感がします。", "", actor=pc) \
-        .say("balgas_fb3", "……ハッ、嫌な予感ってのは当たるもんだ。だが、団員たちの冬越しの金がいる。行くしかねえだろ。", "", actor=balgas) \
+        .say("balgas_fb3", "……嫌な予感ってのは当たるもんだ。だが、団員たちの冬越しの金がいる。行くしかねえだろ。", "", actor=balgas) \
         .say("kain_fb3", "……分かりました。俺がしんがりを務めます。", "", actor=pc) \
         .say("balgas_fb4", "馬鹿野郎。お前は俺の後継者だ。死ぬんじゃねえぞ。", "", actor=balgas) \
         .play_bgm("BGM/Ominous_Suspense_02") \
@@ -92,7 +93,7 @@ def define_vs_balgas(builder: DramaBuilder):
         .say("narr_fb5", "（——遺跡の奥で、次元の裂け目が開いた。団員たちが次々と狭間に引きずり込まれていく。）", "", actor=pc) \
         .say("kain_fb4", "団長……俺を、置いていけ……！ でないと、あんたまで……！", "", actor=pc) \
         .say("narr_fb6", "（カインは罠で重傷を負い、動けなかった。バルガスはカインを背負い、狭間の中を彷徨った。）", "", actor=pc) \
-        .say("balgas_fb5", "馬鹿野郎……！ お前を置いていけるか……！ お前は俺の……！", "", actor=balgas) \
+        .say("balgas_fb5", "馬鹿野郎……！ お前を置いていけるか……！ ", "", actor=balgas) \
         .shake() \
         .say("narr_fb7", "（しかし、カインの体は限界を迎えていた。アスタロトに「拾われた」時、カインは既に息絶えていた。）", "", actor=pc) \
         .play_bgm("BGM/Ominous_Suspense_02") \
@@ -111,10 +112,9 @@ def define_vs_balgas(builder: DramaBuilder):
         .say("narr_7", "（リリィが震える手で水晶を握りしめている。）", "", actor=pc) \
         .say("narr_8", "（その瞳には、事務的な冷徹さは微塵も残っていない。）", "", actor=pc) \
         .focus_chara(Actors.LILY) \
-        .say("lily_1", "……馬鹿な人。その薬は、命の火花を一度に使い果たす禁忌の炎……！", "", actor=lily) \
-        .say("lily_2", "お客様、お願いです。彼を止めて……！ でも、彼を殺さないで……。", "", actor=lily) \
+        .say("lily_1", "……馬鹿な人。それは、命の火花を浪費する禁忌の薬……！", "", actor=lily) \
+        .say("lily_2", "お願いです。彼を止めて……！", "", actor=lily) \
         .say("lily_3", "もし彼が死んだら、このアリーナにはもう、私を叱ってくれる人は誰もいなくなってしまうわ……！", "", actor=lily) \
-        .say("narr_9", "（リリィの頬を涙が伝う。サキュバスが泣いている。あなたは初めて見た。）", "", actor=pc) \
         .jump(scene3)
 
     # ========================================
@@ -124,12 +124,11 @@ def define_vs_balgas(builder: DramaBuilder):
         .play_bgm("BGM/Battle_Balgas_Prime") \
         .say("narr_10", "（若き日の姿を取り戻した「伝説の戦士バルガス」との一騎打ち。）", "", actor=pc) \
         .say("narr_11", "（彼の動きは重く、速く、そして無駄がない。）", "", actor=pc) \
-        .say("narr_12", "（かつて教えてもらった技の数々が、今度は殺意を持ってあなたを襲う。）", "", actor=pc) \
+        .say("narr_12", "（教えてもらった技が、今度は殺意を持ってあなたを襲う。）", "", actor=pc) \
         .shake() \
-        .say("obs_1", "「殺せ！ 師匠を殺せ！」", "", actor=pc) \
-        .say("obs_2", "「英雄の魂を捧げろ！」", "", actor=pc) \
-        .say("obs_3", "「屠竜者となる儀式だ！」", "", actor=pc) \
-        .say("lily_voice", "（リリィの懇願の声が、闘技場に響く……「お願い……殺さないで……」）", "", actor=lily) \
+        .say("obs_1", "観客「...殺せ！ ...師匠を殺せ！」", "", actor=pc) \
+        .say("obs_2", "観客「...魂を捧げろ！」", "", actor=pc) \
+        .say("lily_voice", "（リリィの小さな懇願の声が、あなたの耳に届く。「お願い……殺さないで……」）", "", actor=lily) \
         .set_flag("sukutsu_quest_battle", 2) \
         .start_battle_by_stage("rank_s_trial", master_id="sukutsu_arena_master") \
         .finish()

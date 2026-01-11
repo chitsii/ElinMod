@@ -116,6 +116,9 @@ namespace Elin_SukutsuArena
         [JsonProperty("zoneType")]
         public string ZoneType { get; set; } = "field";
 
+        [JsonProperty("biome")]
+        public string Biome { get; set; } = "";  // Snow, Sand, etc.
+
         [JsonProperty("bgmBattle")]
         public string BgmBattle { get; set; } = "";
 

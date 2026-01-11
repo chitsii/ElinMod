@@ -160,6 +160,5 @@ def define_makuma(builder: DramaBuilder):
     # ========================================
     builder.step(ending) \
         .set_flag(Keys.NULL_CHIP, FlagValues.TRUE) \
-        .mod_flag(Keys.REL_LILY, "+", 10) \
-        .mod_flag(Keys.REL_ZEK, "+", 10) \
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantMakumaReward();") \
         .finish()

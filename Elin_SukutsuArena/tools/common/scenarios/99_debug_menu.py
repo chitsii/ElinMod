@@ -71,13 +71,21 @@ def define_debug_menu(builder: DramaBuilder):
     # メイン
     # ========================================
     builder.step(main) \
-        .say("debug_welcome", "デバッグメニューへようこそ。何をテストしますか？", "", actor=debug_master) \
-        .jump(main_menu)
+        .say("debug_welcome", "デバッグメニューへようこそ。何をテストしますか？", "", actor=debug_master)
 
     builder.choice(drama_menu, "ドラマを再生", "", text_id="c_drama") \
            .choice(battle_menu, "バトルを開始", "", text_id="c_battle") \
            .choice(flags_menu, "フラグ操作", "", text_id="c_flags") \
            .choice(end, "終了", "", text_id="c_end")
+
+    # main_menu ステップ（戻る先）
+    builder.step(main_menu) \
+        .say("debug_main", "何をテストしますか？", "", actor=debug_master)
+
+    builder.choice(drama_menu, "ドラマを再生", "", text_id="c_drama_2") \
+           .choice(battle_menu, "バトルを開始", "", text_id="c_battle_2") \
+           .choice(flags_menu, "フラグ操作", "", text_id="c_flags_2") \
+           .choice(end, "終了", "", text_id="c_end_2")
 
     # ========================================
     # ドラマメニュー（動的カテゴリ分け）
@@ -85,8 +93,7 @@ def define_debug_menu(builder: DramaBuilder):
     categorized_dramas = _get_dramas_by_category()
 
     builder.step(drama_menu) \
-        .say("drama_cat", "ドラマカテゴリを選択してください。", "", actor=debug_master) \
-        .jump("drama_category")
+        .say("drama_cat", "ドラマカテゴリを選択してください。", "", actor=debug_master)
 
     builder.choice(drama_story, "ストーリー", "", text_id="c_drama_story") \
            .choice(drama_rank, "ランクアップ", "", text_id="c_drama_rank") \
@@ -106,8 +113,7 @@ def define_debug_menu(builder: DramaBuilder):
     # バトルメニュー（自動取得）
     # ========================================
     builder.step(battle_menu) \
-        .say("battle_cat", "バトルカテゴリを選択してください。", "", actor=debug_master) \
-        .jump("battle_category")
+        .say("battle_cat", "バトルカテゴリを選択してください。", "", actor=debug_master)
 
     builder.choice(battle_rank, "ランクアップ試練", "", text_id="c_battle_rank") \
            .choice(battle_normal, "通常バトル", "", text_id="c_battle_normal") \
@@ -132,8 +138,7 @@ def define_debug_menu(builder: DramaBuilder):
     set_relations = builder.label("set_relations")
 
     builder.step(flags_menu) \
-        .say("flags_info", "フラグ操作を選択してください。", "", actor=debug_master) \
-        .jump("flags_choice")
+        .say("flags_info", "フラグ操作を選択してください。", "", actor=debug_master)
 
     builder.choice(set_rank_s, "ランクSに設定", "", text_id="c_set_rank_s") \
            .choice(set_all_quests, "全クエスト完了", "", text_id="c_set_quests") \

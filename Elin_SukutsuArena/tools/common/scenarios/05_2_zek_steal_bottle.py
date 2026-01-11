@@ -154,5 +154,5 @@ def define_zek_steal_bottle(builder: DramaBuilder):
     # 終了処理
     # ========================================
     builder.step(ending) \
-        .complete_quest(QuestIds.ZEK_STEAL_BOTTLE) \
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.CompleteZekStealBottleQuest();") \
         .finish()

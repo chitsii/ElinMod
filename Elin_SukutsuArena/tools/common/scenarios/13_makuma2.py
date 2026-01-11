@@ -146,9 +146,7 @@ def define_makuma2(builder: DramaBuilder):
         .say("lily_17", "ゼクのような『完全な嘘つき』よりは、まだ救いがある。", "", actor=lily) \
         .say("lily_18", "……私は、あなたを許すわ。ただし、二度目はない。次にあなたが私を欺いたら……その時は、この爪であなたの喉を裂きます。約束よ。", "", actor=lily) \
         .set_flag(Keys.LILY_BOTTLE_CONFESSION, FlagValues.LilyBottleConfession.CONFESSED) \
-        .set_flag(Keys.REL_LILY, 20) \
-        .set_flag(Keys.LILY_TRUST_REBUILD, FlagValues.TRUE) \
-        .mod_flag(Keys.KARMA, "+", 5) \
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.Makuma2ConfessToLily();") \
         .jump(after_bottle)
 
     builder.step(bottle_blame) \
@@ -158,6 +156,7 @@ def define_makuma2(builder: DramaBuilder):
         .say("lily_20", "……さあ、虚空の心臓の製作に取り掛かりましょう。時間がありません。", "", actor=lily) \
         .say("narr_17", "（リリィの尻尾だけが、不機嫌そうに床を叩いている。）", "", actor=pc) \
         .set_flag(Keys.LILY_BOTTLE_CONFESSION, FlagValues.LilyBottleConfession.BLAMED_ZEK) \
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.Makuma2BlameZek();") \
         .jump(after_bottle)
 
     builder.step(bottle_deny) \
@@ -167,9 +166,7 @@ def define_makuma2(builder: DramaBuilder):
         .say("lily_22", "ふふふ……ええ、そうかもしれませんね。私が、あなたという『獣』を『人間』だと勘違いしていた。それが最大のミスでした。", "", actor=lily) \
         .say("lily_23", "結構です。どうぞ、虚空の心臓でも何でも作って、アスタロト様に挑んでください。……私は、もうあなたに期待しません。", "", actor=lily) \
         .set_flag(Keys.LILY_BOTTLE_CONFESSION, FlagValues.LilyBottleConfession.DENIED) \
-        .set_flag(Keys.REL_LILY, 0) \
-        .set_flag(Keys.LILY_HOSTILE, FlagValues.TRUE) \
-        .mod_flag(Keys.KARMA, "-", 30) \
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.Makuma2DenyInvolvement();") \
         .jump(after_bottle)
 
     builder.step(after_bottle) \
@@ -235,9 +232,7 @@ def define_makuma2(builder: DramaBuilder):
         .say("balgas_13", "……いいか、鴉。いや、もうお前を鴉とは呼ばねえ。俺はこれでも、裏切られ慣れてる。だから、お前を殺したりはしない。", "", actor=balgas) \
         .say("balgas_14", "だが……もう二度と、俺に『友』として話しかけるな。お前は今日から、ただの『契約闘士』だ。それ以上でも、それ以下でもねえ。", "", actor=balgas) \
         .set_flag(Keys.KAIN_SOUL_CONFESSION, FlagValues.KainSoulConfession.CONFESSED) \
-        .set_flag(Keys.REL_BALGAS, 0) \
-        .set_flag(Keys.BALGAS_TRUST_BROKEN, FlagValues.TRUE) \
-        .mod_flag(Keys.KARMA, "-", 20) \
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.Makuma2ConfessAboutKain();") \
         .jump(after_kain)
 
     builder.step(kain_lie) \
@@ -247,7 +242,7 @@ def define_makuma2(builder: DramaBuilder):
         .say("balgas_16", "……なら、いい。……いや、よかねえな。俺の勘が外れてることを祈るよ。", "", actor=balgas) \
         .say("narr_29", "（バルガスがあなたの肩を叩くが、その手には以前のような力強さがない。）", "", actor=pc) \
         .set_flag(Keys.KAIN_SOUL_CONFESSION, FlagValues.KainSoulConfession.LIED) \
-        .set_flag(Keys.REL_BALGAS, 30) \
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.Makuma2LieAboutKain();") \
         .jump(after_kain)
 
     # ========================================
@@ -270,12 +265,12 @@ def define_makuma2(builder: DramaBuilder):
 
     builder.step(final_trust) \
         .say("balgas_r2", "……よし。それでいい。", "", actor=balgas) \
-        .mod_flag(Keys.REL_BALGAS, "+", 10) \
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.Makuma2ChooseTrust();") \
         .jump(scene4)
 
     builder.step(final_knowledge) \
         .say("balgas_r3", "……ケッ、お前の好きにしろ。だが、後悔するなよ。", "", actor=balgas) \
-        .mod_flag(Keys.REL_BALGAS, "-", 5) \
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.Makuma2ChooseKnowledge();") \
         .jump(scene4)
 
     # ========================================
@@ -291,7 +286,7 @@ def define_makuma2(builder: DramaBuilder):
         .say("lily_29", "これで、ランクAへの挑戦権を授与いたします。……ふふ、あなたは既に、この異次元の一部となりました。誇っていいですよ。", "", actor=lily) \
         .say("narr_32", "（彼女は台帳に何かを書き込む。）", "", actor=pc) \
         .say("lily_30", "報酬として、**小さなコイン30枚**と**プラチナコイン15枚**を記録いたします。……それと、あなたは『虚空と共鳴する者』としての称号を獲得しました。", "", actor=lily) \
-        .action("eval", param="for(int i=0; i<30; i++) { EClass.pc.Pick(ThingGen.Create(\\\"coin\\\")); } for(int i=0; i<15; i++) { EClass.pc.Pick(ThingGen.Create(\\\"plat\\\")); }") \
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantMakuma2Reward();") \
         .jump(ending)
 
     # ========================================

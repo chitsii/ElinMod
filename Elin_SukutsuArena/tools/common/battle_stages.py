@@ -104,6 +104,7 @@ class BattleStage:
     display_name_jp: str        # 日本語表示名
     display_name_en: str        # 英語表示名
     zone_type: str = "field"    # マップタイプ
+    biome: str = ""             # Biome設定 (Snow, Sand, etc.) - 空ならデフォルト
     bgm_battle: str = ""        # 戦闘BGM (空なら102)
     bgm_victory: str = "BGM/Fanfare_Audience"  # 勝利BGM（デフォルト）
     reward_plat: int = 10       # プラチナコイン報酬
@@ -118,6 +119,7 @@ class BattleStage:
             "displayNameJp": self.display_name_jp,
             "displayNameEn": self.display_name_en,
             "zoneType": self.zone_type,
+            "biome": self.biome,
             "bgmBattle": self.bgm_battle,
             "bgmVictory": self.bgm_victory,
             "rewardPlat": self.reward_plat,
@@ -138,7 +140,7 @@ RANK_UP_STAGES: Dict[str, BattleStage] = {
     # 地上の冒険者としても駆け出し。バルガスからは「動く死体」扱いされる時期。
     # ========================================
 
-    # ランクG昇格試験: 屑肉の洗礼
+    # ランクG昇格試験: 屑肉の洗礼（混沌ブレススライム群）
     "rank_g_trial": BattleStage(
         stage_id="rank_g_trial",
         display_name_jp="屑肉の洗礼",
@@ -147,30 +149,40 @@ RANK_UP_STAGES: Dict[str, BattleStage] = {
         bgm_battle="BGM/Battle_RankG_VoidOoze",  # 初戦BGM
         reward_plat=5,
         enemies=[
-            # 最弱の試練：スライム系の群れ
-            EnemyConfig("putty", level=15, count=3),
-            EnemyConfig("putty", level=20, count=2),
+            # 虚空のウーズ：混沌ブレスを吐くスライム群
+            EnemyConfig("sukutsu_void_ooze", level=15, count=3),
+            EnemyConfig("sukutsu_void_ooze", level=20, count=2, is_boss=True),
         ],
-        description_jp="「動く死体」から「屑肉」へ。これがお前の第一歩だ——バルガス",
-        description_en="'From walking corpse to scrap meat. This is your first step.' —Balgas",
+        description_jp="混沌の落とし子たち——彼らのブレスは魂を蝕む。耐性なくして生き残れない。",
+        description_en="Children of Chaos—their breath corrodes the soul. Without resistance, you cannot survive.",
     ),
 
-    # ランクF昇格試験: 泥犬の牙
+    # ランクF昇格試験: 霜牙の魔犬（古代種・氷・透明）+ 氷原ギミック
     "rank_f_trial": BattleStage(
         stage_id="rank_f_trial",
-        display_name_jp="泥犬の牙",
-        display_name_en="Fangs of the Mud Dog",
+        display_name_jp="霜牙の試練",
+        display_name_en="Trial of the Frostfang",
         zone_type="field",
+        biome="Snow",  # 動的に雪原ビジュアルを設定
         bgm_battle="BGM/Battle_RankE_Ice",
         reward_plat=10,
         enemies=[
-            # 次元の狭間に適応した獣：猟犬の群れ
-            EnemyConfig("hound", level=40, rarity="Superior"),
-            EnemyConfig("hound", level=45, rarity="Superior"),
-            EnemyConfig("wolf", level=50, rarity="Superior", is_boss=True),
+            # 霜牙の魔犬：古代種、透明化、氷ブレス、鈍足魔法
+            EnemyConfig("sukutsu_frost_hound", level=45, rarity="Legendary", is_boss=True),
         ],
-        description_jp="次元の狭間で変異した獣たち。群れで狩りをする本能は、異次元でも健在だ。",
-        description_en="Beasts mutated in the dimensional void. Their pack hunting instincts remain intact even in other dimensions.",
+        gimmicks=[
+            # 氷原ギミック：定期的に元素の傷跡デバフを付与
+            GimmickConfig(
+                gimmick_type="elemental_scar",
+                interval=8.0,           # 8秒ごとに発動
+                start_delay=5.0,        # 5秒後に開始
+                enable_escalation=True,
+                escalation_rate=0.85,   # 15%ずつ間隔短縮
+                min_interval=3.0,       # 最短3秒間隔
+            ),
+        ],
+        description_jp="姿なき牙——見えぬ敵に怯えるな。透明視を得よ、さもなくば凍え死ぬのみ。極寒の氷原は容赦なくお前の耐性を蝕む。",
+        description_en="The Invisible Fang—do not fear an unseen enemy. Gain true sight, or freeze to death. The frozen tundra mercilessly erodes your resistance.",
     ),
 
     # ランクE昇格試験: 錆びついた英雄（カイン）
@@ -196,19 +208,17 @@ RANK_UP_STAGES: Dict[str, BattleStage] = {
     # 異次元の環境に適応し始めた時期。ゼク（商人）が顔を出し始める。
     # ========================================
 
-    # ランクD昇格試験: 銅貨稼ぎの洗礼（観客ギミック付き）
+    # ランクD昇格試験: 観客の代弁者グリード（観客ギミック付き）
     "rank_d_trial": BattleStage(
         stage_id="rank_d_trial",
-        display_name_jp="銅貨稼ぎの洗礼",
-        display_name_en="Copper Earner's Baptism",
+        display_name_jp="観客の代弁者",
+        display_name_en="Voice of the Audience",
         zone_type="field",
         bgm_battle="BGM/Battle_RankD_Chaos",
         reward_plat=30,
         enemies=[
-            # ミノタウロス：第2階層への入口として相応しい強敵
-            EnemyConfig("minotaur", level=150, rarity="Superior", is_boss=True),
-            # 取り巻きのオーク
-            EnemyConfig("orc", level=120, rarity="Normal", count=2),
+            # グリード：観客の力を取り込んだ傀儡、轟音+混沌ブレス
+            EnemyConfig("sukutsu_greed", level=150, rarity="Legendary", is_boss=True),
         ],
         gimmicks=[
             GimmickConfig(
@@ -229,8 +239,8 @@ RANK_UP_STAGES: Dict[str, BattleStage] = {
                 explosion_count=1,
             ),
         ],
-        description_jp="観客の「注目」が初めて本格的に向けられる試練。その視線は時に物理的な力となって降り注ぐ。",
-        description_en="The first trial where the audience's 'attention' truly focuses on you. Their gaze sometimes manifests as physical force.",
+        description_jp="観客の「注目」に魅せられ、その力を取り込んだ傀儡——グリード。彼の轟音は観客の喝采、混沌は観客の狂気。",
+        description_en="Greed—a puppet who absorbed the audience's power. His sonic blasts are their cheers, his chaos their madness.",
     ),
 
     # ランクC昇格試験: 闘技場の鴉
@@ -243,10 +253,10 @@ RANK_UP_STAGES: Dict[str, BattleStage] = {
         reward_plat=50,
         enemies=[
             # 「鴉」たち：かつての挑戦者だった者たちが番人として立ちはだかる
-            # 多数の敵との乱戦
-            EnemyConfig("orc_warrior", level=350, rarity="Superior", count=2),
-            EnemyConfig("minotaur", level=400, rarity="Legendary"),
-            EnemyConfig("centaur", level=450, rarity="Legendary", is_boss=True),
+            # クロウ（影）、レイヴン（刃）、カラス（毒）の3人組
+            EnemyConfig("sukutsu_crow_shadow", level=350, rarity="Legendary"),
+            EnemyConfig("sukutsu_raven_blade", level=400, rarity="Legendary"),
+            EnemyConfig("sukutsu_karasu_venom", level=450, rarity="Legendary", is_boss=True),
         ],
         description_jp="アリーナに巣食う「鴉」たち——かつての挑戦者だった者たちが、今は番人として立ちはだかる。",
         description_en="The 'Ravens' that nest in the arena—former challengers who now stand as guardians.",
@@ -382,6 +392,22 @@ NORMAL_STAGES: Dict[str, BattleStage] = {
         enemies=[
             EnemyConfig("dragon", level=40, rarity="Legendary", is_boss=True),
         ],
+    ),
+
+    # バルガス訓練クエスト: 戦士の哲学
+    "balgas_training_battle": BattleStage(
+        stage_id="balgas_training_battle",
+        display_name_jp="戦士の哲学",
+        display_name_en="Warrior's Philosophy",
+        zone_type="field",
+        bgm_battle="BGM/Battle_Balgas_Training",
+        reward_plat=0,  # 報酬はドラマで処理
+        enemies=[
+            # 訓練用バルガス：手加減バージョン
+            EnemyConfig("sukutsu_balgas_training", level=200, rarity="Legendary", is_boss=True),
+        ],
+        description_jp="「俺の足を一歩でも動かしてみせろ」——バルガスによる特別訓練。",
+        description_en="'Try to make me move even one step.'—Special training by Balgas.",
     ),
 
     # 上位存在クエスト: 見えざる観客の供物

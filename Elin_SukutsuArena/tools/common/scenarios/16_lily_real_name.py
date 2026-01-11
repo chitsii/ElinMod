@@ -95,14 +95,14 @@ def define_lily_real_name(builder: DramaBuilder):
         .play_bgm("BGM/Lily_Seductive_Danger") \
         .say("narr_5", "（リリィはあなたの至近距離まで歩み寄り、その冷たいはずの指先であなたの胸元に触れた。）", "", actor=pc) \
         .say("narr_6", "（そこには「黄金の戦鬼」としての力強い鼓動が刻まれている。）", "", actor=pc) \
-        .say("lily_5", "私はサキュバス。このアリーナに囚われた魂が、絶望に染まり、最後の一滴まで絞り出されるのを見届ける『観察者』でした。", "", actor=lily) \
+        .say("lily_5", "私は、このアリーナに囚われた魂が、絶望に染まり、最後の一滴まで絞り出されるのを見届けるのが役割でした。", "", actor=lily) \
         .say("lily_6", "……あなたも、その一人になるはずだった。", "", actor=lily) \
         .say("lily_7", "けれど、あなたは強くなるほどに優しく、孤独になるほどに誰かの手を握ろうとした。", "", actor=lily) \
         .say("lily_8", "……その姿を特等席で眺めているうちに、私の方が、あなたの魂に『魅了』されてしまったようです。", "", actor=lily) \
         .jump(choice2)
 
     # プレイヤーの選択肢2
-    builder.choice(react2_enchanted, "魅了……？", "", text_id="c2_enchanted") \
+    builder.choice(react2_enchanted, "サキュバスなのに……？", "", text_id="c2_enchanted") \
            .choice(react2_me_too, "俺も、お前に魅了されている", "", text_id="c2_me_too") \
            .choice(react2_touch, "（無言で頬に触れる）", "", text_id="c2_touch")
 
@@ -127,9 +127,9 @@ def define_lily_real_name(builder: DramaBuilder):
         .play_bgm("BGM/Lily_Confession") \
         .say("narr_nh1", "（リリィは窓辺に歩み寄り、次元の狭間に浮かぶ歪んだ景色を眺める。）", "", actor=pc) \
         .say("lily_nh1", "……ねえ、あなたは知っていますか？ 私がどこから来たのか。", "", actor=lily) \
-        .say("lily_nh2", "私には『故郷』がないのです。他のサキュバスのように、どこかの確定次元から落ちてきたわけではありません。", "", actor=lily) \
-        .say("lily_nh3", "私は……この次元の狭間そのものから生まれました。崩壊した世界の残滓、漂流する感情の欠片、そして『誰かに愛されたい』という無数の魂の願い……。それらが凝縮して、私という存在が生まれた。", "", actor=lily) \
-        .say("lily_nh4", "だから私には、帰る場所がない。どこの世界にも属さない。誰にも必要とされていない。……500年もの間、ずっとそう思って生きてきました。", "", actor=lily) \
+        .say("lily_nh2", "私には『故郷』がないのです。他のサキュバスのように、どこかの確定次元で生まれ、そこから落ちてきたわけではありません。", "", actor=lily) \
+        .say("lily_nh3", "私は……この次元の狭間そのもので生まれました。崩壊した世界の残滓、漂流する感情の欠片、そして『誰かに愛されたい』という無数の魂の願い……。それらが凝縮して、私という存在が生まれた。", "", actor=lily) \
+        .say("lily_nh4", "だから私には、家族も、帰る場所もない。どこの世界にも属さない。本当の意味で、誰とも繋がっていない、と。……500年もの間、ずっとそう思って生きてきました。", "", actor=lily) \
         .jump(choice2_5)
 
     # プレイヤーの選択肢2.5
@@ -138,7 +138,7 @@ def define_lily_real_name(builder: DramaBuilder):
 
     # 選択肢反応2.5
     builder.step(react2_5_hard) \
-        .say("lily_nh_r1", "……ふふ、辛いと思う余裕すらありませんでした。それが当たり前でしたから。", "", actor=lily) \
+        .say("lily_nh_r1", "……ふふ、それが当たり前でしたから。だからこそ、私は、この闘技場での義務に忠実であることができた。", "", actor=lily) \
         .jump(scene2_5_cont)
 
     builder.step(react2_5_hand) \
@@ -148,9 +148,9 @@ def define_lily_real_name(builder: DramaBuilder):
     # シーン2.5続き
     builder.step(scene2_5_cont) \
         .say("lily_nh5", "あなたは違う。あなたには、イルヴァという帰る場所がある。神々との繋がりがあって、いつでもここを去ることができる。", "", actor=lily) \
-        .say("lily_nh6", "……最初、それが羨ましかった。妬ましかった。『どうせこの人も、いつかはここを去っていく。私を置いて』と。", "", actor=lily) \
-        .say("lily_nh7", "でも、あなたは一度去っても、また帰ってきてくれる。バルガスさんのために戦い、私のために怒り……。『義務』ではなく『選択』として、ここにいてくれた。", "", actor=lily) \
-        .say("lily_nh8", "それが、どれほど私を救ったか……あなたには分からないでしょうね。帰る場所がある人に、『それでも傍にいる』と選ばれること。それは、居場所のない私にとって、初めて与えられた『居場所』でした。", "", actor=lily) \
+        .say("lily_nh6", "……最初、それが羨ましく苛立たしかった。『どうせこの人も、いつかは帰るべき場所へ去っていく。私を置いて』と。", "", actor=lily) \
+        .say("lily_nh7", "でも、あなたは一度去っても、また帰ってきてくれる。バルガスさんのために戦い、私のために怒り……。『義務』ではなく『選択』として、ここにいてくれる。", "", actor=lily) \
+        .say("lily_nh8", "それが、どれほど私を救ったか……あなたには分からないでしょう。帰る場所がある人に、『それでも傍にいる』と選ばれること。それは、居場所のない私にとって、初めて与えられた『居場所』でした。", "", actor=lily) \
         .shake() \
         .say("narr_nh3", "（リリィは涙を流しながら、微笑む。）", "", actor=pc) \
         .jump(scene3)
@@ -162,7 +162,6 @@ def define_lily_real_name(builder: DramaBuilder):
         .play_bgm("BGM/Lily_Confession") \
         .say("narr_8", "（部屋の照明が一段と暗くなり、リリィの背中にある翼が、意思を持つかのように微かに震える。）", "", actor=pc) \
         .say("narr_9", "（彼女は意を決したように、あなたの耳元に唇を寄せた。）", "", actor=pc) \
-        .say("narr_10", "（サキュバスにとって、自らの「真名」を明かすことは、魂の手綱を相手に委ねることと同義である。）", "", actor=pc) \
         .say("lily_9", "……これからお話しするのは、この世界のどこにも記録されていない、私の本当の名前。", "", actor=lily) \
         .say("lily_10", "アスタロト様すら知らない……私の魂の、一番奥にある『鍵』。", "", actor=lily) \
         .say("lily_11", "これを知る者は、私の全てを支配し、同時に私の運命を一生背負うことになります。……あなたに知っておいてもらいたいのです。", "", actor=lily) \
@@ -190,7 +189,7 @@ def define_lily_real_name(builder: DramaBuilder):
     builder.step(name_revelation) \
         .say("lily_12", "……私の名は、『リリアリス・ヴォイド・テンプテイション』。", "", actor=lily) \
         .shake() \
-        .say("lily_14", "これからは、事務的な受付嬢（マネージャー）としてではなく……", "", actor=lily) \
+        .say("lily_14", "これからは、単なるあなたのマネージャーとしてではなく……", "", actor=lily) \
         .say("lily_15", "あなたの行く末を地獄の果てまで共にする、『共犯者』として隣に置かせてちょうだい。", "", actor=lily) \
         .jump(scene4)
 
@@ -198,7 +197,6 @@ def define_lily_real_name(builder: DramaBuilder):
     # シーン4: 契約の接吻
     # ========================================
     builder.step(scene4) \
-        .play_bgm("BGM/Emotional_Sacred_Triumph_Special") \
         .say("narr_13", "（彼女の真名が告げられた瞬間、あなたの視界に未知のルーンが浮かび上がり、リリィの魔力があなたの体内に流れ込んでくる。）", "", actor=pc) \
         .shake() \
         .say("narr_14", "（それは契約であり、守護であり、深い愛情の証だった。）", "", actor=pc) \
@@ -206,7 +204,7 @@ def define_lily_real_name(builder: DramaBuilder):
         .say("lily_17", "アスタロト様の待つ頂上で、何が起きようとも……あなたの背中は私が守ります。", "", actor=lily) \
         .say("narr_15", "（リリィはあなたの頬に手を添え、優しく口づけをする。）", "", actor=pc) \
         .shake() \
-        .say("lily_18", "さあ、行きましょう。ランクS『屠竜者』。あなたの伝説に、私の名前を添えて。", "", actor=lily) \
+        .say("lily_18", "さあ、行きましょう。あなたの伝説に、私の名前を添えて。", "", actor=lily) \
         .jump(final_choice)
 
     # 最終選択肢

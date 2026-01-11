@@ -4,6 +4,7 @@
 """
 
 from drama_builder import DramaBuilder
+from arena_drama_builder import ArenaDramaBuilder
 from flag_definitions import Keys, Actors, QuestIds
 
 def define_balgas_training(builder: DramaBuilder):
@@ -127,7 +128,10 @@ def define_balgas_training(builder: DramaBuilder):
         .say("balgas_9", "魔法でも、薬でも、卑怯な手でも何でも使え。", "", actor=balgas) \
         .say("balgas_10", "戦士の哲学とは、『手段』を尽くした先にある『目的』の純粋さだ！", "", actor=balgas) \
         .say("narr_10", "（バルガスとの特別な手合わせが始まる……！）", "", actor=pc) \
-        .jump(scene4)
+        .set_flag("sukutsu_is_quest_battle_result", 1) \
+        .set_flag("sukutsu_quest_battle", 4) \
+        .start_battle_by_stage("balgas_training_battle", master_id="sukutsu_arena_master") \
+        .finish()
 
     # ========================================
     # シーン4: 哲学の伝承
@@ -179,8 +183,6 @@ def define_balgas_training(builder: DramaBuilder):
         .say("narr_16", "（バルガスが酒瓶を傾けながら、あなたに背を向けたまま言う。）", "", actor=pc) \
         .focus_chara(Actors.BALGAS) \
         .say("balgas_15", "……お前は、カインが持っていた以上の、本物の『鋼の心』を持った戦士だ。", "", actor=balgas) \
-        .say("balgas_16", "俺がかつて率いていた『英雄の軍団』にも、お前みたいな奴がいた。", "", actor=balgas) \
-        .say("balgas_17", "……あいつも、最後まで哲学を曲げなかった。", "", actor=balgas) \
         .say("narr_17", "（彼は深く息を吐き、酒を飲み干す。）", "", actor=pc) \
         .say("balgas_18", "……行け。次はもっと厳しい戦いが待ってる。", "", actor=balgas) \
         .say("balgas_19", "だが、お前なら……大丈夫だ。", "", actor=balgas) \
@@ -204,11 +206,129 @@ def define_balgas_training(builder: DramaBuilder):
         .jump(ending)
 
     # ========================================
-    # 終了処理
+    # 終了処理（戦闘なしで直接来た場合のフォールバック）
     # ========================================
     builder.step(ending) \
-        .complete_quest(QuestIds.BALGAS_TRAINING) \
-        .mod_flag(Keys.REL_BALGAS, "+", 20) \
-        .say("sys_title", "【システム】『戦士の心得』を獲得しました。筋力+3、器用+3、PV+3 の加護を得た！", "") \
-        .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantBalgasTrainingBonus();") \
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.CompleteBalgasTrainingQuest();") \
+        .finish()
+
+
+def add_balgas_training_result_steps(builder: ArenaDramaBuilder, victory_label: str, defeat_label: str, return_label: str):
+    """
+    バルガス訓練クエストの勝利/敗北ステップを arena_master ビルダーに追加する
+    訓練なので勝敗どちらでも同じ結果（シーン4相当）に進む
+
+    Args:
+        builder: arena_master の ArenaDramaBuilder インスタンス
+        victory_label: 勝利ステップのラベル名
+        defeat_label: 敗北ステップのラベル名
+        return_label: 結果表示後にジャンプするラベル名
+    """
+    pc = Actors.PC
+    lily = Actors.LILY
+    balgas = Actors.BALGAS
+
+    # 共通の結果処理ラベル
+    training_result = builder.label("balgas_training_result")
+    reward_stone_bt = builder.label("reward_stone_bt")
+    reward_steel_bt = builder.label("reward_steel_bt")
+    reward_bone_bt = builder.label("reward_bone_bt")
+    reward_end_bt = builder.label("reward_end_bt")
+    final_thanks_bt = builder.label("final_thanks_bt")
+    final_again_bt = builder.label("final_again_bt")
+    final_nod_bt = builder.label("final_nod_bt")
+    ending_bt = builder.label("ending_bt")
+
+    # ========================================
+    # 勝利 → 共通結果へ
+    # ========================================
+    builder.step(victory_label) \
+        .set_flag("sukutsu_arena_result", 0) \
+        .jump(training_result)
+
+    # ========================================
+    # 敗北 → 共通結果へ（訓練なので同じ扱い）
+    # ========================================
+    builder.step(defeat_label) \
+        .set_flag("sukutsu_arena_result", 0) \
+        .jump(training_result)
+
+    # ========================================
+    # 共通結果: シーン4相当（哲学の伝承）
+    # ========================================
+    builder.step(training_result) \
+        .play_bgm("BGM/Emotional_Sacred_Triumph_Special") \
+        .say("narr_bt1", "（息を切らし、膝をつくあなた。）", "", actor=pc) \
+        .say("narr_bt2", "（バルガスは一歩も動いていないが、その口元には満足げな笑みが浮かんでいた。）", "", actor=pc) \
+        .say("narr_bt3", "（彼はあなたの肩を、岩のような拳で一つ叩いた。）", "", actor=pc) \
+        .shake() \
+        .focus_chara(Actors.BALGAS) \
+        .say("balgas_bt1", "……ハッ！ 少しは『意志』が剣に乗るようになったじゃねえか。", "", actor=balgas) \
+        .say("balgas_bt2", "いいか、戦いってのはな、ただの殺し合いじゃねえ。", "", actor=balgas) \
+        .say("balgas_bt3", "自分の命を、何のために『消費』するかを決める聖域だ。", "", actor=balgas) \
+        .say("balgas_bt4", "その哲学を忘れるな。そうすれば、どんな異次元の闇もお前を呑み込むことはできねえ。", "", actor=balgas) \
+        .say("narr_bt4", "（ロビーに戻ると、リリィが台帳を開いて待っている。）", "", actor=pc) \
+        .focus_chara(Actors.LILY) \
+        .say("lily_bt1", "……素晴らしい。バルガスさんの説教を聞いて生き残るなんて、あなたは本当の意味で『闘技場の鴉』になる資格を得たようです。", "", actor=lily) \
+        .say("lily_bt2", "カラスは死肉を喰らい、戦場を飛び回る。……今のあなたに、相応しい二つ名ですね。", "", actor=lily) \
+        .say("narr_bt5", "（彼女は台帳に何かを書き込む。）", "", actor=pc) \
+        .say("lily_bt3", "観客からの報酬として、小さなコイン12枚とプラチナコイン5枚。それと、戦闘記録として素材を一つ選んでいただけます。", "", actor=lily)
+
+    # 報酬選択肢
+    builder.choice(reward_stone_bt, "研磨石を頼む", "", text_id="c_reward_stone_bt") \
+           .choice(reward_steel_bt, "鋼鉄の欠片が欲しい", "", text_id="c_reward_steel_bt") \
+           .choice(reward_bone_bt, "骨を選ぶ", "", text_id="c_reward_bone_bt")
+
+    builder.step(reward_stone_bt) \
+        .say("lily_rew1_bt", "『研磨石×1』、記録いたしました。バルガスさんの哲学を継ぐ、良い選択ですね。", "", actor=lily) \
+        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"whetstone\"));") \
+        .jump(reward_end_bt)
+
+    builder.step(reward_steel_bt) \
+        .say("lily_rew2_bt", "『鋼鉄の欠片×1』、記録いたしました。", "", actor=lily) \
+        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"steel\"));") \
+        .jump(reward_end_bt)
+
+    builder.step(reward_bone_bt) \
+        .say("lily_rew3_bt", "『骨×1』ですね。……地味ですが、実用的です。", "", actor=lily) \
+        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"bone\"));") \
+        .jump(reward_end_bt)
+
+    builder.step(reward_end_bt) \
+        .action("eval", param="for(int i=0; i<12; i++) { EClass.pc.Pick(ThingGen.Create(\"coin\")); } for(int i=0; i<5; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
+        .say("lily_bt4", "記録完了です。", "", actor=lily) \
+        .say("lily_bt5", "……それと、今回の戦いで、あなたは『闘技場の鴉』としての称号を獲得しました。", "", actor=lily) \
+        .say("lily_bt6", "死肉を喰らい、戦場を飛び回る……ふふ、あなたらしいですね。", "", actor=lily) \
+        .say("narr_bt6", "（バルガスが酒瓶を傾けながら、あなたに背を向けたまま言う。）", "", actor=pc) \
+        .focus_chara(Actors.BALGAS) \
+        .say("balgas_bt5", "……お前は、カインが持っていた以上の、本物の『鋼の心』を持った戦士だ。", "", actor=balgas) \
+        .say("balgas_bt6", "俺がかつて率いていた『英雄の軍団』にも、お前みたいな奴がいた。", "", actor=balgas) \
+        .say("balgas_bt7", "……あいつも、最後まで哲学を曲げなかった。", "", actor=balgas) \
+        .say("narr_bt7", "（彼は深く息を吐き、酒を飲み干す。）", "", actor=pc) \
+        .say("balgas_bt8", "……行け。次はもっと厳しい戦いが待ってる。", "", actor=balgas) \
+        .say("balgas_bt9", "だが、お前なら……大丈夫だ。", "", actor=balgas)
+
+    # 最終選択肢
+    builder.choice(final_thanks_bt, "……ありがとう", "", text_id="c_final_thanks_bt") \
+           .choice(final_again_bt, "次も教えてくれるか？", "", text_id="c_final_again_bt") \
+           .choice(final_nod_bt, "（無言で頷く）", "", text_id="c_final_nod_bt")
+
+    builder.step(final_thanks_bt) \
+        .say("balgas_r7_bt", "ハッ、礼はいらねえ。生き残って、俺を超えてみせろ。", "", actor=balgas) \
+        .jump(ending_bt)
+
+    builder.step(final_again_bt) \
+        .say("balgas_r8_bt", "……ああ。必要なら、いつでも来い。", "", actor=balgas) \
+        .jump(ending_bt)
+
+    builder.step(final_nod_bt) \
+        .say("balgas_r9_bt", "……よし。じゃあ行け。", "", actor=balgas) \
+        .jump(ending_bt)
+
+    # ========================================
+    # 終了処理
+    # ========================================
+    builder.step(ending_bt) \
+        .action("eval", param="Elin_SukutsuArena.ArenaManager.CompleteBalgasTrainingQuest();") \
+        .say("sys_title_bt", "【システム】『戦士の心得』を獲得しました。筋力+3、器用+3、PV+3 の加護を得た！", "") \
         .finish()

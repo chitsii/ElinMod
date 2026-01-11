@@ -22,6 +22,13 @@ public class ZonePreEnterArenaBattle : ZonePreEnterEvent
             return;
         }
 
+        // Biome設定（雪原など）
+        if (!string.IsNullOrEmpty(stageData.Biome) && EClass._map != null)
+        {
+            EClass._map.config.idBiome = stageData.Biome;
+            Debug.Log($"[SukutsuArena] Set biome to: {stageData.Biome}");
+        }
+
         // 既存のモブを掃除（プレイヤーと仲間以外）
         ClearExistingCharas();
 
@@ -142,6 +149,19 @@ public class ZonePreEnterArenaBattle : ZonePreEnterEvent
                 Debug.Log($"[SukutsuArena] Added gimmick: {config.GimmickType} (interval={config.Interval}, damage={config.Damage}, directHit={config.DirectHitChance}, blastRadius={config.BlastRadius})");
                 break;
 
+            case "elemental_scar":
+                var scarEvent = new ZoneEventElementalScar
+                {
+                    interval = config.Interval,
+                    startDelay = config.StartDelay,
+                    enableEscalation = config.EnableEscalation,
+                    escalationRate = config.EscalationRate,
+                    minInterval = config.MinInterval
+                };
+                EClass._zone.events.Add(scarEvent);
+                Debug.Log($"[SukutsuArena] Added gimmick: {config.GimmickType} (interval={config.Interval}, minInterval={config.MinInterval})");
+                break;
+
             default:
                 Debug.LogWarning($"[SukutsuArena] Unknown gimmick type: {config.GimmickType}");
                 break;
@@ -185,10 +205,16 @@ public class ZonePreEnterArenaBattle : ZonePreEnterEvent
         if (enemy == null) return null;
 
         // レベル設定
+#if DEBUG
+        // DEBUGビルド: 全敵レベル1（テスト用）
+        enemy.SetLv(1);
+        Debug.Log($"[SukutsuArena] DEBUG: Enemy level set to 1 (original: {config.Level})");
+#else
         if (enemy.LV < config.Level)
         {
             enemy.SetLv(config.Level);
         }
+#endif
 
         // レアリティ設定
         switch (config.Rarity)
