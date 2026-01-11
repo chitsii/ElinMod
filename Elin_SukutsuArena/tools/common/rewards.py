@@ -32,10 +32,6 @@ class Reward:
     # バフ報酬（C#メソッド呼び出し）
     buff_method: Optional[str] = None  # "GrantRankFBonus"
 
-    # 関係値変更
-    relations: Dict[str, int] = field(default_factory=dict)
-    # 例: {Keys.REL_LILY: 10, Keys.REL_ZEK: -5}
-
     # フラグ設定
     flags: Dict[str, int] = field(default_factory=dict)
     # 例: {Keys.RANK: 2}
@@ -100,7 +96,6 @@ RANK_REWARDS: Dict[str, RankReward] = {
             RewardItem("lovepotion", 90),
         ],
         buff_method="GrantRankEBonus",
-        relations={Keys.REL_BALGAS: 15},
         rank_value=3,
         quest_id=QuestIds.RANK_UP_E,
         message_jp="報酬として、小さなメダル30枚、エーテル抗体9本、媚薬90本をお渡しします。",
@@ -115,7 +110,6 @@ RANK_REWARDS: Dict[str, RankReward] = {
             RewardItem("lovepotion", 120),
         ],
         buff_method="GrantRankDBonus",
-        relations={Keys.REL_LILY: 10},
         rank_value=4,
         quest_id=QuestIds.RANK_UP_D,
         message_jp="報酬として、小さなメダル40枚、エーテル抗体12本、媚薬120本をお渡しします。",
@@ -130,7 +124,6 @@ RANK_REWARDS: Dict[str, RankReward] = {
             RewardItem("lovepotion", 150),
         ],
         buff_method="GrantRankCBonus",
-        relations={Keys.REL_BALGAS: 25, Keys.REL_LILY: 10},
         rank_value=5,
         quest_id=QuestIds.RANK_UP_C,
         message_jp="報酬として、小さなメダル50枚、エーテル抗体15本、媚薬150本をお渡しします。",
@@ -145,7 +138,6 @@ RANK_REWARDS: Dict[str, RankReward] = {
             RewardItem("lovepotion", 180),
         ],
         buff_method="GrantRankBBonus",
-        relations={Keys.REL_BALGAS: 20, Keys.REL_LILY: 20},
         rank_value=6,
         quest_id=QuestIds.RANK_UP_B,
         message_jp="報酬として、小さなメダル60枚、エーテル抗体18本、媚薬180本をお渡しします。",
@@ -160,7 +152,6 @@ RANK_REWARDS: Dict[str, RankReward] = {
             RewardItem("lovepotion", 210),
         ],
         buff_method="GrantRankABonus",
-        relations={Keys.REL_BALGAS: 15, Keys.REL_LILY: 15, Keys.REL_ZEK: 10},
         rank_value=7,
         quest_id=QuestIds.RANK_UP_A,
         message_jp="報酬として、小さなメダル70枚、エーテル抗体21本、媚薬210本をお渡しします。",
@@ -176,12 +167,7 @@ RANK_REWARDS: Dict[str, RankReward] = {
 # ============================================================================
 
 QUEST_REWARDS: Dict[str, Reward] = {
-    # 例: リリィの私室招待報酬
-    # "lily_private": Reward(
-    #     buff_method="GrantLilyPrivateBonus",
-    #     relations={Keys.REL_LILY: 15},
-    #     system_message_jp="【リリィの寵愛】魔力+5、回避+5、魅了耐性+10 を獲得！",
-    # ),
+    # 将来の拡張用
 }
 
 
@@ -263,6 +249,5 @@ if __name__ == "__main__":
     print("\n=== Rank Rewards Summary ===\n")
     for rank, reward in RANK_REWARDS.items():
         items_str = ", ".join([f"{item.item_id}x{item.count}" for item in reward.items])
-        relations_str = ", ".join([f"{k.split('.')[-1]}+{v}" for k, v in reward.relations.items()]) or "none"
         buff_str = reward.buff_method or "none"
-        print(f"Rank {rank}: rank_value={reward.rank_value}, items=[{items_str}], relations=[{relations_str}], buff={buff_str}")
+        print(f"Rank {rank}: rank_value={reward.rank_value}, items=[{items_str}], buff={buff_str}")

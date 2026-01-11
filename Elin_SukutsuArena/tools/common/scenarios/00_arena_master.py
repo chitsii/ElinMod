@@ -9,7 +9,7 @@ from drama_constants import DramaNames
 from flag_definitions import (
     Keys, Actors, QuestIds,
     Motivation, Rank,
-    PlayerFlags, RelFlags
+    PlayerFlags
 )
 from arena_high_level_api import (
     RankDefinition, GreetingDefinition, QuestEntry,
@@ -437,19 +437,7 @@ def define_arena_master_drama(builder: DramaBuilder):
     # ========================================
     # ランクアップ結果チェック
     # ========================================
-    rank_up_result_check = builder.label("rank_up_result_check")
-    # sukutsu_rank_up_trial: 1=G, 2=F, 3=E, 4=D, 5=C, 6=B, 7=A
-    trial_cases = [registered]  # 0: フォールバック
-    for rank_def in RANK_DEFINITIONS:
-        # trial_flag_value順に追加
-        trial_cases.append(builder.label(f"rank_up_result_{rank_def.rank}"))
-    trial_cases.append(registered)  # 末尾フォールバック
-
-    builder.step(rank_up_result_check) \
-        .set_flag("sukutsu_is_rank_up_result", 0) \
-        .switch_flag("sukutsu_rank_up_trial", trial_cases)
-
-    # ランクアップシステムを自動生成
+    # ランクアップシステムを先に自動生成（ラベルを取得するため）
     rank_labels = build_rank_system(
         builder,
         RANK_DEFINITIONS,
@@ -458,6 +446,18 @@ def define_arena_master_drama(builder: DramaBuilder):
         cancel_step=registered_choices,
         end_step=end,
     )
+
+    rank_up_result_check = builder.label("rank_up_result_check")
+    # sukutsu_rank_up_trial: 1=G, 2=F, 3=E, 4=D, 5=C, 6=B, 7=A
+    trial_cases = [registered]  # 0: フォールバック
+    for rank_def in RANK_DEFINITIONS:
+        # build_rank_systemから返されたラベルを使用（同一オブジェクト参照）
+        trial_cases.append(rank_labels[f'rank_up_result_{rank_def.rank}'])
+    trial_cases.append(registered)  # 末尾フォールバック
+
+    builder.step(rank_up_result_check) \
+        .set_flag("sukutsu_is_rank_up_result", 0) \
+        .switch_flag("sukutsu_rank_up_trial", trial_cases)
 
     # ========================================
     # クエストバトル結果チェック

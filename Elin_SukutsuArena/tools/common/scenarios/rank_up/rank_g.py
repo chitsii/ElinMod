@@ -4,7 +4,7 @@ from drama_builder import DramaBuilder, ChoiceReaction
 from flag_definitions import (
     Keys, Actors, QuestIds,
     Motivation, Rank,
-    PlayerFlags, RelFlags
+    PlayerFlags
 )
 
 def define_rank_up_G(builder: DramaBuilder):
@@ -95,6 +95,7 @@ def add_rank_up_G_result_steps(builder: ArenaDramaBuilder, victory_label: str, d
         .focus_chara(Actors.LILY) \
         .say("rup_vic_l1", "お疲れ様でした。約束通り、ギルドの台帳にあなたの名を刻んでおきました。", "", actor=lily) \
         .say("rup_vic_l2", "ランクG『屑肉』。ふふ、あなたにぴったりの、美味しそうな二つ名だと思いませんか？", "", actor=lily) \
+        .complete_quest(QuestIds.RANK_UP_G) \
         .grant_rank_reward("G", actor=lily) \
         .say("rup_vic_sys", "報酬を受け取った。", "", actor=pc) \
         .finish()

@@ -38,16 +38,12 @@ namespace Elin_SukutsuArena.Core
         {
             _storage = storage;
             Player = new PlayerState(storage);
-            Rel = new RelationshipState(storage);
             Quest = new QuestState(storage);
             Session = new SessionState(storage);
         }
 
         /// <summary>プレイヤー状態</summary>
         public PlayerState Player { get; }
-
-        /// <summary>NPC関係値</summary>
-        public RelationshipState Rel { get; }
 
         /// <summary>クエスト状態</summary>
         public QuestState Quest { get; }

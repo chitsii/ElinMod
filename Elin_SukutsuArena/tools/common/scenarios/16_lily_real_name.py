@@ -228,7 +228,6 @@ def define_lily_real_name(builder: DramaBuilder):
     # 終了処理
     # ========================================
     builder.step(ending) \
-        .set_flag(Keys.REL_LILY, 100) \
         .set_flag(Keys.LILY_TRUE_NAME, FlagValues.LilyTrueName.KNOWN) \
         .say("sys_buff", "【システム】『真名の絆』を獲得しました。魔力+10、精神耐性+20、魅了耐性+20 の加護を得た！", "") \
         .say("sys_title", "【システム】称号『リリアリスの伴侶』を獲得しました。", "") \

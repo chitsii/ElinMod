@@ -5,8 +5,18 @@ set MOD_NAME=Elin_SukutsuArena
 set "SOFFICE=C:\Program Files\LibreOffice\program\soffice.exe"
 set STEAM_PACKAGE_DIR=C:\Program Files (x86)\Steam\steamapps\common\Elin\Package\%MOD_NAME%
 
+REM ビルド構成の設定（引数で debug を指定するとDebugビルド）
+set BUILD_CONFIG=Release
+if /i "%~1"=="debug" set BUILD_CONFIG=Debug
+
 echo.
-echo === %MOD_NAME% Build ===
+if "%BUILD_CONFIG%"=="Debug" (
+    echo === %MOD_NAME% Build [DEBUG] ===
+    echo   * Enemy levels fixed to 1
+    echo   * Debug keys enabled: F9/F11/F12
+) else (
+    echo === %MOD_NAME% Build [Release] ===
+)
 echo.
 
 REM ============================================================
@@ -126,7 +136,12 @@ if %ERRORLEVEL% NEQ 0 (
     popd
     goto :error
 )
-uv run python -c "from battle_stages import export_stages_to_json; import os; export_stages_to_json(os.path.join('..', '..', 'Package', 'battle_stages.json'))" >nul 2>&1
+REM DEBUGビルドの場合は全敵レベル1に設定
+if "%BUILD_CONFIG%"=="Debug" (
+    uv run python -c "from battle_stages import export_stages_to_json; import os; export_stages_to_json(os.path.join('..', '..', 'Package', 'battle_stages.json'), debug_mode=True)" >nul 2>&1
+) else (
+    uv run python -c "from battle_stages import export_stages_to_json; import os; export_stages_to_json(os.path.join('..', '..', 'Package', 'battle_stages.json'), debug_mode=False)" >nul 2>&1
+)
 if %ERRORLEVEL% NEQ 0 (
     echo FAILED
     popd
@@ -138,15 +153,15 @@ echo OK
 REM ============================================================
 REM Step 7: dotnet build
 REM ============================================================
-<nul set /p "=[7/8] dotnet build... "
-dotnet build "%~dp0%MOD_NAME%.csproj" -c Release -v q --nologo >nul 2>&1
+<nul set /p "=[7/8] dotnet build (%BUILD_CONFIG%)... "
+dotnet build "%~dp0%MOD_NAME%.csproj" -c %BUILD_CONFIG% -v q --nologo >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
     echo FAILED
     echo.
     echo ============================================================
     echo BUILD ERROR - Details:
     echo ============================================================
-    dotnet build "%~dp0%MOD_NAME%.csproj" -c Release
+    dotnet build "%~dp0%MOD_NAME%.csproj" -c %BUILD_CONFIG%
     goto :error
 )
 echo OK

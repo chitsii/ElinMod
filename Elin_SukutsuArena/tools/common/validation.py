@@ -14,6 +14,7 @@ from typing import Dict, List, Set, Any, Optional, Union
 from enum import Enum
 from dataclasses import dataclass
 import sys
+import os
 
 
 # ========================================
@@ -57,9 +58,6 @@ CSHARP_ENUM_MAPPINGS: Dict[str, Dict[str, int]] = {
 
 # 数値比較のみを使用するフラグ（Enumマッピング不要）
 NUMERIC_ONLY_FLAGS: Set[str] = {
-    "chitsii.arena.rel.lily",
-    "chitsii.arena.rel.balgas",
-    "chitsii.arena.rel.zek",
     "sukutsu_gladiator",
     "sukutsu_arena_stage",
     "sukutsu_arena_result",
@@ -321,6 +319,105 @@ def validate_quest_definitions(quest_definitions: list, drama_ids: Set[str] = No
     return result
 
 
+def parse_jump_label_mapping_cs(filepath: str) -> Dict[str, int]:
+    """
+    JumpLabelMapping.cs をパースしてラベル→値のマッピングを抽出
+
+    Args:
+        filepath: JumpLabelMapping.cs のパス
+
+    Returns:
+        {"label_name": value, ...}
+    """
+    import re
+
+    result = {}
+
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        # JumpLabel enum の値を抽出
+        enum_values = {}
+        enum_match = re.search(r'public enum JumpLabel\s*\{([^}]+)\}', content, re.DOTALL)
+        if enum_match:
+            enum_body = enum_match.group(1)
+            for line in enum_body.split('\n'):
+                line = line.strip()
+                if '=' in line:
+                    match = re.match(r'(\w+)\s*=\s*(\d+)', line)
+                    if match:
+                        name, value = match.groups()
+                        enum_values[name] = int(value)
+
+        # _labelToEnum の辞書エントリを抽出
+        dict_match = re.search(r'_labelToEnum\s*=\s*new\s+Dictionary[^{]+\{([^;]+)\};', content, re.DOTALL)
+        if dict_match:
+            dict_body = dict_match.group(1)
+            # ["label"] = JumpLabel.XXX パターンを抽出
+            for match in re.finditer(r'\["([^"]+)"\]\s*=\s*JumpLabel\.(\w+)', dict_body):
+                label, enum_name = match.groups()
+                if enum_name in enum_values:
+                    result[label] = enum_values[enum_name]
+
+    except Exception as e:
+        print(f"Warning: Could not parse {filepath}: {e}")
+
+    return result
+
+
+def validate_jump_label_sync() -> ValidationResult:
+    """
+    Python側のJUMP_LABELSとC#側のJumpLabelMappingの同期を検証
+    """
+    import os
+    result = ValidationResult()
+
+    try:
+        from flag_definitions import JUMP_LABELS
+    except ImportError as e:
+        result.add_warning("IMPORT_ERROR", f"Could not import JUMP_LABELS: {e}")
+        return result
+
+    # C#ファイルのパスを計算
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    csharp_path = os.path.join(script_dir, "..", "..", "src", "Data", "JumpLabelMapping.cs")
+
+    if not os.path.exists(csharp_path):
+        result.add_warning("FILE_NOT_FOUND", f"JumpLabelMapping.cs not found at: {csharp_path}")
+        return result
+
+    csharp_labels = parse_jump_label_mapping_cs(csharp_path)
+
+    if not csharp_labels:
+        result.add_warning("PARSE_FAILED", "Could not parse any labels from JumpLabelMapping.cs")
+        return result
+
+    # Python側のラベルがC#側に存在するか確認
+    for label, value in JUMP_LABELS.items():
+        if label not in csharp_labels:
+            result.add_error(
+                "MISSING_LABEL",
+                f"Label '{label}' not found in JumpLabelMapping.cs",
+                suggestion=f'Add: ["{label}"] = JumpLabel.XXX,'
+            )
+        elif csharp_labels[label] != value:
+            result.add_error(
+                "LABEL_VALUE_MISMATCH",
+                f"Label '{label}' value mismatch: Python={value}, C#={csharp_labels[label]}"
+            )
+
+    # C#側にあってPython側にないラベルは警告（必須ではない）
+    for label, value in csharp_labels.items():
+        if label not in JUMP_LABELS:
+            result.add_warning(
+                "EXTRA_CSHARP_LABEL",
+                f"Label '{label}' in C# but not in Python JUMP_LABELS (value={value})"
+            )
+
+    return result
+
+
 def validate_csharp_enum_sync() -> ValidationResult:
     """
     Python側のEnum定義とC#側のEnumMappingsの同期を検証
@@ -399,6 +496,189 @@ def validate_csharp_enum_sync() -> ValidationResult:
     return result
 
 
+def validate_drama_quest_sync() -> ValidationResult:
+    """
+    ドラマファイルで使用されているクエストIDが
+    quest_dependencies.pyに定義されているか検証
+    """
+    import os
+    import re
+
+    result = ValidationResult()
+
+    # quest_dependencies.pyから定義済みクエストIDを取得
+    try:
+        from quest_dependencies import QUEST_DEFINITIONS
+        defined_quest_ids = set()
+        for quest in QUEST_DEFINITIONS:
+            defined_quest_ids.add(quest.quest_id)
+    except ImportError as e:
+        result.add_warning("IMPORT_ERROR", f"Could not import quest_dependencies: {e}")
+        return result
+
+    # ドラマファイルからQuestEntryで使用されているクエストIDを抽出
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    scenarios_dir = os.path.join(script_dir, "scenarios")
+
+    drama_files = [
+        ("00_lily.py", "LILY_QUESTS"),
+        ("00_zek.py", "ZEK_QUESTS"),
+        ("00_arena_master.py", "AVAILABLE_QUESTS"),
+    ]
+
+    drama_quest_ids = set()
+
+    for filename, list_name in drama_files:
+        filepath = os.path.join(scenarios_dir, filename)
+        if not os.path.exists(filepath):
+            continue
+
+        try:
+            with open(filepath, 'r', encoding='utf-8') as f:
+                content = f.read()
+
+            # QuestEntry(QuestIds.XXX, ...) パターンを抽出
+            pattern = r'QuestEntry\s*\(\s*QuestIds\.(\w+)'
+            matches = re.findall(pattern, content)
+
+            for match in matches:
+                # flag_definitions.pyからQuestIdsを取得して実際の値に変換
+                try:
+                    from flag_definitions import QuestIds
+                    quest_id = getattr(QuestIds, match, None)
+                    if quest_id:
+                        drama_quest_ids.add((quest_id, filename, match))
+                except:
+                    pass
+
+        except Exception as e:
+            result.add_warning("FILE_READ_ERROR", f"Could not read {filename}: {e}")
+
+    # 不一致を検出
+    for quest_id, filename, attr_name in drama_quest_ids:
+        if quest_id not in defined_quest_ids:
+            result.add_error(
+                "MISSING_QUEST_DEFINITION",
+                f"Quest 'QuestIds.{attr_name}' ({quest_id}) used in {filename} but not defined in quest_dependencies.py",
+                suggestion="Add parent quest definition to QUEST_DEFINITIONS"
+            )
+
+    return result
+
+
+def validate_custom_zone_maps() -> ValidationResult:
+    """
+    カスタムゾーン定義とマップファイルの整合性を検証
+
+    検証項目:
+    1. battle_stages.json の zoneType がカスタムゾーン（field_fine, field_snow等）の場合、
+       対応するマップファイルが存在するか確認
+    2. Zone_*.cs ファイルが存在するか確認
+    3. create_zone_excel.py で定義されているゾーンIDの一覧取得
+    """
+    import json
+
+    result = ValidationResult()
+
+    # パス設定
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.join(script_dir, "..", "..")
+    battle_stages_path = os.path.join(project_root, "Package", "battle_stages.json")
+    maps_dir = os.path.join(project_root, "LangMod", "JP", "Maps")
+    src_dir = os.path.join(project_root, "src")
+
+    # カスタムゾーンとマップファイルのマッピング
+    # Zone_*.cs の MAP_FILE_NAME 定数に対応
+    CUSTOM_ZONE_MAP_FILES = {
+        "field_fine": "chitsii_battle_field_fine.z",
+        "field_snow": "chitsii_battle_field_snow.z",
+    }
+
+    # カスタムゾーンとC#クラスのマッピング
+    CUSTOM_ZONE_CLASSES = {
+        "field_fine": "Zone_FieldFine.cs",
+        "field_snow": "Zone_FieldSnow.cs",
+    }
+
+    # ゲーム組み込みゾーン（検証不要）
+    BUILTIN_ZONES = {"field", "dungeon", "town", "ntyris"}
+
+    # 1. battle_stages.json のバリデーション
+    if not os.path.exists(battle_stages_path):
+        result.add_warning("FILE_NOT_FOUND", f"battle_stages.json not found at: {battle_stages_path}")
+        return result
+
+    try:
+        with open(battle_stages_path, 'r', encoding='utf-8') as f:
+            battle_stages = json.load(f)
+    except Exception as e:
+        result.add_error("JSON_PARSE_ERROR", f"Failed to parse battle_stages.json: {e}")
+        return result
+
+    # 使用されているカスタムゾーンを収集
+    used_custom_zones = set()
+    stage_categories = ["rankUpStages", "normalStages", "debugStages"]
+
+    for category in stage_categories:
+        stages = battle_stages.get(category, {})
+        for stage_id, stage_data in stages.items():
+            zone_type = stage_data.get("zoneType", "")
+            if zone_type and zone_type not in BUILTIN_ZONES:
+                used_custom_zones.add((zone_type, stage_id, category))
+
+    # 2. カスタムゾーンに対応するマップファイルの存在確認
+    for zone_type, stage_id, category in used_custom_zones:
+        # マップファイルチェック
+        if zone_type in CUSTOM_ZONE_MAP_FILES:
+            map_file = CUSTOM_ZONE_MAP_FILES[zone_type]
+            map_path = os.path.join(maps_dir, map_file)
+            if not os.path.exists(map_path):
+                result.add_error(
+                    "MISSING_MAP_FILE",
+                    f"Map file '{map_file}' not found for zoneType '{zone_type}'",
+                    location=f"{category}/{stage_id}",
+                    suggestion=f"Create map file at: LangMod/JP/Maps/{map_file}"
+                )
+        else:
+            result.add_error(
+                "UNKNOWN_ZONE_TYPE",
+                f"Unknown custom zoneType '{zone_type}' used",
+                location=f"{category}/{stage_id}",
+                suggestion="Add zone to CUSTOM_ZONE_MAP_FILES in validation.py, or use builtin zone"
+            )
+
+    # 3. C#クラスファイルの存在確認
+    for zone_type in set(z[0] for z in used_custom_zones):
+        if zone_type in CUSTOM_ZONE_CLASSES:
+            cs_file = CUSTOM_ZONE_CLASSES[zone_type]
+            cs_path = os.path.join(src_dir, cs_file)
+            if not os.path.exists(cs_path):
+                result.add_error(
+                    "MISSING_ZONE_CLASS",
+                    f"C# class file '{cs_file}' not found for zoneType '{zone_type}'",
+                    suggestion=f"Create {cs_file} in src/ directory"
+                )
+
+    # 4. 定義済みだが未使用のカスタムゾーンを警告
+    defined_custom_zones = set(CUSTOM_ZONE_MAP_FILES.keys())
+    used_zone_types = set(z[0] for z in used_custom_zones)
+    unused_zones = defined_custom_zones - used_zone_types
+
+    for zone_type in unused_zones:
+        # マップファイルが存在する場合のみ警告（未使用でもファイルがなければ問題なし）
+        map_file = CUSTOM_ZONE_MAP_FILES.get(zone_type)
+        if map_file:
+            map_path = os.path.join(maps_dir, map_file)
+            if os.path.exists(map_path):
+                result.add_warning(
+                    "UNUSED_CUSTOM_ZONE",
+                    f"Custom zone '{zone_type}' is defined but not used in any stage",
+                    suggestion="Consider using this zone in battle_stages.json or remove the map file"
+                )
+
+    return result
+
+
 def run_all_validations(quiet: bool = False) -> bool:
     """
     全てのバリデーションを実行
@@ -417,7 +697,21 @@ def run_all_validations(quiet: bool = False) -> bool:
         all_errors.extend(enum_result.errors)
     all_warnings.extend(enum_result.warnings)
 
-    # 2. クエスト定義チェック
+    # 2. ジャンプラベル同期チェック
+    label_result = validate_jump_label_sync()
+    if label_result.has_errors:
+        all_passed = False
+        all_errors.extend(label_result.errors)
+    all_warnings.extend(label_result.warnings)
+
+    # 3. ドラマ-クエスト整合性チェック
+    drama_quest_result = validate_drama_quest_sync()
+    if drama_quest_result.has_errors:
+        all_passed = False
+        all_errors.extend(drama_quest_result.errors)
+    all_warnings.extend(drama_quest_result.warnings)
+
+    # 4. クエスト定義チェック
     try:
         from quest_dependencies import QUEST_DEFINITIONS
         from drama_constants import ALL_DRAMA_IDS
@@ -439,7 +733,7 @@ def run_all_validations(quiet: bool = False) -> bool:
         if not quiet:
             print(f"WARNING: Could not import quest definitions: {e}")
 
-    # 3. 報酬定義チェック
+    # 5. 報酬定義チェック
     try:
         from rewards import validate_all as validate_rewards
         reward_errors = validate_rewards()
@@ -450,6 +744,13 @@ def run_all_validations(quiet: bool = False) -> bool:
     except ImportError as e:
         if not quiet:
             print(f"WARNING: Could not import rewards for validation: {e}")
+
+    # 6. カスタムゾーン・マップファイル整合性チェック
+    zone_map_result = validate_custom_zone_maps()
+    if zone_map_result.has_errors:
+        all_passed = False
+        all_errors.extend(zone_map_result.errors)
+    all_warnings.extend(zone_map_result.warnings)
 
     # 結果出力
     if not all_passed:

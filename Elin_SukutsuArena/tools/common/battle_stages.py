@@ -103,7 +103,7 @@ class BattleStage:
     stage_id: str               # ユニークID
     display_name_jp: str        # 日本語表示名
     display_name_en: str        # 英語表示名
-    zone_type: str = "field"    # マップタイプ
+    zone_type: str = "field_fine"  # マップタイプ (field_fine=通常, field_snow=雪原)
     biome: str = ""             # Biome設定 (Snow, Sand, etc.) - 空ならデフォルト
     bgm_battle: str = ""        # 戦闘BGM (空なら102)
     bgm_victory: str = "BGM/Fanfare_Audience"  # 勝利BGM（デフォルト）
@@ -145,7 +145,7 @@ RANK_UP_STAGES: Dict[str, BattleStage] = {
         stage_id="rank_g_trial",
         display_name_jp="屑肉の洗礼",
         display_name_en="Baptism of Scrap Meat",
-        zone_type="field",
+        zone_type="field_fine",
         bgm_battle="BGM/Battle_RankG_VoidOoze",  # 初戦BGM
         reward_plat=5,
         enemies=[
@@ -162,13 +162,13 @@ RANK_UP_STAGES: Dict[str, BattleStage] = {
         stage_id="rank_f_trial",
         display_name_jp="霜牙の試練",
         display_name_en="Trial of the Frostfang",
-        zone_type="field",
+        zone_type="field_snow",  # カスタム雪原ゾーン（IsSnowZone=true）
         biome="Snow",  # 動的に雪原ビジュアルを設定
         bgm_battle="BGM/Battle_RankE_Ice",
         reward_plat=10,
         enemies=[
-            # 霜牙の魔犬：古代種、透明化、氷ブレス、鈍足魔法
-            EnemyConfig("sukutsu_frost_hound", level=45, rarity="Legendary", is_boss=True),
+            # 凍土の猟犬：古代種、氷ブレス、透明化、鈍足魔法
+            EnemyConfig("sukutsu_frost_hound", level=45, rarity="Legendary", count=10),
         ],
         gimmicks=[
             # 氷原ギミック：定期的に元素の傷跡デバフを付与
@@ -191,13 +191,13 @@ RANK_UP_STAGES: Dict[str, BattleStage] = {
         stage_id="rank_e_trial",
         display_name_jp="錆びついた英雄",
         display_name_en="The Rusty Hero",
-        zone_type="field",
+        zone_type="field_fine",
         bgm_battle="BGM/Battle_Kain_Requiem",
         reward_plat=20,
         enemies=[
             # カイン：鉄血団の元副団長、バルガスが息子のように愛した存在
             # 今は記憶を失った残留思念として試練の番人を務める
-            EnemyConfig("sukutsu_kain_ghost", level=90, rarity="Legendary", is_boss=True),
+            EnemyConfig("sukutsu_kain_ghost", level=100, rarity="Legendary", is_boss=True),
         ],
         description_jp="鉄血団の元副団長——バルガスが息子のように愛した男。今は記憶の大半を失い、戦闘本能だけが残った残留思念。",
         description_en="Former vice-captain of the Iron Blood Corps—the man Balgas loved like a son. Now a lingering soul with only combat instincts remaining.",
@@ -213,12 +213,12 @@ RANK_UP_STAGES: Dict[str, BattleStage] = {
         stage_id="rank_d_trial",
         display_name_jp="観客の代弁者",
         display_name_en="Voice of the Audience",
-        zone_type="field",
+        zone_type="field_fine",
         bgm_battle="BGM/Battle_RankD_Chaos",
         reward_plat=30,
         enemies=[
             # グリード：観客の力を取り込んだ傀儡、轟音+混沌ブレス
-            EnemyConfig("sukutsu_greed", level=150, rarity="Legendary", is_boss=True),
+            EnemyConfig("sukutsu_greed", level=250, rarity="Legendary", is_boss=True),
         ],
         gimmicks=[
             GimmickConfig(
@@ -248,7 +248,7 @@ RANK_UP_STAGES: Dict[str, BattleStage] = {
         stage_id="rank_c_trial",
         display_name_jp="闘技場の鴉",
         display_name_en="Ravens of the Coliseum",
-        zone_type="field",
+        zone_type="field_fine",
         bgm_battle="BGM/Battle_RankC_Heroic_Lament",
         reward_plat=50,
         enemies=[
@@ -268,13 +268,13 @@ RANK_UP_STAGES: Dict[str, BattleStage] = {
         stage_id="rank_b_trial",
         display_name_jp="虚無の処刑人",
         display_name_en="Void Executioner Null",
-        zone_type="field",
+        zone_type="field_fine",
         bgm_battle="BGM/Battle_Null_Assassin",
         reward_plat=80,
         enemies=[
             # ヌル：透明化する暗殺人形、「神の孵化場」計画の失敗作
             # 誰かの記憶の欠片が眠っている
-            EnemyConfig("sukutsu_null", level=800, rarity="Mythical", is_boss=True),
+            EnemyConfig("sukutsu_null", level=1000, rarity="Mythical", is_boss=True),
         ],
         description_jp="「神の孵化場」計画の失敗作——暗殺人形ヌル。透明化し、一撃で仕留める。彼女の中には、素材となった誰かの記憶が眠っている。",
         description_en="A failure of the 'God Hatchery' project—the assassin doll Null. She turns invisible and kills in one strike. Memories of whoever became her material still slumber within.",
@@ -290,7 +290,7 @@ RANK_UP_STAGES: Dict[str, BattleStage] = {
         stage_id="rank_a_trial",
         display_name_jp="黄金の戦鬼",
         display_name_en="Golden War Demon",
-        zone_type="field",
+        zone_type="field_fine",
         bgm_battle="BGM/Battle_Shadow_Self",
         reward_plat=120,
         enemies=[
@@ -309,13 +309,13 @@ RANK_UP_STAGES: Dict[str, BattleStage] = {
         stage_id="rank_s_trial",
         display_name_jp="屠竜者への道",
         display_name_en="Path to Dragon Slayer",
-        zone_type="field",
+        zone_type="field_fine",
         bgm_battle="BGM/Battle_Balgas_Prime",
         reward_plat=200,
         enemies=[
             # 全盛期バルガス：「若返りの薬」で30代の力を取り戻した鉄血団の団長
             # 200名を超える精鋭を率いた伝説の傭兵
-            EnemyConfig("sukutsu_balgas_prime", level=8000, rarity="Mythical", is_boss=True),
+            EnemyConfig("sukutsu_balgas_prime", level=4000, rarity="Mythical", is_boss=True),
         ],
         description_jp="「若返りの薬」を服用し、全盛期の力を取り戻したバルガス。かつて200名の精鋭を率い、竜すら屠った伝説の傭兵団長。",
         description_en="Balgas restored to his prime by the 'Rejuvenation Potion.' The legendary mercenary captain who once led 200 elites and slew dragons.",
@@ -332,7 +332,7 @@ RANK_UP_STAGES: Dict[str, BattleStage] = {
         stage_id="final_astaroth",
         display_name_jp="竜神との対峙",
         display_name_en="Confrontation with the Dragon God",
-        zone_type="field",
+        zone_type="field_fine",
         bgm_battle="BGM/Battle_Astaroth_Phase1",
         bgm_victory="BGM/Final_Liberation",
         reward_plat=10000,
@@ -357,7 +357,7 @@ NORMAL_STAGES: Dict[str, BattleStage] = {
         stage_id="stage_1",
         display_name_jp="森の狼",
         display_name_en="Forest Wolf",
-        zone_type="field",
+        zone_type="field_fine",
         reward_plat=10,
         enemies=[
             EnemyConfig("wolf", level=5),
@@ -367,7 +367,7 @@ NORMAL_STAGES: Dict[str, BattleStage] = {
         stage_id="stage_2",
         display_name_jp="ケンタウロス",
         display_name_en="Centaur",
-        zone_type="field",
+        zone_type="field_fine",
         reward_plat=20,
         enemies=[
             EnemyConfig("centaur", level=15, rarity="Superior"),
@@ -377,7 +377,7 @@ NORMAL_STAGES: Dict[str, BattleStage] = {
         stage_id="stage_3",
         display_name_jp="ミノタウロス",
         display_name_en="Minotaur",
-        zone_type="field",
+        zone_type="field_fine",
         reward_plat=30,
         enemies=[
             EnemyConfig("minotaur", level=25, rarity="Superior"),
@@ -387,7 +387,7 @@ NORMAL_STAGES: Dict[str, BattleStage] = {
         stage_id="stage_4",
         display_name_jp="竜との対峙",
         display_name_en="Dragon Confrontation",
-        zone_type="field",
+        zone_type="field_fine",
         reward_plat=50,
         enemies=[
             EnemyConfig("dragon", level=40, rarity="Legendary", is_boss=True),
@@ -399,7 +399,7 @@ NORMAL_STAGES: Dict[str, BattleStage] = {
         stage_id="balgas_training_battle",
         display_name_jp="戦士の哲学",
         display_name_en="Warrior's Philosophy",
-        zone_type="field",
+        zone_type="field_fine",
         bgm_battle="BGM/Battle_Balgas_Training",
         reward_plat=0,  # 報酬はドラマで処理
         enemies=[
@@ -415,7 +415,7 @@ NORMAL_STAGES: Dict[str, BattleStage] = {
         stage_id="upper_existence_battle",
         display_name_jp="見えざる観客の供物",
         display_name_en="Offering to the Unseen Audience",
-        zone_type="field",
+        zone_type="field_fine",
         bgm_battle="BGM/ProgressiveDance",  # 上位存在戦BGM
         reward_plat=15,
         enemies=[
@@ -461,7 +461,7 @@ DEBUG_STAGES: Dict[str, BattleStage] = {
         stage_id="debug_weak",
         display_name_jp="[DEBUG] 弱い敵",
         display_name_en="[DEBUG] Weak Enemy",
-        zone_type="field",
+        zone_type="field_fine",
         reward_plat=1,
         enemies=[
             EnemyConfig("putty", level=1),
@@ -474,7 +474,7 @@ DEBUG_STAGES: Dict[str, BattleStage] = {
         stage_id="debug_strong",
         display_name_jp="[DEBUG] 強い敵",
         display_name_en="[DEBUG] Strong Enemy",
-        zone_type="field",
+        zone_type="field_fine",
         reward_plat=100,
         enemies=[
             EnemyConfig("dragon", level=100, rarity="Mythical", is_boss=True),
@@ -487,7 +487,7 @@ DEBUG_STAGES: Dict[str, BattleStage] = {
         stage_id="debug_horde",
         display_name_jp="[DEBUG] 敵の群れ",
         display_name_en="[DEBUG] Enemy Horde",
-        zone_type="field",
+        zone_type="field_fine",
         reward_plat=50,
         enemies=[
             EnemyConfig("goblin", level=10, count=10),
@@ -500,7 +500,7 @@ DEBUG_STAGES: Dict[str, BattleStage] = {
         stage_id="debug_gimmick",
         display_name_jp="[DEBUG] ギミックテスト",
         display_name_en="[DEBUG] Gimmick Test",
-        zone_type="field",
+        zone_type="field_fine",
         reward_plat=10,
         enemies=[
             EnemyConfig("putty", level=5, count=3),
@@ -537,13 +537,40 @@ DEBUG_STAGES: Dict[str, BattleStage] = {
 # JSON出力
 # ========================================
 
-def export_stages_to_json(output_path: str):
-    """ステージ定義をJSONにエクスポート"""
-    data = {
-        "rankUpStages": {k: v.to_dict() for k, v in RANK_UP_STAGES.items()},
-        "normalStages": {k: v.to_dict() for k, v in NORMAL_STAGES.items()},
-        "debugStages": {k: v.to_dict() for k, v in DEBUG_STAGES.items()},
-    }
+def _apply_debug_overrides(stages: Dict[str, BattleStage]) -> Dict[str, Any]:
+    """DEBUGビルド用: 全敵のレベルを1に設定したdictを返す"""
+    result = {}
+    for stage_id, stage in stages.items():
+        stage_dict = stage.to_dict()
+        # 全敵のレベルを1に変更
+        for enemy in stage_dict["enemies"]:
+            enemy["level"] = 1
+        result[stage_id] = stage_dict
+    return result
+
+
+def export_stages_to_json(output_path: str, debug_mode: bool = False):
+    """ステージ定義をJSONにエクスポート
+
+    Args:
+        output_path: 出力先パス
+        debug_mode: Trueの場合、全敵のレベルを1に設定
+    """
+    if debug_mode:
+        # DEBUGビルド: 全敵レベル1
+        data = {
+            "rankUpStages": _apply_debug_overrides(RANK_UP_STAGES),
+            "normalStages": _apply_debug_overrides(NORMAL_STAGES),
+            "debugStages": _apply_debug_overrides(DEBUG_STAGES),
+        }
+        print("[DEBUG MODE] All enemy levels set to 1")
+    else:
+        # Releaseビルド: 通常レベル
+        data = {
+            "rankUpStages": {k: v.to_dict() for k, v in RANK_UP_STAGES.items()},
+            "normalStages": {k: v.to_dict() for k, v in NORMAL_STAGES.items()},
+            "debugStages": {k: v.to_dict() for k, v in DEBUG_STAGES.items()},
+        }
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, 'w', encoding='utf-8') as f:

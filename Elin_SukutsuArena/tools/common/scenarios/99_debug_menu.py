@@ -157,10 +157,7 @@ def define_debug_menu(builder: DramaBuilder):
         .jump(flags_menu)
 
     builder.step(set_relations) \
-        .set_flag("chitsii.arena.rel.lily", 100) \
-        .set_flag("chitsii.arena.rel.balgas", 100) \
-        .set_flag("chitsii.arena.rel.zek", 100) \
-        .say("rel_set", "全関係値を100に設定しました。", "", actor=debug_master) \
+        .say("rel_set", "（旧システム: 関係値は削除されました）", "", actor=debug_master) \
         .jump(flags_menu)
 
     # ========================================

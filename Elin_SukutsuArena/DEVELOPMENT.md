@@ -20,6 +20,32 @@ elin_modding/Elin.Docs/articles/100_Mod Documentation/Custom Whatever Loader/JP/
 - `1_talks.md`: NPCにカスタムダイアログを紐付ける`addDrama_`タグ
 - `4_drama.md`: `invoke*`, `if_flag`, `mod_flag`等の拡張アクション
 
+## CWLキャラクタータグ
+
+キャラクター定義（`create_chara_excel.py`）で使用するCWLタグ：
+
+| タグ | 説明 |
+|-----|------|
+| `addZone_ゾーンID` | 指定ゾーンにキャラクターを生成 |
+| `addFlag_StayHomeZone` | ランダム移動を無効化（初期ゾーンに留まる） |
+| `addDrama_ドラマファイル名` | **ドラマシートをキャラクターにリンク** |
+| `addStock` | 商人の在庫を追加 |
+| `humanSpeak` | 人間らしい会話表示（括弧なし） |
+
+### addDrama_ タグの重要性
+
+**このタグがないと、NPCクリック時にゲームのデフォルト会話（`_chara.xlsx`）が表示される。**
+
+```python
+# 正しい例（ドラマが読み込まれる）
+'tag': f'neutral,addZone_{ZONE_ID},addDrama_drama_sukutsu_receptionist,humanSpeak',
+
+# 誤った例（デフォルト会話になる）
+'tag': f'neutral,addZone_{ZONE_ID},humanSpeak',  # addDrama_がない！
+```
+
+ドラマファイル名は `drama_` プレフィックスを含める（例: `addDrama_drama_sukutsu_receptionist`）。
+
 ## ゲーム本体コード
 
 Elin本体のソースコードは`Elin-Decompiled`以下に配置
@@ -81,6 +107,10 @@ ElinMod/Elin_SukutsuArena/
 cd ElinMod/Elin_SukutsuArena
 build.bat
 ```
+
+- build.bat → Releaseビルド（公開用）
+- build.bat debug → DEBUGビルド（テスト用）
+
 
 ### Excel/Python単体ビルド
 

@@ -184,7 +184,6 @@ def define_lily_private(builder: DramaBuilder):
     # ========================================
     builder.step(ending) \
         .complete_quest(QuestIds.LILY_PRIVATE) \
-        .mod_flag(Keys.REL_LILY, "+", 10) \
         .say("sys_buff", "【システム】『リリィの寵愛』を獲得しました。魔力+5、回避+5、魅了耐性+10 の加護を得た！", "") \
         .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantLilyPrivateBonus();") \
         .finish()

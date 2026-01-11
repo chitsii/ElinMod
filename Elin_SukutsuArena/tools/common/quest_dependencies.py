@@ -87,9 +87,6 @@ QUEST_DEFINITIONS = [
         required_quests=[],
         completion_flags={
             Keys.RANK: "unranked",
-            Keys.REL_LILY: 30,
-            Keys.REL_BALGAS: 20,
-            Keys.REL_ZEK: 0,
         },
         priority=1000,
     ),
@@ -107,14 +104,10 @@ QUEST_DEFINITIONS = [
         phase=Phase.PROLOGUE,
         quest_giver=Actors.BALGAS,
         auto_trigger=False,
-        advances_phase=Phase.INITIATION,  # 初戦勝利でフェーズ進行
-        required_flags=[
-            FlagCondition(Keys.RANK, "==", "unranked"),
-        ],
+        advances_phase=Phase.INITIATION,
+        required_flags=[],  # フラグ条件削除
         required_quests=[QuestIds.OPENING],
-        completion_flags={
-            Keys.RANK: "G",
-        },
+        completion_flags={},  # ランクはクエスト完了から推論
         priority=950,
     ),
 
@@ -128,14 +121,10 @@ QUEST_DEFINITIONS = [
         phase=Phase.INITIATION,
         quest_giver=Actors.BALGAS,
         auto_trigger=False,
-        advances_phase=Phase.RISING,  # Rank F昇格でフェーズ進行
-        required_flags=[
-            FlagCondition(Keys.RANK, "==", "G"),
-        ],
+        advances_phase=Phase.RISING,
+        required_flags=[],  # フラグ条件削除
         required_quests=[QuestIds.RANK_UP_G],
-        completion_flags={
-            Keys.RANK: "F",
-        },
+        completion_flags={},  # ランクはクエスト完了から推論
         priority=900,
     ),
 
@@ -147,16 +136,12 @@ QUEST_DEFINITIONS = [
         display_name_en="Rank E Promotion Trial (Rusted Hero Kain)",
         description="錆びついた英雄カインを倒し、ランクEを獲得する",
         phase=Phase.RISING,
-        quest_giver=Actors.BALGAS,  # バルガスの依頼
+        quest_giver=Actors.BALGAS,
         auto_trigger=False,
         advances_phase=None,
-        required_flags=[
-            FlagCondition(Keys.RANK, "==", "F"),
-        ],
+        required_flags=[],  # フラグ条件削除
         required_quests=[QuestIds.RANK_UP_F],
-        completion_flags={
-            Keys.RANK: "E",
-        },
+        completion_flags={},  # ランクはクエスト完了から推論
         priority=900,
     ),
 
@@ -170,14 +155,10 @@ QUEST_DEFINITIONS = [
         phase=Phase.RISING,
         quest_giver=Actors.BALGAS,
         auto_trigger=False,
-        advances_phase=Phase.AWAKENING,  # Rank D昇格でフェーズ進行
-        required_flags=[
-            FlagCondition(Keys.RANK, "==", "E"),
-        ],
+        advances_phase=Phase.AWAKENING,
+        required_flags=[],  # フラグ条件削除
         required_quests=[QuestIds.RANK_UP_E],
-        completion_flags={
-            Keys.RANK: "D",
-        },
+        completion_flags={},  # ランクはクエスト完了から推論
         priority=900,
     ),
 
@@ -189,16 +170,12 @@ QUEST_DEFINITIONS = [
         display_name_en="Rank C Promotion Trial (Arena Crow)",
         description="堕ちた英雄たちを解放し、ランクCを獲得する",
         phase=Phase.AWAKENING,
-        quest_giver=Actors.BALGAS,  # バルガスの依頼
+        quest_giver=Actors.BALGAS,
         auto_trigger=False,
         advances_phase=None,
-        required_flags=[
-            FlagCondition(Keys.RANK, "==", "D"),
-        ],
+        required_flags=[],  # フラグ条件削除
         required_quests=[QuestIds.RANK_UP_D],
-        completion_flags={
-            Keys.RANK: "C",
-        },
+        completion_flags={},  # ランクはクエスト完了から推論
         priority=900,
     ),
 
@@ -212,14 +189,10 @@ QUEST_DEFINITIONS = [
         phase=Phase.AWAKENING,
         quest_giver=Actors.BALGAS,
         auto_trigger=False,
-        advances_phase=Phase.CONFRONTATION,  # Rank B昇格（ヌル撃破）でフェーズ進行
-        required_flags=[
-            FlagCondition(Keys.RANK, "==", "C"),
-        ],
+        advances_phase=Phase.CONFRONTATION,
+        required_flags=[],  # フラグ条件削除
         required_quests=[QuestIds.RANK_UP_C],
-        completion_flags={
-            Keys.RANK: "B",
-        },
+        completion_flags={},  # ランクはクエスト完了から推論
         priority=900,
     ),
 
@@ -234,35 +207,64 @@ QUEST_DEFINITIONS = [
         quest_giver=Actors.BALGAS,
         auto_trigger=False,
         advances_phase=None,
-        required_flags=[
-            FlagCondition(Keys.RANK, "==", "B"),
-        ],
-        required_quests=[QuestIds.RANK_UP_B, QuestIds.MAKUMA2],
-        completion_flags={
-            Keys.RANK: "A",
-        },
+        required_flags=[],  # フラグ条件削除
+        required_quests=[QuestIds.RANK_UP_B],  # MAKUMA2は瓶すり替え時のみなので削除
+        completion_flags={},  # ランクはクエスト完了から推論
         priority=900,
     ),
 
+    # ランクS昇格試験 親クエスト（バルガスのドラマから開始）
     QuestDefinition(
         quest_id=QuestIds.RANK_UP_S,
         quest_type=QuestType.RANK_UP,
         drama_id="vs_balgas",
-        display_name_jp="ランクS昇格試験（バルガス全盛期との一騎打ち）",
-        display_name_en="Rank S Promotion Trial (Duel with Prime Balgas)",
-        description="バルガスの全盛期の姿と戦い、ランクSを獲得する",
+        display_name_jp="Rank S 昇格試験『屠竜者への道』",
+        display_name_en="Rank S Trial: Path to Dragon Slayer",
+        description="全盛期のバルガスとの最終決戦",
         phase=Phase.CONFRONTATION,
         quest_giver=Actors.BALGAS,
         auto_trigger=False,
         advances_phase=None,
-        required_flags=[
-            FlagCondition(Keys.RANK, "==", "A"),
-        ],
+        required_flags=[],
         required_quests=[QuestIds.RANK_UP_A],
-        completion_flags={
-            Keys.RANK: "S",
-        },
-        branch_choices=["balgas_choice"],
+        completion_flags={},
+        priority=910,  # 分岐より少し高い
+    ),
+
+    # ランクS昇格分岐クエスト（排他的）
+    QuestDefinition(
+        quest_id=QuestIds.RANK_UP_S_BALGAS_SPARED,
+        quest_type=QuestType.RANK_UP,
+        drama_id="vs_balgas",  # 同じドラマ、選択で分岐
+        display_name_jp="ランクS昇格：バルガスを見逃す",
+        display_name_en="Rank S: Spare Balgas",
+        description="バルガスを見逃し、慈悲の道を選んだ",
+        phase=Phase.CONFRONTATION,
+        quest_giver=Actors.BALGAS,
+        auto_trigger=False,
+        advances_phase=None,
+        required_flags=[],  # フラグ条件なし
+        required_quests=[QuestIds.RANK_UP_A],
+        completion_flags={},
+        blocks_quests=[QuestIds.RANK_UP_S_BALGAS_KILLED],  # 排他的
+        priority=900,
+    ),
+
+    QuestDefinition(
+        quest_id=QuestIds.RANK_UP_S_BALGAS_KILLED,
+        quest_type=QuestType.RANK_UP,
+        drama_id="vs_balgas",  # 同じドラマ、選択で分岐
+        display_name_jp="ランクS昇格：バルガスを殺す",
+        display_name_en="Rank S: Kill Balgas",
+        description="観客の命令に従い、バルガスを殺した",
+        phase=Phase.CONFRONTATION,
+        quest_giver=Actors.BALGAS,
+        auto_trigger=False,
+        advances_phase=None,
+        required_flags=[],  # フラグ条件なし
+        required_quests=[QuestIds.RANK_UP_A],
+        completion_flags={},
+        blocks_quests=[QuestIds.RANK_UP_S_BALGAS_SPARED, QuestIds.LILY_PRIVATE],  # 排他的、LILY_PRIVATEもブロック
         priority=900,
     ),
 
@@ -280,13 +282,9 @@ QUEST_DEFINITIONS = [
         quest_giver=Actors.ZEK,
         auto_trigger=False,
         advances_phase=None,
-        required_flags=[
-            FlagCondition(Keys.RANK, ">=", "G"),
-        ],
+        required_flags=[],  # フラグ条件削除
         required_quests=[QuestIds.RANK_UP_G],
-        completion_flags={
-            Keys.REL_ZEK: 10,
-        },
+        completion_flags={},  # 関係値はクエスト完了から推論
         priority=800,
     ),
 
@@ -301,51 +299,119 @@ QUEST_DEFINITIONS = [
         quest_giver=Actors.LILY,
         auto_trigger=False,
         advances_phase=None,
-        required_flags=[
-            FlagCondition(Keys.RANK, ">=", "F"),
-        ],
+        required_flags=[],  # フラグ条件削除
         required_quests=[QuestIds.RANK_UP_F],
-        completion_flags={},  # rel.lily +5 は mod_flag で処理
+        completion_flags={},
         priority=700,
     ),
 
+    # 瓶すり替え親クエスト（ゼクのドラマから開始）
     QuestDefinition(
         quest_id=QuestIds.ZEK_STEAL_BOTTLE,
         quest_type=QuestType.SIDE_QUEST,
         drama_id="zek_steal_bottle",
-        display_name_jp="ゼクの器すり替え提案",
-        display_name_en="Zek's Bottle Swap Proposal",
-        description="ゼクが共鳴瓶のすり替えを提案する【重要分岐】",
+        display_name_jp="ゼクの器すり替え",
+        display_name_en="Zek's Bottle Swap",
+        description="ゼクが共鳴瓶のすり替えを提案してくる",
         phase=Phase.INITIATION,
         quest_giver=Actors.ZEK,
         auto_trigger=False,
         advances_phase=None,
-        required_flags=[
-            FlagCondition(Keys.RANK, ">=", "F"),
-        ],
+        required_flags=[],
         required_quests=[QuestIds.LILY_EXPERIMENT],
-        completion_flags={},  # bottle_choice は選択で設定
-        branch_choices=["bottle_choice"],
+        completion_flags={},
+        priority=710,  # LILY_EXPERIMENTより少し高い
+    ),
+
+    # 瓶すり替え分岐クエスト（排他的）
+    QuestDefinition(
+        quest_id=QuestIds.ZEK_STEAL_BOTTLE_ACCEPT,
+        quest_type=QuestType.SIDE_QUEST,
+        drama_id="zek_steal_bottle",  # 同じドラマ、選択で分岐
+        display_name_jp="ゼクの器すり替え：応諾",
+        display_name_en="Zek's Bottle Swap: Accepted",
+        description="ゼクの提案に応じて共鳴瓶をすり替えた",
+        phase=Phase.INITIATION,
+        quest_giver=Actors.ZEK,
+        auto_trigger=False,
+        advances_phase=None,
+        required_flags=[],  # フラグ条件なし
+        required_quests=[QuestIds.LILY_EXPERIMENT],
+        completion_flags={},
+        blocks_quests=[QuestIds.ZEK_STEAL_BOTTLE_REFUSE],  # 排他的
         priority=700,
     ),
 
     QuestDefinition(
+        quest_id=QuestIds.ZEK_STEAL_BOTTLE_REFUSE,
+        quest_type=QuestType.SIDE_QUEST,
+        drama_id="zek_steal_bottle",  # 同じドラマ、選択で分岐
+        display_name_jp="ゼクの器すり替え：拒否",
+        display_name_en="Zek's Bottle Swap: Refused",
+        description="ゼクの提案を断り、正直にリリィに渡した",
+        phase=Phase.INITIATION,
+        quest_giver=Actors.ZEK,
+        auto_trigger=False,
+        advances_phase=None,
+        required_flags=[],  # フラグ条件なし
+        required_quests=[QuestIds.LILY_EXPERIMENT],
+        completion_flags={},
+        blocks_quests=[QuestIds.ZEK_STEAL_BOTTLE_ACCEPT],  # 排他的
+        priority=700,
+    ),
+
+    # カイン魂親クエスト（ゼクのドラマから開始）
+    QuestDefinition(
         quest_id=QuestIds.ZEK_STEAL_SOULGEM,
         quest_type=QuestType.SIDE_QUEST,
         drama_id="zek_steal_soulgem",
-        display_name_jp="カインの魂の選択",
-        display_name_en="Kain's Soul Choice",
-        description="カインの魂をゼクに売るか、バルガスに返すか選択する【重要分岐】",
+        display_name_jp="カインの魂の行方",
+        display_name_en="Fate of Kain's Soul",
+        description="ゼクがカインの魂の取引を持ちかけてくる",
         phase=Phase.RISING,
         quest_giver=Actors.ZEK,
         auto_trigger=False,
         advances_phase=None,
-        required_flags=[
-            FlagCondition(Keys.RANK, "==", "E"),
-        ],
+        required_flags=[],
         required_quests=[QuestIds.RANK_UP_E],
         completion_flags={},
-        branch_choices=["kain_soul_choice"],
+        priority=860,  # 分岐より少し高い
+    ),
+
+    # カイン魂分岐クエスト（排他的）
+    QuestDefinition(
+        quest_id=QuestIds.ZEK_STEAL_SOULGEM_SELL,
+        quest_type=QuestType.SIDE_QUEST,
+        drama_id="zek_steal_soulgem",  # 同じドラマ、選択で分岐
+        display_name_jp="カインの魂：売却",
+        display_name_en="Kain's Soul: Sold",
+        description="カインの魂をゼクに売った",
+        phase=Phase.RISING,
+        quest_giver=Actors.ZEK,
+        auto_trigger=False,
+        advances_phase=None,
+        required_flags=[],  # フラグ条件なし
+        required_quests=[QuestIds.RANK_UP_E],
+        completion_flags={},
+        blocks_quests=[QuestIds.ZEK_STEAL_SOULGEM_RETURN],  # 排他的
+        priority=850,
+    ),
+
+    QuestDefinition(
+        quest_id=QuestIds.ZEK_STEAL_SOULGEM_RETURN,
+        quest_type=QuestType.SIDE_QUEST,
+        drama_id="zek_steal_soulgem",  # 同じドラマ、選択で分岐
+        display_name_jp="カインの魂：返還",
+        display_name_en="Kain's Soul: Returned",
+        description="カインの魂をバルガスに返した",
+        phase=Phase.RISING,
+        quest_giver=Actors.ZEK,
+        auto_trigger=False,
+        advances_phase=None,
+        required_flags=[],  # フラグ条件なし
+        required_quests=[QuestIds.RANK_UP_E],
+        completion_flags={},
+        blocks_quests=[QuestIds.ZEK_STEAL_SOULGEM_SELL],  # 排他的
         priority=850,
     ),
 
@@ -360,9 +426,7 @@ QUEST_DEFINITIONS = [
         quest_giver=Actors.BALGAS,
         auto_trigger=False,
         advances_phase=None,
-        required_flags=[
-            FlagCondition(Keys.RANK, "==", "D"),
-        ],
+        required_flags=[],  # フラグ条件削除
         required_quests=[QuestIds.RANK_UP_D],
         completion_flags={},
         priority=800,
@@ -379,12 +443,10 @@ QUEST_DEFINITIONS = [
         quest_giver=Actors.LILY,
         auto_trigger=False,
         advances_phase=None,
-        required_flags=[
-            FlagCondition(Keys.RANK, ">=", "D"),
-            FlagCondition(Keys.REL_LILY, ">=", 40),
-        ],
-        required_quests=[QuestIds.RANK_UP_D],
+        required_flags=[],  # フラグ条件削除
+        required_quests=[QuestIds.RANK_UP_D],  # ランクD昇格のみ
         completion_flags={},
+        blocks_quests=[],  # バルガス殺害時はArenaQuestManagerでブロック
         priority=600,
     ),
 
@@ -399,11 +461,8 @@ QUEST_DEFINITIONS = [
         quest_giver=Actors.BALGAS,
         auto_trigger=False,
         advances_phase=None,
-        required_flags=[
-            FlagCondition(Keys.RANK, ">=", "D"),
-            FlagCondition(Keys.REL_BALGAS, ">=", 40),
-        ],
-        required_quests=[QuestIds.RANK_UP_D],
+        required_flags=[],  # フラグ条件削除
+        required_quests=[QuestIds.RANK_UP_D],  # ランクD昇格のみ
         completion_flags={},
         priority=650,
     ),
@@ -419,13 +478,9 @@ QUEST_DEFINITIONS = [
         quest_giver=Actors.LILY,
         auto_trigger=False,
         advances_phase=None,
-        required_flags=[
-            FlagCondition(Keys.RANK, "==", "B"),
-        ],
+        required_flags=[],  # フラグ条件削除
         required_quests=[QuestIds.RANK_UP_B],
-        completion_flags={
-            Keys.NULL_CHIP: True,
-        },
+        completion_flags={},  # フラグ設定削除
         priority=850,
     ),
 
@@ -440,13 +495,9 @@ QUEST_DEFINITIONS = [
         quest_giver=None,  # 自動発動（重要イベント）
         auto_trigger=True,  # 条件付き自動発動
         advances_phase=None,
-        required_flags=[
-            FlagCondition(Keys.RANK, "==", "B"),
-            FlagCondition(Keys.BOTTLE_CHOICE, "==", "swapped"),  # 瓶すり替え時のみ発動
-        ],
-        required_quests=[QuestIds.MAKUMA],
+        required_flags=[],  # フラグ条件削除
+        required_quests=[QuestIds.MAKUMA, QuestIds.ZEK_STEAL_BOTTLE_ACCEPT],  # 瓶すり替え完了が条件
         completion_flags={},
-        branch_choices=["lily_bottle_confession", "kain_soul_confession"],
         priority=850,
     ),
 
@@ -461,22 +512,17 @@ QUEST_DEFINITIONS = [
         quest_giver=Actors.LILY,
         auto_trigger=False,
         advances_phase=None,
-        required_flags=[
-            FlagCondition(Keys.RANK, "==", "S"),
-            FlagCondition(Keys.BALGAS_CHOICE, "==", "spared"),
-            FlagCondition(Keys.REL_LILY, ">=", 50),
-        ],
-        required_quests=[QuestIds.RANK_UP_S],
-        completion_flags={
-            Keys.LILY_TRUE_NAME: "Liliaris",
-        },
-        blocks_quests=[],
+        required_flags=[],  # フラグ条件削除
+        required_quests=[QuestIds.RANK_UP_S_BALGAS_SPARED],  # バルガス見逃しが必須
+        completion_flags={},
         priority=600,
     ),
 
     # ========================================
     # 最終章
     # ========================================
+    # NOTE: VS_GRANDMASTER_1 はバルガス戦完了（どちらか）が必要
+    # ArenaQuestManager で特別にチェック: RANK_UP_S_BALGAS_SPARED または RANK_UP_S_BALGAS_KILLED
     QuestDefinition(
         quest_id=QuestIds.VS_GRANDMASTER_1,
         quest_type=QuestType.MAIN_STORY,
@@ -488,13 +534,9 @@ QUEST_DEFINITIONS = [
         quest_giver=None,  # 自動発動
         auto_trigger=True,
         advances_phase=Phase.CLIMAX,  # 逃亡開始でフェーズ進行
-        required_flags=[
-            FlagCondition(Keys.RANK, "==", "S"),
-        ],
-        required_quests=[QuestIds.RANK_UP_S],
-        completion_flags={
-            Keys.FUGITIVE: True,
-        },
+        required_flags=[],  # フラグ条件削除
+        required_quests=[QuestIds.RANK_UP_A],  # バルガス戦完了はArenaQuestManagerでチェック
+        completion_flags={},
         priority=900,
     ),
 
@@ -509,12 +551,9 @@ QUEST_DEFINITIONS = [
         quest_giver=None,  # 自動発動
         auto_trigger=True,
         advances_phase=None,
-        required_flags=[
-            FlagCondition(Keys.FUGITIVE, "==", True),
-        ],
+        required_flags=[],  # フラグ条件削除
         required_quests=[QuestIds.VS_GRANDMASTER_1],
         completion_flags={},
-        branch_choices=["ending"],
         priority=1000,
     ),
 ]
@@ -857,9 +896,6 @@ if __name__ == "__main__":
     current_flags = {
         Keys.RANK: "unranked",
         Keys.CURRENT_PHASE: 0,  # PROLOGUE
-        Keys.REL_LILY: 30,
-        Keys.REL_BALGAS: 20,
-        Keys.REL_ZEK: 0,
     }
     completed = set()
 

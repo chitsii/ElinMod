@@ -3,7 +3,7 @@ from drama_builder import DramaBuilder
 from flag_definitions import (
     Keys, Actors, FlagValues, QuestIds,
     Motivation, Rank,
-    PlayerFlags, RelFlags
+    PlayerFlags
 )
 
 def define_opening_drama(builder: DramaBuilder):
@@ -125,9 +125,6 @@ def define_opening_drama(builder: DramaBuilder):
         .say("end_v1", "リリィ！ こいつの名前を、剣闘士の列に書き加えろ！", actor=vargus) \
         .say("end_v2", "お前がただの肉塊か、それとも多少は骨のある肉塊か……。このコロシアムで証明してみせな。", actor=vargus) \
         .set_flag(Keys.RANK, 0) \
-        .set_flag(Keys.REL_LILY, 30) \
-        .set_flag(Keys.REL_BALGAS, 20) \
-        .set_flag(Keys.REL_ZEK, 0) \
         .set_flag("sukutsu_gladiator", 1) \
         .set_flag("sukutsu_arena_stage", 1) \
         .set_flag("sukutsu_opening_seen", 1) \

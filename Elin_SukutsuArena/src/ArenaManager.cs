@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using UnityEngine;
 using DG.Tweening;
@@ -313,15 +314,26 @@ namespace Elin_SukutsuArena
         public static void GrantRankEBonus()
         {
             var pc = EClass.pc;
-            if (pc == null) return;
+            if (pc == null || pc.elements == null)
+            {
+                Debug.LogWarning("[SukutsuArena] GrantRankEBonus: pc or elements is null, skipping");
+                return;
+            }
 
-            // 筋力+3 (Element ID: 70 = STR)
-            pc.elements.ModBase(70, 3);
-            // PV+5 (Element ID: 153 = PV)
-            pc.elements.ModBase(153, 5);
+            try
+            {
+                // 筋力+3 (Element ID: 70 = STR)
+                pc.elements.ModBase(70, 3);
+                // PV+5 (Element ID: 153 = PV)
+                pc.elements.ModBase(153, 5);
 
-            Msg.Say("【鉄屑の加護】筋力+3、PV+5 を獲得！");
-            Debug.Log("[SukutsuArena] Granted Rank E bonus: STR+3, PV+5");
+                Msg.Say("【鉄屑の加護】筋力+3、PV+5 を獲得！");
+                Debug.Log("[SukutsuArena] Granted Rank E bonus: STR+3, PV+5");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[SukutsuArena] GrantRankEBonus failed: {ex.Message}");
+            }
         }
 
         /// <summary>
@@ -491,24 +503,11 @@ namespace Elin_SukutsuArena
         }
 
         /// <summary>
-        /// マクマ（ランクB後イベント）報酬: 関係値+10
+        /// マクマ（ランクB後イベント）報酬
         /// </summary>
         public static void GrantMakumaReward()
         {
-            var storage = Core.ArenaContext.I?.Storage;
-            if (storage == null) return;
-
-            // リリィとの関係値+10
-            string lilyKey = "chitsii.arena.rel.lily";
-            int lilyRel = storage.GetInt(lilyKey, 30);
-            storage.SetInt(lilyKey, System.Math.Min(100, lilyRel + 10));
-
-            // ゼクとの関係値+10
-            string zekKey = "chitsii.arena.rel.zek";
-            int zekRel = storage.GetInt(zekKey, 30);
-            storage.SetInt(zekKey, System.Math.Min(100, zekRel + 10));
-
-            Debug.Log($"[SukutsuArena] Granted Makuma reward: Lily rel +10, Zek rel +10");
+            Debug.Log("[SukutsuArena] Granted Makuma reward");
         }
 
         /// <summary>
@@ -560,15 +559,6 @@ namespace Elin_SukutsuArena
             {
                 ArenaQuestManager.Instance.CompleteQuest("09_balgas_training");
 
-                // 関係値+20
-                var storage = Core.ArenaContext.I?.Storage;
-                if (storage != null)
-                {
-                    string balgasKey = "chitsii.arena.rel.balgas";
-                    int balgasRel = storage.GetInt(balgasKey, 20);
-                    storage.SetInt(balgasKey, System.Math.Min(100, balgasRel + 20));
-                }
-
                 // ステータスボーナス付与
                 GrantBalgasTrainingBonus();
 
@@ -588,12 +578,11 @@ namespace Elin_SukutsuArena
             var storage = Core.ArenaContext.I?.Storage;
             if (storage != null)
             {
-                storage.SetInt("chitsii.arena.rel.lily", 20);
                 storage.SetInt("chitsii.arena.lily_trust_rebuild", 1);
             }
             // カルマ+5
             EClass.player.ModKarma(5);
-            Debug.Log("[SukutsuArena] Makuma2: Confessed to Lily (Karma+5, Lily rel=20)");
+            Debug.Log("[SukutsuArena] Makuma2: Confessed to Lily (Karma+5)");
         }
 
         /// <summary>
@@ -613,12 +602,11 @@ namespace Elin_SukutsuArena
             var storage = Core.ArenaContext.I?.Storage;
             if (storage != null)
             {
-                storage.SetInt("chitsii.arena.rel.lily", 0);
                 storage.SetInt("chitsii.arena.lily_hostile", 1);
             }
             // カルマ-30
             EClass.player.ModKarma(-30);
-            Debug.Log("[SukutsuArena] Makuma2: Denied involvement (Karma-30, Lily rel=0, hostile)");
+            Debug.Log("[SukutsuArena] Makuma2: Denied involvement (Karma-30, hostile)");
         }
 
         /// <summary>
@@ -629,12 +617,11 @@ namespace Elin_SukutsuArena
             var storage = Core.ArenaContext.I?.Storage;
             if (storage != null)
             {
-                storage.SetInt("chitsii.arena.rel.balgas", 0);
                 storage.SetInt("chitsii.arena.balgas_trust_broken", 1);
             }
             // カルマ-20
             EClass.player.ModKarma(-20);
-            Debug.Log("[SukutsuArena] Makuma2: Confessed about Kain (Karma-20, Balgas rel=0)");
+            Debug.Log("[SukutsuArena] Makuma2: Confessed about Kain (Karma-20)");
         }
 
         /// <summary>
@@ -642,12 +629,7 @@ namespace Elin_SukutsuArena
         /// </summary>
         public static void Makuma2LieAboutKain()
         {
-            var storage = Core.ArenaContext.I?.Storage;
-            if (storage != null)
-            {
-                storage.SetInt("chitsii.arena.rel.balgas", 30);
-            }
-            Debug.Log("[SukutsuArena] Makuma2: Lied about Kain (Balgas rel=30)");
+            Debug.Log("[SukutsuArena] Makuma2: Lied about Kain");
         }
 
         /// <summary>
@@ -655,14 +637,7 @@ namespace Elin_SukutsuArena
         /// </summary>
         public static void Makuma2ChooseTrust()
         {
-            var storage = Core.ArenaContext.I?.Storage;
-            if (storage != null)
-            {
-                string balgasKey = "chitsii.arena.rel.balgas";
-                int balgasRel = storage.GetInt(balgasKey, 30);
-                storage.SetInt(balgasKey, System.Math.Min(100, balgasRel + 10));
-            }
-            Debug.Log("[SukutsuArena] Makuma2: Chose trust (Balgas rel+10)");
+            Debug.Log("[SukutsuArena] Makuma2: Chose trust");
         }
 
         /// <summary>
@@ -670,14 +645,7 @@ namespace Elin_SukutsuArena
         /// </summary>
         public static void Makuma2ChooseKnowledge()
         {
-            var storage = Core.ArenaContext.I?.Storage;
-            if (storage != null)
-            {
-                string balgasKey = "chitsii.arena.rel.balgas";
-                int balgasRel = storage.GetInt(balgasKey, 30);
-                storage.SetInt(balgasKey, System.Math.Max(0, balgasRel - 5));
-            }
-            Debug.Log("[SukutsuArena] Makuma2: Chose knowledge (Balgas rel-5)");
+            Debug.Log("[SukutsuArena] Makuma2: Chose knowledge");
         }
     }
 }

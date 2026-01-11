@@ -58,12 +58,24 @@ class QuestIds:
     RANK_UP_C = "09_rank_up_C"              # ランクC昇格（闘技場の鴉）
     RANK_UP_B = "11_rank_up_B"              # ランクB昇格（虚無の処刑人ヌル）
     RANK_UP_A = "12_rank_up_A"              # ランクA昇格（影との戦い）
-    RANK_UP_S = "15_vs_balgas"              # ランクS昇格（バルガス戦）
+
+    # ランクS昇格（親クエスト + 分岐）
+    RANK_UP_S = "15_vs_balgas"                      # 親（どちらかが完了すれば完了）
+    RANK_UP_S_BALGAS_SPARED = "15_vs_balgas_spared"  # 分岐: バルガスを見逃した
+    RANK_UP_S_BALGAS_KILLED = "15_vs_balgas_killed"  # 分岐: バルガスを殺した
 
     # === ゼクルート ===
     ZEK_INTRO = "03_zek_intro"              # ゼク初遭遇
-    ZEK_STEAL_BOTTLE = "05_2_zek_steal_bottle"    # 器すり替え提案
-    ZEK_STEAL_SOULGEM = "06_2_zek_steal_soulgem"  # カイン魂の選択
+
+    # 瓶すり替え（親クエスト + 分岐）
+    ZEK_STEAL_BOTTLE = "05_2_zek_steal_bottle"                  # 親（どちらかが完了すれば完了）
+    ZEK_STEAL_BOTTLE_ACCEPT = "05_2_zek_steal_bottle_accept"    # 分岐: 器すり替えに応じた
+    ZEK_STEAL_BOTTLE_REFUSE = "05_2_zek_steal_bottle_refuse"    # 分岐: 器すり替えを拒否
+
+    # カイン魂（親クエスト + 分岐）
+    ZEK_STEAL_SOULGEM = "06_2_zek_steal_soulgem"                  # 親（どちらかが完了すれば完了）
+    ZEK_STEAL_SOULGEM_SELL = "06_2_zek_steal_soulgem_sell"        # 分岐: ゼクに売った
+    ZEK_STEAL_SOULGEM_RETURN = "06_2_zek_steal_soulgem_return"    # 分岐: バルガスに返した
 
     # === キャラクターイベント ===
     LILY_EXPERIMENT = "05_1_lily_experiment"  # リリィの私的依頼
@@ -452,35 +464,51 @@ class PlayerFlags:
 
 
 # ============================================================================
-# Flag Instances - Relationship Values
+# Jump Label Definitions (must sync with C# JumpLabelMapping.cs)
 # ============================================================================
 
-class RelFlags:
-    """NPC関係値フラグ"""
+# ジャンプラベル定義（C#側JumpLabelMapping.csと同期必須）
+# ビルド時に validation.py でチェックされる
+JUMP_LABELS = {
+    # ランクアップ開始系 (11-17)
+    "start_rank_g": 11,
+    "start_rank_f": 12,
+    "start_rank_e": 13,
+    "start_rank_d": 14,
+    "start_rank_c": 15,
+    "start_rank_b": 16,
+    "start_rank_a": 17,
 
-    lily = IntFlag(
-        key="rel.lily",
-        default=30,
-        min_value=0,
-        max_value=100,
-        description="リリィとの関係値"
-    )
+    # ランクアップクエスト確認系 (同じ値を共有)
+    "quest_rank_up_g": 11,
+    "quest_rank_up_f": 12,
+    "quest_rank_up_e": 13,
+    "quest_rank_up_d": 14,
+    "quest_rank_up_c": 15,
+    "quest_rank_up_b": 16,
+    "quest_rank_up_a": 17,
 
-    balgas = IntFlag(
-        key="rel.balgas",
-        default=20,
-        min_value=0,
-        max_value=100,
-        description="バルガスとの関係値"
-    )
-
-    zek = IntFlag(
-        key="rel.zek",
-        default=0,
-        min_value=0,
-        max_value=100,
-        description="ゼクとの関係値"
-    )
+    # ストーリークエスト系 (21-33)
+    "quest_zek_intro": 21,
+    "start_zek_intro": 21,
+    "quest_lily_exp": 22,
+    "start_lily_experiment": 22,
+    "quest_zek_steal_bottle": 23,
+    "start_zek_steal_bottle": 23,
+    "quest_zek_steal_soulgem": 24,
+    "start_zek_steal_soulgem": 24,
+    "quest_upper_existence": 25,
+    "quest_lily_private": 26,
+    "start_lily_private": 26,
+    "quest_balgas_training": 27,
+    "quest_makuma": 28,
+    "quest_makuma2": 29,
+    "quest_vs_balgas": 30,
+    "quest_lily_real_name": 31,
+    "start_lily_real_name": 31,
+    "quest_vs_grandmaster_1": 32,
+    "quest_last_battle": 33,
+}
 
 
 # ============================================================================
@@ -494,12 +522,6 @@ def get_all_flags() -> List[FlagDef]:
     for name in dir(PlayerFlags):
         if not name.startswith('_'):
             attr = getattr(PlayerFlags, name)
-            if isinstance(attr, FlagDef):
-                flags.append(attr)
-
-    for name in dir(RelFlags):
-        if not name.startswith('_'):
-            attr = getattr(RelFlags, name)
             if isinstance(attr, FlagDef):
                 flags.append(attr)
 
@@ -551,11 +573,6 @@ class Keys:
     LILY_HOSTILE = PlayerFlags.lily_hostile.full_key
     BALGAS_TRUST_BROKEN = PlayerFlags.balgas_trust_broken.full_key
 
-    # Relationships
-    REL_LILY = RelFlags.lily.full_key
-    REL_BALGAS = RelFlags.balgas.full_key
-    REL_ZEK = RelFlags.zek.full_key
-
 
 # ============================================================================
 # Unit Tests
@@ -586,6 +603,5 @@ if __name__ == "__main__":
     # Test Keys
     print("\n=== Keys Test ===")
     print(f"MOTIVATION key: {Keys.MOTIVATION}")
-    print(f"REL_LILY key: {Keys.REL_LILY}")
 
     print("\n=== All Tests Passed! ===")

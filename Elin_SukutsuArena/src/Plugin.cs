@@ -163,9 +163,6 @@ public class Plugin : BaseUnityPlugin
         Debug.Log($"  Phase: {ctx.Player.CurrentPhase}");
         Debug.Log($"  Karma: {ctx.Player.Karma}");
         Debug.Log($"  Contribution: {ctx.Player.Contribution}");
-        Debug.Log($"  Rel.Lily: {ctx.Rel.Lily}");
-        Debug.Log($"  Rel.Balgas: {ctx.Rel.Balgas}");
-        Debug.Log($"  Rel.Zek: {ctx.Rel.Zek}");
 
         // クエスト状態を表示
         ArenaQuestManager.Instance.DebugLogQuestState();
@@ -174,7 +171,6 @@ public class Plugin : BaseUnityPlugin
         var rank = ctx.Player.Rank;
         var gladiator = ctx.Storage.GetInt("sukutsu_gladiator") != 0;
         Msg.Say($"[Arena] Rank: {rank}, Gladiator: {gladiator}");
-        Msg.Say($"[Arena] Lily: {ctx.Rel.Lily}, Balgas: {ctx.Rel.Balgas}");
 
         var available = ArenaQuestManager.Instance.GetAvailableQuests();
         if (available.Count > 0)

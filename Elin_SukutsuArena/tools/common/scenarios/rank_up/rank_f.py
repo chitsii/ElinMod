@@ -125,8 +125,6 @@ def define_rank_up_F(builder: DramaBuilder):
         .say("narr_9", "（地面は氷に閉ざされ、踏みしめるたびに不吉な軋みを上げる。天井はなく、ただ虚無の闇と、そこから降り注ぐ氷の結晶。）", "", actor=pc) \
         .say("narr_10", "（突如、雪霧の奥から無数の青白い眼光が浮かび上がった。）", "", actor=pc) \
         .say("narr_11", "（それは、体躯が氷の結晶で形成された、異形の魔犬の群れ。彼らが喉を鳴らすたび、大気が結晶化して地面に降り注ぐ。）", "", actor=pc) \
-        .say("narr_12", "（中央には、ひと際巨大な影——『零度の咆哮者（ゼロ・ロアラー）』が、獲物を見定めていた。）", "", actor=pc) \
-        .say("narr_13", "（その体躯は他の個体の二倍以上。背中には鋭利な氷の棘が無数に生え、吐息だけで周囲の空気を凍らせる。）", "", actor=pc) \
         .start_battle_by_stage("rank_f_trial", master_id="sukutsu_arena_master") \
         .finish()
 
@@ -162,6 +160,7 @@ def add_rank_up_F_result_steps(builder: ArenaDramaBuilder, victory_label: str, d
         .focus_chara(Actors.LILY) \
         .say("lily_v1", "おめでとうございます。死体袋は、また次回まで取っておきましょう。", "", actor=lily) \
         .say("lily_v2", "この称号『泥犬』は、あなたがどれほど理不尽な環境でも生き延びる『害虫』のような生命力を持っている証です。……ふふ、褒めているのですよ？", "", actor=lily) \
+        .complete_quest(QuestIds.RANK_UP_F) \
         .grant_rank_reward("F", actor=lily) \
         .finish()
 

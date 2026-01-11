@@ -194,6 +194,7 @@ def add_rank_up_A_result_steps(builder: ArenaDramaBuilder, victory_label: str, d
         .say("lily_v1", "……おかえりなさい。", "", actor=lily) \
         .say("lily_v2", "あなたは今、このアリーナで最も輝く存在になりました。", "", actor=lily) \
         .say("lily_v3", "今日からあなたは、ランクA……『黄金の戦鬼（Golden War Demon）』です。", "", actor=lily) \
+        .complete_quest(QuestIds.RANK_UP_A) \
         .grant_rank_reward("A", actor=lily) \
         .finish()
 

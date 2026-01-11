@@ -123,35 +123,22 @@ class ArenaDramaBuilder(DramaBuilder):
     def complete_quest_with_rewards(
         self,
         quest_id: str,
-        relations: Dict[str, int] = None,
         flags: Dict[str, int] = None
     ) -> 'ArenaDramaBuilder':
         """
-        クエスト完了、関係値更新、フラグ設定を一括処理
+        クエスト完了、フラグ設定を一括処理
 
         Args:
             quest_id: 完了するクエストID
-            relations: 関係値の変更 {フラグキー: 変更量}
-                       例: {Keys.REL_LILY: 10, Keys.REL_ZEK: -5}
             flags: 設定するフラグ {フラグキー: 値}
 
         Example:
             builder.step(ending) \\
                 .say("thanks", "ありがとう！", actor=lily) \\
-                .complete_quest_with_rewards(
-                    QuestIds.LILY_EXP,
-                    relations={Keys.REL_LILY: 10}
-                ) \\
+                .complete_quest_with_rewards(QuestIds.LILY_EXP) \\
                 .finish()
         """
         self.complete_quest(quest_id)
-
-        if relations:
-            for flag_key, value in relations.items():
-                if value >= 0:
-                    self.mod_flag(flag_key, "+", value)
-                else:
-                    self.mod_flag(flag_key, "-", abs(value))
 
         if flags:
             for flag_key, value in flags.items():
@@ -263,9 +250,8 @@ class ArenaDramaBuilder(DramaBuilder):
         1. NPCメッセージ（あれば）
         2. アイテム付与
         3. バフ付与
-        4. 関係値変更
-        5. フラグ設定
-        6. システムメッセージ（あれば）
+        4. フラグ設定
+        5. システムメッセージ（あれば）
         """
         # 1. NPCメッセージ
         if reward.message_jp and actor:
@@ -280,13 +266,10 @@ class ArenaDramaBuilder(DramaBuilder):
             script = f"Elin_SukutsuArena.ArenaManager.{reward.buff_method}();"
             self.action("eval", param=script)
 
-        # 4. 関係値変更
-        self._apply_relations(reward.relations)
-
-        # 5. フラグ設定
+        # 4. フラグ設定
         self._apply_flags(reward.flags)
 
-        # 6. システムメッセージ
+        # 5. システムメッセージ
         if reward.system_message_jp:
             self.say(f"{text_id_prefix}_sys", reward.system_message_jp, reward.system_message_en)
 
@@ -308,9 +291,8 @@ class ArenaDramaBuilder(DramaBuilder):
         1. アイテム付与
         2. クエスト完了
         3. ランク設定
-        4. 関係値変更
-        5. システムメッセージ
-        6. バフ付与
+        4. システムメッセージ
+        5. バフ付与
         """
         from rewards import RANK_REWARDS
 
@@ -337,14 +319,11 @@ class ArenaDramaBuilder(DramaBuilder):
         if reward.rank_value > 0:
             self.set_flag(Keys.RANK, reward.rank_value)
 
-        # 5. 関係値変更
-        self._apply_relations(reward.relations)
-
-        # 6. システムメッセージ
+        # 5. システムメッセージ
         if reward.system_message_jp:
             self.say(f"{text_id_prefix}_sys", reward.system_message_jp, reward.system_message_en)
 
-        # 7. バフ付与（システムメッセージの後）
+        # 6. バフ付与（システムメッセージの後）
         if reward.buff_method:
             script = f"Elin_SukutsuArena.ArenaManager.{reward.buff_method}();"
             self.action("eval", param=script)
@@ -400,24 +379,6 @@ class ArenaDramaBuilder(DramaBuilder):
 
         script = " ".join(parts)
         return self.action("eval", param=script)
-
-    def _apply_relations(self, relations: Dict[str, int]) -> 'ArenaDramaBuilder':
-        """
-        関係値を変更
-
-        Args:
-            relations: {フラグキー: 変更量}
-        """
-        if not relations:
-            return self
-
-        for flag_key, value in relations.items():
-            if value >= 0:
-                self.mod_flag(flag_key, "+", value)
-            else:
-                self.mod_flag(flag_key, "-", abs(value))
-
-        return self
 
     def _apply_flags(self, flags: Dict[str, int]) -> 'ArenaDramaBuilder':
         """

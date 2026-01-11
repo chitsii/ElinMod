@@ -15,10 +15,7 @@
     "requiredFlags": [],
     "requiredQuests": [],
     "completionFlags": {
-      "chitsii.arena.player.rank": "unranked",
-      "chitsii.arena.rel.lily": 30,
-      "chitsii.arena.rel.balgas": 20,
-      "chitsii.arena.rel.zek": 0
+      "chitsii.arena.player.rank": "unranked"
     },
     "branchChoices": [],
     "blocksQuests": [],
@@ -37,19 +34,11 @@
     "autoTrigger": false,
     "advancesPhase": "initiation",
     "advancesPhaseOrdinal": 1,
-    "requiredFlags": [
-      {
-        "flagKey": "chitsii.arena.player.rank",
-        "operator": "==",
-        "value": "unranked"
-      }
-    ],
+    "requiredFlags": [],
     "requiredQuests": [
       "01_opening"
     ],
-    "completionFlags": {
-      "chitsii.arena.player.rank": "G"
-    },
+    "completionFlags": {},
     "branchChoices": [],
     "blocksQuests": [],
     "priority": 950
@@ -67,19 +56,11 @@
     "autoTrigger": false,
     "advancesPhase": "rising",
     "advancesPhaseOrdinal": 2,
-    "requiredFlags": [
-      {
-        "flagKey": "chitsii.arena.player.rank",
-        "operator": "==",
-        "value": "G"
-      }
-    ],
+    "requiredFlags": [],
     "requiredQuests": [
       "02_rank_up_G"
     ],
-    "completionFlags": {
-      "chitsii.arena.player.rank": "F"
-    },
+    "completionFlags": {},
     "branchChoices": [],
     "blocksQuests": [],
     "priority": 900
@@ -97,19 +78,11 @@
     "autoTrigger": false,
     "advancesPhase": null,
     "advancesPhaseOrdinal": -1,
-    "requiredFlags": [
-      {
-        "flagKey": "chitsii.arena.player.rank",
-        "operator": "==",
-        "value": "F"
-      }
-    ],
+    "requiredFlags": [],
     "requiredQuests": [
       "04_rank_up_F"
     ],
-    "completionFlags": {
-      "chitsii.arena.player.rank": "E"
-    },
+    "completionFlags": {},
     "branchChoices": [],
     "blocksQuests": [],
     "priority": 900
@@ -127,19 +100,11 @@
     "autoTrigger": false,
     "advancesPhase": "awakening",
     "advancesPhaseOrdinal": 3,
-    "requiredFlags": [
-      {
-        "flagKey": "chitsii.arena.player.rank",
-        "operator": "==",
-        "value": "E"
-      }
-    ],
+    "requiredFlags": [],
     "requiredQuests": [
       "06_rank_up_E"
     ],
-    "completionFlags": {
-      "chitsii.arena.player.rank": "D"
-    },
+    "completionFlags": {},
     "branchChoices": [],
     "blocksQuests": [],
     "priority": 900
@@ -157,19 +122,11 @@
     "autoTrigger": false,
     "advancesPhase": null,
     "advancesPhaseOrdinal": -1,
-    "requiredFlags": [
-      {
-        "flagKey": "chitsii.arena.player.rank",
-        "operator": "==",
-        "value": "D"
-      }
-    ],
+    "requiredFlags": [],
     "requiredQuests": [
       "10_rank_up_D"
     ],
-    "completionFlags": {
-      "chitsii.arena.player.rank": "C"
-    },
+    "completionFlags": {},
     "branchChoices": [],
     "blocksQuests": [],
     "priority": 900
@@ -187,19 +144,11 @@
     "autoTrigger": false,
     "advancesPhase": "confrontation",
     "advancesPhaseOrdinal": 4,
-    "requiredFlags": [
-      {
-        "flagKey": "chitsii.arena.player.rank",
-        "operator": "==",
-        "value": "C"
-      }
-    ],
+    "requiredFlags": [],
     "requiredQuests": [
       "09_rank_up_C"
     ],
-    "completionFlags": {
-      "chitsii.arena.player.rank": "B"
-    },
+    "completionFlags": {},
     "branchChoices": [],
     "blocksQuests": [],
     "priority": 900
@@ -217,20 +166,11 @@
     "autoTrigger": false,
     "advancesPhase": null,
     "advancesPhaseOrdinal": -1,
-    "requiredFlags": [
-      {
-        "flagKey": "chitsii.arena.player.rank",
-        "operator": "==",
-        "value": "B"
-      }
-    ],
+    "requiredFlags": [],
     "requiredQuests": [
-      "11_rank_up_B",
-      "13_makuma2"
+      "11_rank_up_B"
     ],
-    "completionFlags": {
-      "chitsii.arena.player.rank": "A"
-    },
+    "completionFlags": {},
     "branchChoices": [],
     "blocksQuests": [],
     "priority": 900
@@ -239,32 +179,71 @@
     "questId": "15_vs_balgas",
     "questType": "rank_up",
     "dramaId": "vs_balgas",
-    "displayNameJP": "ランクS昇格試験（バルガス全盛期との一騎打ち）",
-    "displayNameEN": "Rank S Promotion Trial (Duel with Prime Balgas)",
-    "description": "バルガスの全盛期の姿と戦い、ランクSを獲得する",
+    "displayNameJP": "Rank S 昇格試験『屠竜者への道』",
+    "displayNameEN": "Rank S Trial: Path to Dragon Slayer",
+    "description": "全盛期のバルガスとの最終決戦",
     "phase": "confrontation",
     "phaseOrdinal": 4,
     "questGiver": "sukutsu_arena_master",
     "autoTrigger": false,
     "advancesPhase": null,
     "advancesPhaseOrdinal": -1,
-    "requiredFlags": [
-      {
-        "flagKey": "chitsii.arena.player.rank",
-        "operator": "==",
-        "value": "A"
-      }
-    ],
+    "requiredFlags": [],
     "requiredQuests": [
       "12_rank_up_A"
     ],
-    "completionFlags": {
-      "chitsii.arena.player.rank": "S"
-    },
-    "branchChoices": [
-      "balgas_choice"
-    ],
+    "completionFlags": {},
+    "branchChoices": [],
     "blocksQuests": [],
+    "priority": 910
+  },
+  {
+    "questId": "15_vs_balgas_spared",
+    "questType": "rank_up",
+    "dramaId": "vs_balgas",
+    "displayNameJP": "ランクS昇格：バルガスを見逃す",
+    "displayNameEN": "Rank S: Spare Balgas",
+    "description": "バルガスを見逃し、慈悲の道を選んだ",
+    "phase": "confrontation",
+    "phaseOrdinal": 4,
+    "questGiver": "sukutsu_arena_master",
+    "autoTrigger": false,
+    "advancesPhase": null,
+    "advancesPhaseOrdinal": -1,
+    "requiredFlags": [],
+    "requiredQuests": [
+      "12_rank_up_A"
+    ],
+    "completionFlags": {},
+    "branchChoices": [],
+    "blocksQuests": [
+      "15_vs_balgas_killed"
+    ],
+    "priority": 900
+  },
+  {
+    "questId": "15_vs_balgas_killed",
+    "questType": "rank_up",
+    "dramaId": "vs_balgas",
+    "displayNameJP": "ランクS昇格：バルガスを殺す",
+    "displayNameEN": "Rank S: Kill Balgas",
+    "description": "観客の命令に従い、バルガスを殺した",
+    "phase": "confrontation",
+    "phaseOrdinal": 4,
+    "questGiver": "sukutsu_arena_master",
+    "autoTrigger": false,
+    "advancesPhase": null,
+    "advancesPhaseOrdinal": -1,
+    "requiredFlags": [],
+    "requiredQuests": [
+      "12_rank_up_A"
+    ],
+    "completionFlags": {},
+    "branchChoices": [],
+    "blocksQuests": [
+      "15_vs_balgas_spared",
+      "08_lily_private"
+    ],
     "priority": 900
   },
   {
@@ -280,19 +259,11 @@
     "autoTrigger": false,
     "advancesPhase": null,
     "advancesPhaseOrdinal": -1,
-    "requiredFlags": [
-      {
-        "flagKey": "chitsii.arena.player.rank",
-        "operator": ">=",
-        "value": "G"
-      }
-    ],
+    "requiredFlags": [],
     "requiredQuests": [
       "02_rank_up_G"
     ],
-    "completionFlags": {
-      "chitsii.arena.rel.zek": 10
-    },
+    "completionFlags": {},
     "branchChoices": [],
     "blocksQuests": [],
     "priority": 800
@@ -310,13 +281,7 @@
     "autoTrigger": false,
     "advancesPhase": null,
     "advancesPhaseOrdinal": -1,
-    "requiredFlags": [
-      {
-        "flagKey": "chitsii.arena.player.rank",
-        "operator": ">=",
-        "value": "F"
-      }
-    ],
+    "requiredFlags": [],
     "requiredQuests": [
       "04_rank_up_F"
     ],
@@ -329,60 +294,140 @@
     "questId": "05_2_zek_steal_bottle",
     "questType": "side_quest",
     "dramaId": "zek_steal_bottle",
-    "displayNameJP": "ゼクの器すり替え提案",
-    "displayNameEN": "Zek's Bottle Swap Proposal",
-    "description": "ゼクが共鳴瓶のすり替えを提案する【重要分岐】",
+    "displayNameJP": "ゼクの器すり替え",
+    "displayNameEN": "Zek's Bottle Swap",
+    "description": "ゼクが共鳴瓶のすり替えを提案してくる",
     "phase": "initiation",
     "phaseOrdinal": 1,
     "questGiver": "sukutsu_shady_merchant",
     "autoTrigger": false,
     "advancesPhase": null,
     "advancesPhaseOrdinal": -1,
-    "requiredFlags": [
-      {
-        "flagKey": "chitsii.arena.player.rank",
-        "operator": ">=",
-        "value": "F"
-      }
-    ],
+    "requiredFlags": [],
     "requiredQuests": [
       "05_1_lily_experiment"
     ],
     "completionFlags": {},
-    "branchChoices": [
-      "bottle_choice"
-    ],
+    "branchChoices": [],
     "blocksQuests": [],
+    "priority": 710
+  },
+  {
+    "questId": "05_2_zek_steal_bottle_accept",
+    "questType": "side_quest",
+    "dramaId": "zek_steal_bottle",
+    "displayNameJP": "ゼクの器すり替え：応諾",
+    "displayNameEN": "Zek's Bottle Swap: Accepted",
+    "description": "ゼクの提案に応じて共鳴瓶をすり替えた",
+    "phase": "initiation",
+    "phaseOrdinal": 1,
+    "questGiver": "sukutsu_shady_merchant",
+    "autoTrigger": false,
+    "advancesPhase": null,
+    "advancesPhaseOrdinal": -1,
+    "requiredFlags": [],
+    "requiredQuests": [
+      "05_1_lily_experiment"
+    ],
+    "completionFlags": {},
+    "branchChoices": [],
+    "blocksQuests": [
+      "05_2_zek_steal_bottle_refuse"
+    ],
+    "priority": 700
+  },
+  {
+    "questId": "05_2_zek_steal_bottle_refuse",
+    "questType": "side_quest",
+    "dramaId": "zek_steal_bottle",
+    "displayNameJP": "ゼクの器すり替え：拒否",
+    "displayNameEN": "Zek's Bottle Swap: Refused",
+    "description": "ゼクの提案を断り、正直にリリィに渡した",
+    "phase": "initiation",
+    "phaseOrdinal": 1,
+    "questGiver": "sukutsu_shady_merchant",
+    "autoTrigger": false,
+    "advancesPhase": null,
+    "advancesPhaseOrdinal": -1,
+    "requiredFlags": [],
+    "requiredQuests": [
+      "05_1_lily_experiment"
+    ],
+    "completionFlags": {},
+    "branchChoices": [],
+    "blocksQuests": [
+      "05_2_zek_steal_bottle_accept"
+    ],
     "priority": 700
   },
   {
     "questId": "06_2_zek_steal_soulgem",
     "questType": "side_quest",
     "dramaId": "zek_steal_soulgem",
-    "displayNameJP": "カインの魂の選択",
-    "displayNameEN": "Kain's Soul Choice",
-    "description": "カインの魂をゼクに売るか、バルガスに返すか選択する【重要分岐】",
+    "displayNameJP": "カインの魂の行方",
+    "displayNameEN": "Fate of Kain's Soul",
+    "description": "ゼクがカインの魂の取引を持ちかけてくる",
     "phase": "rising",
     "phaseOrdinal": 2,
     "questGiver": "sukutsu_shady_merchant",
     "autoTrigger": false,
     "advancesPhase": null,
     "advancesPhaseOrdinal": -1,
-    "requiredFlags": [
-      {
-        "flagKey": "chitsii.arena.player.rank",
-        "operator": "==",
-        "value": "E"
-      }
-    ],
+    "requiredFlags": [],
     "requiredQuests": [
       "06_rank_up_E"
     ],
     "completionFlags": {},
-    "branchChoices": [
-      "kain_soul_choice"
-    ],
+    "branchChoices": [],
     "blocksQuests": [],
+    "priority": 860
+  },
+  {
+    "questId": "06_2_zek_steal_soulgem_sell",
+    "questType": "side_quest",
+    "dramaId": "zek_steal_soulgem",
+    "displayNameJP": "カインの魂：売却",
+    "displayNameEN": "Kain's Soul: Sold",
+    "description": "カインの魂をゼクに売った",
+    "phase": "rising",
+    "phaseOrdinal": 2,
+    "questGiver": "sukutsu_shady_merchant",
+    "autoTrigger": false,
+    "advancesPhase": null,
+    "advancesPhaseOrdinal": -1,
+    "requiredFlags": [],
+    "requiredQuests": [
+      "06_rank_up_E"
+    ],
+    "completionFlags": {},
+    "branchChoices": [],
+    "blocksQuests": [
+      "06_2_zek_steal_soulgem_return"
+    ],
+    "priority": 850
+  },
+  {
+    "questId": "06_2_zek_steal_soulgem_return",
+    "questType": "side_quest",
+    "dramaId": "zek_steal_soulgem",
+    "displayNameJP": "カインの魂：返還",
+    "displayNameEN": "Kain's Soul: Returned",
+    "description": "カインの魂をバルガスに返した",
+    "phase": "rising",
+    "phaseOrdinal": 2,
+    "questGiver": "sukutsu_shady_merchant",
+    "autoTrigger": false,
+    "advancesPhase": null,
+    "advancesPhaseOrdinal": -1,
+    "requiredFlags": [],
+    "requiredQuests": [
+      "06_rank_up_E"
+    ],
+    "completionFlags": {},
+    "branchChoices": [],
+    "blocksQuests": [
+      "06_2_zek_steal_soulgem_sell"
+    ],
     "priority": 850
   },
   {
@@ -398,13 +443,7 @@
     "autoTrigger": false,
     "advancesPhase": null,
     "advancesPhaseOrdinal": -1,
-    "requiredFlags": [
-      {
-        "flagKey": "chitsii.arena.player.rank",
-        "operator": "==",
-        "value": "D"
-      }
-    ],
+    "requiredFlags": [],
     "requiredQuests": [
       "10_rank_up_D"
     ],
@@ -426,18 +465,7 @@
     "autoTrigger": false,
     "advancesPhase": null,
     "advancesPhaseOrdinal": -1,
-    "requiredFlags": [
-      {
-        "flagKey": "chitsii.arena.player.rank",
-        "operator": ">=",
-        "value": "D"
-      },
-      {
-        "flagKey": "chitsii.arena.rel.lily",
-        "operator": ">=",
-        "value": 40
-      }
-    ],
+    "requiredFlags": [],
     "requiredQuests": [
       "10_rank_up_D"
     ],
@@ -459,18 +487,7 @@
     "autoTrigger": false,
     "advancesPhase": null,
     "advancesPhaseOrdinal": -1,
-    "requiredFlags": [
-      {
-        "flagKey": "chitsii.arena.player.rank",
-        "operator": ">=",
-        "value": "D"
-      },
-      {
-        "flagKey": "chitsii.arena.rel.balgas",
-        "operator": ">=",
-        "value": 40
-      }
-    ],
+    "requiredFlags": [],
     "requiredQuests": [
       "10_rank_up_D"
     ],
@@ -492,19 +509,11 @@
     "autoTrigger": false,
     "advancesPhase": null,
     "advancesPhaseOrdinal": -1,
-    "requiredFlags": [
-      {
-        "flagKey": "chitsii.arena.player.rank",
-        "operator": "==",
-        "value": "B"
-      }
-    ],
+    "requiredFlags": [],
     "requiredQuests": [
       "11_rank_up_B"
     ],
-    "completionFlags": {
-      "chitsii.arena.player.null_chip_obtained": true
-    },
+    "completionFlags": {},
     "branchChoices": [],
     "blocksQuests": [],
     "priority": 850
@@ -522,26 +531,13 @@
     "autoTrigger": true,
     "advancesPhase": null,
     "advancesPhaseOrdinal": -1,
-    "requiredFlags": [
-      {
-        "flagKey": "chitsii.arena.player.rank",
-        "operator": "==",
-        "value": "B"
-      },
-      {
-        "flagKey": "chitsii.arena.player.bottle_choice",
-        "operator": "==",
-        "value": "swapped"
-      }
-    ],
+    "requiredFlags": [],
     "requiredQuests": [
-      "12_makuma"
+      "12_makuma",
+      "05_2_zek_steal_bottle_accept"
     ],
     "completionFlags": {},
-    "branchChoices": [
-      "lily_bottle_confession",
-      "kain_soul_confession"
-    ],
+    "branchChoices": [],
     "blocksQuests": [],
     "priority": 850
   },
@@ -558,29 +554,11 @@
     "autoTrigger": false,
     "advancesPhase": null,
     "advancesPhaseOrdinal": -1,
-    "requiredFlags": [
-      {
-        "flagKey": "chitsii.arena.player.rank",
-        "operator": "==",
-        "value": "S"
-      },
-      {
-        "flagKey": "chitsii.arena.player.balgas_choice",
-        "operator": "==",
-        "value": "spared"
-      },
-      {
-        "flagKey": "chitsii.arena.rel.lily",
-        "operator": ">=",
-        "value": 50
-      }
-    ],
+    "requiredFlags": [],
     "requiredQuests": [
-      "15_vs_balgas"
+      "15_vs_balgas_spared"
     ],
-    "completionFlags": {
-      "chitsii.arena.player.lily_true_name": "Liliaris"
-    },
+    "completionFlags": {},
     "branchChoices": [],
     "blocksQuests": [],
     "priority": 600
@@ -598,19 +576,11 @@
     "autoTrigger": true,
     "advancesPhase": "climax",
     "advancesPhaseOrdinal": 5,
-    "requiredFlags": [
-      {
-        "flagKey": "chitsii.arena.player.rank",
-        "operator": "==",
-        "value": "S"
-      }
-    ],
+    "requiredFlags": [],
     "requiredQuests": [
-      "15_vs_balgas"
+      "12_rank_up_A"
     ],
-    "completionFlags": {
-      "chitsii.arena.player.fugitive_status": true
-    },
+    "completionFlags": {},
     "branchChoices": [],
     "blocksQuests": [],
     "priority": 900
@@ -628,20 +598,12 @@
     "autoTrigger": true,
     "advancesPhase": null,
     "advancesPhaseOrdinal": -1,
-    "requiredFlags": [
-      {
-        "flagKey": "chitsii.arena.player.fugitive_status",
-        "operator": "==",
-        "value": true
-      }
-    ],
+    "requiredFlags": [],
     "requiredQuests": [
       "17_vs_grandmaster_1"
     ],
     "completionFlags": {},
-    "branchChoices": [
-      "ending"
-    ],
+    "branchChoices": [],
     "blocksQuests": [],
     "priority": 1000
   }

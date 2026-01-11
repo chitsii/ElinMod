@@ -4,7 +4,7 @@
       "stageId": "rank_g_trial",
       "displayNameJp": "屑肉の洗礼",
       "displayNameEn": "Baptism of Scrap Meat",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "BGM/Battle_RankG_VoidOoze",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -12,7 +12,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_void_ooze",
-          "level": 15,
+          "level": 1,
           "rarity": "Normal",
           "position": "random",
           "positionX": 0,
@@ -22,7 +22,7 @@
         },
         {
           "charaId": "sukutsu_void_ooze",
-          "level": 20,
+          "level": 1,
           "rarity": "Normal",
           "position": "random",
           "positionX": 0,
@@ -39,7 +39,7 @@
       "stageId": "rank_f_trial",
       "displayNameJp": "霜牙の試練",
       "displayNameEn": "Trial of the Frostfang",
-      "zoneType": "field",
+      "zoneType": "field_snow",
       "biome": "Snow",
       "bgmBattle": "BGM/Battle_RankE_Ice",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -47,13 +47,13 @@
       "enemies": [
         {
           "charaId": "sukutsu_frost_hound",
-          "level": 45,
+          "level": 1,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
           "positionZ": 0,
-          "isBoss": true,
-          "count": 1
+          "isBoss": false,
+          "count": 10
         }
       ],
       "gimmicks": [
@@ -84,7 +84,7 @@
       "stageId": "rank_e_trial",
       "displayNameJp": "錆びついた英雄",
       "displayNameEn": "The Rusty Hero",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "BGM/Battle_Kain_Requiem",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -92,7 +92,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_kain_ghost",
-          "level": 90,
+          "level": 1,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -109,7 +109,7 @@
       "stageId": "rank_d_trial",
       "displayNameJp": "観客の代弁者",
       "displayNameEn": "Voice of the Audience",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "BGM/Battle_RankD_Chaos",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -117,7 +117,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_greed",
-          "level": 150,
+          "level": 1,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -154,7 +154,7 @@
       "stageId": "rank_c_trial",
       "displayNameJp": "闘技場の鴉",
       "displayNameEn": "Ravens of the Coliseum",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "BGM/Battle_RankC_Heroic_Lament",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -162,7 +162,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_crow_shadow",
-          "level": 350,
+          "level": 1,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -172,7 +172,7 @@
         },
         {
           "charaId": "sukutsu_raven_blade",
-          "level": 400,
+          "level": 1,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -182,7 +182,7 @@
         },
         {
           "charaId": "sukutsu_karasu_venom",
-          "level": 450,
+          "level": 1,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -199,7 +199,7 @@
       "stageId": "rank_b_trial",
       "displayNameJp": "虚無の処刑人",
       "displayNameEn": "Void Executioner Null",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "BGM/Battle_Null_Assassin",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -207,7 +207,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_null",
-          "level": 800,
+          "level": 1,
           "rarity": "Mythical",
           "position": "random",
           "positionX": 0,
@@ -224,7 +224,7 @@
       "stageId": "rank_a_trial",
       "displayNameJp": "黄金の戦鬼",
       "displayNameEn": "Golden War Demon",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "BGM/Battle_Shadow_Self",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -232,7 +232,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_shadow_self",
-          "level": 2500,
+          "level": 1,
           "rarity": "Mythical",
           "position": "random",
           "positionX": 0,
@@ -249,7 +249,7 @@
       "stageId": "rank_s_trial",
       "displayNameJp": "屠竜者への道",
       "displayNameEn": "Path to Dragon Slayer",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "BGM/Battle_Balgas_Prime",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -257,7 +257,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_balgas_prime",
-          "level": 8000,
+          "level": 1,
           "rarity": "Mythical",
           "position": "random",
           "positionX": 0,
@@ -274,7 +274,7 @@
       "stageId": "final_astaroth",
       "displayNameJp": "竜神との対峙",
       "displayNameEn": "Confrontation with the Dragon God",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "BGM/Battle_Astaroth_Phase1",
       "bgmVictory": "BGM/Final_Liberation",
@@ -282,7 +282,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_astaroth",
-          "level": 50000,
+          "level": 1,
           "rarity": "Mythical",
           "position": "random",
           "positionX": 0,
@@ -301,7 +301,7 @@
       "stageId": "stage_1",
       "displayNameJp": "森の狼",
       "displayNameEn": "Forest Wolf",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -309,7 +309,7 @@
       "enemies": [
         {
           "charaId": "wolf",
-          "level": 5,
+          "level": 1,
           "rarity": "Normal",
           "position": "random",
           "positionX": 0,
@@ -326,7 +326,7 @@
       "stageId": "stage_2",
       "displayNameJp": "ケンタウロス",
       "displayNameEn": "Centaur",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -334,7 +334,7 @@
       "enemies": [
         {
           "charaId": "centaur",
-          "level": 15,
+          "level": 1,
           "rarity": "Superior",
           "position": "random",
           "positionX": 0,
@@ -351,7 +351,7 @@
       "stageId": "stage_3",
       "displayNameJp": "ミノタウロス",
       "displayNameEn": "Minotaur",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -359,7 +359,7 @@
       "enemies": [
         {
           "charaId": "minotaur",
-          "level": 25,
+          "level": 1,
           "rarity": "Superior",
           "position": "random",
           "positionX": 0,
@@ -376,7 +376,7 @@
       "stageId": "stage_4",
       "displayNameJp": "竜との対峙",
       "displayNameEn": "Dragon Confrontation",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -384,7 +384,7 @@
       "enemies": [
         {
           "charaId": "dragon",
-          "level": 40,
+          "level": 1,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -401,7 +401,7 @@
       "stageId": "balgas_training_battle",
       "displayNameJp": "戦士の哲学",
       "displayNameEn": "Warrior's Philosophy",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "BGM/Battle_Balgas_Training",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -409,7 +409,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_balgas_training",
-          "level": 200,
+          "level": 1,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -426,7 +426,7 @@
       "stageId": "upper_existence_battle",
       "displayNameJp": "見えざる観客の供物",
       "displayNameEn": "Offering to the Unseen Audience",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "BGM/ProgressiveDance",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -434,7 +434,7 @@
       "enemies": [
         {
           "charaId": "gladiator",
-          "level": 100,
+          "level": 1,
           "rarity": "Superior",
           "position": "random",
           "positionX": 0,
@@ -444,7 +444,7 @@
         },
         {
           "charaId": "gladiator",
-          "level": 80,
+          "level": 1,
           "rarity": "Normal",
           "position": "random",
           "positionX": 0,
@@ -483,7 +483,7 @@
       "stageId": "rank_g_trial",
       "displayNameJp": "屑肉の洗礼",
       "displayNameEn": "Baptism of Scrap Meat",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "BGM/Battle_RankG_VoidOoze",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -491,7 +491,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_void_ooze",
-          "level": 15,
+          "level": 1,
           "rarity": "Normal",
           "position": "random",
           "positionX": 0,
@@ -501,7 +501,7 @@
         },
         {
           "charaId": "sukutsu_void_ooze",
-          "level": 20,
+          "level": 1,
           "rarity": "Normal",
           "position": "random",
           "positionX": 0,
@@ -518,7 +518,7 @@
       "stageId": "rank_f_trial",
       "displayNameJp": "霜牙の試練",
       "displayNameEn": "Trial of the Frostfang",
-      "zoneType": "field",
+      "zoneType": "field_snow",
       "biome": "Snow",
       "bgmBattle": "BGM/Battle_RankE_Ice",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -526,13 +526,13 @@
       "enemies": [
         {
           "charaId": "sukutsu_frost_hound",
-          "level": 45,
+          "level": 1,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
           "positionZ": 0,
-          "isBoss": true,
-          "count": 1
+          "isBoss": false,
+          "count": 10
         }
       ],
       "gimmicks": [
@@ -563,7 +563,7 @@
       "stageId": "rank_e_trial",
       "displayNameJp": "錆びついた英雄",
       "displayNameEn": "The Rusty Hero",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "BGM/Battle_Kain_Requiem",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -571,7 +571,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_kain_ghost",
-          "level": 90,
+          "level": 1,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -588,7 +588,7 @@
       "stageId": "rank_d_trial",
       "displayNameJp": "観客の代弁者",
       "displayNameEn": "Voice of the Audience",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "BGM/Battle_RankD_Chaos",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -596,7 +596,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_greed",
-          "level": 150,
+          "level": 1,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -633,7 +633,7 @@
       "stageId": "rank_c_trial",
       "displayNameJp": "闘技場の鴉",
       "displayNameEn": "Ravens of the Coliseum",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "BGM/Battle_RankC_Heroic_Lament",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -641,7 +641,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_crow_shadow",
-          "level": 350,
+          "level": 1,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -651,7 +651,7 @@
         },
         {
           "charaId": "sukutsu_raven_blade",
-          "level": 400,
+          "level": 1,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -661,7 +661,7 @@
         },
         {
           "charaId": "sukutsu_karasu_venom",
-          "level": 450,
+          "level": 1,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -678,7 +678,7 @@
       "stageId": "rank_b_trial",
       "displayNameJp": "虚無の処刑人",
       "displayNameEn": "Void Executioner Null",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "BGM/Battle_Null_Assassin",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -686,7 +686,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_null",
-          "level": 800,
+          "level": 1,
           "rarity": "Mythical",
           "position": "random",
           "positionX": 0,
@@ -703,7 +703,7 @@
       "stageId": "rank_a_trial",
       "displayNameJp": "黄金の戦鬼",
       "displayNameEn": "Golden War Demon",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "BGM/Battle_Shadow_Self",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -711,7 +711,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_shadow_self",
-          "level": 2500,
+          "level": 1,
           "rarity": "Mythical",
           "position": "random",
           "positionX": 0,
@@ -728,7 +728,7 @@
       "stageId": "rank_s_trial",
       "displayNameJp": "屠竜者への道",
       "displayNameEn": "Path to Dragon Slayer",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "BGM/Battle_Balgas_Prime",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -736,7 +736,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_balgas_prime",
-          "level": 8000,
+          "level": 1,
           "rarity": "Mythical",
           "position": "random",
           "positionX": 0,
@@ -753,7 +753,7 @@
       "stageId": "final_astaroth",
       "displayNameJp": "竜神との対峙",
       "displayNameEn": "Confrontation with the Dragon God",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "BGM/Battle_Astaroth_Phase1",
       "bgmVictory": "BGM/Final_Liberation",
@@ -761,7 +761,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_astaroth",
-          "level": 50000,
+          "level": 1,
           "rarity": "Mythical",
           "position": "random",
           "positionX": 0,
@@ -778,7 +778,7 @@
       "stageId": "stage_1",
       "displayNameJp": "森の狼",
       "displayNameEn": "Forest Wolf",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -786,7 +786,7 @@
       "enemies": [
         {
           "charaId": "wolf",
-          "level": 5,
+          "level": 1,
           "rarity": "Normal",
           "position": "random",
           "positionX": 0,
@@ -803,7 +803,7 @@
       "stageId": "stage_2",
       "displayNameJp": "ケンタウロス",
       "displayNameEn": "Centaur",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -811,7 +811,7 @@
       "enemies": [
         {
           "charaId": "centaur",
-          "level": 15,
+          "level": 1,
           "rarity": "Superior",
           "position": "random",
           "positionX": 0,
@@ -828,7 +828,7 @@
       "stageId": "stage_3",
       "displayNameJp": "ミノタウロス",
       "displayNameEn": "Minotaur",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -836,7 +836,7 @@
       "enemies": [
         {
           "charaId": "minotaur",
-          "level": 25,
+          "level": 1,
           "rarity": "Superior",
           "position": "random",
           "positionX": 0,
@@ -853,7 +853,7 @@
       "stageId": "stage_4",
       "displayNameJp": "竜との対峙",
       "displayNameEn": "Dragon Confrontation",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -861,7 +861,7 @@
       "enemies": [
         {
           "charaId": "dragon",
-          "level": 40,
+          "level": 1,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -878,7 +878,7 @@
       "stageId": "balgas_training_battle",
       "displayNameJp": "戦士の哲学",
       "displayNameEn": "Warrior's Philosophy",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "BGM/Battle_Balgas_Training",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -886,7 +886,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_balgas_training",
-          "level": 200,
+          "level": 1,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -903,7 +903,7 @@
       "stageId": "upper_existence_battle",
       "displayNameJp": "見えざる観客の供物",
       "displayNameEn": "Offering to the Unseen Audience",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "BGM/ProgressiveDance",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -911,7 +911,7 @@
       "enemies": [
         {
           "charaId": "gladiator",
-          "level": 100,
+          "level": 1,
           "rarity": "Superior",
           "position": "random",
           "positionX": 0,
@@ -921,7 +921,7 @@
         },
         {
           "charaId": "gladiator",
-          "level": 80,
+          "level": 1,
           "rarity": "Normal",
           "position": "random",
           "positionX": 0,
@@ -958,7 +958,7 @@
       "stageId": "debug_weak",
       "displayNameJp": "[DEBUG] 弱い敵",
       "displayNameEn": "[DEBUG] Weak Enemy",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -983,7 +983,7 @@
       "stageId": "debug_strong",
       "displayNameJp": "[DEBUG] 強い敵",
       "displayNameEn": "[DEBUG] Strong Enemy",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -991,7 +991,7 @@
       "enemies": [
         {
           "charaId": "dragon",
-          "level": 100,
+          "level": 1,
           "rarity": "Mythical",
           "position": "random",
           "positionX": 0,
@@ -1008,7 +1008,7 @@
       "stageId": "debug_horde",
       "displayNameJp": "[DEBUG] 敵の群れ",
       "displayNameEn": "[DEBUG] Enemy Horde",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -1016,7 +1016,7 @@
       "enemies": [
         {
           "charaId": "goblin",
-          "level": 10,
+          "level": 1,
           "rarity": "Normal",
           "position": "random",
           "positionX": 0,
@@ -1033,7 +1033,7 @@
       "stageId": "debug_gimmick",
       "displayNameJp": "[DEBUG] ギミックテスト",
       "displayNameEn": "[DEBUG] Gimmick Test",
-      "zoneType": "field",
+      "zoneType": "field_fine",
       "biome": "",
       "bgmBattle": "",
       "bgmVictory": "BGM/Fanfare_Audience",
@@ -1041,7 +1041,7 @@
       "enemies": [
         {
           "charaId": "putty",
-          "level": 5,
+          "level": 1,
           "rarity": "Normal",
           "position": "random",
           "positionX": 0,

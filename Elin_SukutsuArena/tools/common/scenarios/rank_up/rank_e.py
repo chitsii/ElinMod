@@ -141,6 +141,7 @@ def add_rank_up_E_result_steps(builder: ArenaDramaBuilder, victory_label: str, d
         .focus_chara(Actors.LILY) \
         .say("lily_v1", "お疲れ様でした。カインさんの魂の一部……回収いたしました。", "", actor=lily) \
         .say("lily_v2", "バルガスさんが珍しく涙ぐんでいたのは見なかったことにしてあげますから、報酬の授与をさせていただきます。", "", actor=lily) \
+        .complete_quest(QuestIds.RANK_UP_E) \
         .grant_rank_reward("E", actor=lily) \
         .finish()
 

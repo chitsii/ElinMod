@@ -22,9 +22,6 @@ namespace Elin_SukutsuArena.Commands
             Debug.Log($"  Fugitive: {ctx.Player.IsFugitive}");
             Debug.Log($"  NullChip: {ctx.Player.HasNullChip}");
             Debug.Log($"  LilyTrueNameKnown: {ctx.Player.KnowsLilyTrueName}");
-            Debug.Log($"  Rel.Lily: {ctx.Rel.Lily}");
-            Debug.Log($"  Rel.Balgas: {ctx.Rel.Balgas}");
-            Debug.Log($"  Rel.Zek: {ctx.Rel.Zek}");
             Debug.Log($"  BottleChoice: {ctx.Player.GetBottleChoice()?.ToString() ?? "null"}");
             Debug.Log($"  KainSoulChoice: {ctx.Player.GetKainSoulChoice()?.ToString() ?? "null"}");
             Debug.Log($"  BalgasChoice: {ctx.Player.GetBalgasChoice()?.ToString() ?? "null"}");

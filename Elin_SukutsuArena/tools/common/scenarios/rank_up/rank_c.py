@@ -156,6 +156,7 @@ def add_rank_up_C_result_steps(builder: ArenaDramaBuilder, victory_label: str, d
         .say("lily_v1", "……素晴らしい戦いでした。", "", actor=lily) \
         .say("lily_v2", "観客の皆様も、あなたの『慈悲』に感動されていたようです。", "", actor=lily) \
         .say("lily_v3", "では、報酬の授与です。", "", actor=lily) \
+        .complete_quest(QuestIds.RANK_UP_C) \
         .grant_rank_reward("C", actor=lily) \
         .finish()
 

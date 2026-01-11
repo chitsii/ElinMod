@@ -119,7 +119,6 @@ def define_zek_intro(builder: DramaBuilder):
         .play_bgm("BGM/Lobby_Normal") \
         .say("zek_9", "さあ、賢明な選択を。私は常に、この歪んだ影の中に潜んでおりますよ。", "", actor=zek) \
         .say("zek_10", "あなたが『力』を、あるいは『救い』を求めたくなったら……いつでもお声掛けください。あなたの魂が、完熟した果実のように弾けるその時まで、ね。", "", actor=zek) \
-        .say("narr_9", "（ゼクの姿が薄れ、影に溶けるように消えていく。空間の裂け目が閉じ、ロビーの喧騒が一気に戻る。まるで、先ほどの出来事が幻だったかのように。）", "", actor=pc) \
         .jump(ending)
 
     # ========================================
@@ -127,5 +126,4 @@ def define_zek_intro(builder: DramaBuilder):
     # ========================================
     builder.step(ending) \
         .complete_quest(QuestIds.ZEK_INTRO) \
-        .set_flag(Keys.REL_ZEK, 10) \
         .finish()

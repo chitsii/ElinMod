@@ -156,6 +156,7 @@ def add_rank_up_B_result_steps(builder: ArenaDramaBuilder, victory_label: str, d
         .say("balgas_v4", "絶望の空を飛び越え、希望を掴み取る……『銀翼（Silver Wing）』だ。", "", actor=balgas) \
         .focus_chara(Actors.LILY) \
         .say("lily_v4", "では、報酬の授与です。", "", actor=lily) \
+        .complete_quest(QuestIds.RANK_UP_B) \
         .grant_rank_reward("B", actor=lily) \
         .finish()
 

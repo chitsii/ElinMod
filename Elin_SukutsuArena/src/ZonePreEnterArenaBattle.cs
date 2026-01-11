@@ -47,6 +47,10 @@ public class ZonePreEnterArenaBattle : ZonePreEnterEvent
             enemy.c_originalHostility = Hostility.Enemy;
             enemy.SetEnemy(EClass.pc);
             enemy.HealAll();
+#if DEBUG
+            // DEBUGビルド: HPを1に設定（HealAllの後に実行）
+            enemy.hp = 1;
+#endif
         }
 
         // 勝利判定イベントを追加
@@ -204,19 +208,7 @@ public class ZonePreEnterArenaBattle : ZonePreEnterEvent
 
         if (enemy == null) return null;
 
-        // レベル設定
-#if DEBUG
-        // DEBUGビルド: 全敵レベル1（テスト用）
-        enemy.SetLv(1);
-        Debug.Log($"[SukutsuArena] DEBUG: Enemy level set to 1 (original: {config.Level})");
-#else
-        if (enemy.LV < config.Level)
-        {
-            enemy.SetLv(config.Level);
-        }
-#endif
-
-        // レアリティ設定
+        // レアリティ設定（Zone追加前でもOK）
         switch (config.Rarity)
         {
             case "Superior":
@@ -263,6 +255,14 @@ public class ZonePreEnterArenaBattle : ZonePreEnterEvent
 
         // マップに追加
         EClass._zone.AddCard(enemy, pos);
+
+        // レベル設定（Zone追加後に行う必要あり - SetLv内部でFeat.Applyが呼ばれるため）
+        // DEBUGビルドではPython側でconfig.Level=1に設定済み
+        if (enemy.LV < config.Level)
+        {
+            enemy.SetLv(config.Level);
+        }
+
         Debug.Log($"[SukutsuArena] Spawned: {enemy.Name} (Lv.{enemy.LV}, {config.Rarity}, Boss={config.IsBoss}) at {pos}");
 
         return enemy;

@@ -287,8 +287,6 @@ def define_vs_balgas(builder: DramaBuilder):
     # ========================================
     builder.step(ending) \
         .set_flag(Keys.RANK, 8) \
-        .set_flag(Keys.REL_BALGAS, 100) \
-        .mod_flag(Keys.REL_LILY, "+", 30) \
         .set_flag(Keys.BALGAS_CHOICE, FlagValues.BalgasChoice.SPARED) \
         .complete_quest(QuestIds.RANK_UP_S) \
         .say("sys_title", "【システム】称号『理を拒む者（System Breaker）』を獲得しました。", "") \
@@ -377,11 +375,7 @@ def add_vs_balgas_result_steps(builder: ArenaDramaBuilder, victory_label: str, d
         .focus_chara(Actors.BALGAS) \
         .say("balgas_s2", "……ハッ。甘っちょろい野郎だ。……だが、その甘さが、俺がカインに教えてやれなかった『本物の強さ』なのかもしれねえな。", "", actor=balgas) \
         .say("balgas_s3", "……負けたよ。今日からお前がランクS『屠竜者（Dragon Slayer）』だ。", "", actor=balgas) \
-        .set_flag(Keys.RANK, 8) \
-        .set_flag(Keys.REL_BALGAS, 100) \
-        .mod_flag(Keys.REL_LILY, "+", 30) \
-        .set_flag(Keys.BALGAS_CHOICE, FlagValues.BalgasChoice.SPARED) \
-        .complete_quest(QuestIds.RANK_UP_S) \
+        .complete_quest(QuestIds.RANK_UP_S_BALGAS_SPARED) \
         .say("sys_title_s", "【システム】称号『理を拒む者（System Breaker）』を獲得しました。", "") \
         .say("sys_buff_s", "【システム】『戦鬼の証』を獲得しました。筋力+5、耐久+5、各種耐性+5 の加護を得た！", "") \
         .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantVsBalgasBonus();") \
@@ -405,11 +399,7 @@ def add_vs_balgas_result_steps(builder: ArenaDramaBuilder, victory_label: str, d
         .jump(killed_ending)
 
     builder.step(killed_ending) \
-        .set_flag(Keys.RANK, 8) \
-        .set_flag(Keys.REL_BALGAS, 0) \
-        .mod_flag(Keys.REL_LILY, "+", -20) \
-        .set_flag(Keys.BALGAS_CHOICE, FlagValues.BalgasChoice.KILLED) \
-        .complete_quest(QuestIds.RANK_UP_S) \
+        .complete_quest(QuestIds.RANK_UP_S_BALGAS_KILLED) \
         .say("sys_title_k", "【システム】称号『観客の傀儡（Audience's Puppet）』を獲得しました。", "") \
         .say("sys_buff_k", "【システム】『血塗られた称号』を獲得しました。筋力+10、魔力+10……しかし、何かを失った気がする。", "") \
         .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantVsBalgasBonus();") \

@@ -155,6 +155,7 @@ def add_rank_up_D_result_steps(builder: ArenaDramaBuilder, victory_label: str, d
         .say("balgas_v3", "誇れることじゃねえが……生き残るためには必要なスキルだ。", "", actor=balgas) \
         .focus_chara(Actors.LILY) \
         .say("lily_v3", "では、報酬の授与です。", "", actor=lily) \
+        .complete_quest(QuestIds.RANK_UP_D) \
         .grant_rank_reward("D", actor=lily) \
         .finish()
 

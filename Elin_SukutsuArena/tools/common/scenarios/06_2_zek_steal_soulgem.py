@@ -186,9 +186,8 @@ def define_zek_steal_soulgem(builder: DramaBuilder):
         .say("narr_ref4", "（彼は魂の欠片を兜の中にそっと収める。）", "", actor=pc) \
         .say("balgas_ref2", "……ありがよ。お前をただの『鉄屑』呼ばわりしたのは取り消してやる。", "", actor=balgas) \
         .say("balgas_ref3", "お前は……カインが持っていた以上の、本物の『鋼の心』を持った戦士だ。", "", actor=balgas) \
-        .set_flag(Keys.KAIN_SOUL_CHOICE, FlagValues.KainSoulChoice.RETURNED) \
-        .mod_flag(Keys.REL_BALGAS, "+", 30) \
-        .jump(scene4_lily)
+        .complete_quest(QuestIds.ZEK_STEAL_SOULGEM_RETURN) \
+        .finish()
 
     # ========================================
     # 分岐B: 売る
@@ -213,9 +212,8 @@ def define_zek_steal_soulgem(builder: DramaBuilder):
         .say("balgas_sell2", "……そうか。見つからなかったか。", "", actor=balgas) \
         .say("narr_sell5", "（彼は深く息を吐き、酒瓶を手に取る。）", "", actor=pc) \
         .say("balgas_sell3", "……まあ、仕方ねえ。お前は十分頑張った。……ありがよ。", "", actor=balgas) \
-        .set_flag(Keys.KAIN_SOUL_CHOICE, FlagValues.KainSoulChoice.SOLD) \
-        .mod_flag(Keys.REL_ZEK, "+", 20) \
-        .jump(scene4_lily)
+        .complete_quest(QuestIds.ZEK_STEAL_SOULGEM_SELL) \
+        .finish()
 
     # ========================================
     # シーン4: リリィの冷ややかな総括

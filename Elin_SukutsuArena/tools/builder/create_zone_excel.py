@@ -61,6 +61,34 @@ data_row[21] = 'The entrance to the underground arena.' # V: textFlavor
 
 rows.append(data_row)
 
+# 新規: field_fine エントリ（通常バトルゾーン用）
+data_row_fine = [""] * sample_ws.max_column
+data_row_fine[0] = 'field_fine'                               # A: id
+data_row_fine[1] = ''                                         # B: parent
+data_row_fine[2] = '闘技場フィールド'                          # C: name_JP
+data_row_fine[3] = 'Arena Field'                              # D: name
+data_row_fine[4] = 'Elin_SukutsuArena.Zone_FieldFine'        # E: type
+data_row_fine[5] = 1                                          # F: LV
+data_row_fine[6] = 100                                        # G: chance
+data_row_fine[10] = 'chitsii_battle_field_fine'              # K: idFile（カスタムマップ）
+data_row_fine[11] = 'Plain'                                   # L: idBiome
+data_row_fine[14] = 'addMap'                                  # O: tag (light不要)
+rows.append(data_row_fine)
+
+# 新規: field_snow エントリ（雪原バトルゾーン用）
+data_row_snow = [""] * sample_ws.max_column
+data_row_snow[0] = 'field_snow'                              # A: id
+data_row_snow[1] = ''                                         # B: parent
+data_row_snow[2] = '雪原フィールド'                            # C: name_JP
+data_row_snow[3] = 'Snow Field'                               # D: name
+data_row_snow[4] = 'Elin_SukutsuArena.Zone_FieldSnow'        # E: type
+data_row_snow[5] = 1                                          # F: LV
+data_row_snow[6] = 100                                        # G: chance
+data_row_snow[10] = 'chitsii_battle_field_snow'              # K: idFile（カスタムマップ）
+data_row_snow[11] = 'Snow'                                    # L: idBiome
+data_row_snow[14] = 'addMap'                                  # O: tag (light不要)
+rows.append(data_row_snow)
+
 # TSV書き出し関数
 def write_tsv(path, row_data):
     with open(path, 'w', newline='', encoding='utf-8') as f:

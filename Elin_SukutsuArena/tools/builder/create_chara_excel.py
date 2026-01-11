@@ -98,8 +98,8 @@ npcs.append({
     'hostility': 'Friend',
     'bio': 'f/1001/165/52/sexy',
     'idText': 'sukutsu_receptionist',
-    # CWL タグ: ゾーン生成、ランダム移動無効、商人在庫、人間らしい会話
-    'tag': f'neutral,addZone_{ZONE_ID},addFlag_StayHomeZone,addStock,humanSpeak',
+    # CWL タグ: ゾーン生成、ランダム移動無効、商人在庫、ドラマリンク、人間らしい会話
+    'tag': f'neutral,addZone_{ZONE_ID},addFlag_StayHomeZone,addStock,addDrama_drama_sukutsu_receptionist,humanSpeak',
     'trait': 'Merchant',
     'quality': 4,
     'chance': 0,
@@ -223,12 +223,12 @@ npcs.append({
     'chance': 0,
 })
 
-# 7. 霜牙の魔犬 (Rank F昇格試験 / 古代種・氷・透明魔犬)
+# 7. 凍土の猟犬 (Rank F昇格試験 / 古代種・氷・透明魔犬)
 # lore: 古代種の魔犬、氷ブレスと透明化で獲物を狩る
 npcs.append({
     'id': 'sukutsu_frost_hound',
     'Author': 'tishi.elin.sukutsu_arena',
-    'name_JP': '霜牙の魔犬',
+    'name_JP': '凍土の猟犬',
     'name': 'Frostfang Hound',
     'aka_JP': '凍える牙',
     'aka': 'Freezing Fang',

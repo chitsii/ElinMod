@@ -295,33 +295,19 @@ namespace Elin_SukutsuArena
 
         private void SpawnRandomItem(Point pos)
         {
-            string[] potionIds = new string[]
+            string[] itemIds = new string[]
             {
-                "potion_heal",
-                "potion_healmajor",
-                "potion_speed",
-                "potion_hero"
-            };
-
-            string[] scrollIds = new string[]
-            {
-                "scroll_teleport",
-                "scroll_identify",
-                "scroll_uncurse",
-                "scroll_returnhome"
+                "water_dirty",
+                "water",
+                "potion",
+                "drug",
+                "junk",
+                "head2"
             };
 
             try
             {
-                string itemId;
-                if (EClass.rnd(2) == 0)
-                {
-                    itemId = potionIds[EClass.rnd(potionIds.Length)];
-                }
-                else
-                {
-                    itemId = scrollIds[EClass.rnd(scrollIds.Length)];
-                }
+                string itemId = itemIds[EClass.rnd(itemIds.Length)];
 
                 Thing item = ThingGen.Create(itemId);
                 if (item != null)
