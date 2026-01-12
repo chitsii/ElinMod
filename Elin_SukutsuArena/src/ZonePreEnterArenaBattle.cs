@@ -53,6 +53,13 @@ public class ZonePreEnterArenaBattle : ZonePreEnterEvent
             // #endif
         }
 
+        // 睡眠禁止のためにZoneEventQuestを追加
+        // Chara.CanSleep()はZoneEventQuestがあるとfalseを返す
+        if (EClass._zone.events.GetEvent<ZoneEventQuest>() == null)
+        {
+            EClass._zone.events.Add(new ZoneEventQuest());
+        }
+
         // 勝利判定イベントを追加
         EClass._zone.events.Add(new ZoneEventArenaBattle());
 
@@ -343,6 +350,15 @@ public class ZonePreEnterArenaBattle : ZonePreEnterEvent
             {
                 shadow.pccData = pc.pccData;
                 Debug.Log($"[SukutsuArena] Shadow: Copied pccData");
+
+                // レンダラーのpccDataも更新してRenderDataを再選択
+                // これにより正しいサイズ・位置で表示される
+                if (shadow.renderer is CharaRenderer charaRenderer)
+                {
+                    charaRenderer.pccData = pc.pccData;
+                    charaRenderer.SetOwner(shadow);
+                    Debug.Log($"[SukutsuArena] Shadow: Renderer pccData updated and SetOwner called");
+                }
             }
 
             // 生物学的情報をコピー（性別のみ確実にアクセス可能）

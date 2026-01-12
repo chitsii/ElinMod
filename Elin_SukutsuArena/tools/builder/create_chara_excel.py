@@ -115,7 +115,7 @@ npcs.append({
     'idText': 'sukutsu_receptionist',
     # CWL タグ: ゾーン生成、ランダム移動無効、商人在庫、ドラマリンク、人間らしい会話
     'tag': f'neutral,addZone_{ZONE_ID},addFlag_StayHomeZone,addStock_sukutsu_receptionist,addDrama_drama_sukutsu_receptionist,humanSpeak',
-    'trait': 'Merchant',
+    'trait': 'SukutsuMerchant',  # メインクエスト完了前はペット化不可
     'quality': 4,
     'chance': 0,
 })
@@ -128,7 +128,7 @@ npcs.append({
     'name': 'Vargus',
     'aka_JP': 'アリーナマスター',
     'aka': 'Champion of Hundred Battles',
-    'race': 'human',
+    'race': 'juere',
     'job': 'warrior',
     '_idRenderData': '@chara',
     'tiles': 0,  # human male warrior
@@ -138,6 +138,7 @@ npcs.append({
     'idText': 'sukutsu_arena_master',
     # CWL タグ: ゾーン生成、ランダム移動無効、ドラマリンク、人間らしい会話
     'tag': f'neutral,addZone_{ZONE_ID},addFlag_StayHomeZone,addDrama_drama_sukutsu_arena_master,humanSpeak',
+    'trait': 'SukutsuNPC',  # メインクエスト完了前はペット化不可
     'quality': 4,
     'chance': 0,
 })
@@ -163,10 +164,10 @@ npcs.append({
     'bio': 'm/1003/350/500/proud',
     'idText': 'sukutsu_astaroth',
     'portrait': 'UN_sukutsu_astaroth',  # カスタムポートレート
-    # 能力: 全属性攻撃、12部位、ほぼ全属性耐性（聖のみ弱点）
+    # 能力: 全属性攻撃、12部位、ほぼ全属性耐性（聖のみ弱点）、大幅強化
     'mainElement': 'Void',
-    'elements': 'featElder/1,featBodyParts/12,resVoid/100,resChaos/80,resNether/80,resMagic/80,resDarkness/80,resFire/60,resCold/60,resLightning/60,resPoison/60,resAcid/60,resSound/60,resNerve/80,resMind/80,resHoly/40,resCut/50,resImpact/50',
-    'actCombat': 'breathe_Void/40,breathe_Chaos/30,breathe_Nether/25,hand_Magic/35,SpGravity/15,SpBane/10',
+    'elements': 'featElder/1,featBodyParts/12,resVoid/20,resChaos/20,resNether/20,resMagic/20,resDarkness/20,resFire/20,resNerve/20,resMind/20,resHoly/20,resCut/20,resImpact/20,featBoost/1,featBloodBond/1',
+    'actCombat': 'breathe_Void/35,breathe_Chaos/25,breathe_Nether/20,hand_Magic/30,SpGravity/10,SpBane/5,ActGazeInsane/15,ActGazeMutation/10,ActCurse/10,ActBurnMana/15,SpHeal/5,SpSummonDragon/5,SpEarthquake/5,SpShutterHex/5,SpSpeedDown/5,SpSilence/5,SpWeakness/5,SpNightmare/5,SpSummonTentacle/5,SpGate/5,ActTouchDrown/5,ActNeckHunt/5',
     # CWL タグ: ゾーン生成、ランダム移動無効
     'tag': f'boss,undead,addZone_{ZONE_ID},addFlag_StayHomeZone',
     'quality': 5,
@@ -177,7 +178,7 @@ npcs.append({
 npcs.append({
     'id': 'sukutsu_shady_merchant',
     'Author': 'tishi.elin.sukutsu_arena',
-    'name_JP': 'エゼキエル',
+    'name_JP': 'ゼク',
     'name': 'Ezekiel',
     'aka_JP': '剥製師',
     'aka': 'The Taxidermist',
@@ -191,7 +192,7 @@ npcs.append({
     'idText': 'sukutsu_shady_merchant',
     # CWL タグ: ゾーン生成、ランダム移動無効、商人在庫、ドラマリンク、人間らしい会話
     'tag': f'neutral,addZone_{ZONE_ID},addFlag_StayHomeZone,addStock_sukutsu_shady_merchant,addDrama_drama_sukutsu_shady_merchant,humanSpeak',
-    'trait': 'Merchant',
+    'trait': 'SukutsuMerchant',  # メインクエスト完了前はペット化不可
     'quality': 4,
     'chance': 0,
 })
@@ -238,10 +239,10 @@ npcs.append({
     'hostility': 'Enemy',
     'bio': 'n/2001/50/30/mindless',
     'idText': 'sukutsu_void_ooze',
-    # 能力: 混沌ブレス、混沌免疫
+    # 能力: 混沌ブレス、混沌免疫、肉クッション、窃盗系
     'mainElement': 'Chaos',
-    'elements': 'resChaos/100',  # 混沌免疫（ブレス自爆防止）
-    'actCombat': 'breathe_Chaos/30',  # 30%確率で混沌ブレス
+    'elements': 'resChaos/100,featMeatCushion/4',
+    'actCombat': 'breathe_Chaos/30,ActStealFood/15,ActStealMoney/15,ActDraw/10,ActTouchDrown/10',
     'tag': 'boss',
     'quality': 3,
     'chance': 0,
@@ -283,7 +284,7 @@ npcs.append({
     'name': 'Balgas',
     'aka_JP': '百戦の覇者',
     'aka': 'Champion of Hundred Battles',
-    'race': 'human',
+    'race': 'juere',
     'job': 'warrior',
     '_idRenderData': '@chara',
     'tiles': 0,  # human male warrior
@@ -294,7 +295,7 @@ npcs.append({
     # 能力: 物理特化（手加減）
     'mainElement': 'Cut',
     'elements': 'featElder/1,resCut/60,resImpact/60',
-    'actCombat': 'breathe_Cut/30,breathe_Impact/20',
+    'actCombat': '',
     'tag': 'boss',
     'quality': 4,
     'chance': 0,
@@ -311,7 +312,7 @@ npcs.append({
     'name': 'Balgas at His Prime',
     'aka_JP': '鉄血の覇者',
     'aka': 'Iron-Blooded Champion',
-    'race': 'human',
+    'race': 'juere',
     'job': 'warrior',
     '_idRenderData': '@chara',
     'tiles': 0,  # human male warrior
@@ -319,10 +320,10 @@ npcs.append({
     'hostility': 'Enemy',
     'bio': 'm/1002/188/95/stern',
     'idText': 'sukutsu_balgas_prime',
-    # 能力: 物理特化、8部位連撃、高物理耐性
+    # 能力: 物理特化、8部位連撃、高物理耐性、魔法無効、ヴォーパル、連撃系
     'mainElement': 'Cut',
-    'elements': 'featElder/1,featBodyParts/8,resCut/80,resImpact/80,resFire/40,resCold/40,resLightning/40,resMind/60,resNerve/60',
-    'actCombat': 'breathe_Cut/45,breathe_Impact/35,SpHero/10',
+    'elements': 'featElder/1,featBodyParts/8,resCut/80,resImpact/80,resFire/40,resCold/40,resLightning/40,resMind/60,resNerve/60,antiMagic/60,vopal/60,mod_flurry/65,mod_chaser/30,mod_cleave/10,redirect_blaser/23,counter/20',
+    'actCombat': 'breathe_Cut/40,breathe_Impact/30,SpHero/10,ActRush/25,ActBash/20',
     'tag': 'boss',
     'quality': 5,
     'chance': 0,
@@ -338,7 +339,7 @@ npcs.append({
     'name': 'Rusted Hero Cain',
     'aka_JP': '忘れられた副団長',
     'aka': 'Forgotten Vice-Captain',
-    'race': 'chaos',  # ghost から chaos に変更
+    'race': 'wraith',
     'job': 'warrior',
     '_idRenderData': '@chara',
     'tiles': 458,  # ghost (fallback)
@@ -346,9 +347,9 @@ npcs.append({
     'hostility': 'Enemy',
     'bio': 'm/1006/180/0/melancholic',
     'idText': 'sukutsu_kain_ghost',
-    # 能力: 多属性攻撃、追加部位
-    'elements': 'featBodyParts/5',  # 手の部位追加
-    'actCombat': 'breathe_Acid/25,breathe_Cut/25,hand_Nether/30',  # 酸25%、出血25%、地獄30%
+    # 能力: 多属性攻撃、追加部位、アンデッド、影召喚
+    'elements': 'featBodyParts/5,featUndead/1',
+    'actCombat': 'breathe_Acid/25,breathe_Cut/25,hand_Nether/30,SpSummonShadow/15',
     'tag': 'boss,undead',
     'quality': 4,
     'chance': 0,
@@ -362,24 +363,25 @@ npcs.append({
     'id': 'sukutsu_null',
     'Author': 'tishi.elin.sukutsu_arena',
     'name_JP': 'Nul',
-    'name': 'Null',
+    'name': 'Nul',
     'aka_JP': '虚無の処刑人',
     'aka': 'Void Executioner',
     'race': 'machine',
     'job': 'thief',
     '_idRenderData': '@chara',
     'tiles': 536,  # machine/robot
-    'LV': 2000,  # Tier2最終: Lv.100-1,000
+    'LV': 2000,
     'hostility': 'Friend',  # アリーナではNPCとして配置
-    'bio': 'f/1007/165/45/emotionless',
+    'bio': 'f/1007/165/45/princess',
     'idText': 'sukutsu_null',
     'portrait': 'UN_sukutsu_null',  # カスタムポートレート
-    # 能力: 透明化、分裂、虚無攻撃、沈黙
+    # 能力: 大幅強化版
     'mainElement': 'Void',
-    'elements': 'invisibility/1,featSplit/1,featElder/1,resVoid/80,resNether/60,resMagic/40,resNerve/100,resMind/100',
-    'actCombat': 'hand_Void/45,SpInvisibility/25,SpSilence/15',
+    'elements': 'invisibility/1,featSplit/1,featElder/1,resVoid/80,resNether/60,resMagic/40,resNerve/100,resMind/100,featGolem/1,featReboot/1,featBoost/1,featEarthStrength/1,featRapidArrow/3,featGeneSlot/10,featMiscreation/1,featMetal/120,featManaMeat/1,featRoran/1,evasionPerfect/60',
+    'actCombat': 'hand_Void/40,SpInvisibility/30,SpSilence/15,ActGazeInsane/15,ActRush/10,ActInsult/10,SpEarthquake/10,SpSeeInvisible/10,arrow_Void/20',
     # アリーナに配置してglobalCharasに登録
     'tag': f'boss,addZone_{ZONE_ID},addFlag_StayHomeZone',
+    'trait': 'SukutsuNPC',  # メインクエスト完了前はペット化不可
     'quality': 4,
     'chance': 0,
 })
@@ -395,15 +397,17 @@ npcs.append({
     'name': 'Shadow Self',
     'aka_JP': '映し身',
     'aka': 'Mirror Image',
-    'race': 'shade',
+    'race': 'phantom',
     'job': 'warrior',
     '_idRenderData': '@chara',
-    'tiles': 460,  # shade (fallback, C# will copy PC appearance)
+    'tiles': 460,
     'LV': 2500,  # Tier3前半: Lv.1,000-10,000
     'hostility': 'Enemy',
     'bio': 'n/1008/170/60/sinister',
     'idText': 'sukutsu_shadow_self',
-    # 試練ボス: プレイヤーの影
+    # 試練ボス: プレイヤーの影、デーモン
+    'elements': 'featDemon/1',
+    'actCombat': 'arrow_Darkness/25,SpHeal/15,SpTeleport/15,ActSwarm/20,ActBladeStorm/20',
     'tag': 'boss,undead',
     'quality': 4,
     'chance': 0,
@@ -420,7 +424,7 @@ npcs.append({
     'name': 'Greed',
     'aka_JP': '観客の代弁者',
     'aka': 'Voice of the Audience',
-    'race': 'human',
+    'race': 'wraith',
     'job': 'warrior',
     '_idRenderData': '@chara',
     'tiles': 0,  # human male warrior
@@ -428,13 +432,13 @@ npcs.append({
     'hostility': 'Enemy',
     'bio': 'm/2003/175/70/possessed',
     'idText': 'sukutsu_greed',
-    # 能力: 轟音+混沌ブレス、弱体魔法
+    # 能力: 轟音+混沌ブレス、弱体魔法、宇宙的恐怖、回復
     'mainElement': 'Sound',
-    'elements': 'resSound/50,resChaos/30,resMagic/60,featElder/1',
-    'actCombat': 'breathe_Sound/35,breathe_Chaos/25,SpWeakness/15',
-    # AI: シルバーベルのように逃げ回り、黒天使のように罵倒する
+    'elements': 'resSound/50,resChaos/30,resMagic/60,featElder/1,featCosmicHorror/1',
+    'actCombat': 'breathe_Sound/35,breathe_Chaos/25,SpWeakness/15,ActInsult/30,SpHeal/10',
+    # AI: 黒天使のように罵倒する
     'AI_Calm': '4,30',
-    'AI_Combat': 'ActInsult,ActEscape/5',
+    'AI_Combat': 'ActInsult',
     'tag': 'boss',
     'quality': 4,
     'chance': 0,
@@ -452,7 +456,7 @@ npcs.append({
     'name': 'Crow',
     'aka_JP': '影の鴉',
     'aka': 'Crow of Shadows',
-    'race': 'human',
+    'race': 'wraith',
     'job': 'thief',
     '_idRenderData': '@chara',
     'tiles': 2,  # human male thief
@@ -477,7 +481,7 @@ npcs.append({
     'name': 'Raven',
     'aka_JP': '刃の鴉',
     'aka': 'Raven of Blades',
-    'race': 'human',
+    'race': 'wraith',
     'job': 'warrior',
     '_idRenderData': '@chara',
     'tiles': 0,  # human male warrior

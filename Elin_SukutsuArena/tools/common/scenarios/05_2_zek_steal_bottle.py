@@ -118,6 +118,8 @@ def define_zek_steal_bottle(builder: DramaBuilder):
         .say("zek_ref1", "……残念です。ですが、無理強いはいたしません。", "", actor=zek) \
         .say("zek_ref2", "あなたが『忠犬』の道を選ばれるというのなら、それもまた一興。……いつか、その選択を後悔する日が来るかもしれませんが。", "", actor=zek) \
         .say("narr_ref", "（ゼクは影の中へと消えていく。）", "", actor=pc) \
+        .set_flag(Keys.BOTTLE_CHOICE, FlagValues.BottleChoice.REFUSED) \
+        .complete_quest(QuestIds.ZEK_STEAL_BOTTLE) \
         .complete_quest(QuestIds.ZEK_STEAL_BOTTLE_REFUSE) \
         .finish()
 
@@ -151,5 +153,7 @@ def define_zek_steal_bottle(builder: DramaBuilder):
     # 終了処理（受諾した場合のみここに到達）
     # ========================================
     builder.step(ending) \
+        .set_flag(Keys.BOTTLE_CHOICE, FlagValues.BottleChoice.SWAPPED) \
+        .complete_quest(QuestIds.ZEK_STEAL_BOTTLE) \
         .complete_quest(QuestIds.ZEK_STEAL_BOTTLE_ACCEPT) \
         .finish()

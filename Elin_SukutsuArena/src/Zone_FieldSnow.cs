@@ -11,6 +11,12 @@ namespace Elin_SukutsuArena;
 /// </summary>
 public class Zone_FieldSnow : Zone_Field
 {
+    /// <summary>
+    /// 敵の自然発生を無効化
+    /// Zone_Field は PrespawnRate = 1.2f だが、アリーナ戦闘では不要
+    /// </summary>
+    public override float PrespawnRate => 0f;
+
     private const string MAP_FILE_NAME = "chitsii_battle_field_snow.z";
 
     /// <summary>

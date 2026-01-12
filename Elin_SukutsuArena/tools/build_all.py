@@ -93,6 +93,66 @@ def step_generate_csharp():
     return result.returncode == 0
 
 
+def step_generate_stat_excel():
+    """SourceStat.xlsx を生成（カスタムCondition用）"""
+    script_path = BUILDER_DIR / 'create_stat_excel.py'
+    result = subprocess.run(
+        [sys.executable, str(script_path)],
+        cwd=str(BUILDER_DIR),
+        capture_output=True,
+        text=True
+    )
+    print(result.stdout)
+    if result.stderr:
+        print(result.stderr)
+    return result.returncode == 0
+
+
+def step_generate_source_xlsx():
+    """SourceSukutsu.xlsx を生成（Zone + Element シート）"""
+    script_path = BUILDER_DIR / 'create_source_xlsx.py'
+    result = subprocess.run(
+        [sys.executable, str(script_path)],
+        cwd=str(BUILDER_DIR),
+        capture_output=True,
+        text=True
+    )
+    print(result.stdout)
+    if result.stderr:
+        print(result.stderr)
+    return result.returncode == 0
+
+
+def step_generate_thing_tsv():
+    """Thing.tsv を生成（カスタムアイテム定義）"""
+    script_path = BUILDER_DIR / 'create_thing_excel.py'
+    result = subprocess.run(
+        [sys.executable, str(script_path)],
+        cwd=str(BUILDER_DIR),
+        capture_output=True,
+        text=True
+    )
+    print(result.stdout)
+    if result.stderr:
+        print(result.stderr)
+    return result.returncode == 0
+
+
+def step_generate_merchant_stock():
+    """商人在庫JSONを生成"""
+    script_path = BUILDER_DIR / 'create_merchant_stock.py'
+    result = subprocess.run(
+        [sys.executable, str(script_path)],
+        cwd=str(BUILDER_DIR),
+        capture_output=True,
+        text=True
+    )
+    print(result.stdout)
+    if result.stderr:
+        print(result.stderr)
+    return result.returncode == 0
+
+
 def main():
     print("="*60)
     print("Sukutsu Arena Mod - Build System")
@@ -100,8 +160,12 @@ def main():
 
     steps = [
         ("Validation", step_validation),
+        ("Generate Source XLSX", step_generate_source_xlsx),
+        ("Generate Thing TSV", step_generate_thing_tsv),
+        ("Generate Merchant Stock", step_generate_merchant_stock),
         ("Generate Quest JSON", step_generate_quest_json),
         ("Generate Drama Excel", step_generate_drama_excel),
+        ("Generate Stat Excel", step_generate_stat_excel),
         ("Generate C# Code", step_generate_csharp),
     ]
 

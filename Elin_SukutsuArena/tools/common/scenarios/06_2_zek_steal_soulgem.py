@@ -186,6 +186,8 @@ def define_zek_steal_soulgem(builder: DramaBuilder):
         .say("narr_ref4", "（彼は魂の欠片を兜の中にそっと収める。）", "", actor=pc) \
         .say("balgas_ref2", "……ありがよ。お前をただの『鉄屑』呼ばわりしたのは取り消してやる。", "", actor=balgas) \
         .say("balgas_ref3", "お前は……カインが持っていた以上の、本物の『鋼の心』を持った戦士だ。", "", actor=balgas) \
+        .set_flag(Keys.KAIN_SOUL_CHOICE, FlagValues.KainSoulChoice.RETURNED) \
+        .complete_quest(QuestIds.ZEK_STEAL_SOULGEM) \
         .complete_quest(QuestIds.ZEK_STEAL_SOULGEM_RETURN) \
         .finish()
 
@@ -212,25 +214,7 @@ def define_zek_steal_soulgem(builder: DramaBuilder):
         .say("balgas_sell2", "……そうか。見つからなかったか。", "", actor=balgas) \
         .say("narr_sell5", "（彼は深く息を吐き、酒瓶を手に取る。）", "", actor=pc) \
         .say("balgas_sell3", "……まあ、仕方ねえ。お前は十分頑張った。……ありがよ。", "", actor=balgas) \
-        .complete_quest(QuestIds.ZEK_STEAL_SOULGEM_SELL) \
-        .finish()
-
-    # ========================================
-    # シーン4: リリィの冷ややかな総括
-    # ========================================
-    builder.step(scene4_lily) \
-        .play_bgm("BGM/Lobby_Normal") \
-        .focus_chara(Actors.LILY) \
-        .say("narr_lily1", "（受付に戻ったプレイヤーに対し、リリィは全てを見透かしたような目でランクD『銅貨稼ぎ（Copper Earner）』の刻印を台帳に打つ。）", "", actor=pc) \
-        .say("lily_1", "……ふふ、面白いこと。", "", actor=lily) \
-        .say("lily_2", "友情を選んでも、力を選んでも、あなたの歩む先が『闘争』であることに変わりはありません。", "", actor=lily) \
-        .say("lily_3", "ランクDへようこそ。ここからは、ただ生き残るだけでなく、いかに効率よく『価値』を証明するかが問われます。", "", actor=lily) \
-        .say("lily_4", "次は『銅貨』を稼ぐだけでは足りません。より多くの血と、より多くの選択を。……準備が整ったら、また声をかけてくださいね？", "", actor=lily) \
-        .jump(ending)
-
-    # ========================================
-    # 終了処理
-    # ========================================
-    builder.step(ending) \
+        .set_flag(Keys.KAIN_SOUL_CHOICE, FlagValues.KainSoulChoice.SOLD) \
         .complete_quest(QuestIds.ZEK_STEAL_SOULGEM) \
+        .complete_quest(QuestIds.ZEK_STEAL_SOULGEM_SELL) \
         .finish()

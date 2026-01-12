@@ -4,7 +4,7 @@
 """
 
 from drama_builder import DramaBuilder
-from flag_definitions import Keys, Actors, FlagValues
+from flag_definitions import Keys, Actors, FlagValues, QuestIds
 
 def define_lily_real_name(builder: DramaBuilder):
     """
@@ -232,4 +232,5 @@ def define_lily_real_name(builder: DramaBuilder):
         .say("sys_buff", "【システム】『真名の絆』を獲得しました。魔力+10、精神耐性+20、魅了耐性+20 の加護を得た！", "") \
         .say("sys_title", "【システム】称号『リリシエルの伴侶』を獲得しました。", "") \
         .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantLilyRealNameBonus();") \
+        .complete_quest(QuestIds.LILY_REAL_NAME) \
         .finish()

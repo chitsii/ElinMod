@@ -1,3 +1,102 @@
 {
-    "Items": []
+  "Items": [
+    {
+      "Id": "sukutsu_kiss_of_inferno",
+      "Num": 3,
+      "Restock": true,
+      "Type": "Item",
+      "Rarity": "Artifact"
+    },
+    {
+      "Id": "sukutsu_frost_ward",
+      "Num": 5,
+      "Restock": true,
+      "Type": "Item",
+      "Rarity": "Artifact"
+    },
+    {
+      "Id": "sukutsu_mind_ward",
+      "Num": 5,
+      "Restock": true,
+      "Type": "Item",
+      "Rarity": "Artifact"
+    },
+    {
+      "Id": "sukutsu_chaos_ward",
+      "Num": 5,
+      "Restock": true,
+      "Type": "Item",
+      "Rarity": "Artifact"
+    },
+    {
+      "Id": "sukutsu_sound_ward",
+      "Num": 5,
+      "Restock": true,
+      "Type": "Item",
+      "Rarity": "Artifact"
+    },
+    {
+      "Id": "sukutsu_impact_ward",
+      "Num": 5,
+      "Restock": true,
+      "Type": "Item",
+      "Rarity": "Artifact"
+    },
+    {
+      "Id": "sukutsu_bleed_ward",
+      "Num": 5,
+      "Restock": true,
+      "Type": "Item",
+      "Rarity": "Artifact"
+    },
+    {
+      "Id": "sukutsu_hunger_amulet",
+      "Num": 1,
+      "Restock": true,
+      "Type": "Item",
+      "Rarity": "Artifact"
+    },
+    {
+      "Id": "sukutsu_ephemeral_gift",
+      "Num": 1,
+      "Restock": true,
+      "Type": "Item",
+      "Rarity": "Artifact"
+    },
+    {
+      "Id": "sukutsu_fools_peace",
+      "Num": 1,
+      "Restock": true,
+      "Type": "Item",
+      "Rarity": "Artifact"
+    },
+    {
+      "Id": "sukutsu_painkiller",
+      "Num": 3,
+      "Restock": true,
+      "Type": "Item",
+      "Rarity": "Artifact"
+    },
+    {
+      "Id": "sukutsu_stimulant",
+      "Num": 2,
+      "Restock": true,
+      "Type": "Item",
+      "Rarity": "Artifact"
+    },
+    {
+      "Id": "sukutsu_gilded_armor",
+      "Num": 1,
+      "Restock": true,
+      "Type": "Item",
+      "Rarity": "Artifact"
+    },
+    {
+      "Id": "sukutsu_twin_mirror",
+      "Num": 1,
+      "Restock": true,
+      "Type": "Item",
+      "Rarity": "Artifact"
+    }
+  ]
 }

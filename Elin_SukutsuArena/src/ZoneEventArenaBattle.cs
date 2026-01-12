@@ -13,6 +13,13 @@ public class ZoneEventArenaBattle : ZoneEvent
 
     public override void OnTick()
     {
+        // 戦闘中の帰還を禁止
+        if (EClass.player.returnInfo != null)
+        {
+            EClass.player.returnInfo = null;
+            Msg.Say("戦闘中は帰還できない！");
+        }
+
         // 勝利後の待機処理
         if (victoryTimer >= 0f)
         {

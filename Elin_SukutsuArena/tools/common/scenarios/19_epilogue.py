@@ -19,6 +19,7 @@ def define_epilogue(builder: DramaBuilder):
     balgas = builder.register_actor(Actors.BALGAS, "バルガス", "Balgas")
     lily = builder.register_actor(Actors.LILY, "リリィ", "Lily")
     zek = builder.register_actor(Actors.ZEK, "ゼク", "Zek")
+    nul = builder.register_actor(Actors.NUL, "ヌル", "Nul")
 
     # ラベル定義
     main = builder.label("main")
@@ -28,6 +29,7 @@ def define_epilogue(builder: DramaBuilder):
     ending_a_rescue = builder.label("ending_a_rescue")  # 連れ出し
     ending_b_inherit = builder.label("ending_b_inherit")  # 継承
     epilogue = builder.label("epilogue")
+    nul_return = builder.label("nul_return")
     finale = builder.label("finale")
 
     # バルガス死亡版ラベル
@@ -135,6 +137,25 @@ def define_epilogue(builder: DramaBuilder):
         .play_bgm("BGM/ProgressiveDance") \
         .wait(500) \
         .say("narr_21", "かつて、異次元の闘技場に迷い込んだ一人の冒険者がいた。そこで絶望の底で友を得て、魂を賭けて戦い、ついには、『うつろいし神』をも超える存在となった。そして今、解放された魂は、新たな物語を紡ぎ始めるーー", "", actor=pc) \
+        .jump(nul_return)
+
+    # ========================================
+    # ヌル再登場（全ルート共通）
+    # ========================================
+    builder.step(nul_return) \
+        .say("narr_nul_r1", "（帰還の道へ向かおうとした時、崩れかけた回廊から、ゆっくりと歩いてくる人影がある。）", "", actor=pc) \
+        .shake() \
+        .say("narr_nul_r2", "（その姿を見た瞬間、あなたは目を疑った。）", "", actor=pc) \
+        .focus_chara(Actors.NUL) \
+        .say("nul_r1", "……私も、驚いている。消えかけた……でも、消えなかった。", "", actor=nul) \
+        .focus_chara(Actors.ZEK) \
+        .say("zek_nul_r1", "ふむ……なるほど。アスタロトの『削除命令』は、完全に執行される前に、あの方の消滅と共に無効化されたのでしょう。", "", actor=zek) \
+        .focus_chara(Actors.NUL) \
+        .say("nul_r2", "……あの方が消えた瞬間、私の中で何かが止まった。削除ではなく……解放。", "", actor=nul) \
+        .say("nul_r3", "……私の名前は、ヌル。……それでいい。", "", actor=nul) \
+        .say("nul_r4", "……これからは、あなたと一緒に……生きていきたい。", "", actor=nul) \
+        .focus_chara(Actors.ZEK) \
+        .say("zek_nul_r2", "クク……また一人、このアリーナから解放された魂が生まれましたね。……良い取引だ。", "", actor=zek) \
         .jump(finale)
 
     # ========================================

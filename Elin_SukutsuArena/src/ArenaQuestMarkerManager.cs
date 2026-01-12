@@ -190,14 +190,7 @@ namespace Elin_SukutsuArena
         {
             try
             {
-                var zone = EClass._zone;
-                if (zone == null) return false;
-
-                // ゾーン名やIDでアリーナかどうかを判定
-                // TODO: 正確なアリーナゾーン判定条件を追加
-                return zone.id?.Contains("sukutsu") == true ||
-                       zone.id?.Contains("arena") == true ||
-                       ArenaZonePatches.IsArenaZone(zone);
+                return ArenaZonePatches.IsArenaZone(EClass._zone);
             }
             catch
             {

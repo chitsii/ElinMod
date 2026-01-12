@@ -261,9 +261,9 @@ class ArenaDramaBuilder(DramaBuilder):
         if reward.items:
             self._grant_items(reward.items)
 
-        # 3. バフ付与
-        if reward.buff_method:
-            script = f"Elin_SukutsuArena.ArenaManager.{reward.buff_method}();"
+        # 3. フィート付与
+        if reward.feat_level > 0:
+            script = f"Elin_SukutsuArena.ArenaManager.GrantArenaFeat({reward.feat_level});"
             self.action("eval", param=script)
 
         # 4. フラグ設定
@@ -323,9 +323,9 @@ class ArenaDramaBuilder(DramaBuilder):
         if reward.system_message_jp:
             self.say(f"{text_id_prefix}_sys", reward.system_message_jp, reward.system_message_en)
 
-        # 6. バフ付与（システムメッセージの後）
-        if reward.buff_method:
-            script = f"Elin_SukutsuArena.ArenaManager.{reward.buff_method}();"
+        # 6. フィート付与（システムメッセージの後）
+        if reward.feat_level > 0:
+            script = f"Elin_SukutsuArena.ArenaManager.GrantArenaFeat({reward.feat_level});"
             self.action("eval", param=script)
 
         return self

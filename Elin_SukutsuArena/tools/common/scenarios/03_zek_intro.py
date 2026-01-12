@@ -57,12 +57,12 @@ def define_zek_intro(builder: DramaBuilder):
     builder.step(scene2) \
         .play_bgm("BGM/Zek_Merchant") \
         .say("narr_6", "（ゼクは懐から、何か金属的なキューブ状の魔道具らしきものをを取り出し、軽く弄ぶ。）", "", actor=pc) \
-        .say("zek_3", "お初にお目に掛かります、若き闘士殿。私はゼキシエル……ゼクとお呼び下さい。この虚無の狭間で、行き場を失った『価値ある遺物』を拾い集める、しがない商人に過ぎません。", "", actor=zek) \
+        .say("zek_3", "お初にお目に掛かります、若き闘士殿。私はエゼキエル……単にゼクとお呼び下さい。この虚無の狭間で、行き場を失った『価値ある遺物』を拾い集める趣味人に過ぎません。そして、見つけた有用な品々を必要な方にお届けしています。", "", actor=zek) \
         .say("zek_4", "バルガスのように、あなたの肉体を試すような無作法はいたしません。私はただ、あなたの行く先に待つ『絶望』を、少しだけ華やかなものに変えるお手伝いをしたいだけなのです……ふふ。", "", actor=zek)
 
     # プレイヤーの選択肢
-    builder.choice(react_who, "……お前は何者だ？", "", text_id="c_who") \
-           .choice(react_merchant, "商人だと？ ここで何を売っているんだ", "", text_id="c_merchant") \
+    builder.choice(react_who, "……何者だ？", "", text_id="c_who") \
+           .choice(react_merchant, "商人なのか？ 売り物はなんだ？", "", text_id="c_merchant") \
            .choice(react_silent, "（無言で警戒する）", "", text_id="c_silent")
 
     # 選択肢反応: お前は何者だ？

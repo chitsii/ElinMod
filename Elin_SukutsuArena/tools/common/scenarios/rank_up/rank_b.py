@@ -143,7 +143,11 @@ def add_rank_up_B_result_steps(builder: ArenaDramaBuilder, victory_label: str, d
     builder.step(victory_label) \
         .set_flag("sukutsu_arena_result", 0) \
         .play_bgm("BGM/Emotional_Sacred_Triumph_Special") \
-        .say("narr_v1", "（ヌルの体が霧のように消え去る瞬間、あなたの耳に、かすかに音が戻ってきた。）", "", actor=pc) \
+        .say("narr_v1", "（ヌルの体が霧のように崩れ始めた瞬間——）", "", actor=pc) \
+        .shake() \
+        .say("narr_v1b", "（闘技場の空間が歪み、巨大な『手』が虚空から伸びてきた。）", "", actor=pc) \
+        .say("narr_v1c", "（その手は崩れかけたヌルの体を掴み、次元の裂け目へと引きずり込んでいく。）", "", actor=pc) \
+        .say("narr_v1d", "（一瞬、ヌルの瞳に……何か、光が宿ったように見えた。）", "", actor=pc) \
         .say("narr_v2", "（それは、観客の歓声でも、嘲笑でもない。ただ、静かな沈黙の中に響く、あなた自身の心臓の鼓動。）", "", actor=pc) \
         .say("narr_v3", "（ロビーに戻ると、リリィが駆け寄ってきた。）", "", actor=pc) \
         .focus_chara(Actors.LILY) \

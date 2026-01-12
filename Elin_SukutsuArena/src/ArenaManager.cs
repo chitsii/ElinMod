@@ -220,140 +220,36 @@ namespace Elin_SukutsuArena
         // ============================================================
 
         /// <summary>
-        /// Rank D 昇格報酬: 銅貨稼ぎの加護
-        /// - 回避+5
-        /// - 運+3
+        /// 闘志フィート付与/レベルアップ
+        /// ランク昇格時にフィート「闘志（Arena Spirit）」を付与またはレベルアップする。
         /// </summary>
-        public static void GrantRankDBonus()
-        {
-            var pc = EClass.pc;
-            if (pc == null) return;
-
-            // 回避+5 (Element ID: 64 = DV)
-            pc.elements.ModBase(64, 5);
-            // 運+3 (Element ID: 78 = LUC)
-            pc.elements.ModBase(78, 3);
-
-            Msg.Say("【銅貨稼ぎの加護】回避+5、運+3 を獲得！");
-            Debug.Log("[SukutsuArena] Granted Rank D bonus: DV+5, LUC+3");
-        }
-
-        /// <summary>
-        /// Rank C 昇格報酬: 闘技場の鴉の加護
-        /// - クリティカル率向上（器用+5）
-        /// - 活力+5（スタミナ5%増）
-        /// </summary>
-        public static void GrantRankCBonus()
-        {
-            var pc = EClass.pc;
-            if (pc == null) return;
-
-            // 器用+5 (Element ID: 72 = DEX) - クリティカルに影響
-            pc.elements.ModBase(72, 5);
-            // 活力+5 (Element ID: 62 = vigor) - スタミナ最大値+5%
-            pc.elements.ModBase(62, 5);
-
-            Msg.Say("【闘技場の鴉の加護】器用+5、活力+5 を獲得！");
-            Debug.Log("[SukutsuArena] Granted Rank C bonus: DEX+5, vigor+5");
-        }
-
-        /// <summary>
-        /// Rank B 昇格報酬: 銀翼の加護
-        /// - 全主要ステータス+3
-        /// - 魔法耐性+10
-        /// </summary>
-        public static void GrantRankBBonus()
-        {
-            var pc = EClass.pc;
-            if (pc == null) return;
-
-            // 主要ステータス全て+3
-            // STR=70, END=71, DEX=72, PER=73, LER=74, WIL=75, MAG=76, CHA=77, SPD=79
-            int[] mainStats = { 70, 71, 72, 73, 74, 75, 76, 77, 79 };
-            foreach (int statId in mainStats)
-            {
-                pc.elements.ModBase(statId, 3);
-            }
-
-            // 魔法耐性+10 (Element ID: 955 = resMagic)
-            pc.elements.ModBase(955, 10);
-
-            Msg.Say("【銀翼の加護】全ステータス+3、魔法耐性+10 を獲得！");
-            Debug.Log("[SukutsuArena] Granted Rank B bonus: All stats+3, Magic Resist+10");
-        }
-
-        /// <summary>
-        /// Rank A 昇格報酬: 黄金の戦鬼の加護（影の自己を倒した証）
-        /// - 筋力+5
-        /// - 魔力+5
-        /// - 回避+5
-        /// - PV+5
-        /// </summary>
-        public static void GrantRankABonus()
-        {
-            var pc = EClass.pc;
-            if (pc == null) return;
-
-            // 筋力+5 (Element ID: 70 = STR)
-            pc.elements.ModBase(70, 5);
-            // 魔力+5 (Element ID: 76 = MAG)
-            pc.elements.ModBase(76, 5);
-            // 回避+5 (Element ID: 64 = DV)
-            pc.elements.ModBase(64, 5);
-            // PV+5 (Element ID: 65 = PV)
-            pc.elements.ModBase(65, 5);
-
-            Msg.Say("【黄金の戦鬼】筋力+5、魔力+5、回避+5、PV+5 を獲得！");
-            Debug.Log("[SukutsuArena] Granted Rank A bonus: STR+5, MAG+5, DV+5, PV+5");
-        }
-
-        /// <summary>
-        /// Rank E 昇格報酬: 鉄屑の加護（カインを倒した証）
-        /// - 筋力+3
-        /// - PV+5
-        /// </summary>
-        public static void GrantRankEBonus()
+        /// <param name="level">フィートレベル (1-7)</param>
+        public static void GrantArenaFeat(int level)
         {
             var pc = EClass.pc;
             if (pc == null || pc.elements == null)
             {
-                Debug.LogWarning("[SukutsuArena] GrantRankEBonus: pc or elements is null, skipping");
+                Debug.LogWarning("[SukutsuArena] GrantArenaFeat: pc or elements is null, skipping");
                 return;
             }
 
             try
             {
-                // 筋力+3 (Element ID: 70 = STR)
-                pc.elements.ModBase(70, 3);
-                // PV+5 (Element ID: 65 = PV)
-                pc.elements.ModBase(65, 5);
+                const int featId = 10001; // featArenaSpirit
 
-                Msg.Say("【鉄屑の加護】筋力+3、PV+5 を獲得！");
-                Debug.Log("[SukutsuArena] Granted Rank E bonus: STR+3, PV+5");
+                // フィートを設定（既存の場合はレベルアップ）
+                pc.elements.SetBase(featId, level);
+
+                // 活力ボーナスを計算
+                int vigorBonus = level <= 5 ? level * 5 : (level == 6 ? 30 : 40);
+
+                Msg.Say($"【闘志】Lv{level}を獲得！（活力+{vigorBonus}）");
+                Debug.Log($"[SukutsuArena] Granted Arena Spirit feat Lv{level} (vigor+{vigorBonus})");
             }
             catch (Exception ex)
             {
-                Debug.LogError($"[SukutsuArena] GrantRankEBonus failed: {ex.Message}");
+                Debug.LogError($"[SukutsuArena] GrantArenaFeat failed: {ex.Message}");
             }
-        }
-
-        /// <summary>
-        /// Rank F 昇格報酬: 泥犬の加護（冷気を生き延びた証）
-        /// - 耐久+3
-        /// - 冷気耐性+5
-        /// </summary>
-        public static void GrantRankFBonus()
-        {
-            var pc = EClass.pc;
-            if (pc == null) return;
-
-            // 耐久+3 (Element ID: 71 = END)
-            pc.elements.ModBase(71, 3);
-            // 冷気耐性+5 (Element ID: 951 = resCold)
-            pc.elements.ModBase(951, 5);
-
-            Msg.Say("【泥犬の加護】耐久+3、冷気耐性+5 を獲得！");
-            Debug.Log("[SukutsuArena] Granted Rank F bonus: END+3, Cold Resist+5");
         }
 
         // ============================================================

@@ -11,50 +11,65 @@ namespace Elin_SukutsuArena
     public class TraitSukutsuItem : TraitDrink
     {
         /// <summary>
+        /// 親クラスの IdEffect をオーバーライド
+        /// カスタム効果IDはバニラの EffectId 列挙型に存在しないため、
+        /// デフォルト値を返して列挙型変換エラーを回避
+        /// </summary>
+        public override EffectId IdEffect => global::EffectId.Drink;
+
+        /// <summary>
         /// 効果ID（item_definitions.py の EFFECT_DEFINITIONS キーに対応）
         /// trait列の2番目のパラメータで指定
         /// </summary>
-        public string EffectId => GetParam(1) ?? "";
+        public string CustomEffectId => GetParam(1) ?? "";
 
         /// <summary>
         /// 飲んだ時の処理
         /// </summary>
         public override void OnDrink(Chara c)
         {
-            Debug.Log($"[SukutsuArena] TraitSukutsuItem.OnDrink: EffectId={EffectId}");
+            Debug.Log($"[SukutsuArena] TraitSukutsuItem.OnDrink: CustomEffectId={CustomEffectId}");
 
-            switch (EffectId)
+            switch (CustomEffectId)
             {
                 case "kiss_of_inferno":
                     ApplyKissOfInferno(c);
                     break;
 
                 case "frost_ward":
-                    ApplySingleResistance(c, 951, -15, "frost");  // resCold
+                    ApplyConditionByAlias(c, "ConSukutsuResCold", -15);
                     break;
 
                 case "mind_ward":
-                    ApplySingleResistance(c, 953, -15, "mind");   // resDarkness
+                    ApplyConditionByAlias(c, "ConSukutsuResDarkness", -15);
                     break;
 
                 case "chaos_ward":
-                    ApplySingleResistance(c, 959, -15, "chaos");  // resChaos
+                    ApplyConditionByAlias(c, "ConSukutsuResChaos", -15);
                     break;
 
                 case "sound_ward":
-                    ApplySingleResistance(c, 957, -15, "sound");  // resSound
+                    ApplyConditionByAlias(c, "ConSukutsuResSound", -15);
                     break;
 
                 case "impact_ward":
-                    ApplySingleResistance(c, 965, -15, "impact"); // resImpact
+                    ApplyConditionByAlias(c, "ConSukutsuResImpact", -15);
                     break;
 
                 case "bleed_ward":
-                    ApplySingleResistance(c, 964, -15, "bleed");  // resCut
+                    ApplyConditionByAlias(c, "ConSukutsuResCut", -15);
+                    break;
+
+                case "painkiller":
+                    ApplyPainkiller(c);
+                    break;
+
+                case "stimulant":
+                    ApplyStimulant(c);
                     break;
 
                 default:
-                    Debug.LogWarning($"[SukutsuArena] Unknown effect ID: {EffectId}, falling back to base");
+                    Debug.LogWarning($"[SukutsuArena] Unknown effect ID: {CustomEffectId}, falling back to base");
                     base.OnDrink(c);
                     break;
             }
@@ -62,89 +77,128 @@ namespace Elin_SukutsuArena
 
         /// <summary>
         /// 業火の接吻効果
-        /// - 複数耐性バフ（一時的、10000ターン）
+        /// - 複数耐性バフ（一時的）
         /// - カルマ-30
         /// </summary>
         private void ApplyKissOfInferno(Chara c)
         {
-            // 効果メッセージ・演出
-            c.Say("drink_cursed", c, owner);
+            // 演出
             c.PlaySound("curse");
             c.PlayEffect("curse");
 
-            // バフ持続時間（10000ターン相当のpower）
-            // ConBuffStats.EvaluateTurn: return base.EvaluateTurn(p) * 100 / 100
-            // Condition.EvaluateTurn: return 5 + (int)Mathf.Sqrt(p)
-            // 10000ターン → p = (10000 - 5)^2 = 99,900,025 → 約1億
-            // 実用的には power = 100000000 で十分長い
-            int buffPower = 100000000;
-
-            // 付与する耐性リスト
-            int[] resistanceIds = new int[]
+            // 付与する耐性Condition（alias）
+            string[] conditionAliases = new string[]
             {
-                951,  // resCold (冷気)
-                953,  // resDarkness (幻惑)
-                959,  // resChaos (混沌)
-                957,  // resSound (轟音)
-                965,  // resImpact (衝撃)
-                964,  // resCut (出血)
+                "ConSukutsuResCold",
+                "ConSukutsuResDarkness",
+                "ConSukutsuResChaos",
+                "ConSukutsuResSound",
+                "ConSukutsuResImpact",
+                "ConSukutsuResCut",
             };
 
-            foreach (int elementId in resistanceIds)
+            // 長めの持続時間
+            int power = 2000;
+
+            foreach (string alias in conditionAliases)
             {
-                c.AddCondition(Condition.Create(buffPower, delegate (ConBuffStats con)
-                {
-                    // refVal = element ID, refVal2 = 0 (バフ、222だとデバフ)
-                    con.SetRefVal(elementId, 0);
-                }));
+                c.AddCondition(Condition.Create(alias, power));
             }
 
-            Msg.Say("sukutsu_kiss_inferno", c);
-            Debug.Log($"[SukutsuArena] Applied Kiss of Inferno buffs ({resistanceIds.Length} resistances) to {c.Name}");
+            Debug.Log($"[SukutsuArena] Applied Kiss of Inferno buffs ({conditionAliases.Length} resistances) to {c.Name}");
 
             // カルマ減少（PCのみ）
             if (c.IsPC)
             {
                 EClass.player.ModKarma(-30);
-                Msg.Say("sukutsu_karma_cost");
             }
         }
 
         /// <summary>
-        /// 単一耐性バフを付与
+        /// Condition aliasを使ってバフを付与
         /// </summary>
-        private void ApplySingleResistance(Chara c, int elementId, int karmaChange, string effectName)
+        private void ApplyConditionByAlias(Chara c, string conditionAlias, int karmaChange)
+        {
+            try
+            {
+                Debug.Log($"[SukutsuArena] ApplyConditionByAlias: {conditionAlias}");
+
+                // 演出
+                c.PlaySound("buff");
+                c.PlayEffect("buff");
+
+                // Conditionを付与（power = 500 → 約27ターン持続）
+                int power = 500;
+                c.AddCondition(Condition.Create(conditionAlias, power));
+
+                Debug.Log($"[SukutsuArena] Applied {conditionAlias} to {c.Name}");
+
+                // カルマ減少（PCのみ）
+                if (c.IsPC && karmaChange != 0)
+                {
+                    EClass.player.ModKarma(karmaChange);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"[SukutsuArena] ApplyConditionByAlias EXCEPTION: {ex.Message}\n{ex.StackTrace}");
+            }
+        }
+
+        /// <summary>
+        /// 痛覚遮断薬効果
+        /// - 物理ダメージ軽減（PVバフ、一時的）
+        /// - 強力な毒状態付与
+        /// </summary>
+        private void ApplyPainkiller(Chara c)
         {
             // 演出
-            c.PlaySound("buff");
-            c.PlayEffect("buff");
+            c.PlaySound("curse");
+            c.PlayEffect("curse");
 
-            // バフ持続時間（10000ターン相当）
-            int buffPower = 100000000;
+            // PVを一時的に上昇
+            // power = 800 → 約33ターン持続
+            int power = 800;
+            c.AddCondition(Condition.Create("ConSukutsuPVBuff", power));
 
-            c.AddCondition(Condition.Create(buffPower, delegate (ConBuffStats con)
+            // 強力な毒状態付与（power = 500で強力な毒）
+            c.AddCondition<ConPoison>(500);
+
+            Debug.Log($"[SukutsuArena] Applied Painkiller (PV buff + strong poison) to {c.Name}");
+
+            // カルマ減少
+            if (c.IsPC)
             {
-                con.SetRefVal(elementId, 0);
-            }));
-
-            Msg.Say($"sukutsu_{effectName}_ward_effect", c);
-            Debug.Log($"[SukutsuArena] Applied {effectName} ward (element {elementId}) to {c.Name}");
-
-            // カルマ減少（PCのみ）
-            if (c.IsPC && karmaChange != 0)
-            {
-                EClass.player.ModKarma(karmaChange);
-                Msg.Say("sukutsu_karma_cost_minor");
+                EClass.player.ModKarma(-10);
             }
         }
 
         /// <summary>
-        /// バフ値の計算（ConBuffStats.CalcValue を参考）
+        /// 禁断の覚醒剤効果
+        /// - ブースト状態付与
+        /// - 後遺症として強力な出血（ブーストより長く持続）
         /// </summary>
-        private int GetBuffValue(int power)
+        private void ApplyStimulant(Chara c)
         {
-            // ConBuffStats.CalcValue: return (int)Mathf.Max(5f, Mathf.Sqrt(base.power) * 2f - 15f);
-            return (int)Mathf.Max(5f, Mathf.Sqrt(power) * 2f - 15f);
+            // 演出
+            c.PlaySound("boost2");
+            c.PlayEffect("buff");
+
+            // ブースト状態付与（power = 200 → 約30ターン）
+            c.AddCondition<ConBoost>(200);
+
+            // 強力な出血状態付与（ブーストより長く持続）
+            // power = 600 → 約40ターン、ブーストが切れた後も続く
+            c.AddCondition<ConBleed>(600);
+
+            Debug.Log($"[SukutsuArena] Applied Stimulant (Boost + delayed Bleed) to {c.Name}");
+
+            // カルマ減少
+            if (c.IsPC)
+            {
+                EClass.player.ModKarma(-15);
+            }
         }
+
     }
 }

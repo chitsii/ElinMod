@@ -244,6 +244,150 @@ Portrait of a young female adventurer full of hope, long flowing brown hair, bri
 
 ---
 
+## 11. 虚空のウーズ（Void Ooze）
+
+混沌ブレスを吐くスライム。虚空から生まれた落とし子。ランクG昇格試験のボス。
+
+### Retro Diffusion（キャラチップ）
+
+**Positive:**
+```
+pixel art, RPG game assets, monster, void slime, dark purple ooze, chaos energy, glowing red core, dripping form, amorphous blob, tentacle-like appendages, ethereal glow, dark fantasy creature, eldritch horror, corrupted slime
+```
+
+**Negative:**
+```
+cute slime, blue slime, friendly, smile face, solid form, clean edges, modern, deformed, blurry, anime style
+```
+
+---
+
+## 12. 凍土の猟犬（Frost Hound）
+
+古代種の氷の魔犬。透明化能力を持つ。ランクF昇格試験のボス。
+
+### Retro Diffusion（キャラチップ）
+
+**Positive:**
+```
+pixel art, RPG game assets, monster, ice wolf, spectral hound, translucent body, frost aura, glowing blue eyes, ancient beast, ethereal ice crystals, freezing breath, ghostly canine, dark fantasy creature, semi-transparent, frozen fur
+```
+
+**Negative:**
+```
+normal wolf, cute dog, solid body, warm colors, fire, friendly, modern, deformed, blurry, anime style
+```
+
+---
+
+## 13. グリード（Greed）
+
+観客の力を取り込んだ傀儡。轟音と混沌ブレスを操る。ランクD昇格試験のボス。
+
+### Retro Diffusion（キャラチップ）
+
+**Positive:**
+```
+pixel art, RPG game assets, humanoid puppet, chaos marionette, twisted body, multiple mouths, speaker-like openings, purple energy strings, audience eyes on body, sonic waves, grotesque, dark fantasy horror, eldritch puppet, distorted humanoid
+```
+
+**Negative:**
+```
+cute puppet, wooden puppet, normal human, friendly, clean design, modern, deformed, blurry, anime style
+```
+
+---
+
+## 14. クロウ（Crow Shadow）
+
+闘技場の鴉・影。かつての挑戦者。ランクC昇格試験のボス（3人組の1人）。
+
+### Retro Diffusion（キャラチップ）
+
+**Positive:**
+```
+pixel art, RPG game assets, shadow assassin, dark ninja, crow mask, black feathered cloak, dual daggers, shadow form, ethereal darkness, red glowing eyes through mask, dark fantasy rogue, former gladiator, bird-like movement
+```
+
+**Negative:**
+```
+bright colors, friendly, no mask, armored, cute, modern, deformed, blurry, anime style
+```
+
+---
+
+## 15. レイヴン（Raven Blade）
+
+闘技場の鴉・刃。かつての挑戦者。ランクC昇格試験のボス（3人組の1人）。
+
+### Retro Diffusion（キャラチップ）
+
+**Positive:**
+```
+pixel art, RPG game assets, blade dancer, sword master, raven mask, dark armor, multiple floating swords, graceful pose, silver blades, purple energy, dark fantasy warrior, former gladiator, bird-themed knight
+```
+
+**Negative:**
+```
+bright colors, friendly, no mask, clumsy, cute, modern, deformed, blurry, anime style
+```
+
+---
+
+## 16. カラス（Karasu Venom）
+
+闘技場の鴉・毒。かつての挑戦者。ランクC昇格試験のボス（3人組のリーダー）。
+
+### Retro Diffusion（キャラチップ）
+
+**Positive:**
+```
+pixel art, RPG game assets, poison master, toxic assassin, elaborate crow mask, dark robes, green poison mist, vials and bottles, dripping venom, sickly aura, dark fantasy alchemist, former gladiator leader, bird skull ornaments
+```
+
+**Negative:**
+```
+bright colors, friendly, no mask, healthy appearance, cute, modern, deformed, blurry, anime style
+```
+
+---
+
+## 17. 影の自己（Shadow Self）
+
+観客の「注目」が生み出したプレイヤーの影。ランクA昇格試験のボス。
+
+### Retro Diffusion（キャラチップ）
+
+**Positive:**
+```
+pixel art, RPG game assets, shadow doppelganger, dark silhouette, humanoid shadow, glowing white eyes, copying pose, ethereal darkness, mirror reflection, purple void energy, ominous aura, dark fantasy, living shadow, faceless form
+```
+
+**Negative:**
+```
+solid colors, friendly, detailed face, bright, cute, modern, deformed, blurry, anime style
+```
+
+---
+
+## 18. 訓練用バルガス（Balgas Training）
+
+手加減モードのバルガス。訓練クエスト用。
+
+### Retro Diffusion（キャラチップ）
+
+**Positive:**
+```
+pixel art, RPG game assets, elderly warrior training, 68 years old, muscular, white hair, relaxed stance, training wooden sword, no armor casual clothes, patient expression, mentor pose, dark fantasy, veteran teaching
+```
+
+**Negative:**
+```
+angry, full armor, real weapon, young, battle mode, cute, modern, deformed, blurry, anime style
+```
+
+---
+
 ## 使用上の注意
 
 ### Retro Diffusion
@@ -257,15 +401,32 @@ Portrait of a young female adventurer full of hope, long flowing brown hair, bri
 - 表情や雰囲気を重視
 
 ### キャラクター性の反映
+
+#### メインNPC
 | キャラクター | 表現のポイント |
 |-------------|---------------|
 | アスタロト | 威厳と冷酷さ、竜神の威圧感 |
 | バルガス（老年） | 疲れた老兵の父性、戦傷 |
 | リリィ | 魅惑と寂しさの混在、事務的 |
 | ゼク | 不気味な古代機械、フードの影 |
-| カイン（残留思念） | 悲しい残留思念、半透明 |
-| Nul | 空虚な人形、感情の欠落 |
-| 若きバルガス | 全盛期の自信、黒髪の傭兵団長 |
+
+#### ボスモンスター
+| キャラクター | ランク | 表現のポイント |
+|-------------|--------|---------------|
+| 虚空のウーズ | G | 混沌、不定形、虚空エネルギー |
+| 凍土の猟犬 | F | 透明、氷、幽霊的な犬 |
+| カイン（残留思念） | E | 悲しい残留思念、半透明 |
+| グリード | D | 観客の力、傀儡、歪んだ人型 |
+| クロウ | C | 影、二刀、鴉マスク |
+| レイヴン | C | 刃の達人、鴉マスク |
+| カラス | C | 毒使い、鴉マスクのリーダー |
+| Nul | B | 空虚な人形、感情の欠落 |
+| 影の自己 | A | プレイヤーの影、模倣 |
+| 若きバルガス | S | 全盛期の自信、黒髪の傭兵団長 |
+
+#### 回想シーン
+| キャラクター | 表現のポイント |
+|-------------|---------------|
 | 少年カイン | 諦めない目をした孤児 |
 | 青年カイン | 頼れる副官、忠誠心 |
 | 名もなき冒険者 | 希望に満ちた冒険者（Nulの過去）|

@@ -7,6 +7,71 @@ BUILDER_DIR = os.path.dirname(os.path.abspath(__file__))
 TOOLS_DIR = os.path.dirname(BUILDER_DIR)
 PROJECT_ROOT = os.path.dirname(TOOLS_DIR)
 
+# =============================================================================
+# Element シート定義（カスタムフィート用）
+# =============================================================================
+ELEMENT_HEADERS = [
+    "id", "alias", "name_JP", "name", "type", "group", "max", "cost",
+    "tag", "textPhase_JP", "textPhase", "textExtra_JP", "textExtra"
+]
+
+ELEMENT_TYPES = [
+    "int", "string", "string", "string", "string", "string", "int", "int",
+    "string[]", "string", "string", "string", "string"
+]
+
+ELEMENT_DEFAULTS = [
+    "", "", "", "", "", "FEAT", "1", "0",
+    "", "", "", "", ""
+]
+
+# カスタムフィート: 闘志（Arena Spirit）
+CUSTOM_FEATS = [
+    {
+        "id": 10001,
+        "alias": "featArenaSpirit",
+        "name_JP": "闘志",
+        "name": "Arena Spirit",
+        "type": "FeatArenaSpirit",
+        "group": "FEAT",
+        "max": 7,
+        "cost": 0,
+        "tag": "",
+        "textPhase_JP": "闘技場で戦い抜いた証。活力が向上する。",
+        "textPhase": "Proof of surviving the arena. Increases vigor.",
+        "textExtra_JP": "Lv1:活力+5 / Lv2:+10 / Lv3:+15 / Lv4:+20 / Lv5:+25 / Lv6:+30 / Lv7:+40",
+        "textExtra": "Lv1:Vigor+5 / Lv2:+10 / Lv3:+15 / Lv4:+20 / Lv5:+25 / Lv6:+30 / Lv7:+40",
+    },
+]
+
+
+def build_element_rows():
+    """Elementシート用の行データを構築"""
+    rows = []
+    rows.append(ELEMENT_HEADERS)
+    rows.append(ELEMENT_TYPES)
+    rows.append(ELEMENT_DEFAULTS)
+
+    for feat in CUSTOM_FEATS:
+        row = [
+            feat.get("id", ""),
+            feat.get("alias", ""),
+            feat.get("name_JP", ""),
+            feat.get("name", ""),
+            feat.get("type", ""),
+            feat.get("group", ""),
+            feat.get("max", ""),
+            feat.get("cost", ""),
+            feat.get("tag", ""),
+            feat.get("textPhase_JP", ""),
+            feat.get("textPhase", ""),
+            feat.get("textExtra_JP", ""),
+            feat.get("textExtra", ""),
+        ]
+        rows.append(row)
+
+    return rows
+
 # CWLサンプルファイルのパス（環境変数で上書き可能）
 DEFAULT_SAMPLE_PATH = r'c:\Users\tishi\programming\elin_modding\CWL_AddLocation_Example\LangMod\EN\SourceSSS.xlsx'
 SAMPLE_PATH = os.environ.get('CWL_SAMPLE_PATH', DEFAULT_SAMPLE_PATH)

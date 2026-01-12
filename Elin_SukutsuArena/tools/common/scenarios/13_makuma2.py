@@ -3,7 +3,7 @@
 """
 
 from drama_builder import DramaBuilder
-from flag_definitions import Keys, Actors, FlagValues
+from flag_definitions import Keys, Actors, FlagValues, QuestIds
 
 def define_makuma2(builder: DramaBuilder):
     """
@@ -40,6 +40,10 @@ def define_makuma2(builder: DramaBuilder):
 
     # シーン2: 製作
     scene2 = builder.label("scene2_crafting")
+    check_materials = builder.label("check_materials")
+    has_materials = builder.label("has_materials")
+    no_materials = builder.label("no_materials")
+    crafting_complete = builder.label("crafting_complete")
     scene3 = builder.label("scene3_balgas_warning")
 
     # 条件分岐: カインの魂
@@ -120,9 +124,13 @@ def define_makuma2(builder: DramaBuilder):
         .say("lily_11", "このままでは、溜め込んだ死者の残響が暴走して、アリーナごと呑み込まれるわ！", "", actor=lily) \
         .jump(bottle_battle)
 
-    # 戦闘イベント（プレースホルダー）
+    # 戦闘イベント
     builder.step(bottle_battle) \
-        .say("narr_10", "（プレースホルダー：暴走した怨念の影との戦闘が発生する。）", "", actor=pc) \
+        .shake() \
+        .say("narr_10", "（黒い霧から形成された怨念の影が、悲鳴のような咆哮を上げてあなたに襲いかかる！）", "", actor=pc) \
+        .say("narr_10_1", "（リリィが叫ぶ。「私が抑え込む！ 今のうちに核を砕いて！」）", "", actor=pc) \
+        .shake() \
+        .say("narr_10_2", "（あなたは怨念の中心、脈動する黒い結晶を砕き、影を霧散させた。）", "", actor=pc) \
         .say("narr_11", "（リリィは息を切らしながら、砕け散った偽物の瓶の破片を拾い上げる。）", "", actor=pc) \
         .say("narr_12", "（その断面には、ゼク特有の『影の刻印』が刻まれていた。）", "", actor=pc) \
         .say("lily_12", "……これは、ゼクの細工ね。間違いないわ。", "", actor=lily) \
@@ -131,19 +139,18 @@ def define_makuma2(builder: DramaBuilder):
         .jump(bottle_choice)
 
     # 瓶の真実についての選択肢
-    builder.choice(bottle_confess, "……すまない。ゼクに唆されて、本物と偽物をすり替えた。君を裏切った", "", text_id="c_bottle_confess") \
-           .choice(bottle_blame, "知らなかった。ゼクが勝手に細工したんだ。俺は何も……", "", text_id="c_bottle_blame") \
-           .choice(bottle_deny, "俺が作った瓶に問題はなかった。お前の管理ミスだろう", "", text_id="c_bottle_deny")
+    builder.choice(bottle_confess, "……すまない。ゼクに唆されて、本物と偽物をすり替えた。君を裏切ってしまった", "", text_id="c_bottle_confess") \
+           .choice(bottle_blame, "ゼクが勝手に細工したのだろう……", "", text_id="c_bottle_blame") \
+           .choice(bottle_deny, "何も知らない。君の管理ミスじゃないか？", "", text_id="c_bottle_deny")
 
     # 瓶の選択肢反応
     builder.step(bottle_confess) \
         .say("lily_r4", "……そう。", "", actor=lily) \
         .say("narr_14", "（リリィの肩が小刻みに震えている。）", "", actor=pc) \
-        .say("lily_14", "……あなたは、私を『利用できる道具』だと思っていたのね。バルガスさんには友情を示し、私には欺瞞を。", "", actor=lily) \
         .say("lily_15", "……ふふ、サキュバスが人間に裏切られるなんて、滑稽な話だわ。", "", actor=lily) \
         .say("narr_15", "（彼女は深く息を吐き、再びあなたを見つめる。）", "", actor=pc) \
         .say("lily_16", "でも……でもね。あなたが今、正直に話してくれたこと……それだけは、評価します。", "", actor=lily) \
-        .say("lily_17", "ゼクのような『完全な嘘つき』よりは、まだ救いがある。", "", actor=lily) \
+        .say("lily_17", "『嘘つき』よりは、まだ救いがある。", "", actor=lily) \
         .say("lily_18", "……私は、あなたを許すわ。ただし、二度目はない。次にあなたが私を欺いたら……その時は、この爪であなたの喉を裂きます。約束よ。", "", actor=lily) \
         .set_flag(Keys.LILY_BOTTLE_CONFESSION, FlagValues.LilyBottleConfession.CONFESSED) \
         .action("eval", param="Elin_SukutsuArena.ArenaManager.Makuma2ConfessToLily();") \
@@ -161,9 +168,9 @@ def define_makuma2(builder: DramaBuilder):
 
     builder.step(bottle_deny) \
         .say("narr_18", "（リリィの表情が凍りつく。）", "", actor=pc) \
-        .say("narr_19", "（リリィの周囲に冷気のような波動が広がる。）", "", actor=pc) \
+        .say("narr_19", "（リリィの周囲に氷のような魔力の波動が広がる。）", "", actor=pc) \
         .say("lily_21", "……そうですか。私の、管理ミス。", "", actor=lily) \
-        .say("lily_22", "ふふふ……ええ、そうかもしれませんね。私が、あなたという『獣』を『人間』だと勘違いしていた。それが最大のミスでした。", "", actor=lily) \
+        .say("lily_22", "ふふふ……ええ、私が、あなたという『獣』を『人間』だと勘違いしていた。それが最大のミスでした。", "", actor=lily) \
         .say("lily_23", "結構です。どうぞ、虚空の心臓でも何でも作って、アスタロト様に挑んでください。……私は、もうあなたに期待しません。", "", actor=lily) \
         .set_flag(Keys.LILY_BOTTLE_CONFESSION, FlagValues.LilyBottleConfession.DENIED) \
         .action("eval", param="Elin_SukutsuArena.ArenaManager.Makuma2DenyInvolvement();") \
@@ -176,11 +183,42 @@ def define_makuma2(builder: DramaBuilder):
     # シーン2: 虚空の心臓の製作
     # ========================================
     builder.step(scene2) \
-        .play_bgm("BGM/Crafting_Ambient") \
+        .play_bgm("BGM/Mystical_Ritual") \
         .say("lily_24", "必要な素材は以下の通りです。", "", actor=lily) \
-        .say("lily_25", "**高品質な宝石×3**、**エーテルの結晶×5**、そしてゼクの店で購入できる**『星の断片』×1**。これらを『宝石細工』または『機械製作』の技術で練り上げてください。", "", actor=lily) \
-        .say("lily_26", "……完成したら、私に見せてください。台帳に記録し、ランクAへの挑戦権を授与いたします。", "", actor=lily) \
-        .say("narr_20", "（プレースホルダー：ここで実際の製作処理を行う。）", "", actor=pc) \
+        .say("lily_25", "**心臓×1**と**ルーンモールド×1**。これらを私に渡してください。", "", actor=lily) \
+        .say("lily_26", "……素材が揃ったら、私が『虚空の心臓』を組み上げます。", "", actor=lily) \
+        .jump(check_materials)
+
+    # 素材チェック
+    builder.step(check_materials) \
+        .say("lily_check", "……さて、素材はお持ちですか？", "", actor=lily)
+
+    # 条件付き選択肢: 両方の素材を持っている場合のみ「渡す」が表示される
+    builder.choice_if(has_materials, "素材を渡す（心臓×1、ルーンモールド×1）", "hasItem,heart&hasItem,rune_mold", text_id="c_give_materials") \
+           .choice(no_materials, "まだ揃っていない", "", text_id="c_no_materials")
+
+    # 素材あり → 消費して製作へ
+    builder.step(has_materials) \
+        .cs_eval("var heart = EClass.pc.things.Find(t => t.id == \"heart\"); if(heart != null) heart.Destroy();") \
+        .cs_eval("var mold = EClass.pc.things.Find(t => t.id == \"rune_mold\"); if(mold != null) mold.Destroy();") \
+        .say("lily_take", "……ありがとうございます。優秀ですこと。", "", actor=lily) \
+        .jump(crafting_complete)
+
+    # 素材なし → 会話終了（再度話しかけで再試行可能）
+    builder.step(no_materials) \
+        .say("lily_no_mat", "そうですか。素材がまだ揃っていないのですね。", "", actor=lily) \
+        .say("lily_no_mat2", "心臓は簡単でしょう。ルーンモールドは、ご自身で魔法石から磨き上げる必要があります。", "", actor=lily) \
+        .say("lily_no_mat3", "……揃ったらまた声をかけてくださいな。", "", actor=lily) \
+        .finish()
+
+    # 製作完了
+    builder.step(crafting_complete) \
+        .play_bgm("BGM/Lily_Tranquil") \
+        .say("narr_20", "（リリィは素材を受け取ると、それらを机の上に並べた。）", "", actor=pc) \
+        .say("narr_20_1", "（彼女は素材に指先を当て、何やら呪文を唱え始める。）", "", actor=pc) \
+        .say("narr_20_2", "（心臓とルーンの鋳型が淡く光り、徐々に融合していく。）", "", actor=pc) \
+        .say("narr_20_3", "（数分後、淡い青白い光を放つ、拳大の結晶が完成した。）", "", actor=pc) \
+        .say("lily_craft", "……完成です。『虚空の心臓』。これがあれば、アスタロトの領域にも踏み込めるでしょう。", "", actor=lily) \
         .jump(scene3)
 
     # ========================================
@@ -191,7 +229,7 @@ def define_makuma2(builder: DramaBuilder):
         .focus_chara(Actors.BALGAS) \
         .say("narr_21", "（リリィとの打ち合わせを終え、素材を探しに出ようとするあなたの腕を、酒臭い、しかし岩のように力強い手が掴んだ。）", "", actor=pc) \
         .say("narr_22", "（バルガスだ。彼はあなたを人気の無い柱の影へと引きずり込み、周囲を警戒しながら低く、掠れた声で話し始めた。）", "", actor=pc) \
-        .say("balgas_1", "……おい、待て。リリィの女狐に言われるがまま、あいつ（ゼク）の店へ行くつもりか？", "", actor=balgas) \
+        .say("balgas_1", "……おい、待て。リリィに言われるがまま、ゼクの店へ行くつもりか？", "", actor=balgas) \
         .say("balgas_2", "最近のお前は、あいつの吐く『毒』を飲みすぎだ。ヌルの記憶チップだの、世界のバグだの……ゼクが語る『真実』ってのはな、お前の足を止めるための泥濘（ぬかるみ）なんだよ。", "", actor=balgas) \
         .say("balgas_3", "あいつはな、ただの商人じゃねえ。……『剥製師（はくせいし）』なんだ。", "", actor=balgas) \
         .say("balgas_4", "英雄が絶望し、魂が折れる瞬間を待っている。そして、その『最も美しい瞬間』を切り取って、永遠にコレクションしやがる。", "", actor=balgas) \
@@ -293,4 +331,5 @@ def define_makuma2(builder: DramaBuilder):
     # 終了処理
     # ========================================
     builder.step(ending) \
+        .complete_quest(QuestIds.MAKUMA2) \
         .finish()

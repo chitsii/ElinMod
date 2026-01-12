@@ -4,7 +4,7 @@
 """
 
 from drama_builder import DramaBuilder
-from flag_definitions import Keys, Actors, FlagValues
+from flag_definitions import Keys, Actors, FlagValues, QuestIds
 
 
 def define_makuma(builder: DramaBuilder):
@@ -185,4 +185,5 @@ def define_makuma(builder: DramaBuilder):
     builder.step(ending) \
         .set_flag(Keys.NULL_CHIP, FlagValues.TRUE) \
         .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantMakumaReward();") \
+        .complete_quest(QuestIds.MAKUMA) \
         .finish()

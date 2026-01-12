@@ -24,7 +24,7 @@ echo.
 REM ============================================================
 REM Step 1: Validation
 REM ============================================================
-<nul set /p "=[1/11] Validation... "
+<nul set /p "=[1/13] Validation... "
 pushd tools\common
 uv run python validation.py >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
@@ -43,7 +43,7 @@ echo OK
 REM ============================================================
 REM Step 2: Zone Excel
 REM ============================================================
-<nul set /p "=[2/11] Zone Excel... "
+<nul set /p "=[2/13] Zone Excel... "
 pushd tools
 uv run python builder/create_zone_excel.py >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
@@ -63,7 +63,7 @@ echo OK
 REM ============================================================
 REM Step 3: Chara Excel
 REM ============================================================
-<nul set /p "=[3/11] Chara Excel... "
+<nul set /p "=[3/13] Chara Excel... "
 pushd tools
 uv run python builder/create_chara_excel.py >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
@@ -83,9 +83,13 @@ echo OK
 REM ============================================================
 REM Step 4: Thing Excel (Custom Items)
 REM ============================================================
-<nul set /p "=[4/11] Thing Excel... "
+<nul set /p "=[4/13] Thing Excel... "
 pushd tools
-uv run python builder/create_thing_excel.py >nul 2>&1
+if "%BUILD_CONFIG%"=="Debug" (
+    uv run python builder/create_thing_excel.py --debug >nul 2>&1
+) else (
+    uv run python builder/create_thing_excel.py >nul 2>&1
+)
 if %ERRORLEVEL% NEQ 0 (
     echo FAILED
     popd
@@ -101,9 +105,43 @@ del "%~dp0LangMod\JP\Thing.tsv" >nul 2>&1
 echo OK
 
 REM ============================================================
-REM Step 5: Stat Excel (Custom Stats)
+REM Step 5: Merchant Stock JSON
 REM ============================================================
-<nul set /p "=[5/11] Stat Excel... "
+<nul set /p "=[5/13] Merchant Stock... "
+pushd tools
+uv run python builder/create_merchant_stock.py >nul 2>&1
+if %ERRORLEVEL% NEQ 0 (
+    echo FAILED
+    popd
+    goto :error
+)
+popd
+echo OK
+
+REM ============================================================
+REM Step 6: Element Excel (Custom Feats)
+REM ============================================================
+<nul set /p "=[6/13] Element Excel... "
+pushd tools
+uv run python builder/create_element_excel.py >nul 2>&1
+if %ERRORLEVEL% NEQ 0 (
+    echo FAILED
+    popd
+    goto :error
+)
+popd
+"%SOFFICE%" --headless --convert-to "xlsx:Calc MS Excel 2007 XML" --infilter="CSV:9,34,76" "%~dp0LangMod\EN\Element.tsv" --outdir "%~dp0LangMod\EN" >nul 2>&1
+"%SOFFICE%" --headless --convert-to "xlsx:Calc MS Excel 2007 XML" --infilter="CSV:9,34,76" "%~dp0LangMod\JP\Element.tsv" --outdir "%~dp0LangMod\JP" >nul 2>&1
+move /Y "%~dp0LangMod\EN\Element.xlsx" "%~dp0LangMod\EN\SourceElement.xlsx" >nul 2>&1
+move /Y "%~dp0LangMod\JP\Element.xlsx" "%~dp0LangMod\JP\SourceElement.xlsx" >nul 2>&1
+del "%~dp0LangMod\EN\Element.tsv" >nul 2>&1
+del "%~dp0LangMod\JP\Element.tsv" >nul 2>&1
+echo OK
+
+REM ============================================================
+REM Step 7: Stat Excel (Custom Stats)
+REM ============================================================
+<nul set /p "=[7/13] Stat Excel... "
 pushd tools
 uv run python builder/create_stat_excel.py >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
@@ -123,7 +161,7 @@ echo OK
 REM ============================================================
 REM Step 6: BGM JSON
 REM ============================================================
-<nul set /p "=[6/11] BGM JSON... "
+<nul set /p "=[8/13] BGM JSON... "
 pushd tools
 uv run python builder/create_bgm_json.py >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
@@ -137,7 +175,7 @@ echo OK
 REM ============================================================
 REM Step 7: Drama Excel
 REM ============================================================
-<nul set /p "=[7/11] Drama Excel... "
+<nul set /p "=[9/13] Drama Excel... "
 pushd tools
 uv run python builder/create_drama_excel.py >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
@@ -159,7 +197,7 @@ echo OK
 REM ============================================================
 REM Step 8: C# Flags + Quest Data
 REM ============================================================
-<nul set /p "=[8/11] C# Flags... "
+<nul set /p "=[10/13] C# Flags... "
 pushd tools
 uv run python builder/generate_flags.py >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
@@ -202,7 +240,7 @@ echo OK
 REM ============================================================
 REM Step 9: Config JSON (Quest + Battle Stages)
 REM ============================================================
-<nul set /p "=[9/11] Config JSON... "
+<nul set /p "=[11/13] Config JSON... "
 pushd tools\common
 uv run python -c "from quest_dependencies import export_quests_to_json; import os; export_quests_to_json(os.path.join('..', '..', 'Package', 'quest_definitions.json'))" >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
@@ -227,7 +265,7 @@ echo OK
 REM ============================================================
 REM Step 10: dotnet build
 REM ============================================================
-<nul set /p "=[10/11] dotnet build (%BUILD_CONFIG%)... "
+<nul set /p "=[12/13] dotnet build (%BUILD_CONFIG%)... "
 dotnet build "%~dp0%MOD_NAME%.csproj" -c %BUILD_CONFIG% -v q --nologo >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
     echo FAILED
@@ -243,7 +281,7 @@ echo OK
 REM ============================================================
 REM Step 11: Deploy
 REM ============================================================
-<nul set /p "=[11/11] Deploy... "
+<nul set /p "=[13/13] Deploy... "
 
 REM Package folder
 xcopy "%~dp0_bin\%MOD_NAME%.dll" "%~dp0elin_link\Package\%MOD_NAME%\" /Y /Q >nul 2>&1
