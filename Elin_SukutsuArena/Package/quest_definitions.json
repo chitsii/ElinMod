@@ -274,7 +274,7 @@
     "dramaId": "lily_experiment",
     "displayNameJP": "リリィの私的依頼『残響の器』",
     "displayNameEN": "Lily's Private Request: Vessel of Echoes",
-    "description": "リリィのために虚空の共鳴瓶を製作する",
+    "description": "リリィのために死の共鳴瓶を製作する",
     "phase": "initiation",
     "phaseOrdinal": 1,
     "questGiver": "sukutsu_receptionist",
@@ -547,7 +547,7 @@
     "dramaId": "lily_real_name",
     "displayNameJP": "リリィの真名告白",
     "displayNameEN": "Lily's True Name Revelation",
-    "description": "リリィが真名『リリアリス』を明かす",
+    "description": "リリィが真名『リリシエル』を明かす",
     "phase": "confrontation",
     "phaseOrdinal": 4,
     "questGiver": "sukutsu_receptionist",
@@ -564,9 +564,9 @@
     "priority": 600
   },
   {
-    "questId": "17_vs_grandmaster_1",
+    "questId": "17_vs_astaroth",
     "questType": "main_story",
-    "dramaId": "vs_grandmaster_1",
+    "dramaId": "vs_astaroth",
     "displayNameJP": "アスタロト初遭遇、ゼクによる救出",
     "displayNameEN": "First Astaroth Encounter, Zek's Rescue",
     "description": "アスタロトが降臨し、ゼクが介入して救出する",
@@ -600,7 +600,7 @@
     "advancesPhaseOrdinal": -1,
     "requiredFlags": [],
     "requiredQuests": [
-      "17_vs_grandmaster_1"
+      "17_vs_astaroth"
     ],
     "completionFlags": {},
     "branchChoices": [],

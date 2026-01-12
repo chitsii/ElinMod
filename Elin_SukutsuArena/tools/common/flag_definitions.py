@@ -87,7 +87,7 @@ class QuestIds:
     # === 後半メインストーリー ===
     MAKUMA = "12_makuma"                    # ヌルの記憶チップ
     MAKUMA2 = "13_makuma2"                  # 虚空の心臓製作
-    VS_GRANDMASTER_1 = "17_vs_grandmaster_1"  # アスタロト初遭遇・逃亡
+    VS_ASTAROTH = "17_vs_astaroth"  # アスタロト初遭遇・逃亡
     LAST_BATTLE = "18_last_battle"          # 最終決戦
 
 
@@ -428,11 +428,11 @@ class PlayerFlags:
         description="カインの魂の選択"
     )
 
-    balgas_choice = EnumFlag(
-        key="player.balgas_choice",
+    balgas_killed = EnumFlag(
+        key="player.balgas_killed",
         enum_type=BalgasChoice,
         default=None,
-        description="バルガス戦での選択"
+        description="バルガス戦での選択（生存=0, 殺害=1）"
     )
 
     lily_bottle_confession = EnumFlag(
@@ -506,7 +506,7 @@ JUMP_LABELS = {
     "quest_vs_balgas": 30,
     "quest_lily_real_name": 31,
     "start_lily_real_name": 31,
-    "quest_vs_grandmaster_1": 32,
+    "quest_vs_astaroth": 32,
     "quest_last_battle": 33,
 }
 
@@ -565,7 +565,7 @@ class Keys:
     # Choices
     BOTTLE_CHOICE = PlayerFlags.bottle_choice.full_key
     KAIN_SOUL_CHOICE = PlayerFlags.kain_soul_choice.full_key
-    BALGAS_CHOICE = PlayerFlags.balgas_choice.full_key
+    BALGAS_KILLED = PlayerFlags.balgas_killed.full_key
     LILY_BOTTLE_CONFESSION = PlayerFlags.lily_bottle_confession.full_key
     KAIN_SOUL_CONFESSION = PlayerFlags.kain_soul_confession.full_key
 

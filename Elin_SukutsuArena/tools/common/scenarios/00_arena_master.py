@@ -220,7 +220,7 @@ QUEST_INFOS = [
     QuestInfoDefinition(
         "quest_lily_exp",
         "quest_lily_info",
-        ["リリィが何やら困ってるらしいぜ。『虚空の共鳴瓶』とかいう怪しげなアイテムを作りたいとか。", "あいつのところへ行って話を聞いてやれ。"],
+        ["リリィが何やら困ってるらしいぜ。『死の共鳴瓶』とかいう怪しげなアイテムを作りたいとか。", "あいつのところへ行って話を聞いてやれ。"],
     ),
     QuestInfoDefinition(
         "quest_lily_private",
@@ -230,23 +230,23 @@ QUEST_INFOS = [
     QuestInfoDefinition(
         "quest_makuma",
         "quest_makuma_info",
-        ["怪しい連中が闘技場をうろついてる。『マクマ』とかいう組織らしい。", "リリィが詳しく知ってるかもしれねえ。あいつに聞いてみろ。"],
+        ["リリィがお前を探していたぞ。"],
     ),
     QuestInfoDefinition(
         "quest_lily_real_name",
         "quest_lily_name_info",
-        ["リリィが『真の名』を教えてくれるらしい。", "……あいつを本気で信用するのか？　あいつに話しかけろ。"],
+        ["リリィがお前を探していたぞ。"],
     ),
     # 自動発動系
     QuestInfoDefinition(
         "quest_makuma2",
         "quest_makuma2_info",
-        ["マクマの連中が何か企んでやがる。リリィも巻き込まれてるかもしれねえ。", "……気をつけろ。"],
+        ["リリィがお前を探していたぞ。"],
     ),
     QuestInfoDefinition(
-        "quest_vs_grandmaster_1",
-        "quest_gm_info",
-        ["……いよいよだな。グランドマスターとの戦いが近い。", "覚悟しておけ。"],
+        "quest_vs_astaroth",
+        "quest_astaroth_info",
+        ["……いよいよだな。アスタロトとの戦いが近い。", "覚悟しておけ。"],
     ),
     QuestInfoDefinition(
         "quest_last_battle",
@@ -267,7 +267,7 @@ QUEST_INFOS = [
     QuestInfoDefinition(
         "quest_rank_up_e",
         "quest_rank_e_info",
-        ["【昇格試験】ランクE『カイン亡霊戦』が受けられるぜ。「昇格試験を受けたい」を選んでくれ。"],
+        ["【昇格試験】ランクE『カインの亡霊』が受けられるぜ。「昇格試験を受けたい」を選んでくれ。"],
     ),
     QuestInfoDefinition(
         "quest_rank_up_d",
@@ -296,7 +296,7 @@ QUEST_STARTS = [
     QuestStartDefinition(
         info_step="quest_upper_existence",
         start_step="start_upper_existence",
-        info_messages=["……お前には『観客』の正体を教えておく必要がある。", "聞く覚悟はあるか？　真実は重いぞ。"],
+        info_messages=["……お前には『観客』について教えたいと思ってな。", "聞く覚悟はあるか？"],
         info_id_prefix="quest_upper_info",
         accept_button="聞く",
         accept_id="c_accept_upper",
@@ -345,7 +345,7 @@ AVAILABLE_QUESTS = [
     QuestEntry(QuestIds.MAKUMA2, 29, "quest_makuma2"),
     QuestEntry(QuestIds.RANK_UP_S, 30, "quest_vs_balgas"),
     QuestEntry(QuestIds.LILY_REAL_NAME, 31, "quest_lily_real_name"),
-    QuestEntry(QuestIds.VS_GRANDMASTER_1, 32, "quest_vs_grandmaster_1"),
+    QuestEntry(QuestIds.VS_ASTAROTH, 32, "quest_vs_astaroth"),
     QuestEntry(QuestIds.LAST_BATTLE, 33, "quest_last_battle"),
     # ランクアップ系
     QuestEntry(QuestIds.RANK_UP_G, 11, "quest_rank_up_g"),
@@ -616,7 +616,7 @@ def define_arena_master_drama(builder: DramaBuilder):
         entry_step=check_available_quests,
         fallback_step=quest_none,
         actor=vargus,
-        intro_message="利用可能なクエストがあるか確認するぜ...",
+        intro_message="どれどれ...",
         intro_id="quest_check",
     )
 
@@ -639,7 +639,7 @@ def define_arena_master_drama(builder: DramaBuilder):
 
     # クエストなし
     builder.step(quest_none) \
-        .say("no_quest", "今は特に依頼はねえな。まずは実力をつけることだ。", "", actor=vargus) \
+        .say("no_quest", "今は特に依頼はねえな。いまのうちに実力をつけることだ。", "", actor=vargus) \
         .jump(registered_choices)
 
     # ========================================

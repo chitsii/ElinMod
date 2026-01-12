@@ -176,7 +176,7 @@ def define_balgas_training(builder: DramaBuilder):
         .jump(reward_end)
 
     builder.step(reward_end) \
-        .action("eval", param="for(int i=0; i<12; i++) { EClass.pc.Pick(ThingGen.Create(\"coin\")); } for(int i=0; i<5; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
+        .action("eval", param="for(int i=0; i<12; i++) { EClass.pc.Pick(ThingGen.Create(\"medal\")); } for(int i=0; i<5; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
         .say("lily_7", "記録完了です。", "", actor=lily) \
         .say("lily_8", "……それと、今回の戦いで、あなたは『闘技場の鴉』としての称号を獲得しました。", "", actor=lily) \
         .say("lily_9", "死肉を喰らい、戦場を飛び回る……ふふ、あなたらしいですね。", "", actor=lily) \
@@ -272,41 +272,17 @@ def add_balgas_training_result_steps(builder: ArenaDramaBuilder, victory_label: 
         .say("lily_bt1", "……素晴らしい。バルガスさんの説教を聞いて生き残るなんて、あなたは本当の意味で『闘技場の鴉』になる資格を得たようです。", "", actor=lily) \
         .say("lily_bt2", "カラスは死肉を喰らい、戦場を飛び回る。……今のあなたに、相応しい二つ名ですね。", "", actor=lily) \
         .say("narr_bt5", "（彼女は台帳に何かを書き込む。）", "", actor=pc) \
-        .say("lily_bt3", "観客からの報酬として、小さなコイン12枚とプラチナコイン5枚。それと、戦闘記録として素材を一つ選んでいただけます。", "", actor=lily)
-
-    # 報酬選択肢
-    builder.choice(reward_stone_bt, "研磨石を頼む", "", text_id="c_reward_stone_bt") \
-           .choice(reward_steel_bt, "鋼鉄の欠片が欲しい", "", text_id="c_reward_steel_bt") \
-           .choice(reward_bone_bt, "骨を選ぶ", "", text_id="c_reward_bone_bt")
-
-    builder.step(reward_stone_bt) \
-        .say("lily_rew1_bt", "『研磨石×1』、記録いたしました。バルガスさんの哲学を継ぐ、良い選択ですね。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"whetstone\"));") \
-        .jump(reward_end_bt)
-
-    builder.step(reward_steel_bt) \
-        .say("lily_rew2_bt", "『鋼鉄の欠片×1』、記録いたしました。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"steel\"));") \
-        .jump(reward_end_bt)
-
-    builder.step(reward_bone_bt) \
-        .say("lily_rew3_bt", "『骨×1』ですね。……地味ですが、実用的です。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"bone\"));") \
-        .jump(reward_end_bt)
+        .say("lily_bt3", "観客からの報酬として、小さなコイン12枚とプラチナコイン5枚。それと、戦闘記録として素材を一つ選んでいただけます。", "", actor=lily) \
+        .jump(reward_stone_bt)
 
     builder.step(reward_end_bt) \
-        .action("eval", param="for(int i=0; i<12; i++) { EClass.pc.Pick(ThingGen.Create(\"coin\")); } for(int i=0; i<5; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
-        .say("lily_bt4", "記録完了です。", "", actor=lily) \
+        .action("eval", param="for(int i=0; i<12; i++) { EClass.pc.Pick(ThingGen.Create(\"medal\")); } for(int i=0; i<5; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
         .say("lily_bt5", "……それと、今回の戦いで、あなたは『闘技場の鴉』としての称号を獲得しました。", "", actor=lily) \
         .say("lily_bt6", "死肉を喰らい、戦場を飛び回る……ふふ、あなたらしいですね。", "", actor=lily) \
         .say("narr_bt6", "（バルガスが酒瓶を傾けながら、あなたに背を向けたまま言う。）", "", actor=pc) \
         .focus_chara(Actors.BALGAS) \
-        .say("balgas_bt5", "……お前は、カインが持っていた以上の、本物の『鋼の心』を持った戦士だ。", "", actor=balgas) \
-        .say("balgas_bt6", "俺がかつて率いていた『英雄の軍団』にも、お前みたいな奴がいた。", "", actor=balgas) \
-        .say("balgas_bt7", "……あいつも、最後まで哲学を曲げなかった。", "", actor=balgas) \
         .say("narr_bt7", "（彼は深く息を吐き、酒を飲み干す。）", "", actor=pc) \
-        .say("balgas_bt8", "……行け。次はもっと厳しい戦いが待ってる。", "", actor=balgas) \
-        .say("balgas_bt9", "だが、お前なら……大丈夫だ。", "", actor=balgas)
+        .say("balgas_bt5", "……お前は本物の『鋼の心』を持った戦士だ。", "", actor=balgas)
 
     # 最終選択肢
     builder.choice(final_thanks_bt, "……ありがとう", "", text_id="c_final_thanks_bt") \

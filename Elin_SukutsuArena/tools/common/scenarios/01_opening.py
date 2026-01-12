@@ -28,23 +28,22 @@ def define_opening_drama(builder: DramaBuilder):
     # ==== メインステップ: 異次元への転落 ====
     builder.step(main)
 
-    # BGM開始 (CWL仕様: Sound/BGM/ファイル名 → "BGM/sukutsu_arena_opening")
-    builder.play_bgm("BGM/sukutsu_arena_opening")
+    # === 演出: ドラマ開始（fadeOut → 背景設定 → fadeIn → BGM）===
+    builder.drama_start(
+        bg_id="Drama/arena_lobby",
+        bgm_id="BGM/sukutsu_arena_opening",
+        fade_duration=3.0
+    )
 
-    # ナレーション (PCの独白 - 主観的な感覚のみ)
-    builder.say("narr1", "(……どこだ、ここは。上も下も分からない。体が浮いているような、沈んでいるような……)", actor=pc) \
-           .say("narr2", "(足が何かに触れた。冷たい。石……？)", actor=pc)
+    # === 演出: グリッチ + 独白 ===
+    builder.glitch() \
+           .say("narr1", "(……どこだ、ここは。)", actor=pc) \
+           .say("narr2", "(奇妙な場所だ。時間の流れすら曖昧に感じる。)", actor=pc) \
+           .say("narr3", "(遠くから響く、雷鳴のような音……歓声か？ 何かに見られているーーその感覚だけは確かだ。)", actor=pc)
 
-    # 画面を揺らす - 異次元の不安定さを表現
-    builder.shake()
-
-    builder.say("narr3", "(頭上には……空がない。ただ、渦を巻く紫の闇。何か巨大なものが、そこから垂れ下がっている気がする。)", actor=pc) \
-           .say("narr3b", "(奇妙な場所だ。時間の流れすら曖昧に感じる。)", actor=pc) \
-           .say("narr3c", "(遠くから響く、雷鳴のような音……歓声か？ だが、誰もいない。見えないだけか。何かに見られている——その感覚だけは確かだ。)", actor=pc)
-
-    # リリィ登場（フォーカスにウェイト内蔵）
+    # === リリィに声をかけられる ===
     builder.focus_chara(Actors.LILY) \
-           .say("lily1", "……あら。召喚の儀も、空間の歪みもなしに、この『ヴォイド・コロシアム』に迷い込む『生きた肉』がいるなんて。", actor=lily) \
+           .say("lily1", "……あら。召喚の儀も、空間の歪みもなしに、ここまで迷い込む『生きた肉』がいるなんて。", actor=lily) \
            .say("lily1b", "……おかしいですね。普通、この狭間に落ちた者は、イルヴァとの繋がりを失うはずなのに。あなた、まだ『帰り道』を持っている……？ イルヴァの神々の加護でもあるのかしら。", actor=lily) \
            .say("lily2", "まあ、いいでしょう。お客様、それとも……新たな『商品』かしら？ここは次元の狭間、そして絶望の始まり。", actor=lily) \
            .say("lily3", "……あなたは自由に出入りできるようですけれど、ここの『仕組み』はあそこにいる「飲んだくれ」に聞くのが作法ですから。", actor=lily)
@@ -71,10 +70,10 @@ def define_opening_drama(builder: DramaBuilder):
            .say("vargus_react2", "いいぜ。囚われた奴らが生き残るために戦うのとは訳が違う。『選んで』来る奴は、最高に面白いか、最高に馬鹿か、どっちかだ。\n聞かせろ、お前は何のために戦う？", actor=vargus)
 
     # 動機選択 (フラグ管理システムのキーを使用)
-    builder.choice(greed, "【強欲】富と名声、そして力が欲しい", "", text_id="c1") \
-           .choice(battle, "【求道】己の限界を知りたい。強い奴と戦わせろ", "", text_id="c2") \
-           .choice(void, "【虚無】帰る場所などない。ここが終着点だ", "", text_id="c3") \
-           .choice(pride, "【傲慢】この闘技場もいずれ配下に置いてやる", "", text_id="c4") \
+    builder.choice(greed, "【強欲】富と名声、そして力！", "", text_id="c1") \
+           .choice(battle, "【求道】己の限界を量るためだ。強い奴と戦わせろ", "", text_id="c2") \
+           .choice(void, "【虚無】もとより帰る場所などない", "", text_id="c3") \
+           .choice(pride, "【傲慢】闘技場を支配下に置くのも悪くない", "", text_id="c4") \
            .choice(drift, "【狂人】理由はない", "", text_id="c5") \
            .on_cancel(drift)
 
@@ -114,7 +113,7 @@ def define_opening_drama(builder: DramaBuilder):
 
     # --- Drift (Madman) Route ---
     builder.step(drift) \
-        .say("drift_v1", "……ヤク中か、それとも脳みそまで混沌に冒されたか。会話もできねえ壊れた玩具に用はねえんだがな。", actor=vargus) \
+        .say("drift_v1", "……ヤク中か、それとも脳みそまでエーテルに冒されたか。会話もできねえ壊れた玩具に用はねえんだがな。", actor=vargus) \
         .say("drift_l1", "あら、私は嫌いではありませんよ？ 理由なき衝動ほど、純粋で美しいものはありません。あなたのその濁った瞳……何を見るのか楽しみです。", actor=lily) \
         .jump(ending)
 
@@ -123,10 +122,10 @@ def define_opening_drama(builder: DramaBuilder):
     builder.step(ending) \
         .shake() \
         .say("end_v1", "リリィ！ こいつの名前を、剣闘士の列に書き加えろ！", actor=vargus) \
-        .say("end_v2", "お前がただの肉塊か、それとも多少は骨のある肉塊か……。このコロシアムで証明してみせな。", actor=vargus) \
+        .say("end_v2", "お前がただの肉塊か、それとも多少は骨のある肉塊か……。この闘技場で証明してみせな。", actor=vargus) \
         .set_flag(Keys.RANK, 0) \
         .set_flag("sukutsu_gladiator", 1) \
         .set_flag("sukutsu_arena_stage", 1) \
         .set_flag("sukutsu_opening_seen", 1) \
         .complete_quest(QuestIds.OPENING) \
-        .finish()
+        .drama_end(fade_duration=1.0)

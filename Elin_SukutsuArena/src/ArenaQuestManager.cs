@@ -70,57 +70,8 @@ namespace Elin_SukutsuArena
             Debug.Log($"[ArenaQuest] Marked quest as completed in dialogFlags: {flagKey}");
         }
 
-        // Enum mappings for string-to-int conversion
-        private static readonly Dictionary<string, Dictionary<string, int>> EnumMappings = new Dictionary<string, Dictionary<string, int>>
-        {
-            {
-                "chitsii.arena.player.rank", new Dictionary<string, int>
-                {
-                    { "unranked", 0 },
-                    { "G", 1 },
-                    { "F", 2 },
-                    { "E", 3 },
-                    { "D", 4 },
-                    { "C", 5 },
-                    { "B", 6 },
-                    { "A", 7 },
-                    { "S", 8 }
-                }
-            },
-            {
-                "chitsii.arena.player.current_phase", new Dictionary<string, int>
-                {
-                    { "prologue", 0 },
-                    { "initiation", 1 },
-                    { "rising", 2 },
-                    { "awakening", 3 },
-                    { "confrontation", 4 },
-                    { "climax", 5 }
-                }
-            },
-            // Choice flags (from flag_definitions.py FlagValues)
-            {
-                "chitsii.arena.player.balgas_choice", new Dictionary<string, int>
-                {
-                    { "spared", 0 },
-                    { "killed", 1 }
-                }
-            },
-            {
-                "chitsii.arena.player.bottle_choice", new Dictionary<string, int>
-                {
-                    { "kept", 0 },
-                    { "swapped", 1 }
-                }
-            },
-            {
-                "chitsii.arena.player.kain_soul_choice", new Dictionary<string, int>
-                {
-                    { "freed", 0 },
-                    { "sold", 1 }
-                }
-            }
-        };
+        // Enum mappings for string-to-int conversion (auto-generated from ArenaEnumMappings.cs)
+        private static readonly Dictionary<string, Dictionary<string, int>> EnumMappings = ArenaEnumMappings.Mappings;
 
         /// <summary>
         /// 現在のストーリーフェーズを取得

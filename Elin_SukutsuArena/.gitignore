@@ -5,3 +5,5 @@ elin_link/*
 obj/*
 
 __pycache__
+
+**/.claude/*

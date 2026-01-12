@@ -6,7 +6,10 @@ import csv
 BUILDER_DIR = os.path.dirname(os.path.abspath(__file__))
 TOOLS_DIR = os.path.dirname(BUILDER_DIR)
 PROJECT_ROOT = os.path.dirname(TOOLS_DIR)
-SAMPLE_PATH = r'c:\Users\tishi\programming\elin_modding\CWL_AddLocation_Example\LangMod\EN\SourceSSS.xlsx'
+
+# CWLサンプルファイルのパス（環境変数で上書き可能）
+DEFAULT_SAMPLE_PATH = r'c:\Users\tishi\programming\elin_modding\CWL_AddLocation_Example\LangMod\EN\SourceSSS.xlsx'
+SAMPLE_PATH = os.environ.get('CWL_SAMPLE_PATH', DEFAULT_SAMPLE_PATH)
 OUTPUT_EN_TSV = os.path.join(PROJECT_ROOT, 'LangMod', 'EN', 'Zone.tsv')
 OUTPUT_JP_TSV = os.path.join(PROJECT_ROOT, 'LangMod', 'JP', 'Zone.tsv')
 

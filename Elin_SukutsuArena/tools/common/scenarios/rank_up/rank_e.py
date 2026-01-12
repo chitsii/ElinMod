@@ -35,7 +35,10 @@ def define_rank_up_E(builder: DramaBuilder):
     # シーン1: 酒の切れた夜に
     # ========================================
     builder.step(main) \
-        .play_bgm("BGM/Lobby_Normal") \
+        .drama_start(
+            bg_id="Drama/arena_battle_normal",
+            bgm_id="BGM/Lobby_Normal"
+        ) \
         .say("narr_1", "（ロビーの喧騒が嘘のように静まり返った深夜。）", "", actor=pc) \
         .say("narr_2", "（バルガスはいつもの酒瓶を持たず、代わりに血錆にまみれた「古い戦士の兜」を無造作に眺めていた。）", "", actor=pc) \
         .say("narr_3", "（彼がこれほどまでに静かなのは、あなたがここへ来てから初めてのことだった。）", "", actor=pc) \
@@ -100,7 +103,7 @@ def define_rank_up_E(builder: DramaBuilder):
     # ========================================
     builder.step(battle_start) \
         .play_bgm("BGM/Battle_Kain_Requiem") \
-        .say("narr_8", "（闘技場の門を潜ると、そこはいつもの砂地ではなく、無数の折れた剣と壊れた鎧が積み上がった「武具の墓場」へと変貌していた。）", "", actor=pc) \
+        .say("narr_8", "（闘技場の門を潜ると、冷たく不吉な風が吹いた。）", "", actor=pc) \
         .shake() \
         .say("narr_9", "（中央に立つのは、全身から赤黒い錆を滴らせ、顔のない兜から青い炎を揺らめかせる一人の騎士。）", "", actor=pc) \
         .say("narr_10", "（騎士は巨大な錆びた剣を地に突き立て、ゆっくりと頭を上げる。）", "", actor=pc) \
@@ -140,7 +143,7 @@ def add_rank_up_E_result_steps(builder: ArenaDramaBuilder, victory_label: str, d
         .say("balgas_v4", "……お前は、カインが持っていた以上の、本物の『鋼の心』を持った戦士だ。", "", actor=balgas) \
         .focus_chara(Actors.LILY) \
         .say("lily_v1", "お疲れ様でした。カインさんの魂の一部……回収いたしました。", "", actor=lily) \
-        .say("lily_v2", "バルガスさんが珍しく涙ぐんでいたのは見なかったことにしてあげますから、報酬の授与をさせていただきます。", "", actor=lily) \
+        .say("lily_v2", "バルガスさんが珍しく涙ぐんでいたのは見なかったことにしてあげましょうか。さて、報酬の授与をさせていただきます。", "", actor=lily) \
         .complete_quest(QuestIds.RANK_UP_E) \
         .grant_rank_reward("E", actor=lily) \
         .finish()

@@ -61,8 +61,8 @@ def define_vs_balgas(builder: DramaBuilder):
         .focus_chara(Actors.BALGAS) \
         .say("balgas_1", "……おい、黄金の戦鬼。お前はもう、俺の手の届かねえ高みへ行こうとしてやがる。", "", actor=balgas) \
         .say("balgas_2", "だがな、それでもアスタロト……あの竜神は、別格なんだ。", "", actor=balgas) \
-        .say("balgas_2_1", "だからこそ、ここで俺が試金石になってやる。おまえを倒すために、対戦させてもらう。冗談じゃねえぞ。", "", actor=balgas) \
-        .say("balgas_3", "俺を、この『全盛期の俺』を越えてみせろ。それができなきゃ、お前は犠牲になっちまうだけだ。", "", actor=balgas) \
+        .say("balgas_2_1", "だからこそ、ここで俺が試金石になってやる。おまえを倒すために、対戦させてもらう。......冗談なんかじゃねえぞ。", "", actor=balgas) \
+        .say("balgas_3", "俺を......『全盛期の俺』を越えてみせろ。それができなきゃ、このさきお前は犠牲になっちまう。", "", actor=balgas) \
         .say("narr_4", "（バルガスは一気に薬を煽った。）", "", actor=pc) \
         .shake() \
         .say("narr_5", "（瞬間、彼の全身を覆っていた古い傷跡が消え、萎みかけていた筋肉が鋼のように膨れ上がる。）", "", actor=pc) \
@@ -73,33 +73,33 @@ def define_vs_balgas(builder: DramaBuilder):
         .jump(scene1_5)
 
     # ========================================
-    # シーン1.5: 回想——鉄血団の記憶
+    # シーン1.5: 回想ーー鉄血団の記憶
     # ========================================
     builder.step(scene1_5) \
         .play_bgm("BGM/Emotional_Sorrow_1") \
-        .say("narr_fb1", "（——35年前、ノースティリス。）", "", actor=pc) \
+        .say("narr_fb1", "（ーー35年前、ノースティリス。）", "", actor=pc) \
         .say("narr_fb2", "（若き日のバルガスが、傭兵団「鉄血団」を率いていた頃の記憶。）", "", actor=pc) \
         .say("balgas_fb1", "おい、ガキ。俺の懐に手を突っ込もうってのか？", "", actor=balgas) \
-        .say("narr_fb3", "（10歳の孤児——後のカインは、バルガスの財布を盗もうとして捕まった。痩せこけた体、汚れた衣服、しかしその目だけは諦めていなかった。）", "", actor=pc) \
+        .say("narr_fb3", "（10歳の孤児ーー後のカインは、バルガスの財布を盗もうとして捕まった。痩せこけた体、汚れた衣服、しかしその目だけは諦めていなかった。）", "", actor=pc) \
         .say("kain_fb1", "……殺すなら殺せよ。どうせ、誰も俺のことなんか……", "", actor=pc) \
         .say("balgas_fb2", "……盗むしかなかったんだろう。なら、正しく戦う術を教えてやる。明日から俺の部下だ。飯は食わせてやる。その代わり、死ぬほど鍛えてやるからな。", "", actor=balgas) \
-        .say("narr_fb4", "（——18年後。カインは鉄血団の副団長となった。バルガスの右腕として、誰よりも信頼された戦士。）", "", actor=pc) \
+        .say("narr_fb4", "（ーー18年後。カインは鉄血団の副団長となった。バルガスの右腕として、誰よりも信頼された戦士。）", "", actor=pc) \
         .say("kain_fb2", "団長、次の依頼……『禁断の遺跡』の調査だそうです。報酬は破格ですが、嫌な予感がします。", "", actor=pc) \
         .say("balgas_fb3", "……嫌な予感ってのは当たるもんだ。だが、団員たちの冬越しの金がいる。行くしかねえだろ。", "", actor=balgas) \
         .say("kain_fb3", "……分かりました。俺がしんがりを務めます。", "", actor=pc) \
         .say("balgas_fb4", "馬鹿野郎。お前は俺の後継者だ。死ぬんじゃねえぞ。", "", actor=balgas) \
         .play_bgm("BGM/Ominous_Suspense_02") \
         .shake() \
-        .say("narr_fb5", "（——遺跡の奥で、次元の裂け目が開いた。団員たちが次々と狭間に引きずり込まれていく。）", "", actor=pc) \
+        .say("narr_fb5", "（ーー遺跡の奥で、次元の裂け目が開いた。団員たちが次々と狭間に引きずり込まれていく。）", "", actor=pc) \
         .say("kain_fb4", "団長……俺を、置いていけ……！ でないと、あんたまで……！", "", actor=pc) \
         .say("narr_fb6", "（カインは罠で重傷を負い、動けなかった。バルガスはカインを背負い、狭間の中を彷徨った。）", "", actor=pc) \
         .say("balgas_fb5", "馬鹿野郎……！ お前を置いていけるか……！ ", "", actor=balgas) \
         .shake() \
         .say("narr_fb7", "（しかし、カインの体は限界を迎えていた。アスタロトに「拾われた」時、カインは既に息絶えていた。）", "", actor=pc) \
         .play_bgm("BGM/Ominous_Suspense_02") \
-        .say("narr_fb8", "（——回想が終わり、現在に戻る。）", "", actor=pc) \
+        .say("narr_fb8", "（ーー回想が終わり、現在に戻る。）", "", actor=pc) \
         .focus_chara(Actors.BALGAS) \
-        .say("balgas_fb6", "……俺はあの時、カインを救えなかった。あいつの魂は今も、このアリーナのどこかで彷徨ってやがる。", "", actor=balgas) \
+        .say("balgas_fb6", "……俺はあの時、カインを救えなかった。", "", actor=balgas) \
         .say("balgas_fb7", "だがな、お前は違う。お前は帰れるんだ。イルヴァに、生きている世界に。……だからこそ、俺は本気でお前を試す。中途半端な強さじゃ、アスタロトには勝てねえ。", "", actor=balgas) \
         .say("balgas_fb8", "カインに教えてやれなかったことを、今度こそお前に叩き込んでやる……！", "", actor=balgas) \
         .jump(scene2)
@@ -217,40 +217,21 @@ def define_vs_balgas(builder: DramaBuilder):
         .play_bgm("BGM/Emotional_Sacred_Triumph_Special") \
         .say("narr_17", "（あなたがバルガスの手を取り、立ち上がらせる。）", "", actor=pc) \
         .say("narr_18", "（その瞬間、アリーナ全体を包んでいた不気味な魔力が霧散し、観客たちの声が落胆の溜息へと変わる。）", "", actor=pc) \
-        .say("narr_19", "（リリィが駆け寄り、泣きながらバルガスに回復魔法を注ぎ込む。）", "", actor=pc) \
+        .say("narr_19", "（リリィが駆け寄り、バルガスに回復魔法を注ぎ込む。）", "", actor=pc) \
         .focus_chara(Actors.LILY) \
         .focus_chara(Actors.BALGAS) \
         .say("balgas_7", "……ハッ。甘っちょろい野郎だ。……だが、その甘さが、俺がカインに教えてやれなかった『本物の強さ』なのかもしれねえな。", "", actor=balgas) \
         .say("balgas_8", "……負けたよ。今日からお前がランクS『屠竜者（Dragon Slayer）』だ。", "", actor=balgas) \
+        .say("balgas_8b", "聞け……グランドマスターは……お前を特別扱いしている。", "", actor=balgas) \
+        .say("balgas_8c", "なぜあいつがお前を育てようとしているのか……俺には分からねえ。だが、いい予感はしねえ。", "", actor=balgas) \
         .say("balgas_9", "俺はもう引退だ。これからは、ただの酔いどれの『隠居』として、お前の凱旋をここで待たせてもらうぜ。", "", actor=balgas) \
-        .say("narr_20", "（リリィは台帳を開き、涙を拭きながら何かを書き込む。）", "", actor=pc) \
         .focus_chara(Actors.LILY) \
         .say("lily_4", "……ありがとう。本当に、ありがとうございます。", "", actor=lily) \
-        .say("lily_5", "観客からの報酬として、小さなコイン50枚とプラチナコイン30枚。それと、戦闘記録として素材を一つ選んでいただけます。", "", actor=lily) \
-        .jump(reward_choice)
-
-    # 報酬選択肢
-    builder.choice(reward_sword, "バルガスの剣の欠片を頼む", "", text_id="c_reward_sword") \
-           .choice(reward_ether, "エーテルの欠片が欲しい", "", text_id="c_reward_ether") \
-           .choice(reward_mana, "魔力の結晶を選ぶ", "", text_id="c_reward_mana")
-
-    builder.step(reward_sword) \
-        .say("lily_rew1", "『バルガスの剣の欠片×1』、記録いたしました。……彼の魂が宿る、大切な欠片ですね。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"fragment_balgas_sword\"));") \
-        .jump(reward_end)
-
-    builder.step(reward_ether) \
-        .say("lily_rew2", "『エーテルの欠片×1』、記録いたしました。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"fragment_ether\"));") \
-        .jump(reward_end)
-
-    builder.step(reward_mana) \
-        .say("lily_rew3", "『魔力の結晶×1』、記録いたしました。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"gem_mana\"));") \
+        .say("lily_5", "観客からの報酬は、小さなコイン50枚とプラチナコイン30枚です。", "", actor=lily) \
         .jump(reward_end)
 
     builder.step(reward_end) \
-        .action("eval", param="for(int i=0; i<50; i++) { EClass.pc.Pick(ThingGen.Create(\"coin\")); } for(int i=0; i<30; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
+        .action("eval", param="for(int i=0; i<50; i++) { EClass.pc.Pick(ThingGen.Create(\"medal\")); } for(int i=0; i<30; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
         .say("lily_6", "記録完了です。", "", actor=lily) \
         .say("lily_7", "……それと、今回の戦いで、あなたは『理を拒む者』としての称号を獲得しました。", "", actor=lily) \
         .say("lily_8", "アリーナの命令を拒絶し、師匠を生かす……ふふ、あなたは本当に、システムの『バグ』ですね。", "", actor=lily) \
@@ -287,7 +268,7 @@ def define_vs_balgas(builder: DramaBuilder):
     # ========================================
     builder.step(ending) \
         .set_flag(Keys.RANK, 8) \
-        .set_flag(Keys.BALGAS_CHOICE, FlagValues.BalgasChoice.SPARED) \
+        .set_flag(Keys.BALGAS_KILLED, FlagValues.BalgasChoice.SPARED) \
         .complete_quest(QuestIds.RANK_UP_S) \
         .say("sys_title", "【システム】称号『理を拒む者（System Breaker）』を獲得しました。", "") \
         .say("sys_buff", "【システム】『戦鬼の証』を獲得しました。筋力+5、耐久+5、各種耐性+5 の加護を得た！", "") \
@@ -399,6 +380,7 @@ def add_vs_balgas_result_steps(builder: ArenaDramaBuilder, victory_label: str, d
         .jump(killed_ending)
 
     builder.step(killed_ending) \
+        .set_flag(Keys.BALGAS_KILLED, FlagValues.BalgasChoice.KILLED) \
         .complete_quest(QuestIds.RANK_UP_S_BALGAS_KILLED) \
         .say("sys_title_k", "【システム】称号『観客の傀儡（Audience's Puppet）』を獲得しました。", "") \
         .say("sys_buff_k", "【システム】『血塗られた称号』を獲得しました。筋力+10、魔力+10……しかし、何かを失った気がする。", "") \

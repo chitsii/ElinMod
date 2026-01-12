@@ -46,6 +46,21 @@ if 'Author' not in header_map.values():
     # colsを更新
     cols += 1
 
+# 'portrait' カラムが存在しない場合、強制的に追加
+if 'portrait' not in header_map.values():
+    print("Adding missing 'portrait' column...")
+    new_col_idx = len(header_map)
+    header_map[new_col_idx] = 'portrait'
+
+    # Header行に追加
+    rows[0].append('portrait')
+    # Type行, Default行に追加 (空文字)
+    rows[1].append('')
+    rows[2].append('')
+
+    # colsを更新
+    cols += 1
+
 # Helper
 def create_npc_row(npc_def):
     row = [""] * cols  # 更新されたcolsを使用
@@ -86,20 +101,20 @@ ZONE_ID = 'sukutsu_arena'  # カスタムゾーンID
 npcs.append({
     'id': 'sukutsu_receptionist',
     'Author': 'tishi.elin.sukutsu_arena',
-    'name_JP': 'リリィ',
-    'name': 'Lily',
-    'aka_JP': '魅惑の受付嬢',
-    'aka': 'Charming Receptionist',
+    'name_JP': 'リリシエル',
+    'name': 'Lilithiel',
+    'aka_JP': '登録官',
+    'aka': 'The Overseer',
     'race': 'succubus',
     'job': 'shopkeeper',
     '_idRenderData': '@chara',
     'tiles': 340,  # succubus female
-    'LV': 50,
+    'LV': 500,
     'hostility': 'Friend',
     'bio': 'f/1001/165/52/sexy',
     'idText': 'sukutsu_receptionist',
     # CWL タグ: ゾーン生成、ランダム移動無効、商人在庫、ドラマリンク、人間らしい会話
-    'tag': f'neutral,addZone_{ZONE_ID},addFlag_StayHomeZone,addStock,addDrama_drama_sukutsu_receptionist,humanSpeak',
+    'tag': f'neutral,addZone_{ZONE_ID},addFlag_StayHomeZone,addStock_sukutsu_receptionist,addDrama_drama_sukutsu_receptionist,humanSpeak',
     'trait': 'Merchant',
     'quality': 4,
     'chance': 0,
@@ -111,13 +126,13 @@ npcs.append({
     'Author': 'tishi.elin.sukutsu_arena',
     'name_JP': 'バルガス',
     'name': 'Vargus',
-    'aka_JP': '百戦の覇者',
+    'aka_JP': 'アリーナマスター',
     'aka': 'Champion of Hundred Battles',
     'race': 'human',
     'job': 'warrior',
     '_idRenderData': '@chara',
     'tiles': 0,  # human male warrior
-    'LV': 70,
+    'LV': 800,
     'hostility': 'Friend',
     'bio': 'm/1002/185/90/stern',
     'idText': 'sukutsu_arena_master',
@@ -127,24 +142,33 @@ npcs.append({
     'chance': 0,
 })
 
-# 3. グランドマスター (ドラゴン / 男性 / チャンピオン)
+# 3. アスタロト (ドラゴン / 男性 / アリーナ創設者 / 最終ボス)
+# lore: イルヴァの神々と同格の竜神、Lv.50000
+# 滅びた次元「カラドリウス」の唯一の生存者、アリーナ創設者
+# 3,000年間、観客の「注目」を力に変換してきた
+# Note: アリーナではNPCとして配置、ボス戦時は新規スポーン
 npcs.append({
-    'id': 'sukutsu_grand_master',
+    'id': 'sukutsu_astaroth',
     'Author': 'tishi.elin.sukutsu_arena',
-    'name_JP': 'グランドマスター',
-    'name': 'Grand Master',
-    'aka_JP': '竜鱗の王者',
-    'aka': 'Dragon Scale Champion',
+    'name_JP': 'アスタロト',
+    'name': 'Astaroth',
+    'aka_JP': 'うつろいし竜神',
+    'aka': 'The Hollow Dragon God',
     'race': 'dragon',
     'job': 'warrior',
     '_idRenderData': '@chara',
     'tiles': 168,  # dragon
-    'LV': 100,
-    'hostility': 'Friend',
-    'bio': 'm/1003/210/150/proud',
-    'idText': 'sukutsu_grand_master',
+    'LV': 50000,  # 最終ボス級
+    'hostility': 'Friend',  # アリーナではNPCとして配置
+    'bio': 'm/1003/350/500/proud',
+    'idText': 'sukutsu_astaroth',
+    'portrait': 'UN_sukutsu_astaroth',  # カスタムポートレート
+    # 能力: 全属性攻撃、12部位、ほぼ全属性耐性（聖のみ弱点）
+    'mainElement': 'Void',
+    'elements': 'featElder/1,featBodyParts/12,resVoid/100,resChaos/80,resNether/80,resMagic/80,resDarkness/80,resFire/60,resCold/60,resLightning/60,resPoison/60,resAcid/60,resSound/60,resNerve/80,resMind/80,resHoly/40,resCut/50,resImpact/50',
+    'actCombat': 'breathe_Void/40,breathe_Chaos/30,breathe_Nether/25,hand_Magic/35,SpGravity/15,SpBane/10',
     # CWL タグ: ゾーン生成、ランダム移動無効
-    'tag': f'neutral,addZone_{ZONE_ID},addFlag_StayHomeZone',
+    'tag': f'boss,undead,addZone_{ZONE_ID},addFlag_StayHomeZone',
     'quality': 5,
     'chance': 0,
 })
@@ -153,20 +177,20 @@ npcs.append({
 npcs.append({
     'id': 'sukutsu_shady_merchant',
     'Author': 'tishi.elin.sukutsu_arena',
-    'name_JP': '怪しい商人',
-    'name': 'Shady Merchant',
-    'aka_JP': '闇市の支配者',
-    'aka': 'Lord of Black Market',
+    'name_JP': 'エゼキエル',
+    'name': 'Ezekiel',
+    'aka_JP': '剥製師',
+    'aka': 'The Taxidermist',
     'race': 'mutant',
     'job': 'merchant',
-    'LV': 60,
+    'LV': 666,
     'hostility': 'Friend',
     'tiles': 807,
     '_idRenderData': '@chara',
     'bio': 'm/1004/170/65/sly',
     'idText': 'sukutsu_shady_merchant',
     # CWL タグ: ゾーン生成、ランダム移動無効、商人在庫、ドラマリンク、人間らしい会話
-    'tag': f'neutral,addZone_{ZONE_ID},addFlag_StayHomeZone,addStock,addDrama_drama_sukutsu_shady_merchant,humanSpeak',
+    'tag': f'neutral,addZone_{ZONE_ID},addFlag_StayHomeZone,addStock_sukutsu_shady_merchant,addDrama_drama_sukutsu_shady_merchant,humanSpeak',
     'trait': 'Merchant',
     'quality': 4,
     'chance': 0,
@@ -184,7 +208,7 @@ npcs.append({
     'job': 'wizard',
     '_idRenderData': '@chara',
     'tiles': 478,  # spirit/wisp
-    'LV': 999,
+    'LV': 1,
     'hostility': 'Friend',
     'bio': 'n/1005/160/0/mysterious',
     'idText': 'sukutsu_debug_master',
@@ -304,34 +328,6 @@ npcs.append({
     'chance': 0,
 })
 
-# 7. アスタロト (最終ボス / 竜神 / グランドマスターの真の姿)
-# lore: イルヴァの神々と同格の竜神、Lv.100,000,000（システム上限）
-# 滅びた次元「カラドリウス」の唯一の生存者、アリーナ創設者
-# 3,000年間、観客の「注目」を力に変換してきた
-npcs.append({
-    'id': 'sukutsu_astaroth',
-    'Author': 'tishi.elin.sukutsu_arena',
-    'name_JP': 'アスタロト',
-    'name': 'Astaroth',
-    'aka_JP': '虚空の竜神',
-    'aka': 'Dragon God of the Void',
-    'race': 'dragon',
-    'job': 'warrior',
-    '_idRenderData': '@chara',
-    'tiles': 168,  # dragon
-    'LV': 50000,  # エンドコンテンツ: 次元深度
-    'hostility': 'Enemy',
-    'bio': 'm/1003/350/500/proud',
-    'idText': 'sukutsu_astaroth',
-    # 能力: 全属性攻撃、12部位、ほぼ全属性耐性（聖のみ弱点）
-    'mainElement': 'Void',
-    'elements': 'featElder/1,featBodyParts/12,resVoid/100,resChaos/80,resNether/80,resMagic/80,resDarkness/80,resFire/60,resCold/60,resLightning/60,resPoison/60,resAcid/60,resSound/60,resNerve/80,resMind/80,resHoly/40,resCut/50,resImpact/50',
-    'actCombat': 'breathe_Void/40,breathe_Chaos/30,breathe_Nether/25,hand_Magic/35,SpGravity/15,SpBane/10',
-    'tag': 'boss,undead',
-    'quality': 5,
-    'chance': 0,
-})
-
 # 10. カインの亡霊 (Rank E昇格試験 / バルガスの元副官)
 # lore: 次元の狭間で変異したカオスシェイプ
 # 記憶を失い、戦闘本能だけが残った異形の存在
@@ -361,6 +357,7 @@ npcs.append({
 # 9. ヌル (Rank B昇格試験 / 暗殺人形 / 人造生命体)
 # lore: 「神の孵化場」計画の失敗作、アリーナの「清掃係」
 # 透明化 + 分裂能力で数で圧倒する暗殺者
+# Note: アリーナではNPCとして配置、ボス戦時はevalでhostility変更
 npcs.append({
     'id': 'sukutsu_null',
     'Author': 'tishi.elin.sukutsu_arena',
@@ -372,15 +369,17 @@ npcs.append({
     'job': 'thief',
     '_idRenderData': '@chara',
     'tiles': 536,  # machine/robot
-    'LV': 800,  # Tier2最終: Lv.100-1,000
-    'hostility': 'Enemy',
+    'LV': 2000,  # Tier2最終: Lv.100-1,000
+    'hostility': 'Friend',  # アリーナではNPCとして配置
     'bio': 'f/1007/165/45/emotionless',
     'idText': 'sukutsu_null',
+    'portrait': 'UN_sukutsu_null',  # カスタムポートレート
     # 能力: 透明化、分裂、虚無攻撃、沈黙
     'mainElement': 'Void',
     'elements': 'invisibility/1,featSplit/1,featElder/1,resVoid/80,resNether/60,resMagic/40,resNerve/100,resMind/100',
     'actCombat': 'hand_Void/45,SpInvisibility/25,SpSilence/15',
-    'tag': 'boss',
+    # アリーナに配置してglobalCharasに登録
+    'tag': f'boss,addZone_{ZONE_ID},addFlag_StayHomeZone',
     'quality': 4,
     'chance': 0,
 })

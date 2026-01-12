@@ -42,8 +42,10 @@ define_makuma = importlib.import_module('scenarios.12_makuma').define_makuma
 define_makuma2 = importlib.import_module('scenarios.13_makuma2').define_makuma2
 define_vs_balgas = importlib.import_module('scenarios.15_vs_balgas').define_vs_balgas
 define_lily_real_name = importlib.import_module('scenarios.16_lily_real_name').define_lily_real_name
-define_vs_grandmaster_1 = importlib.import_module('scenarios.17_vs_grandmaster_1').define_vs_grandmaster_1
+define_vs_astaroth = importlib.import_module('scenarios.17_vs_astaroth').define_vs_astaroth
 define_last_battle = importlib.import_module('scenarios.18_last_battle').define_last_battle
+define_epilogue = importlib.import_module('scenarios.19_epilogue').define_epilogue
+define_opening_drama = importlib.import_module('scenarios.01_opening').define_opening_drama
 define_debug_menu = importlib.import_module('scenarios.99_debug_menu').define_debug_menu
 
 PROJECT_ROOT = os.path.dirname(TOOLS_DIR)
@@ -92,6 +94,9 @@ def main():
     process_scenario(output_dir_jp, DramaIds.RANK_UP_B, define_rank_up_B)
     process_scenario(output_dir_jp, DramaIds.RANK_UP_A, define_rank_up_A)
 
+    # --- Opening ---
+    process_scenario(output_dir_jp, DramaIds.SUKUTSU_OPENING, define_opening_drama)
+
     # --- Story Events ---
     process_scenario(output_dir_jp, DramaIds.ZEK_INTRO, define_zek_intro)
     process_scenario(output_dir_jp, DramaIds.LILY_EXPERIMENT, define_lily_experiment)
@@ -104,8 +109,9 @@ def main():
     process_scenario(output_dir_jp, DramaIds.MAKUMA2, define_makuma2)
     process_scenario(output_dir_jp, DramaIds.VS_BALGAS, define_vs_balgas)
     process_scenario(output_dir_jp, DramaIds.LILY_REAL_NAME, define_lily_real_name)
-    process_scenario(output_dir_jp, DramaIds.VS_GRANDMASTER_1, define_vs_grandmaster_1)
+    process_scenario(output_dir_jp, DramaIds.VS_ASTAROTH, define_vs_astaroth)
     process_scenario(output_dir_jp, DramaIds.LAST_BATTLE, define_last_battle)
+    process_scenario(output_dir_jp, DramaIds.EPILOGUE, define_epilogue)
 
     # --- Debug Menu ---
     process_scenario(output_dir_jp, DramaIds.DEBUG_MENU, define_debug_menu)

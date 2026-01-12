@@ -128,8 +128,8 @@ RANK_REWARDS: Dict[str, RankReward] = {
         quest_id=QuestIds.RANK_UP_C,
         message_jp="報酬として、小さなメダル50枚、エーテル抗体15本、媚薬150本をお渡しします。",
         message_en="As your reward, I present you with 50 small medals, 15 ether antibodies, and 150 love potions.",
-        system_message_jp="【システム】称号『闘技場の鴉（Arena Crow）』を獲得しました。器用+5、スタミナ+10 の加護を得た！",
-        system_message_en="[System] Title 'Arena Crow' acquired. Dexterity+5, Stamina+10 blessing obtained!",
+        system_message_jp="【システム】称号『闘技場の鴉（Arena Crow）』を獲得しました。器用+5、活力+5 の加護を得た！",
+        system_message_en="[System] Title 'Arena Crow' acquired. Dexterity+5, Vigor+5 blessing obtained!",
     ),
     "B": RankReward(
         items=[

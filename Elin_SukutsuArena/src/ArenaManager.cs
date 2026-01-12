@@ -60,7 +60,8 @@ namespace Elin_SukutsuArena
                     Debug.Log($"[SukutsuArena] DelayedCall executed. Attempting to activate drama: {dramaName}");
                     try
                     {
-                        LayerDrama.Activate(dramaName, null, null, null, null, null);
+                        // targetにPCを指定することで、CWLのif_flag等がEClass.player.dialogFlagsを参照できるようにする
+                        LayerDrama.Activate(dramaName, null, null, EClass.pc, null, null);
                         Debug.Log($"[SukutsuArena] LayerDrama.Activate returned successfully.");
                     }
                     catch (System.Exception ex)
@@ -228,8 +229,8 @@ namespace Elin_SukutsuArena
             var pc = EClass.pc;
             if (pc == null) return;
 
-            // 回避+5 (Element ID: 152 = DV)
-            pc.elements.ModBase(152, 5);
+            // 回避+5 (Element ID: 64 = DV)
+            pc.elements.ModBase(64, 5);
             // 運+3 (Element ID: 78 = LUC)
             pc.elements.ModBase(78, 3);
 
@@ -240,20 +241,20 @@ namespace Elin_SukutsuArena
         /// <summary>
         /// Rank C 昇格報酬: 闘技場の鴉の加護
         /// - クリティカル率向上（器用+5）
-        /// - スタミナ+10
+        /// - 活力+5（スタミナ5%増）
         /// </summary>
         public static void GrantRankCBonus()
         {
             var pc = EClass.pc;
             if (pc == null) return;
 
-            // 器用+5 (Element ID: 73 = DEX) - クリティカルに影響
-            pc.elements.ModBase(73, 5);
-            // スタミナ+10 (Element ID: 151 = Stamina)
-            pc.elements.ModBase(151, 10);
+            // 器用+5 (Element ID: 72 = DEX) - クリティカルに影響
+            pc.elements.ModBase(72, 5);
+            // 活力+5 (Element ID: 62 = vigor) - スタミナ最大値+5%
+            pc.elements.ModBase(62, 5);
 
-            Msg.Say("【闘技場の鴉の加護】器用+5、スタミナ+10 を獲得！");
-            Debug.Log("[SukutsuArena] Granted Rank C bonus: DEX+5, Stamina+10");
+            Msg.Say("【闘技場の鴉の加護】器用+5、活力+5 を獲得！");
+            Debug.Log("[SukutsuArena] Granted Rank C bonus: DEX+5, vigor+5");
         }
 
         /// <summary>
@@ -267,8 +268,8 @@ namespace Elin_SukutsuArena
             if (pc == null) return;
 
             // 主要ステータス全て+3
-            // STR=70, END=71, DEX=73, PER=74, LER=75, WIL=76, MAG=77, CHA=79
-            int[] mainStats = { 70, 71, 73, 74, 75, 76, 77, 79 };
+            // STR=70, END=71, DEX=72, PER=73, LER=74, WIL=75, MAG=76, CHA=77, SPD=79
+            int[] mainStats = { 70, 71, 72, 73, 74, 75, 76, 77, 79 };
             foreach (int statId in mainStats)
             {
                 pc.elements.ModBase(statId, 3);
@@ -295,12 +296,12 @@ namespace Elin_SukutsuArena
 
             // 筋力+5 (Element ID: 70 = STR)
             pc.elements.ModBase(70, 5);
-            // 魔力+5 (Element ID: 77 = MAG)
-            pc.elements.ModBase(77, 5);
-            // 回避+5 (Element ID: 152 = DV)
-            pc.elements.ModBase(152, 5);
-            // PV+5 (Element ID: 153 = PV)
-            pc.elements.ModBase(153, 5);
+            // 魔力+5 (Element ID: 76 = MAG)
+            pc.elements.ModBase(76, 5);
+            // 回避+5 (Element ID: 64 = DV)
+            pc.elements.ModBase(64, 5);
+            // PV+5 (Element ID: 65 = PV)
+            pc.elements.ModBase(65, 5);
 
             Msg.Say("【黄金の戦鬼】筋力+5、魔力+5、回避+5、PV+5 を獲得！");
             Debug.Log("[SukutsuArena] Granted Rank A bonus: STR+5, MAG+5, DV+5, PV+5");
@@ -324,8 +325,8 @@ namespace Elin_SukutsuArena
             {
                 // 筋力+3 (Element ID: 70 = STR)
                 pc.elements.ModBase(70, 3);
-                // PV+5 (Element ID: 153 = PV)
-                pc.elements.ModBase(153, 5);
+                // PV+5 (Element ID: 65 = PV)
+                pc.elements.ModBase(65, 5);
 
                 Msg.Say("【鉄屑の加護】筋力+3、PV+5 を獲得！");
                 Debug.Log("[SukutsuArena] Granted Rank E bonus: STR+3, PV+5");
@@ -370,10 +371,10 @@ namespace Elin_SukutsuArena
             var pc = EClass.pc;
             if (pc == null) return;
 
-            // 魔力+5 (Element ID: 77 = MAG)
-            pc.elements.ModBase(77, 5);
-            // 回避+5 (Element ID: 152 = DV)
-            pc.elements.ModBase(152, 5);
+            // 魔力+5 (Element ID: 76 = MAG)
+            pc.elements.ModBase(76, 5);
+            // 回避+5 (Element ID: 64 = DV)
+            pc.elements.ModBase(64, 5);
             // 魅了耐性+10 (Element ID: 961 = resCharm)
             pc.elements.ModBase(961, 10);
 
@@ -391,8 +392,8 @@ namespace Elin_SukutsuArena
             var pc = EClass.pc;
             if (pc == null) return;
 
-            // 回避+3 (Element ID: 152 = DV)
-            pc.elements.ModBase(152, 3);
+            // 回避+3 (Element ID: 64 = DV)
+            pc.elements.ModBase(64, 3);
             // 運+3 (Element ID: 78 = LUC)
             pc.elements.ModBase(78, 3);
 
@@ -413,10 +414,10 @@ namespace Elin_SukutsuArena
 
             // 筋力+3 (Element ID: 70 = STR)
             pc.elements.ModBase(70, 3);
-            // 器用+3 (Element ID: 73 = DEX)
-            pc.elements.ModBase(73, 3);
-            // PV+3 (Element ID: 153 = PV)
-            pc.elements.ModBase(153, 3);
+            // 器用+3 (Element ID: 72 = DEX)
+            pc.elements.ModBase(72, 3);
+            // PV+3 (Element ID: 65 = PV)
+            pc.elements.ModBase(65, 3);
 
             Msg.Say("【戦士の心得】筋力+3、器用+3、PV+3 を獲得！");
             Debug.Log("[SukutsuArena] Granted Balgas Training bonus: STR+3, DEX+3, PV+3");

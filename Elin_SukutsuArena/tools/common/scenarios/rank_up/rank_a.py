@@ -44,7 +44,10 @@ def define_rank_up_A(builder: DramaBuilder):
     # シーン1: 影の予兆
     # ========================================
     builder.step(main) \
-        .play_bgm("BGM/Ominous_Suspense_02") \
+        .drama_start(
+            bg_id="Drama/arena_battle_normal",
+            bgm_id="BGM/Ominous_Suspense_02"
+        ) \
         .say("narr_1", "（ロビーに足を踏み入れた瞬間、あなたは自分の影が妙に濃いことに気づく。）", "", actor=pc) \
         .say("narr_2", "（それは、松明の光に関係なく、まるで意志を持つかのように蠢いている。）", "", actor=pc) \
         .say("narr_3", "（バルガスが厳しい表情で近づいてくる。）", "", actor=pc) \
@@ -54,7 +57,7 @@ def define_rank_up_A(builder: DramaBuilder):
         .focus_chara(Actors.BALGAS) \
         .say("balgas_1", "……おい、銀翼。お前、自分の影をよく見てみろ。", "", actor=balgas) \
         .say("balgas_2", "観客どもの『注目』が、お前に集まりすぎたんだ。その結果、お前の影から……『もう一人のお前』が生まれようとしている。", "", actor=balgas) \
-        .say("balgas_3", "『黄金の戦鬼』——それが、次の試練の名前だ。", "", actor=balgas) \
+        .say("balgas_3", "『黄金の戦鬼』ーーそれが、次の試練の名前だ。", "", actor=balgas) \
         .say("balgas_4", "お前が積み上げてきた全ての技術、全ての経験、全ての殺意……それを完璧にコピーした存在と戦うことになる。", "", actor=balgas) \
         .say("narr_4", "（バルガスは苦々しげに首を振る。）", "", actor=pc) \
         .say("balgas_5", "こいつは、ヌルとは違う意味で厄介だ。虚無には『意味』で対抗できた。だが、影はお前自身だ。", "", actor=balgas) \
@@ -121,8 +124,8 @@ def define_rank_up_A(builder: DramaBuilder):
         .say("lily_1", "……あなたの影は、確かに強い。あなたと同じだけの力を持っている。", "", actor=lily) \
         .say("lily_2", "でも、影には一つ、決定的に欠けているものがあります。", "", actor=lily) \
         .say("lily_3", "……それは、『繋がり』です。", "", actor=lily) \
-        .say("lily_4", "あなたがバルガスさんから学んだ哲学、私と交わした言葉、ゼクとの駆け引き……それらは全て、あなたの『今』を形作っている。", "", actor=lily) \
-        .say("lily_5", "影はあなたの『力』をコピーできても、あなたの『絆』まではコピーできません。", "", actor=lily) \
+        .say("lily_4", "あなたがバルガスさんと飲んだ酒杯、私と交わした言葉、ゼクとの駆け引き……それらも全て、あなたの『今』を形作っている。", "", actor=lily) \
+        .say("lily_5", "影はあなたの『力』をコピーできても、あなたの『絆の力』まではコピーできません。", "", actor=lily) \
         .say("narr_8", "（リリィは、あなたの胸に手を当てる。）", "", actor=pc) \
         .say("lily_6", "ここに、私たちの想いがあります。……それを、忘れないでくださいね。", "", actor=lily)
 
@@ -155,7 +158,7 @@ def define_rank_up_A(builder: DramaBuilder):
         .say("narr_11", "（その瞳は、あなたと同じ光を湛えながらも、どこか虚ろだ。）", "", actor=pc) \
         .say("narr_12", "（影が剣を構える。その動作は、あなたがこれから行おうとした動作と、寸分違わず一致していた。）", "", actor=pc) \
         .shake() \
-        .say("narr_13", "（観客席から、異様な熱狂が渦巻く——自分自身との決闘。これほど『面白い』見世物は、アリーナの歴史にも稀だろう。）", "", actor=pc) \
+        .say("narr_13", "（観客席から、異様な熱狂が渦巻くーー自分自身との決闘。これほど『面白い』見世物は、アリーナの歴史にも稀だろう。）", "", actor=pc) \
         .start_battle_by_stage("rank_a_trial", master_id="sukutsu_arena_master") \
         .finish()
 

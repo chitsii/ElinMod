@@ -36,12 +36,15 @@ def define_rank_up_G(builder: DramaBuilder):
     # 注意: 結果チェックは arena_master.py 側で行い、
     # このドラマは戦闘開始前の会話のみを担当する
     builder.step(main) \
-        .play_bgm("BGM/sukutsu_arena_opening") \
+        .drama_start(
+            bg_id="Drama/arena_battle_normal",
+            bgm_id="BGM/sukutsu_arena_opening"
+        ) \
         .focus_chara(Actors.LILY) \
         .say("narr_1", "（薄暗いロビーに、異次元の嵐が石壁を叩く音が不気味に響いている。空気は重く、血と錆の臭いが鼻腔を突く。）", "", actor=pc) \
         .say("lily_r1", "……準備はよろしいですか？", "", actor=lily) \
         .say("narr_2", "（彼女は細長い爪で、血塗られた羊皮紙を軽く叩いた。パチン、パチンと、まるで死刑執行の秒読みのように。）", "", actor=pc) \
-        .say("lily_r2", "これは単なる試合ではありません。あなたがこの『ヴォイド・コロシアム』の胃袋に放り込まれる、最初の『餌』になるための儀式です。", "", actor=lily) \
+        .say("lily_r2", "これは単なる試合ではありません。あなたがこの闘技場の胃袋に放り込まれる、最初の『餌』になるための儀式です。", "", actor=lily) \
         .say("lily_r3", "対戦相手は『飢えたヴォイド・プチ』の群れ。……ああ、地上にいる愛らしい彼らだと思わないことね。敗者の絶望を啜って肥大化した、純然たる殺意の塊ですから。", "", actor=lily) \
         .say("lily_r4", "もし、五体満足で戻られたら……その時は、正式に『闘士』として登録して差し上げます。死体袋の用意は、あちらの隅に。……ご武運を。", "", actor=lily)
 

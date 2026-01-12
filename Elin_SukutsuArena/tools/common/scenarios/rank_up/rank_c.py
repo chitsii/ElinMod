@@ -36,7 +36,10 @@ def define_rank_up_C(builder: DramaBuilder):
     # シーン1: 堕ちた英雄たち
     # ========================================
     builder.step(main) \
-        .play_bgm("BGM/Ominous_Suspense_01") \
+        .drama_start(
+            bg_id="Drama/arena_battle_normal",
+            bgm_id="BGM/Ominous_Suspense_01"
+        ) \
         .say("narr_1", "（ロビーの空気が重い。）", "", actor=pc) \
         .say("narr_2", "（バルガスは珍しく酒瓶を手にせず、険しい表情で闘技場の門を見つめている。）", "", actor=pc) \
         .say("narr_3", "（リリィも、いつもの妖艶な笑みを消し、羊皮紙を静かに整理していた。）", "", actor=pc) \

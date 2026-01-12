@@ -75,9 +75,9 @@ def define_lily_experiment(builder: DramaBuilder):
     builder.step(scene2) \
         .play_bgm("BGM/Mystical_Ritual") \
         .say("narr_4", "（リリィは細長い指先で設計図の一点を鋭く指し示した。そこには、内部に複雑な空洞を持つ、特殊な瓶のような構造が描かれている。）", "", actor=pc) \
-        .say("lily_5", "必要なのは**『虚空の共鳴瓶』**。この器があれば、アリーナに満ちる雑音を……純粋な魔力として回収できるのです。", "", actor=lily) \
+        .say("lily_5", "必要なのは『死の共鳴瓶』。この器があれば、アリーナに満ちる雑音を……純粋な魔力として回収できるのです。", "", actor=lily) \
         .say("lily_6", "器の製作は私が行います。あなたには、材料を集めてきてほしいのです。", "", actor=lily) \
-        .say("lily_7", "必要なのは**『骨』**。生き物の残骸に宿る魔力の残滓……それが、器の核となるのです。", "", actor=lily) \
+        .say("lily_7", "必要なのは『骨』。強大な生き物の骨は、魂の入れ物として使えます……それが、器の核となるのです。", "", actor=lily) \
         .say("lily_8", "闘技場で倒した敵から手に入るでしょう。……一つで十分ですよ。", "", actor=lily)
 
     # プレイヤーの選択肢
@@ -134,8 +134,8 @@ def define_lily_experiment(builder: DramaBuilder):
         .say("narr_9", "（彼女は器を丁寧に棚に置き、台帳を開く。）", "", actor=pc) \
         .say("lily_13", "これはお礼です。", "", actor=lily) \
         .cs_eval("for(int i=0; i<20; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
-        .say("lily_14", "**プラチナコイン20枚**を台帳に記録いたしました。", "", actor=lily) \
-        .say("lily_15", "それと……あなたの協力を評価して、称号も記録しておきました。『繊細な泥犬』。ふふ、あなたは暴力だけではないのですね。", "", actor=lily) \
+        .say("lily_14", "（プラチナコインを20枚もらった）", "", actor=lily) \
+        .say("lily_15", "それと……あなたの協力を評価して、個人的に『繊細な泥犬』の称号を授与しましょう。ふふ、あなたは暴力だけではないのですね。", "", actor=lily) \
         .say("lily_16", "これからも、何か特別な依頼があれば、あなたにお願いするかもしれません。……期待していますよ。", "", actor=lily) \
         .jump(ending)
 

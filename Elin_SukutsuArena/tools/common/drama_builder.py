@@ -924,19 +924,127 @@ class DramaBuilder:
     # CWL 拡張機能: 視覚効果
     # ============================================================================
 
-    def fade_in(self, color: str = "black") -> 'DramaBuilder':
-        """フェードイン（画面が明るくなる）"""
-        self.entries.append({'action': 'fadeIn', 'param': color})
+    def fade_in(self, duration: float = 1.0, color: str = "black") -> 'DramaBuilder':
+        """
+        フェードイン（画面が明るくなる）
+
+        Args:
+            duration: フェード時間（秒）
+            color: フェード色 ("black" または "white")
+        """
+        # 色を常に第2パラメータとして明示的に指定
+        param = f"{duration},{color}"
+        self.entries.append({'action': 'fadeIn', 'param': param})
         return self
 
-    def fade_out(self, color: str = "black") -> 'DramaBuilder':
-        """フェードアウト（画面が暗くなる）"""
-        self.entries.append({'action': 'fadeOut', 'param': color})
+    def fade_out(self, duration: float = 1.0, color: str = "black") -> 'DramaBuilder':
+        """
+        フェードアウト（画面が暗くなる）
+
+        Args:
+            duration: フェード時間（秒）
+            color: フェード色 ("black" または "white")
+        """
+        # 色を常に第2パラメータとして明示的に指定
+        param = f"{duration},{color}"
+        self.entries.append({'action': 'fadeOut', 'param': param})
+        return self
+
+    def set_background(self, bg_id: str) -> 'DramaBuilder':
+        """
+        背景画像を設定（CWL eval経由でTextureフォルダから読み込み）
+
+        Args:
+            bg_id: 背景画像ID（Texture/{bg_id}.png）
+        """
+        # CWLのSpriteCreator拡張メソッドを使用
+        code = f'dm.imageBG.enabled = true; dm.imageBG.sprite = "{bg_id}".LoadSprite();'
+        self.entries.append({'action': 'eval', 'param': code})
+        return self
+
+    def glitch(self) -> 'DramaBuilder':
+        """グリッチエフェクトを有効化"""
+        self.entries.append({'action': 'glitch'})
         return self
 
     def shake(self) -> 'DramaBuilder':
         """画面を揺らす"""
         self.entries.append({'action': 'shake'})
+        return self
+
+    def set_dialog_style(self, style: str = "Default") -> 'DramaBuilder':
+        """
+        ダイアログスタイルを変更
+
+        Args:
+            style: ダイアログスタイル
+                - "Default": 標準ダイアログ
+                - "Default2": 別スタイル
+                - "Mono": モノローグ（キャラ名なし、グレースケール背景）
+        """
+        self.entries.append({'action': 'setDialog', 'param': f",,{style}"})
+        return self
+
+    # ============================================================================
+    # ハイレベルAPI: ドラマ演出
+    # ============================================================================
+
+    def drama_start(
+        self,
+        bg_id: str = None,
+        bgm_id: str = None,
+        fade_duration: float = 1.0
+    ) -> 'DramaBuilder':
+        """
+        ドラマ開始演出
+        fadeOut → set_background(オプション) → fadeIn → play_bgm(オプション)
+
+        Args:
+            bg_id: 背景画像ID (Texture/フォルダからの相対パス、例: "Drama/arena_lobby")
+            bgm_id: BGM ID (例: "BGM/sukutsu_arena_opening")
+            fade_duration: フェード時間（秒）
+        """
+        self.fade_out(duration=fade_duration, color="black")
+        if bg_id:
+            self.set_background(bg_id)
+        self.fade_in(duration=fade_duration, color="black")
+        if bgm_id:
+            self.play_bgm(bgm_id)
+        return self
+
+    def drama_end(self, fade_duration: float = 1.0) -> 'DramaBuilder':
+        """
+        ドラマ終了演出
+        fadeOut → finish
+
+        Args:
+            fade_duration: フェード時間（秒）
+        """
+        self.fade_out(duration=fade_duration, color="black")
+        self.finish()
+        return self
+
+    def scene_transition(
+        self,
+        bg_id: str = None,
+        bgm_id: str = None,
+        fade_duration: float = 0.5
+    ) -> 'DramaBuilder':
+        """
+        シーン切り替え演出
+        fadeOut → set_background(オプション) → fadeIn → play_bgm(オプション)
+
+        Args:
+            bg_id: 新しい背景画像ID
+            bgm_id: 新しいBGM ID (省略時は継続)
+            fade_duration: フェード時間（秒）
+        """
+        self.fade_out(duration=fade_duration, color="black")
+        if bg_id:
+            self.set_background(bg_id)
+        self.fade_in(duration=fade_duration, color="black")
+        if bgm_id:
+            self.play_bgm(bgm_id)
         return self
 
     # ============================================================================

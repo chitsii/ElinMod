@@ -86,6 +86,6 @@ builder.play_bgm("BGM/[ファイル名]")
 |-------|--------|--------|
 | `Battle_RankF_Mud.mp3` | Rank F 初戦、泥の闘技場 | 高 |
 | `Ominous_Rumble.mp3` | 虚空の心臓の脈動、アリーナの崩壊兆候、次元の不安定化 | 中 |
-| `Crafting_Ambient.mp3` | 虚空の共鳴瓶作成、虚空の心臓作成、クラフト作業 | 低 |
+| `Crafting_Ambient.mp3` | 死の共鳴瓶作成、虚空の心臓作成、クラフト作業 | 低 |
 | `Zek_Hideout.mp3` | ゼクの隠れ家、コレクションの展示、英雄の剥製 | 中 |
 | `Emotional_Warmth.mp3` | バルガスとの深夜の会話、仲間との語らい、絆の確認 | 中 |

@@ -39,8 +39,8 @@ def define_zek_steal_bottle(builder: DramaBuilder):
     # ========================================
     builder.step(main) \
         .play_bgm("BGM/Ominous_Suspense_01") \
-        .say("narr_1", "（リリィが作った『虚空の共鳴瓶』。彼女は満足げに、その器を受付の棚に飾っていた。）", "", actor=pc) \
-        .say("narr_2", "（——廊下を歩いていると、灯火が不自然に揺らぎ、あなたの足元の影が、まるで意思を持った沼のように長く伸びる。）", "", actor=pc) \
+        .say("narr_1", "（リリィが作った『死の共鳴瓶』。彼女は満足げに、その器を受付の棚に飾っていた。）", "", actor=pc) \
+        .say("narr_2", "（ーー廊下を歩いていると、灯火が不自然に揺らぎ、あなたの足元の影が、まるで意思を持った沼のように長く伸びる。）", "", actor=pc) \
         .shake() \
         .say("narr_3", "（そこから、鎖の擦れる音と共に、ゼクが音もなく這い出してきた。）", "", actor=pc) \
         .focus_chara(Actors.ZEK) \
@@ -129,7 +129,7 @@ def define_zek_steal_bottle(builder: DramaBuilder):
         .shake() \
         .say("zek_acc3", "これで、私の店での取引が、より『有利』になりますよ。……では、良い仕事を。彼女が寝静まった頃に、すり替えてきてくださいな。", "", actor=zek) \
         .say("narr_acc2", "（ゼクは影の中へと消えていく。）", "", actor=pc) \
-        .cs_eval("for(int i=0; i<10; i++) { EClass.pc.Pick(ThingGen.Create(\"coin\")); } for(int i=0; i<3; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
+        .cs_eval("for(int i=0; i<10; i++) { EClass.pc.Pick(ThingGen.Create(\"medal\")); } for(int i=0; i<3; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
         .jump(scene4_aftermath)
 
     # ========================================
@@ -137,14 +137,14 @@ def define_zek_steal_bottle(builder: DramaBuilder):
     # ========================================
     builder.step(scene4_aftermath) \
         .play_bgm("BGM/Lobby_Normal") \
-        .say("narr_aft1", "（深夜——リリィが休んでいる隙に、あなたは受付に忍び込み、棚の『共鳴瓶』を偽物とすり替えた。）", "", actor=pc) \
+        .say("narr_aft1", "（深夜ーーリリィが休んでいる隙に、あなたは受付に忍び込み、棚の『共鳴瓶』を偽物とすり替えた。）", "", actor=pc) \
         .say("narr_aft2", "（本物の器はゼクの元へ。あなたの手には、澱んだ霧を宿す模造品だけが残った。）", "", actor=pc) \
-        .say("narr_aft3", "（翌朝——）", "", actor=pc) \
+        .say("narr_aft3", "（翌朝ーー）", "", actor=pc) \
         .focus_chara(Actors.LILY) \
         .say("lily_a1", "……あら、なんだか少し、器の感触が変わったかしら？", "", actor=lily) \
         .say("narr_aft4", "（彼女は棚の器を手に取り、軽く傾ける。一瞬、その瞳があなたを鋭く見つめるが、すぐに笑顔に戻る。）", "", actor=pc) \
         .say("lily_a2", "……まぁいいわ。これで私の研究は飛躍的に進みます。ふふ、感謝してくださいね。あなたが『使い物』にならなくなった後も、その響きだけは私の手元に残るのですから。", "", actor=lily) \
-        .say("narr_aft5", "（彼女は気づいていないのか、それとも——）", "", actor=pc) \
+        .say("narr_aft5", "（彼女は気づいていないのか、それともーー）", "", actor=pc) \
         .jump(ending)
 
     # ========================================

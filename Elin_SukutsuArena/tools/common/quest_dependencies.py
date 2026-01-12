@@ -294,7 +294,7 @@ QUEST_DEFINITIONS = [
         drama_id="lily_experiment",
         display_name_jp="リリィの私的依頼『残響の器』",
         display_name_en="Lily's Private Request: Vessel of Echoes",
-        description="リリィのために虚空の共鳴瓶を製作する",
+        description="リリィのために死の共鳴瓶を製作する",
         phase=Phase.INITIATION,
         quest_giver=Actors.LILY,
         auto_trigger=False,
@@ -507,7 +507,7 @@ QUEST_DEFINITIONS = [
         drama_id="lily_real_name",
         display_name_jp="リリィの真名告白",
         display_name_en="Lily's True Name Revelation",
-        description="リリィが真名『リリアリス』を明かす",
+        description="リリィが真名『リリシエル』を明かす",
         phase=Phase.CONFRONTATION,
         quest_giver=Actors.LILY,
         auto_trigger=False,
@@ -521,12 +521,12 @@ QUEST_DEFINITIONS = [
     # ========================================
     # 最終章
     # ========================================
-    # NOTE: VS_GRANDMASTER_1 はバルガス戦完了（どちらか）が必要
+    # NOTE: VS_ASTAROTH はバルガス戦完了（どちらか）が必要
     # ArenaQuestManager で特別にチェック: RANK_UP_S_BALGAS_SPARED または RANK_UP_S_BALGAS_KILLED
     QuestDefinition(
-        quest_id=QuestIds.VS_GRANDMASTER_1,
+        quest_id=QuestIds.VS_ASTAROTH,
         quest_type=QuestType.MAIN_STORY,
-        drama_id="vs_grandmaster_1",
+        drama_id="vs_astaroth",
         display_name_jp="アスタロト初遭遇、ゼクによる救出",
         display_name_en="First Astaroth Encounter, Zek's Rescue",
         description="アスタロトが降臨し、ゼクが介入して救出する",
@@ -552,7 +552,7 @@ QUEST_DEFINITIONS = [
         auto_trigger=True,
         advances_phase=None,
         required_flags=[],  # フラグ条件削除
-        required_quests=[QuestIds.VS_GRANDMASTER_1],
+        required_quests=[QuestIds.VS_ASTAROTH],
         completion_flags={},
         priority=1000,
     ),

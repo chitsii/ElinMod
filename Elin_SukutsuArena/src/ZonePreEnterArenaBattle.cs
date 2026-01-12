@@ -47,10 +47,10 @@ public class ZonePreEnterArenaBattle : ZonePreEnterEvent
             enemy.c_originalHostility = Hostility.Enemy;
             enemy.SetEnemy(EClass.pc);
             enemy.HealAll();
-#if DEBUG
-            // DEBUGビルド: HPを1に設定（HealAllの後に実行）
-            enemy.hp = 1;
-#endif
+            // #if DEBUG
+            //             // DEBUGビルド: HPを1に設定（HealAllの後に実行）
+            //             enemy.hp = 1;
+            // #endif
         }
 
         // 勝利判定イベントを追加

@@ -361,7 +361,7 @@ Bright celebration theme, 120 BPM. Upbeat fantasy tavern music. Acoustic guitars
 Quiet crafting/work theme, 70 BPM. Minimal ambient music for concentration. Gentle chimes, soft pads, workshop sounds (hammer on anvil, gentle). Meditative and focused atmosphere. Non-intrusive background.
 ```
 
-**使用シーン**: 虚空の共鳴瓶作成、虚空の心臓作成、クラフト作業
+**使用シーン**: 死の共鳴瓶作成、虚空の心臓作成、クラフト作業
 
 ---
 

@@ -187,7 +187,7 @@ def define_lily_real_name(builder: DramaBuilder):
 
     # 真名の啓示
     builder.step(name_revelation) \
-        .say("lily_12", "……私の名は、『リリアリス・ヴォイド・テンプテイション』。", "", actor=lily) \
+        .say("lily_12", "……私の名は、『リリシエル・サングイス・ルナエ（Lilithiel Sanguis Lunae）』。", "", actor=lily) \
         .shake() \
         .say("lily_14", "これからは、単なるあなたのマネージャーとしてではなく……", "", actor=lily) \
         .say("lily_15", "あなたの行く末を地獄の果てまで共にする、『共犯者』として隣に置かせてちょうだい。", "", actor=lily) \
@@ -208,7 +208,7 @@ def define_lily_real_name(builder: DramaBuilder):
         .jump(final_choice)
 
     # 最終選択肢
-    builder.choice(final_thanks, "……ありがとう、リリアリス", "", text_id="c_final_thanks") \
+    builder.choice(final_thanks, "……ありがとう、リリシエル", "", text_id="c_final_thanks") \
            .choice(final_protect, "お前を、必ず守る", "", text_id="c_final_protect") \
            .choice(final_embrace, "（抱きしめる）", "", text_id="c_final_embrace")
 
@@ -230,6 +230,6 @@ def define_lily_real_name(builder: DramaBuilder):
     builder.step(ending) \
         .set_flag(Keys.LILY_TRUE_NAME, FlagValues.LilyTrueName.KNOWN) \
         .say("sys_buff", "【システム】『真名の絆』を獲得しました。魔力+10、精神耐性+20、魅了耐性+20 の加護を得た！", "") \
-        .say("sys_title", "【システム】称号『リリアリスの伴侶』を獲得しました。", "") \
+        .say("sys_title", "【システム】称号『リリシエルの伴侶』を獲得しました。", "") \
         .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantLilyRealNameBonus();") \
         .finish()

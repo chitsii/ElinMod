@@ -2,8 +2,10 @@
 setlocal EnableDelayedExpansion
 
 set MOD_NAME=Elin_SukutsuArena
-set "SOFFICE=C:\Program Files\LibreOffice\program\soffice.exe"
-set STEAM_PACKAGE_DIR=C:\Program Files (x86)\Steam\steamapps\common\Elin\Package\%MOD_NAME%
+
+REM 環境変数が未設定ならデフォルト値を使用
+if not defined SOFFICE set "SOFFICE=C:\Program Files\LibreOffice\program\soffice.exe"
+if not defined STEAM_PACKAGE_DIR set "STEAM_PACKAGE_DIR=C:\Program Files (x86)\Steam\steamapps\common\Elin\Package\%MOD_NAME%"
 
 REM ビルド構成の設定（引数で debug を指定するとDebugビルド）
 set BUILD_CONFIG=Release
@@ -22,7 +24,7 @@ echo.
 REM ============================================================
 REM Step 1: Validation
 REM ============================================================
-<nul set /p "=[1/8] Validation... "
+<nul set /p "=[1/11] Validation... "
 pushd tools\common
 uv run python validation.py >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
@@ -41,7 +43,7 @@ echo OK
 REM ============================================================
 REM Step 2: Zone Excel
 REM ============================================================
-<nul set /p "=[2/8] Zone Excel... "
+<nul set /p "=[2/11] Zone Excel... "
 pushd tools
 uv run python builder/create_zone_excel.py >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
@@ -61,7 +63,7 @@ echo OK
 REM ============================================================
 REM Step 3: Chara Excel
 REM ============================================================
-<nul set /p "=[3/8] Chara Excel... "
+<nul set /p "=[3/11] Chara Excel... "
 pushd tools
 uv run python builder/create_chara_excel.py >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
@@ -79,9 +81,63 @@ del "%~dp0LangMod\JP\Chara.tsv" >nul 2>&1
 echo OK
 
 REM ============================================================
-REM Step 4: Drama Excel
+REM Step 4: Thing Excel (Custom Items)
 REM ============================================================
-<nul set /p "=[4/8] Drama Excel... "
+<nul set /p "=[4/11] Thing Excel... "
+pushd tools
+uv run python builder/create_thing_excel.py >nul 2>&1
+if %ERRORLEVEL% NEQ 0 (
+    echo FAILED
+    popd
+    goto :error
+)
+popd
+"%SOFFICE%" --headless --convert-to "xlsx:Calc MS Excel 2007 XML" --infilter="CSV:9,34,76" "%~dp0LangMod\EN\Thing.tsv" --outdir "%~dp0LangMod\EN" >nul 2>&1
+"%SOFFICE%" --headless --convert-to "xlsx:Calc MS Excel 2007 XML" --infilter="CSV:9,34,76" "%~dp0LangMod\JP\Thing.tsv" --outdir "%~dp0LangMod\JP" >nul 2>&1
+move /Y "%~dp0LangMod\EN\Thing.xlsx" "%~dp0LangMod\EN\SourceThing.xlsx" >nul 2>&1
+move /Y "%~dp0LangMod\JP\Thing.xlsx" "%~dp0LangMod\JP\SourceThing.xlsx" >nul 2>&1
+del "%~dp0LangMod\EN\Thing.tsv" >nul 2>&1
+del "%~dp0LangMod\JP\Thing.tsv" >nul 2>&1
+echo OK
+
+REM ============================================================
+REM Step 5: Stat Excel (Custom Stats)
+REM ============================================================
+<nul set /p "=[5/11] Stat Excel... "
+pushd tools
+uv run python builder/create_stat_excel.py >nul 2>&1
+if %ERRORLEVEL% NEQ 0 (
+    echo FAILED
+    popd
+    goto :error
+)
+popd
+"%SOFFICE%" --headless --convert-to "xlsx:Calc MS Excel 2007 XML" --infilter="CSV:9,34,76" "%~dp0LangMod\EN\Stat.tsv" --outdir "%~dp0LangMod\EN" >nul 2>&1
+"%SOFFICE%" --headless --convert-to "xlsx:Calc MS Excel 2007 XML" --infilter="CSV:9,34,76" "%~dp0LangMod\JP\Stat.tsv" --outdir "%~dp0LangMod\JP" >nul 2>&1
+move /Y "%~dp0LangMod\EN\Stat.xlsx" "%~dp0LangMod\EN\SourceStat.xlsx" >nul 2>&1
+move /Y "%~dp0LangMod\JP\Stat.xlsx" "%~dp0LangMod\JP\SourceStat.xlsx" >nul 2>&1
+del "%~dp0LangMod\EN\Stat.tsv" >nul 2>&1
+del "%~dp0LangMod\JP\Stat.tsv" >nul 2>&1
+echo OK
+
+REM ============================================================
+REM Step 6: BGM JSON
+REM ============================================================
+<nul set /p "=[6/11] BGM JSON... "
+pushd tools
+uv run python builder/create_bgm_json.py >nul 2>&1
+if %ERRORLEVEL% NEQ 0 (
+    echo FAILED
+    popd
+    goto :error
+)
+popd
+echo OK
+
+REM ============================================================
+REM Step 7: Drama Excel
+REM ============================================================
+<nul set /p "=[7/11] Drama Excel... "
 pushd tools
 uv run python builder/create_drama_excel.py >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
@@ -101,11 +157,23 @@ popd
 echo OK
 
 REM ============================================================
-REM Step 5: C# Flags
+REM Step 8: C# Flags + Quest Data
 REM ============================================================
-<nul set /p "=[5/8] C# Flags... "
+<nul set /p "=[8/11] C# Flags... "
 pushd tools
 uv run python builder/generate_flags.py >nul 2>&1
+if %ERRORLEVEL% NEQ 0 (
+    echo FAILED
+    popd
+    goto :error
+)
+uv run python builder/generate_jump_label_mapping.py >nul 2>&1
+if %ERRORLEVEL% NEQ 0 (
+    echo FAILED
+    popd
+    goto :error
+)
+uv run python builder/generate_enum_mappings.py >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
     echo FAILED
     popd
@@ -122,13 +190,19 @@ if %ERRORLEVEL% NEQ 0 (
     popd
     goto :error
 )
+uv run python builder/generate_quest_data.py >nul 2>&1
+if %ERRORLEVEL% NEQ 0 (
+    echo FAILED
+    popd
+    goto :error
+)
 popd
 echo OK
 
 REM ============================================================
-REM Step 6: Config JSON (Quest + Battle Stages)
+REM Step 9: Config JSON (Quest + Battle Stages)
 REM ============================================================
-<nul set /p "=[6/8] Config JSON... "
+<nul set /p "=[9/11] Config JSON... "
 pushd tools\common
 uv run python -c "from quest_dependencies import export_quests_to_json; import os; export_quests_to_json(os.path.join('..', '..', 'Package', 'quest_definitions.json'))" >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
@@ -151,9 +225,9 @@ popd
 echo OK
 
 REM ============================================================
-REM Step 7: dotnet build
+REM Step 10: dotnet build
 REM ============================================================
-<nul set /p "=[7/8] dotnet build (%BUILD_CONFIG%)... "
+<nul set /p "=[10/11] dotnet build (%BUILD_CONFIG%)... "
 dotnet build "%~dp0%MOD_NAME%.csproj" -c %BUILD_CONFIG% -v q --nologo >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
     echo FAILED
@@ -167,9 +241,9 @@ if %ERRORLEVEL% NEQ 0 (
 echo OK
 
 REM ============================================================
-REM Step 8: Deploy
+REM Step 11: Deploy
 REM ============================================================
-<nul set /p "=[8/8] Deploy... "
+<nul set /p "=[11/11] Deploy... "
 
 REM Package folder
 xcopy "%~dp0_bin\%MOD_NAME%.dll" "%~dp0elin_link\Package\%MOD_NAME%\" /Y /Q >nul 2>&1
@@ -180,6 +254,7 @@ xcopy "%~dp0LangMod" "%~dp0elin_link\Package\%MOD_NAME%\LangMod\" /E /Y /I /Q >n
 xcopy "%~dp0Texture" "%~dp0elin_link\Package\%MOD_NAME%\Texture\" /E /Y /I /Q >nul 2>&1
 xcopy "%~dp0Portrait" "%~dp0elin_link\Package\%MOD_NAME%\Portrait\" /E /Y /I /Q >nul 2>&1
 xcopy "%~dp0Media" "%~dp0elin_link\Package\%MOD_NAME%\Media\" /E /Y /I /Q >nul 2>&1
+xcopy "%~dp0Sound" "%~dp0elin_link\Package\%MOD_NAME%\Sound\" /E /Y /I /Q >nul 2>&1
 
 REM Steam folder
 if not exist "%STEAM_PACKAGE_DIR%" mkdir "%STEAM_PACKAGE_DIR%" >nul 2>&1
@@ -191,6 +266,7 @@ xcopy "%~dp0LangMod" "%STEAM_PACKAGE_DIR%\LangMod\" /E /Y /I /Q >nul 2>&1
 xcopy "%~dp0Texture" "%STEAM_PACKAGE_DIR%\Texture\" /E /Y /I /Q >nul 2>&1
 xcopy "%~dp0Portrait" "%STEAM_PACKAGE_DIR%\Portrait\" /E /Y /I /Q >nul 2>&1
 xcopy "%~dp0Media" "%STEAM_PACKAGE_DIR%\Media\" /E /Y /I /Q >nul 2>&1
+xcopy "%~dp0Sound" "%STEAM_PACKAGE_DIR%\Sound\" /E /Y /I /Q >nul 2>&1
 echo OK
 
 echo.

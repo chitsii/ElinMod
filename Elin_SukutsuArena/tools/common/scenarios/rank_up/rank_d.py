@@ -36,7 +36,10 @@ def define_rank_up_D(builder: DramaBuilder):
     # シーン1: リリィの宣告
     # ========================================
     builder.step(main) \
-        .play_bgm("BGM/Lobby_Normal") \
+        .drama_start(
+            bg_id="Drama/arena_battle_normal",
+            bgm_id="BGM/Lobby_Normal"
+        ) \
         .say("narr_1", "（ロビーに戻ったあなたを、リリィが妖艶な笑みで迎える。）", "", actor=pc) \
         .say("narr_2", "（彼女の台帳には、あなたの戦績と共に、新たな「試練」の記録が追加されている。）", "", actor=pc) \
         .jump(scene1)
@@ -83,8 +86,8 @@ def define_rank_up_D(builder: DramaBuilder):
         .say("balgas_3", "石が降ってきたら、敵に当たるように誘導しろ。薬が降ってきたら、素早く拾って飲め。", "", actor=balgas) \
         .say("balgas_4", "爆発物が降ってきたら……全力で逃げろ。", "", actor=balgas) \
         .say("balgas_5", "大事なのは、『動き続ける』ことだ。止まれば的になる。", "", actor=balgas) \
-        .say("balgas_6", "それと……観客を楽しませることも忘れるな。派手に戦えば、良い物が降ってくる確率が上がる。", "", actor=balgas) \
-        .say("balgas_7", "……まあ、お前なら大丈夫だろう。行ってこい。", "", actor=balgas)
+        .say("balgas_6", "それと……観客を楽しませることも忘れるな。派手に戦えば、即死するような物は投げてこないからな。", "", actor=balgas) \
+        .say("balgas_7", "……死ぬなよ。行ってこい。", "", actor=balgas)
 
     # プレイヤーの選択肢2
     builder.choice(react2_dodge, "避けることに集中する", "", text_id="c2_dodge") \
@@ -111,7 +114,7 @@ def define_rank_up_D(builder: DramaBuilder):
         .play_bgm("BGM/Battle_Audience_Chaos") \
         .say("narr_5", "（闘技場の門を潜ると、既に観客たちの熱気が空気を震わせている。）", "", actor=pc) \
         .say("narr_6", "（砂地の中央に立つのは、ただ一人の男。だが、その眼は虚ろで、口元には不自然な笑みが張り付いている。）", "", actor=pc) \
-        .say("narr_6b", "（男の名は『グリード』——かつて『闘技場の鴉』の一員だったが、観客の力に魅せられ、自らその傀儡となった者。）", "", actor=pc) \
+        .say("narr_6b", "（男の名は『グリード』ーーかつて『闘技場の鴉』の一員だったが、観客の力に魅せられ、自らその傀儡となった者。）", "", actor=pc) \
         .say("narr_7", "（リリィの声が、魔術的な拡声によって会場全体に響き渡る。）", "", actor=pc) \
         .focus_chara(Actors.LILY) \
         .say("lily_ann1", "……皆様、本日のメインディッシュです！", "", actor=lily) \

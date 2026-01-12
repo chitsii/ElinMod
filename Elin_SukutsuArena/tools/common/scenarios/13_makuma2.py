@@ -108,7 +108,7 @@ def define_makuma2(builder: DramaBuilder):
 
     builder.step(bottle_event) \
         .play_bgm("BGM/Ominous_Suspense_02") \
-        .say("narr_6", "（リリィが設計図を広げる中、彼女は棚の奥から、以前あなたが製作した『虚空の共鳴瓶』を取り出した。）", "", actor=pc) \
+        .say("narr_6", "（リリィが設計図を広げる中、彼女は棚の奥から、以前あなたが製作した『死の共鳴瓶』を取り出した。）", "", actor=pc) \
         .say("lily_7", "……虚空の心臓を起動させる前に、この共鳴瓶で次元の『周波数』を測定する必要があります。", "", actor=lily) \
         .say("lily_8", "あなたが作ってくれたこの器……今まで完璧に機能していたのだけれど。", "", actor=lily) \
         .say("narr_7", "（リリィが瓶に魔力を流し込むと、瓶の表面に不吉な亀裂が走る。）", "", actor=pc) \

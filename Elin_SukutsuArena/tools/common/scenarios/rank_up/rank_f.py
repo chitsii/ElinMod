@@ -36,7 +36,10 @@ def define_rank_up_F(builder: DramaBuilder):
     # シーン1: 凍てつく境界線（受付）
     # ========================================
     builder.step(main) \
-        .play_bgm("BGM/Lobby_Normal") \
+        .drama_start(
+            bg_id="Drama/arena_battle_normal",
+            bgm_id="BGM/Lobby_Normal"
+        ) \
         .focus_chara(Actors.LILY) \
         .say("narr_1", "（ロビーの空気が一変している。受付カウンターには薄く霜が降り、リリィの吐息すら白く濁っている。）", "", actor=pc) \
         .say("narr_2", "（彼女は冷たくなった指先を温めるように摩りながら、氷の結晶が浮き出た登録証を提示した。）", "", actor=pc) \

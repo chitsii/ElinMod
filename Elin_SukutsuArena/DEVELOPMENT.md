@@ -46,6 +46,57 @@ elin_modding/Elin.Docs/articles/100_Mod Documentation/Custom Whatever Loader/JP/
 
 ドラマファイル名は `drama_` プレフィックスを含める（例: `addDrama_drama_sukutsu_receptionist`）。
 
+## ドラマ演出機能
+
+`drama_builder.py`で使用可能な演出メソッド：
+
+| メソッド | 説明 | パラメータ |
+|---------|------|-----------|
+| `fade_in(duration, color)` | フェードイン | duration=秒, color="black"/"white" |
+| `fade_out(duration, color)` | フェードアウト | duration=秒, color="black"/"white" |
+| `set_background(bg_id)` | 背景画像設定 | bg_id=画像名 |
+| `glitch()` | グリッチエフェクト | - |
+| `shake()` | 画面揺れ | - |
+| `focus_chara(chara_id)` | キャラフォーカス | chara_id=キャラID |
+| `set_dialog_style(style)` | ダイアログスタイル変更 | "Default"/"Default2"/"Mono" |
+
+### ダイアログスタイル
+
+| スタイル | 説明 |
+|---------|------|
+| `Default` | 標準ダイアログ |
+| `Default2` | 別スタイル |
+| `Mono` | モノローグ（キャラ名なし、グレースケール背景） |
+
+**ナレーション用例**:
+```python
+builder.set_dialog_style("Mono") \
+    .say("narr1", "（闘技場に静寂が訪れた...）", actor=pc) \
+    .set_dialog_style("Default")  # 通常に戻す
+```
+
+### 背景画像の規格
+
+| 項目 | 値 |
+|------|-----|
+| **推奨サイズ** | 1920 x 1080 px |
+| **最小サイズ** | 1280 x 720 px |
+| **アスペクト比** | 16:9（必須） |
+| **形式** | PNG |
+
+**配置場所**: `Texture/Drama/{画像名}.png`（CWLがTextureフォルダから読み込む）
+
+**使用時**: `set_background("Drama/{画像名}")`
+
+**使用例**:
+```python
+builder.step(main) \
+    .fade_out(duration=0.5, color="black") \
+    .set_background("Drama/arena_lobby") \
+    .fade_in(duration=1.5, color="black") \
+    .say("narr1", "（異次元の闘技場に足を踏み入れた）", actor=pc)
+```
+
 ## ゲーム本体コード
 
 Elin本体のソースコードは`Elin-Decompiled`以下に配置
@@ -65,7 +116,6 @@ ElinMod/Elin_SukutsuArena/
 │   └── Generated/           # 自動生成（ArenaFlags.cs, ArenaQuestData.cs）
 │
 ├── tools/                   # Python生成ツール
-│   ├── build_all.py         # Python側フルビルド
 │   ├── builder/             # 各種ジェネレーター
 │   │   ├── create_chara_excel.py   # SourceChara.xlsx生成
 │   │   ├── create_drama_excel.py   # ドラマExcel生成
@@ -114,9 +164,13 @@ build.bat
 
 ### Excel/Python単体ビルド
 
+個別のPythonスクリプトを直接実行：
+
 ```bash
-cd tools
-uv run python build_all.py
+cd tools/builder
+uv run python create_drama_excel.py   # ドラマExcel
+uv run python create_chara_excel.py   # キャラExcel
+uv run python generate_flags.py       # C#フラグ
 ```
 ※Elinゲームへのデプロイは行われない
 

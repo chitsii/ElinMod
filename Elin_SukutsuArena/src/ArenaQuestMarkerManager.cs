@@ -20,7 +20,7 @@ namespace Elin_SukutsuArena
             { "sukutsu_receptionist", "sukutsu_receptionist" },    // リリィ
             { "sukutsu_arena_master", "sukutsu_arena_master" },    // バルガス
             { "sukutsu_shady_merchant", "sukutsu_shady_merchant" }, // ゼク
-            { "sukutsu_grandmaster", "sukutsu_grandmaster" }        // アスタロト
+            { "sukutsu_astaroth", "sukutsu_astaroth" }        // アスタロト
         };
 
         // 現在マーカーが表示されているNPC

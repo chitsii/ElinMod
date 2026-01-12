@@ -53,8 +53,9 @@ class DramaIds:
     UPPER_EXISTENCE = "upper_existence"
     MAKUMA = "makuma"
     MAKUMA2 = "makuma2"
-    VS_GRANDMASTER_1 = "vs_grandmaster_1"
+    VS_ASTAROTH = "vs_astaroth"
     LAST_BATTLE = "last_battle"
+    EPILOGUE = "epilogue"
 
     # デバッグ用
     DEBUG_BATTLE = "debug_battle"
@@ -95,8 +96,9 @@ class DramaNames:
     UPPER_EXISTENCE = f"drama_{DramaIds.UPPER_EXISTENCE}"
     MAKUMA = f"drama_{DramaIds.MAKUMA}"
     MAKUMA2 = f"drama_{DramaIds.MAKUMA2}"
-    GRANDMASTER_1 = f"drama_{DramaIds.VS_GRANDMASTER_1}"
+    VS_ASTAROTH = f"drama_{DramaIds.VS_ASTAROTH}"
     LAST_BATTLE = f"drama_{DramaIds.LAST_BATTLE}"
+    EPILOGUE = f"drama_{DramaIds.EPILOGUE}"
 
     # デバッグ用
     DEBUG_MENU = f"drama_{DramaIds.DEBUG_MENU}"
@@ -143,8 +145,9 @@ DRAMA_DISPLAY_NAMES = {
     DramaIds.UPPER_EXISTENCE: ("上位存在", "Upper Existence"),
     DramaIds.MAKUMA: ("マクマ", "Makuma"),
     DramaIds.MAKUMA2: ("マクマ2", "Makuma 2"),
-    DramaIds.VS_GRANDMASTER_1: ("vsグランドマスター", "vs Grandmaster"),
+    DramaIds.VS_ASTAROTH: ("vsアスタロト", "vs Astaroth"),
     DramaIds.LAST_BATTLE: ("最終決戦", "Last Battle"),
+    DramaIds.EPILOGUE: ("エピローグ", "Epilogue"),
 }
 
 
@@ -170,7 +173,8 @@ ALL_DRAMA_IDS = [
     DramaIds.UPPER_EXISTENCE,
     DramaIds.MAKUMA,
     DramaIds.MAKUMA2,
-    DramaIds.VS_GRANDMASTER_1,
+    DramaIds.VS_ASTAROTH,
     DramaIds.LAST_BATTLE,
+    DramaIds.EPILOGUE,
     DramaIds.DEBUG_MENU,
 ]

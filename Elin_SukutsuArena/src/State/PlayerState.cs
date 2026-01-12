@@ -140,14 +140,14 @@ namespace Elin_SukutsuArena.State
 
         public BalgasChoice? GetBalgasChoice()
         {
-            var value = _storage.GetInt(ArenaFlagKeys.BalgasChoice, -1);
+            var value = _storage.GetInt(ArenaFlagKeys.BalgasKilled, -1);
             if (value < 0 || value >= 2) return null;
             return (BalgasChoice)value;
         }
 
         public void SetBalgasChoice(BalgasChoice choice)
         {
-            _storage.SetInt(ArenaFlagKeys.BalgasChoice, (int)choice);
+            _storage.SetInt(ArenaFlagKeys.BalgasKilled, (int)choice);
         }
 
         public LilyBottleConfession? GetLilyBottleConfession()

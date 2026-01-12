@@ -31,7 +31,10 @@ def define_upper_existence(builder: ArenaDramaBuilder):
     # シーン1: 鉄格子の前の警告
     # ========================================
     builder.step(main) \
-        .play_bgm("BGM/Ominous_Suspense_01") \
+        .drama_start(
+            bg_id="Drama/arena_battle_normal",
+            bgm_id="BGM/Ominous_Suspense_01"
+        ) \
         .say("narr_1", "（門扉の前に立つあなたに対し、バルガスはいつになく真剣な表情で、武器の調子を確認している。）", "", actor=pc) \
         .say("narr_2", "（上空からは、地鳴りのような低い笑い声が降ってきている。）", "", actor=pc) \
         .jump(scene1)
@@ -110,6 +113,9 @@ def add_upper_existence_result_steps(builder: ArenaDramaBuilder, victory_label: 
     lily = Actors.LILY
     balgas = Actors.BALGAS
 
+    # 報酬授与用ラベル
+    reward_end_ue = builder.label("reward_end_ue")
+
     # ========================================
     # 上位存在クエスト 勝利
     # ========================================
@@ -121,6 +127,10 @@ def add_upper_existence_result_steps(builder: ArenaDramaBuilder, victory_label: 
         .focus_chara(Actors.LILY) \
         .say("lily_v1", "……ふふ、見事な逃げ回りっぷりでした。", "", actor=lily) \
         .say("lily_v2", "上の方々は、あなたが重力石に足を取られた時の慌てた顔が、今日一番の傑作だったと仰っていますよ。", "", actor=lily) \
+        .say("narr_process1", "（ふと闘技場の方を振り返ると、黒い霧が敗北した闘士の体を包んでいくのが見えた。）", "", actor=pc) \
+        .say("narr_process2", "（霧が晴れた後、そこには何も残っていなかったーー衣服も、武器も、血痕すらも。）", "", actor=pc) \
+        .say("lily_process", "……ああ、気になさらないでください。『回収』されただけですから。", "", actor=lily) \
+        .say("narr_process3", "（リリィの声には、どこか悲しげな響きがあった。）", "", actor=pc) \
         .say("narr_v3", "（バルガスが近づいてくる。）", "", actor=pc) \
         .focus_chara(Actors.BALGAS) \
         .say("balgas_v1", "……ケッ、笑わせておけ。", "", actor=balgas) \
@@ -128,35 +138,11 @@ def add_upper_existence_result_steps(builder: ArenaDramaBuilder, victory_label: 
         .say("balgas_v3", "だがな、次はもっと酷いもんが降ってくるぜ。連中はすぐに飽きるからな。", "", actor=balgas) \
         .focus_chara(Actors.LILY) \
         .say("lily_v3", "では、報酬の授与です。", "", actor=lily) \
-        .say("lily_v4", "観客からの投げ銭……小さなコイン10枚とプラチナコイン2枚。それと、素材を一つ選んでいただけます。", "", actor=lily)
-
-    # 報酬選択肢
-    reward_cloth_ue = builder.label("reward_cloth_ue")
-    reward_iron_ue = builder.label("reward_iron_ue")
-    reward_bone_ue = builder.label("reward_bone_ue")
-    reward_end_ue = builder.label("reward_end_ue")
-
-    builder.choice(reward_cloth_ue, "布の切れ端を頼む", "", text_id="c_reward_cloth_ue") \
-           .choice(reward_iron_ue, "鉄の欠片が欲しい", "", text_id="c_reward_iron_ue") \
-           .choice(reward_bone_ue, "骨を選ぶ", "", text_id="c_reward_bone_ue")
-
-    builder.step(reward_cloth_ue) \
-        .say("lily_rew1_ue", "『布の切れ端×1』、記録いたしました。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"cloth\"));") \
-        .jump(reward_end_ue)
-
-    builder.step(reward_iron_ue) \
-        .say("lily_rew2_ue", "『鉄の欠片×1』、記録いたしました。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"fragment_iron\"));") \
-        .jump(reward_end_ue)
-
-    builder.step(reward_bone_ue) \
-        .say("lily_rew3_ue", "『骨×1』ですね。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"bone\"));") \
+        .say("lily_v4", "観客からの投げ銭……小さなコイン10枚とプラチナコイン2枚です。", "", actor=lily) \
         .jump(reward_end_ue)
 
     builder.step(reward_end_ue) \
-        .action("eval", param="for(int i=0; i<10; i++) { EClass.pc.Pick(ThingGen.Create(\"coin\")); } for(int i=0; i<2; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
+        .action("eval", param="for(int i=0; i<10; i++) { EClass.pc.Pick(ThingGen.Create(\"medal\")); } for(int i=0; i<2; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
         .complete_quest(QuestIds.UPPER_EXISTENCE) \
         .say("sys_title", "【システム】称号『笑われる者』を獲得しました。回避+3、運+3 の加護を得た！", "") \
         .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantUpperExistenceBonus();") \

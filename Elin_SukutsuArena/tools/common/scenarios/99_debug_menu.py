@@ -17,7 +17,7 @@ from drama_constants import (
     DRAMA_DISPLAY_NAMES,
 )
 from battle_stages import DEBUG_STAGES, RANK_UP_STAGES, NORMAL_STAGES
-from flag_definitions import Actors
+from flag_definitions import Actors, Keys, FlagValues
 
 
 def _get_dramas_by_category():
@@ -135,14 +135,14 @@ def define_debug_menu(builder: DramaBuilder):
     # ========================================
     set_rank_s = builder.label("set_rank_s")
     set_all_quests = builder.label("set_all_quests")
-    set_relations = builder.label("set_relations")
+    scenario_flags = builder.label("scenario_flags")
 
     builder.step(flags_menu) \
         .say("flags_info", "フラグ操作を選択してください。", "", actor=debug_master)
 
     builder.choice(set_rank_s, "ランクSに設定", "", text_id="c_set_rank_s") \
            .choice(set_all_quests, "全クエスト完了", "", text_id="c_set_quests") \
-           .choice(set_relations, "関係値MAX", "", text_id="c_set_relations") \
+           .choice(scenario_flags, "シナリオ分岐フラグ", "", text_id="c_scenario_flags") \
            .choice(main_menu, "戻る", "", text_id="c_flags_back")
 
     builder.step(set_rank_s) \
@@ -156,9 +156,58 @@ def define_debug_menu(builder: DramaBuilder):
         .say("quests_set", "全クエストを完了しました。", "", actor=debug_master) \
         .jump(flags_menu)
 
-    builder.step(set_relations) \
-        .say("rel_set", "（旧システム: 関係値は削除されました）", "", actor=debug_master) \
-        .jump(flags_menu)
+    # ========================================
+    # シナリオ分岐フラグメニュー
+    # ========================================
+    set_balgas_killed = builder.label("set_balgas_killed")
+    set_balgas_alive = builder.label("set_balgas_alive")
+    set_lily_hostile = builder.label("set_lily_hostile")
+    set_lily_friendly = builder.label("set_lily_friendly")
+    set_worst_case = builder.label("set_worst_case")
+    reset_all_flags = builder.label("reset_all_flags")
+
+    builder.step(scenario_flags) \
+        .say("scenario_info", "シナリオ分岐フラグを設定します。", "", actor=debug_master)
+
+    builder.choice(set_balgas_killed, "バルガス殺害ON", "", text_id="c_balgas_killed") \
+           .choice(set_balgas_alive, "バルガス殺害OFF", "", text_id="c_balgas_alive") \
+           .choice(set_lily_hostile, "リリィ離反ON", "", text_id="c_lily_hostile") \
+           .choice(set_lily_friendly, "リリィ離反OFF", "", text_id="c_lily_friendly") \
+           .choice(set_worst_case, "最悪ルート（両方ON）", "", text_id="c_worst_case") \
+           .choice(reset_all_flags, "全てリセット", "", text_id="c_reset_flags") \
+           .choice(flags_menu, "戻る", "", text_id="c_scenario_back")
+
+    builder.step(set_balgas_killed) \
+        .set_flag(Keys.BALGAS_KILLED, FlagValues.BalgasChoice.KILLED) \
+        .say("balgas_killed_set", "バルガス殺害フラグをONにしました。", "", actor=debug_master) \
+        .jump(scenario_flags)
+
+    builder.step(set_balgas_alive) \
+        .set_flag(Keys.BALGAS_KILLED, FlagValues.BalgasChoice.SPARED) \
+        .say("balgas_alive_set", "バルガス殺害フラグをOFFにしました。", "", actor=debug_master) \
+        .jump(scenario_flags)
+
+    builder.step(set_lily_hostile) \
+        .set_flag(Keys.LILY_HOSTILE, FlagValues.TRUE) \
+        .say("lily_hostile_set", "リリィ離反フラグをONにしました。", "", actor=debug_master) \
+        .jump(scenario_flags)
+
+    builder.step(set_lily_friendly) \
+        .set_flag(Keys.LILY_HOSTILE, FlagValues.FALSE) \
+        .say("lily_friendly_set", "リリィ離反フラグをOFFにしました。", "", actor=debug_master) \
+        .jump(scenario_flags)
+
+    builder.step(set_worst_case) \
+        .set_flag(Keys.BALGAS_KILLED, FlagValues.BalgasChoice.KILLED) \
+        .set_flag(Keys.LILY_HOSTILE, FlagValues.TRUE) \
+        .say("worst_case_set", "最悪ルート設定完了（バルガス殺害+リリィ離反）", "", actor=debug_master) \
+        .jump(scenario_flags)
+
+    builder.step(reset_all_flags) \
+        .set_flag(Keys.BALGAS_KILLED, FlagValues.BalgasChoice.SPARED) \
+        .set_flag(Keys.LILY_HOSTILE, FlagValues.FALSE) \
+        .say("flags_reset", "全フラグをリセットしました。", "", actor=debug_master) \
+        .jump(scenario_flags)
 
     # ========================================
     # 終了

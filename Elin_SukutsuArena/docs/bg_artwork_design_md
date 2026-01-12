@@ -1,0 +1,62 @@
+● シナリオの雰囲気を踏まえて、オールドスクールTRPGコンセプトアート風のプロンプトを作成します。
+
+  ---
+  背景画像生成プロンプト
+
+  共通スタイル指定（各プロンプトの末尾に追加）
+
+  old school TTRPG concept art style, 1980s fantasy illustration, painterly technique, dramatic lighting, rich earth tones, detailed linework with soft color washes, reminiscent of Larry Elmore and Keith Parkinson, 16:9 aspect ratio, 1920x1080
+
+  ---
+  1. アリーナロビー (arena_lobby)
+
+  A dimly lit reception hall in an otherworldly gladiator arena, purple ethereal mist swirling near the ceiling, ancient stone pillars with eldritch runes, a worn wooden counter where a seductive succubus receptionist sits, scattered weapons and armor on display racks, flickering magical torches casting dancing shadows, a sense of decadent despair and dark entertainment, view from entrance looking inward
+
+  old school TTRPG concept art style, 1980s fantasy illustration, painterly technique, dramatic lighting, rich earth tones, detailed linework with soft color washes, reminiscent of Larry Elmore and Keith Parkinson, 16:9 aspect ratio, 1920x1080
+
+  ---
+  2. 闘技場・通常 (arena_battle_normal)
+
+  A circular gladiatorial arena floating in a void dimension, cracked stone floor stained with old blood, towering walls with empty spectator seats that feel watched by invisible beings, swirling purple-black sky above with no stars, scattered bones and broken weapons, magical barrier shimmering at the edges, ominous atmosphere of entertainment through suffering, wide establishing shot
+
+  old school TTRPG concept art style, 1980s fantasy illustration, painterly technique, dramatic lighting, rich earth tones, detailed linework with soft color washes, reminiscent of Larry Elmore and Keith Parkinson, 16:9 aspect ratio, 1920x1080
+
+  ---
+  3. 闘技場・雪 (arena_battle_snow)
+
+  A frozen gladiatorial arena in an otherworldly dimension, thick snow covering the battle floor, icicles hanging from ancient stone pillars, pale blue magical light filtering through swirling blizzard, frost-covered spectator stands disappearing into white mist, frozen statues of fallen warriors partially buried in snow, breath-visible cold atmosphere, desolate winter battlefield
+
+  old school TTRPG concept art style, 1980s fantasy illustration, painterly technique, dramatic lighting, cool blue and white palette with purple shadows, detailed linework with soft color washes, reminiscent of Larry Elmore and Keith Parkinson, 16:9 aspect ratio, 1920x1080
+
+  ---
+  4. ゼクのゴミ山 (zek_hideout)
+
+  A disturbing collection chamber in a pocket dimension, towering piles of broken artifacts and discarded treasures, glass display cases containing frozen moments of warriors in their final despair, glowing crystals and strange dimensional debris scattered everywhere, cobwebs and dust covering forgotten relics, a twisted curator's gallery of tragedy, dim greenish magical light, claustrophobic and unsettling atmosphere
+
+  old school TTRPG concept art style, 1980s fantasy illustration, painterly technique, dramatic lighting, sickly green and brown tones, detailed linework with soft color washes, reminiscent of Larry Elmore and Keith Parkinson, 16:9 aspect ratio, 1920x1080
+
+  ---
+  5. 玉座の間 (throne_room)
+
+  A massive throne room of a dragon god emperor, colossal obsidian throne atop a mountain of steps, crimson banners with eldritch symbols hanging from impossibly high ceilings, molten cracks in the black stone floor glowing with hellfire, massive dragon skull trophies mounted on walls, swirling vortex of dimensional energy behind the throne, oppressive atmosphere of absolute power and ancient evil, view looking up toward the empty throne
+
+  old school TTRPG concept art style, 1980s fantasy illustration, painterly technique, dramatic lighting, deep reds and blacks with golden accents, detailed linework with soft color washes, reminiscent of Larry Elmore and Keith Parkinson, 16:9 aspect ratio, 1920x1080
+
+  ---
+
+
+  ファイル名対応
+  ┌────────────────┬─────────────────────────┐
+  │      場所      │       ファイル名        │
+  ├────────────────┼─────────────────────────┤
+  │ アリーナロビー │ arena_lobby.png         │
+  ├────────────────┼─────────────────────────┤
+  │ 闘技場（通常） │ arena_battle_normal.png │
+  ├────────────────┼─────────────────────────┤
+  │ 闘技場（雪）   │ arena_battle_snow.png   │
+  ├────────────────┼─────────────────────────┤
+  │ ゼクのゴミ山   │ zek_hideout.png         │
+  ├────────────────┼─────────────────────────┤
+  │ 玉座の間       │ throne_room.png         │
+  └────────────────┴─────────────────────────┘
+  配置先: Package/Media/Graphics/Image/Drama/

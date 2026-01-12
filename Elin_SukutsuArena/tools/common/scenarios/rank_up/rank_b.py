@@ -35,7 +35,10 @@ def define_rank_up_B(builder: DramaBuilder):
     # シーン1: 虚無の予兆
     # ========================================
     builder.step(main) \
-        .play_bgm("BGM/Ominous_Suspense_02") \
+        .drama_start(
+            bg_id="Drama/arena_battle_normal",
+            bgm_id="BGM/Ominous_Suspense_02"
+        ) \
         .say("narr_1", "（ロビーの空気が異様に重い。）", "", actor=pc) \
         .say("narr_2", "（バルガスは珍しく、酒瓶を手にせず、険しい表情で闘技場の門を見つめている。）", "", actor=pc) \
         .say("narr_3", "（リリィも、いつもの事務的な仮面の下に、微かな緊張を滲ませていた。）", "", actor=pc) \
@@ -46,11 +49,11 @@ def define_rank_up_B(builder: DramaBuilder):
         .say("balgas_1", "……おい、闘技場の鴉。", "", actor=balgas) \
         .say("balgas_2", "お前はここまで、よく戦ってきた。だが、次の相手は……今までの敵とは次元が違う。", "", actor=balgas) \
         .say("balgas_3", "『虚無の処刑人ヌル』。", "", actor=balgas) \
-        .say("balgas_4", "あいつは、このアリーナの『概念』そのものだ。感情も、意志も、魂すらも持たねえ。", "", actor=balgas) \
-        .say("balgas_5", "ただひたすらに、『存在を無に還す』ことだけを目的に動く、生ける虚無だ。", "", actor=balgas) \
+        .say("balgas_4", "あいつは、グランドマスター『アスタロト』の『人形』だ。感情も、意志も、魂すらも持たねえ。", "", actor=balgas) \
+        .say("balgas_5", "ただひたすらに、『存在を無に還す』ことだけを目的に動く、生ける屍だ。", "", actor=balgas) \
         .say("narr_4", "（彼は深く息を吐く。）", "", actor=pc) \
         .say("balgas_6", "……かつての英雄たち、カインを含めた俺の仲間たちも、あいつに飲み込まれて消えた。", "", actor=balgas) \
-        .say("balgas_7", "俺たちが持っていた『意志』も、『哲学』も、全てあいつの『無』の前では意味を成さなかった。", "", actor=balgas)
+        .say("balgas_7", "俺たちが持っていた『意志』も、『信念』も、全てあいつの『無』の前では意味を成さなかった。", "", actor=balgas)
 
     # プレイヤーの選択肢1
     builder.choice(react1_null, "どうすれば倒せる？", "", text_id="c1_null") \
@@ -59,7 +62,7 @@ def define_rank_up_B(builder: DramaBuilder):
 
     # 選択肢反応1
     builder.step(react1_null) \
-        .say("balgas_r1", "分からねえ。だが、お前なら……。お前が積み上げてきた『絆』が、鍵になるかもしれねえ。", "", actor=balgas) \
+        .say("balgas_r1", "分からねえ。", "", actor=balgas) \
         .jump(scene2)
 
     builder.step(react1_fear) \
@@ -81,15 +84,15 @@ def define_rank_up_B(builder: DramaBuilder):
         .say("lily_2", "あなたがどれほど強くなっても、どれほど技術を磨いても、『虚無』の前では全てが等しく無意味。", "", actor=lily) \
         .say("narr_6", "（彼女は、あなたの手を取る。）", "", actor=pc) \
         .say("lily_3", "でも……あなたには、私たちがいます。", "", actor=lily) \
-        .say("lily_4", "バルガスさんの哲学、あなたが救った魂たち、そして……私の真名を知るあなた。", "", actor=lily) \
-        .say("lily_5", "虚無に抗う唯一の方法は、『意味』を信じ続けることです。", "", actor=lily) \
+        .say("lily_4", "バルガスさんの技、あなたが救った魂たち、そして……私の真名を知るあなた。", "", actor=lily) \
+        .say("lily_5", "虚無に抗う唯一の方法は、『自身』を信じ続けることです。", "", actor=lily) \
         .say("lily_6", "あなたが今まで積み上げてきた全ての選択、全ての戦い……それが、あなたを虚無から守る盾になります。", "", actor=lily) \
         .say("narr_7", "（リリィは、あなたの額に軽く口づけをする。）", "", actor=pc) \
         .say("lily_7", "……行ってらっしゃい。そして、必ず戻ってきてください。", "", actor=lily)
 
     # プレイヤーの選択肢2
     builder.choice(react2_survive, "……生き残る。必ず", "", text_id="c2_survive") \
-           .choice(react2_meaning, "意味を、信じる", "", text_id="c2_meaning") \
+           .choice(react2_meaning, "自身を信じる", "", text_id="c2_meaning") \
            .choice(react2_nod, "（無言で頷く）", "", text_id="c2_nod")
 
     # 選択肢反応2
@@ -98,7 +101,7 @@ def define_rank_up_B(builder: DramaBuilder):
         .jump(battle_start)
 
     builder.step(react2_meaning) \
-        .say("lily_r5", "……ええ。それがあなたの、最強の武器です。", "", actor=lily) \
+        .say("lily_r5", "……ええ。それがあなたの武器です。", "", actor=lily) \
         .jump(battle_start)
 
     builder.step(react2_nod) \
