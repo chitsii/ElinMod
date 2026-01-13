@@ -76,7 +76,7 @@ namespace Elin_SukutsuArena
         }
 
         /// <summary>
-        /// 業火の接吻効果
+        /// 万難のエリクサー効果
         /// - 複数耐性バフ（一時的）
         /// - カルマ-30
         /// </summary>
@@ -188,10 +188,12 @@ namespace Elin_SukutsuArena
             c.AddCondition<ConBoost>(200);
 
             // 強力な出血状態付与（ブーストより長く持続）
-            // power = 600 → 約40ターン、ブーストが切れた後も続く
-            c.AddCondition<ConBleed>(600);
+            // Conditionを直接作成してvalueを設定
+            var bleed = Condition.Create<ConBleed>(1);
+            bleed.value = 50;  // 50ターン持続
+            c.AddCondition(bleed);
 
-            Debug.Log($"[SukutsuArena] Applied Stimulant (Boost + delayed Bleed) to {c.Name}");
+            Debug.Log($"[SukutsuArena] Applied Stimulant (Boost + Bleed value={bleed.value}) to {c.Name}");
 
             // カルマ減少
             if (c.IsPC)

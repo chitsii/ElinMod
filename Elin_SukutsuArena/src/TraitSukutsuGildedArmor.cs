@@ -9,9 +9,9 @@ namespace Elin_SukutsuArena
     public class TraitSukutsuGildedArmor : Trait
     {
         /// <summary>
-        /// 所持金1枚あたりの吸収HP
+        /// 1HPダメージあたりの消費ゴールド
         /// </summary>
-        public const int GoldPerHp = 10;
+        public const int GoldCostPerHp = 10;
 
         /// <summary>
         /// キャラクターが虚飾の黄金鎧を装備しているか確認
@@ -41,24 +41,51 @@ namespace Elin_SukutsuArena
             int currentGold = c.GetCurrency("money");
             if (currentGold <= 0) return 0;
 
-            // 吸収可能な最大ダメージ（所持金 ÷ GoldPerHp）
-            long maxAbsorb = currentGold / GoldPerHp;
+            // 吸収可能な最大ダメージ（所持金 ÷ GoldCostPerHp）
+            // 例：1000ゴールドで10HPまで吸収可能
+            long maxAbsorb = currentGold / GoldCostPerHp;
+
+            // 100ゴールド未満の場合は吸収できない（ゴールドも消費しない）
+            if (maxAbsorb == 0)
+            {
+                Debug.Log($"[SukutsuArena] Gilded Armor: insufficient gold ({currentGold}), need at least {GoldCostPerHp}");
+                return 0;
+            }
+
             long actualAbsorb = System.Math.Min(damage, maxAbsorb);
 
             if (actualAbsorb > 0)
             {
                 // 所持金を消費（Card.ModCurrency を使用）
-                int goldCost = (int)(actualAbsorb * GoldPerHp);
+                int goldCost = (int)(actualAbsorb * GoldCostPerHp);
                 c.ModCurrency(-goldCost, "money");
 
                 // 金貨が剥がれ落ちる演出
-                c.PlaySound("pay");
-                c.PlayEffect("sparkle");
+                PlayGoldEffect(c);
 
-                Debug.Log($"[SukutsuArena] Gilded Armor absorbed {actualAbsorb} damage, cost {goldCost} gold");
+                Debug.Log($"[SukutsuArena] Gilded Armor absorbed {actualAbsorb} damage, cost {goldCost} gold (remaining: {currentGold - goldCost})");
             }
 
             return actualAbsorb;
+        }
+
+        /// <summary>
+        /// 金貨が剥がれ落ちる演出（nullチェック付き）
+        /// </summary>
+        private static void PlayGoldEffect(Chara c)
+        {
+            try
+            {
+                // posがnullの場合はスキップ
+                if (c == null || c.pos == null || !c.pos.IsValid) return;
+
+                c.PlaySound("pay");
+                c.PlayEffect("identify");  // 金色の光
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"[SukutsuArena] PlayGoldEffect failed: {ex.Message}");
+            }
         }
     }
 
@@ -82,22 +109,24 @@ namespace Elin_SukutsuArena
             // 虚飾の黄金鎧を装備しているか確認
             if (!TraitSukutsuGildedArmor.IsWearingGildedArmor(c)) return;
 
-            // 物理ダメージのみ適用（ele == 0 は物理）
-            // 元素ダメージ（火、冷気など）は吸収しない
-            if (ele != 0) return;
+            Debug.Log($"[SukutsuArena] Gilded Armor: incoming damage={dmg}, ele={ele}");
 
-            // 所持金でダメージを吸収
+            // 全てのダメージをお金で吸収（元素ダメージも含む）
             long absorbed = TraitSukutsuGildedArmor.AbsorbDamageWithGold(c, dmg);
+            Debug.Log($"[SukutsuArena] Gilded Armor: absorbed={absorbed}");
+
             if (absorbed > 0)
             {
                 dmg -= absorbed;
                 if (dmg < 0) dmg = 0;
 
-                // メッセージ表示（頻繁すぎないように条件付き）
-                if (absorbed >= 10)
-                {
-                    Msg.Say("sukutsu_gilded_absorb");
-                }
+                // 消費したゴールド量
+                long goldSpent = absorbed * TraitSukutsuGildedArmor.GoldCostPerHp;
+                Debug.Log($"[SukutsuArena] Gilded Armor: remaining damage={dmg}, gold spent={goldSpent}");
+
+                // メッセージ表示（金貨が剥がれ落ちた）
+                Msg.SetColor(Msg.colors.Ding);
+                Msg.Say($"金貨が{goldSpent}枚剥がれ落ちた！");
             }
         }
     }

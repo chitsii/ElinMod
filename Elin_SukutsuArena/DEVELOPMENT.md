@@ -217,6 +217,139 @@ uv run python builder/validate_scenario_flags.py
 
 ドラマファイルで使用されるフラグがC#側で定義されているか検証。
 
+## カスタムアイテム作成のハマりどころ
+
+### SourceStat（カスタムCondition）
+
+カスタムポーションで一時的なバフを付与する場合、`SourceStat.xlsx`（Stat.tsv）でConditionを定義する。
+
+#### id列のデフォルト値
+
+**デフォルト値（3行目）のidは、データ行のid最大値より大きくする必要がある。**
+
+```python
+# 正しい例
+DEFAULTS = {'id': '100000', ...}  # データ行のidは10001〜10020
+CONDITIONS = [{'id': '10001', ...}, {'id': '10020', ...}]
+
+# 誤った例（エラーになる）
+DEFAULTS = {'id': '100', ...}  # データ行のidより小さい
+```
+
+#### type列の指定
+
+**type列を空にするとCWLが警告を出す。バニラのクラスを指定する。**
+
+```python
+# 推奨（警告なし）
+'type': 'BaseBuff',  # バニラのBaseBuffクラスを使用
+
+# 非推奨（動作するが警告が出る）
+'type': '',  # CWLがaliasをtype名として解決しようとして警告
+```
+
+#### phase配列
+
+`BaseCondition.GetPhase()`は`value/10`をインデックスとして使用するため、通常は10要素必要。
+
+```csharp
+// バニラの実装
+public override int GetPhase()
+{
+    return base.source.phase[Mathf.Clamp(value, 0, 99) / 10];
+}
+```
+
+**ただし`BaseBuff`/`BaseDebuff`はGetPhase=>0をオーバーライドしているので、これらを使う場合はphase配列不要。**
+
+```python
+# BaseBuffを使う場合
+'type': 'BaseBuff',
+'phase': '',  # 不要
+
+# カスタムクラスを使う場合
+'type': 'MyCustomCondition',
+'phase': '0,0,0,0,0,0,0,0,0,0',  # 10要素必要
+```
+
+#### elements列で一時的バフ
+
+elements列でエレメント値を一時的に変更できる。
+
+```python
+'elements': 'resCold,50',   # 冷気耐性+50
+'elements': 'PV,30',        # PV+30
+'elements': 'STR,10',       # 筋力+10
+```
+
+#### TSV形式とsoffice変換
+
+**直接xlsxを生成するとCWLが読み込めない場合がある。TSVで出力してsofficeで変換する。**
+
+```python
+# build.batで自動的にsoffice変換される
+OUTPUT_JP = os.path.join(PROJECT_ROOT, 'LangMod', 'JP', 'Stat.tsv')
+```
+
+### カスタムTrait（装備効果）
+
+#### OnEquipのonSetOwner引数
+
+**onSetOwner=trueはセーブデータロード時。新規装備時の処理と分ける。**
+
+```csharp
+public override void OnEquip(Chara c, bool onSetOwner)
+{
+    base.OnEquip(c, onSetOwner);
+
+    // セーブロード時は処理をスキップ
+    if (onSetOwner) return;
+
+    // EClass._mapがnullの可能性もチェック
+    if (EClass._map == null) return;
+
+    // 新規装備時の処理（ミニオン召喚等）
+    SummonMinion(c);
+}
+```
+
+### TraitDrink継承（カスタムポーション）
+
+#### IdEffectのオーバーライド
+
+カスタム効果IDはバニラの`EffectId`列挙型に存在しないため、デフォルト値を返す。
+
+```csharp
+public class TraitSukutsuItem : TraitDrink
+{
+    // 列挙型変換エラーを回避
+    public override EffectId IdEffect => global::EffectId.Drink;
+
+    // 独自の効果ID（trait列の2番目パラメータ）
+    public string CustomEffectId => GetParam(1) ?? "";
+
+    public override void OnDrink(Chara c)
+    {
+        switch (CustomEffectId)
+        {
+            case "my_effect":
+                ApplyMyEffect(c);
+                break;
+            default:
+                base.OnDrink(c);
+                break;
+        }
+    }
+}
+```
+
+#### SourceThingでの指定
+
+```python
+# trait列: "名前空間.クラス名,効果ID"
+'trait': 'Elin_SukutsuArena.TraitSukutsuItem,frost_ward',
+```
+
 ## 既知の問題・バックログ
 
 ### キャラクターチップ移動問題

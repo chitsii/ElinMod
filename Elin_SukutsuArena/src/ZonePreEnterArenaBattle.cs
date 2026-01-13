@@ -445,7 +445,10 @@ public class ZonePreEnterArenaBattle : ZonePreEnterEvent
 
         boss.elements.SetBase(END_ELEMENT_ID, boostedEnd);
 
-        Debug.Log($"[SukutsuArena] Boss Endurance Boost: {boss.Name} END {currentEnd} -> {boostedEnd} (x{BOSS_ENDURANCE_MULTIPLIER})");
+        // HPを新しいMaxHPに合わせてフル回復
+        boss.hp = boss.MaxHP;
+
+        Debug.Log($"[SukutsuArena] Boss Endurance Boost: {boss.Name} END {currentEnd} -> {boostedEnd} (x{BOSS_ENDURANCE_MULTIPLIER}), HP={boss.hp}");
     }
 
     /// <summary>

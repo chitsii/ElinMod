@@ -70,6 +70,11 @@ class ItemDefinition:
     tiles: int = 0             # tiles（スプライトID）
     render_data: str = "item"  # _idRenderData
 
+    # 装備品用（鎧、武器など）
+    def_mat: str = ""          # defMat（デフォルト素材: iron, gold など）
+    tier_group: str = ""       # tierGroup（metal, wood など）
+    defense: str = ""          # defense（防御値: "6,21" など）
+
     # タグ
     tags: List[str] = field(default_factory=list)  # tag
 
@@ -93,8 +98,8 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         name_jp="万難のエリクサー",
         name_en="Elixir of Trials",
         category="drink",
-        detail_jp="あらゆる困難を退ける禁断の霊薬。複数の耐性を長時間得られるが、魂を代償に捧げる。",
-        detail_en="A forbidden elixir that wards off all trials. Grants multiple resistances, but demands your soul.",
+        detail_jp="異端の錬金術師が生涯をかけて完成させた禁忌の霊薬。あらゆる災厄を退けるが、その代償として魂の一部を蝕む。術師は完成の日、自ら服用し、そのまま灰となった。",
+        detail_en="A forbidden elixir perfected by a heretic alchemist over a lifetime. It wards off all calamities, but corrodes a part of the soul. On the day of completion, the alchemist drank it himself and turned to ash.",
 
         trait_type=TraitType.CUSTOM,
         trait_name="SukutsuItem",
@@ -107,7 +112,8 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         value=50000,
         lv=30,
         weight=50,
-        tiles=176,
+        tiles=1551, # potion_alchemy	ポーション
+        render_data="obj_S",
 
         tags=["neg"],
 
@@ -127,8 +133,8 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         name_jp="凍牙の護り",
         name_en="Frostfang Ward",
         category="drink",
-        detail_jp="氷のような冷たさを持つ青い薬。冷気への耐性を得る。",
-        detail_en="A blue potion cold as ice. Grants resistance to cold.",
+        detail_jp="北の凍土で採れる霜竜の血から精製された青き秘薬。飲めば身体の芯まで凍えるが、いかなる冷気も肌を刺すことはない。",
+        detail_en="A blue elixir distilled from the blood of frost dragons found in the northern tundra. It chills to the bone, yet no cold can pierce the skin thereafter.",
 
         trait_type=TraitType.CUSTOM,
         trait_name="SukutsuItem",
@@ -142,7 +148,8 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         value=30000,
         lv=10,
         weight=50,
-        tiles=176,
+        tiles=1614, # ポーション
+        render_data="obj_S",
 
         tags=["neg"],
 
@@ -158,8 +165,8 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         name_jp="明鏡の護り",
         name_en="Clarity Ward",
         category="drink",
-        detail_jp="澄んだ銀色の薬。幻惑への耐性を得る。",
-        detail_en="A clear silver potion. Grants resistance to darkness/blindness.",
+        detail_jp="真実のみを映す鏡を砕いて作られた銀の薬。飲めば全ての幻が剥がれ落ちる。だが、真実を見続けた者は皆、やがて己の目を抉り取ったという。",
+        detail_en="A silver elixir made from a shattered mirror that reflected only truth. All illusions fall away upon drinking. Yet all who gazed upon truth unending eventually gouged out their own eyes.",
 
         trait_type=TraitType.CUSTOM,
         trait_name="SukutsuItem",
@@ -173,7 +180,8 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         value=30000,
         lv=10,
         weight=50,
-        tiles=176,
+        tiles=1614, # ポーション
+        render_data="obj_S",
 
         tags=["neg"],
 
@@ -189,8 +197,8 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         name_jp="秩序の護り",
         name_en="Order Ward",
         category="drink",
-        detail_jp="虹色に揺らめく不思議な薬。混沌への耐性を得る。",
-        detail_en="A potion shimmering with rainbow colors. Grants resistance to chaos.",
+        detail_jp="混沌の深淵を覗き込み、正気を失った賢者が遺した虹色の薬。秩序なき力を退けるが、その製法は狂気の書物にのみ記されている。",
+        detail_en="A rainbow elixir left by a sage who gazed into the abyss of chaos and lost his mind. It repels the forces of disorder, though its recipe exists only in tomes of madness.",
 
         trait_type=TraitType.CUSTOM,
         trait_name="SukutsuItem",
@@ -204,7 +212,8 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         value=30000,
         lv=10,
         weight=50,
-        tiles=176,
+        tiles=1614, # ポーション
+        render_data="obj_S",
 
         tags=["neg"],
 
@@ -220,8 +229,8 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         name_jp="静寂の護り",
         name_en="Silence Ward",
         category="drink",
-        detail_jp="飲むと耳鳴りがする黄色い薬。轟音への耐性を得る。",
-        detail_en="A yellow potion that causes ringing in the ears. Grants resistance to sound.",
+        detail_jp="雷神の落とした耳栓を溶かして作られたという黄金色の薬。一時的に聴覚が鈍るが、いかなる轟音も鼓膜を破ることはない。",
+        detail_en="A golden potion said to be made from melted earplugs dropped by the thunder god. Hearing dulls temporarily, but no roar can burst the eardrums.",
 
         trait_type=TraitType.CUSTOM,
         trait_name="SukutsuItem",
@@ -235,7 +244,8 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         value=30000,
         lv=10,
         weight=50,
-        tiles=176,
+        tiles=1614, # ポーション
+        render_data="obj_S",
 
         tags=["neg"],
 
@@ -251,8 +261,8 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         name_jp="鋼鉄の護り",
         name_en="Steel Ward",
         category="drink",
-        detail_jp="鉄錆の味がする灰色の薬。衝撃への耐性を得る。",
-        detail_en="A gray potion tasting of iron rust. Grants resistance to impact.",
+        detail_jp="鋼鉄の巨人の心臓から抽出された灰色の液体。飲めば全身が鉄のように硬くなり、いかなる衝撃も骨を砕くことはできない。",
+        detail_en="A gray liquid extracted from the heart of a steel colossus. The body hardens like iron upon consumption, and no impact can shatter bone.",
 
         trait_type=TraitType.CUSTOM,
         trait_name="SukutsuItem",
@@ -266,7 +276,8 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         value=30000,
         lv=10,
         weight=50,
-        tiles=176,
+        tiles=1614, # ポーション
+        render_data="obj_S",
 
         tags=["neg"],
 
@@ -282,8 +293,8 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         name_jp="凝血の護り",
         name_en="Clotting Ward",
         category="drink",
-        detail_jp="血のように赤黒い薬。出血への耐性を得る。",
-        detail_en="A dark red potion like blood. Grants resistance to bleeding.",
+        detail_jp="不死の吸血鬼から採取した血を凝固させた赤黒い秘薬。飲めば傷口が瞬時に塞がり、いかなる刃も血を流させることはできない。",
+        detail_en="A dark red elixir made from coagulated blood of an immortal vampire. Wounds close instantly, and no blade can draw blood.",
 
         trait_type=TraitType.CUSTOM,
         trait_name="SukutsuItem",
@@ -297,7 +308,8 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         value=30000,
         lv=10,
         weight=50,
-        tiles=176,
+        tiles=1614, # ポーション
+        render_data="obj_S",
 
         tags=["neg"],
 
@@ -317,8 +329,8 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         name_jp="飢餓の首飾り",
         name_en="Amulet of Hunger",
         category="amulet",
-        detail_jp="装備者の食欲を異常なまでに刺激する呪われた首飾り。常に腹が減る。",
-        detail_en="A cursed amulet that stimulates abnormal appetite. Always hungry.",
+        detail_jp="餓鬼道に堕ちた僧侶が首に掛けていた呪物。装備すると底なしの飢えに苛まれ、いくら食べても満たされることはない。僧侶は最期、己の腕を喰らったという。",
+        detail_en="A cursed relic worn by a monk who fell into the realm of hungry ghosts. The wearer suffers endless hunger that cannot be sated. The monk is said to have devoured his own arms in the end.",
 
         trait_type=TraitType.VANILLA,
         trait_name="",  # 装備品は通常Traitなし
@@ -328,7 +340,8 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         value=40000,
         lv=15,
         weight=50,
-        tiles=1168,  # amulet sprite
+        tiles=1221,  # amulet_necklace	ネックレス
+        render_data="obj_S flat",
 
         tags=["neg"],
 
@@ -344,18 +357,19 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         name_jp="儚き天禀",
         name_en="Ephemeral Gift",
         category="ring",
-        detail_jp="魔力を増幅する代わりに生命力を奪う指輪。ガラス細工のように繊細。",
-        detail_en="A ring that amplifies mana at the cost of vitality. Delicate as glass.",
+        detail_jp="夭折した天才魔術師の指に嵌められていた硝子の指輪。魔力を極限まで高めるが、生命の炎を急速に燃やし尽くす。彼女は二十歳を迎えることなく灰となった。",
+        detail_en="A glass ring found on the finger of a prodigy sorceress who died young. It amplifies magic to its limits but rapidly burns away the flame of life. She turned to ash before her twentieth year.",
 
         trait_type=TraitType.VANILLA,
         trait_name="",
 
-        elements="r_life/10,r_mana/200",
+        elements="r_life/-90,r_mana/200",
 
         value=50000,
         lv=25,
         weight=10,
-        tiles=1184,  # ring sprite
+        tiles=1219,  # aurora ring
+        render_data="obj_S flat",
 
         tags=["neg"],
 
@@ -371,18 +385,19 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         name_jp="愚者の平穏",
         name_en="Fool's Peace",
         category="ring",
-        detail_jp="頑強な肉体を与える代わりに魔力を封じる指輪。知らぬが仏。",
-        detail_en="A ring that grants robust health but seals magical power. Ignorance is bliss.",
+        detail_jp="魔法を恐れた愚かな王が鍛冶師に作らせた鉛の指輪。肉体を頑強にするが、一切の魔力を封じてしまう。王は魔術師の呪いから逃れたが、知恵までも失うこととなった。",
+        detail_en="A leaden ring forged by a smith for a foolish king who feared magic. It grants robust flesh but seals all magical power. The king escaped the sorcerer's curse but lost his wisdom as well.",
 
         trait_type=TraitType.VANILLA,
         trait_name="",
 
-        elements="r_life/200,r_mana/10",
+        elements="r_life/200,r_mana/-90",
 
         value=50000,
         lv=25,
         weight=10,
-        tiles=1184,  # ring sprite
+        tiles=1219,  # aurora ring
+        render_data="obj_S flat",
 
         tags=["neg"],
 
@@ -402,8 +417,8 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         name_jp="痛覚遮断薬",
         name_en="Painkiller",
         category="drink",
-        detail_jp="痛みを感じなくなる危険な薬。物理ダメージを40%軽減するが、強烈な毒に侵される。",
-        detail_en="A dangerous drug that numbs pain. Reduces physical damage by 40%, but causes severe poisoning.",
+        detail_jp="拷問官が囚人に与えていた黒い薬。苦痛を遮断し肉体を守るが、臓腑を蝕む猛毒を含む。囚人たちは痛みを忘れたまま、静かに腐っていったという。",
+        detail_en="A black drug given to prisoners by torturers. It blocks pain and protects the flesh, but contains a deadly poison that rots the organs. The prisoners forgot their pain and quietly decayed.",
 
         trait_type=TraitType.CUSTOM,
         trait_name="SukutsuItem",
@@ -414,7 +429,8 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         value=30000,
         lv=20,
         weight=50,
-        tiles=176,
+        tiles=1614, # ポーション
+        render_data="obj_S",
 
         tags=["neg"],
 
@@ -430,8 +446,8 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         name_jp="禁断の覚醒剤",
         name_en="Forbidden Stimulant",
         category="drink",
-        detail_jp="極限まで神経を研ぎ澄ます禁断の薬。ブースト状態になるが、効果が切れると血管が破裂する。",
-        detail_en="A forbidden drug that sharpens nerves to the limit. Grants Boost, but causes severe bleeding when it wears off.",
+        detail_jp="狂戦士たちが決死の戦いの前に服用した禁断の薬。神経を極限まで研ぎ澄ませるが、効果が切れた時、血管が内側から破裂する。",
+        detail_en="A forbidden drug taken by berserkers before battles to the death. It sharpens the nerves to their limit, but when it wears off, blood vessels rupture from within. None are said to have survived.",
 
         trait_type=TraitType.CUSTOM,
         trait_name="SukutsuItem",
@@ -442,7 +458,8 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         value=40000,
         lv=30,
         weight=50,
-        tiles=176,
+        tiles=1311,
+        render_data="obj_S flat",
 
         tags=["neg"],
 
@@ -457,9 +474,9 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         id="sukutsu_gilded_armor",
         name_jp="虚飾の黄金鎧",
         name_en="Gilded Vanity Armor",
-        category="armor",
-        detail_jp="金箔で覆われた見た目だけの鎧。物理ダメージを受けると所持金が剥がれ落ちる。",
-        detail_en="Armor covered in gold leaf. Physical damage costs gold instead of HP.",
+        category="torso",  # 胴装備（armorは親カテゴリ）
+        detail_jp="かつて強欲な王が纏った呪われし黄金の鎧。その輝きは持ち主の富を喰らい、傷の代わりに金貨を剥ぎ取る。王は最期、一枚の金貨も残さず骸と化したという。",
+        detail_en="A cursed golden armor once worn by a greedy king. Its radiance devours the wearer's wealth, shedding gold coins instead of blood. The king met his end as a penniless corpse.",
 
         trait_type=TraitType.CUSTOM,
         trait_name="SukutsuGildedArmor",
@@ -469,9 +486,13 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         elements="SPD/-60",  # 速度-60
 
         value=80000,
-        lv=30,
-        weight=5000,  # 重い
-        tiles=1056,
+        lv=48,
+        weight=7500,  # 重い
+        tiles=1255,  # 重装鎧
+        render_data="obj_S flat",  # 重装鎧と同じ
+        def_mat="gold",  # 金
+        tier_group="metal",
+        defense="6,21",
 
         tags=["neg"],
 
@@ -487,8 +508,8 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         name_jp="双子の鏡",
         name_en="Twin Mirror",
         category="amulet",
-        detail_jp="鏡に映る自分の影が実体化して付き従う。外すと消える。",
-        detail_en="Your reflection in the mirror materializes as a minion. Vanishes when removed.",
+        detail_jp="双子の魔女が互いを封じ込めた呪われた鏡。装備すると鏡の中からもう一人の自分が這い出し、主に付き従う。外せば影は鏡の中へ還る。",
+        detail_en="A cursed mirror in which twin witches sealed each other. When worn, another self crawls out from the mirror to serve its master. Remove it, and the shadow returns within.",
 
         trait_type=TraitType.CUSTOM,
         trait_name="SukutsuTwinMirror",
@@ -499,7 +520,8 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         value=80000,
         lv=35,
         weight=100,
-        tiles=1168,
+        tiles=1318, # 細工首輪
+        render_data="obj_S flat",  # 細工首輪と同じ
 
         tags=["neg"],
 
@@ -515,15 +537,15 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
 # 効果IDマッピング（C#側で参照用のドキュメント）
 # ============================================================================
 
-EFFECT_DEFINITIONS = {
-    "kiss_of_inferno": {
-        "description": "業火の接吻 - 冷気耐性バフ + カルマ減少",
-        "buff_element": 951,  # resCold
-        "buff_value": 20,
-        "buff_power": 500,
-        "karma": -30,
-    },
-}
+# EFFECT_DEFINITIONS = {
+#     "kiss_of_inferno": {
+#         "description": "万難のエリクサー - 冷気耐性バフ + カルマ減少",
+#         "buff_element": 951,  # resCold
+#         "buff_value": 20,
+#         "buff_power": 500,
+#         "karma": -30,
+#     },
+# }
 
 
 # ============================================================================

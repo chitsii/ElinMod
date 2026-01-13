@@ -253,6 +253,14 @@ def main():
         set_cell(row, 'tiles', item.tiles)
         set_cell(row, '_idRenderData', item.render_data)
 
+        # 装備品用フィールド
+        if item.def_mat:
+            set_cell(row, 'defMat', item.def_mat)
+        if item.tier_group:
+            set_cell(row, 'tierGroup', item.tier_group)
+        if item.defense:
+            set_cell(row, 'defense', item.defense)
+
         # タグ
         if item.tags:
             tags_str = ','.join(item.tags)
