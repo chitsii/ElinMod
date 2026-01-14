@@ -70,7 +70,7 @@ def define_epilogue(builder: DramaBuilder):
     builder.step(act5) \
         .branch_if(Keys.BALGAS_KILLED, "==", FlagValues.BalgasChoice.KILLED, act5_check_lily_dead) \
         .branch_if(Keys.LILY_HOSTILE, "==", FlagValues.TRUE, act5_lily_hostile) \
-        .play_bgm("BGM/Victory_Epilogue") \
+        .play_bgm("BGM/Emotional_Hope") \
         .say("narr_14", "（激闘の末、アスタロトの身体が崩れ始める。王座は砕け、アリーナの外壁は剥がれ落ち、そこから美しい『本当の星空』が姿を現した。）", "", actor=pc) \
         .say("astaroth_6", "「……見事だ。私は……ただ、この閉じられた孵化器を守るだけの、古い部品に過ぎなかったのかもしれないな。」", "", actor=astaroth) \
         .say("astaroth_7", "「……リリィ、バルガス、ゼク。……そして新しき王よ。この世界の重さを、お前たちが分かち合うというのなら……私は、安心して土へ還ろう。」", "", actor=astaroth) \
@@ -85,7 +85,6 @@ def define_epilogue(builder: DramaBuilder):
     # 第6幕: 帰還の道
     # ========================================
     builder.step(act6) \
-        .play_bgm("BGM/Hopeful_Theme") \
         .say("narr_16", "（アスタロトが完全に消えると、アリーナ全体を覆っていた次元の壁が、ガラスのように砕け散り始める。）", "", actor=pc) \
         .say("narr_17", "（紫紺の虚無が晴れ、その向こうに久しく忘れていた『青空』が広がっていた。）", "", actor=pc) \
         .focus_chara(Actors.BALGAS) \
@@ -135,7 +134,6 @@ def define_epilogue(builder: DramaBuilder):
     # ========================================
     builder.step(epilogue) \
         .play_bgm("BGM/ProgressiveDance") \
-        .wait(500) \
         .say("narr_21", "かつて、異次元の闘技場に迷い込んだ一人の冒険者がいた。そこで絶望の底で友を得て、魂を賭けて戦い、ついには、『うつろいし神』をも超える存在となった。そして今、解放された魂は、新たな物語を紡ぎ始めるーー", "", actor=pc) \
         .jump(nul_return)
 
@@ -169,13 +167,16 @@ def define_epilogue(builder: DramaBuilder):
         .say("zek_f1", "おや、私も混ぜてくださいよ？", "", actor=zek) \
         .complete_quest(QuestIds.LAST_BATTLE) \
         .say("sys_complete", "【巣窟アリーナ】メインストーリークリア！", actor=pc) \
-        .drama_end()
+        .eval("Elin_SukutsuArena.ArenaManager.ShowEndingCredit()") \
+        .unfocus() \
+        .fade_in(duration=0.5, color="black") \
+        .finish()
 
     # ========================================
     # バルガス死亡版: 第5幕
     # ========================================
     builder.step(act5_dead) \
-        .play_bgm("BGM/Victory_Epilogue") \
+        .play_bgm("BGM/Emotional_Hope") \
         .say("narr_14", "（激闘の末、アスタロトの身体が崩れ始める。王座は砕け、アリーナの外壁は剥がれ落ち、そこから美しい『本当の星空』が姿を現した。）", "", actor=pc) \
         .say("astaroth_6d", "「……見事だ。私は……ただ、この閉じられた孵化器を守るだけの、古い部品に過ぎなかったのかもしれないな。」", "", actor=astaroth) \
         .say("astaroth_7d", "「……リリィ、ゼク。……そして新しき王よ。この世界の重さを、お前たちが分かち合うというのなら……私は、安心して土へ還ろう。」", "", actor=astaroth) \
@@ -188,7 +189,6 @@ def define_epilogue(builder: DramaBuilder):
 
     # バルガス死亡版: 第6幕
     builder.step(act6_dead) \
-        .play_bgm("BGM/Hopeful_Theme") \
         .say("narr_16", "（アスタロトが完全に消えると、アリーナ全体を覆っていた次元の壁が、ガラスのように砕け散り始める。）", "", actor=pc) \
         .say("narr_17", "（紫紺の虚無が晴れ、その向こうに久しく忘れていた『青空』が広がっていた。）", "", actor=pc) \
         .focus_chara(Actors.LILY) \
@@ -232,7 +232,10 @@ def define_epilogue(builder: DramaBuilder):
         .say("zek_f1", "おや、私も混ぜてくださいよ？", "", actor=zek) \
         .complete_quest(QuestIds.LAST_BATTLE) \
         .say("sys_complete", "【巣窟アリーナ】メインストーリークリア！", actor=pc) \
-        .drama_end()
+        .eval("Elin_SukutsuArena.ArenaManager.ShowEndingCredit()") \
+        .unfocus() \
+        .fade_in(duration=0.5, color="black") \
+        .finish()
 
     # ========================================
     # 分岐チェック用ステップ
@@ -251,7 +254,7 @@ def define_epilogue(builder: DramaBuilder):
     # リリィ離反版: 第5幕（バルガス生存、リリィ離反）
     # ========================================
     builder.step(act5_lily_hostile) \
-        .play_bgm("BGM/Victory_Epilogue") \
+        .play_bgm("BGM/Emotional_Hope") \
         .say("narr_14", "（激闘の末、アスタロトの身体が崩れ始める。王座は砕け、アリーナの外壁は剥がれ落ち、そこから美しい『本当の星空』が姿を現した。）", "", actor=pc) \
         .say("astaroth_6", "「……見事だ。私は……ただ、この閉じられた孵化器を守るだけの、古い部品に過ぎなかったのかもしれないな。」", "", actor=astaroth) \
         .say("astaroth_7_lh", "「……バルガス、ゼク。……そして新しき王よ。この世界の重さを、お前たちが分かち合うというのなら……私は、安心して土へ還ろう。」", "", actor=astaroth) \
@@ -265,7 +268,6 @@ def define_epilogue(builder: DramaBuilder):
 
     # リリィ離反版: 第6幕
     builder.step(act6_lily_hostile) \
-        .play_bgm("BGM/Hopeful_Theme") \
         .say("narr_16", "（アスタロトが完全に消えると、アリーナ全体を覆っていた次元の壁が、ガラスのように砕け散り始める。）", "", actor=pc) \
         .say("narr_17", "（紫紺の虚無が晴れ、その向こうに久しく忘れていた『青空』が広がっていた。）", "", actor=pc) \
         .focus_chara(Actors.BALGAS) \
@@ -308,13 +310,16 @@ def define_epilogue(builder: DramaBuilder):
         .say("zek_f1", "おや、私も混ぜてくださいよ？", "", actor=zek) \
         .complete_quest(QuestIds.LAST_BATTLE) \
         .say("sys_complete", "【巣窟アリーナ】メインストーリークリア！", actor=pc) \
-        .drama_end()
+        .eval("Elin_SukutsuArena.ArenaManager.ShowEndingCredit()") \
+        .unfocus() \
+        .fade_in(duration=0.5, color="black") \
+        .finish()
 
     # ========================================
     # 最悪版: 第5幕（バルガス死亡、リリィ離反）
     # ========================================
     builder.step(act5_worst) \
-        .play_bgm("BGM/Victory_Epilogue") \
+        .play_bgm("BGM/Emotional_Hope") \
         .say("narr_14", "（激闘の末、アスタロトの身体が崩れ始める。王座は砕け、アリーナの外壁は剥がれ落ち、そこから美しい『本当の星空』が姿を現した。）", "", actor=pc) \
         .say("astaroth_6", "「……見事だ。私は……ただ、この閉じられた孵化器を守るだけの、古い部品に過ぎなかったのかもしれないな。」", "", actor=astaroth) \
         .say("astaroth_7_w", "「……ゼク。……そして新しき王よ。この世界の重さを、お前たちが分かち合うというのなら……私は、安心して土へ還ろう。」", "", actor=astaroth) \
@@ -326,7 +331,6 @@ def define_epilogue(builder: DramaBuilder):
 
     # 最悪版: 第6幕
     builder.step(act6_worst) \
-        .play_bgm("BGM/Hopeful_Theme") \
         .say("narr_16", "（アスタロトが完全に消えると、アリーナ全体を覆っていた次元の壁が、ガラスのように砕け散り始める。）", "", actor=pc) \
         .say("narr_17", "（紫紺の虚無が晴れ、その向こうに久しく忘れていた『青空』が広がっていた。）", "", actor=pc) \
         .focus_chara(Actors.ZEK) \
@@ -364,4 +368,7 @@ def define_epilogue(builder: DramaBuilder):
         .say("zek_fw2", "私は……見届けさせてもらいましょう。あなたの選択の結末を。", "", actor=zek) \
         .complete_quest(QuestIds.LAST_BATTLE) \
         .say("sys_complete", "【巣窟アリーナ】メインストーリークリア！", actor=pc) \
-        .drama_end()
+        .eval("Elin_SukutsuArena.ArenaManager.ShowEndingCredit()") \
+        .unfocus() \
+        .fade_in(duration=0.5, color="black") \
+        .finish()

@@ -12,23 +12,13 @@
       "enemies": [
         {
           "charaId": "sukutsu_void_ooze",
-          "level": 1,
+          "level": 35,
           "rarity": "Normal",
           "position": "random",
           "positionX": 0,
           "positionZ": 0,
           "isBoss": false,
-          "count": 3
-        },
-        {
-          "charaId": "sukutsu_void_ooze",
-          "level": 1,
-          "rarity": "Normal",
-          "position": "random",
-          "positionX": 0,
-          "positionZ": 0,
-          "isBoss": true,
-          "count": 2
+          "count": 10
         }
       ],
       "gimmicks": [],
@@ -47,7 +37,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_frost_hound",
-          "level": 1,
+          "level": 45,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -92,7 +82,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_kain_ghost",
-          "level": 1,
+          "level": 100,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -117,7 +107,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_greed",
-          "level": 1,
+          "level": 250,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -162,7 +152,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_crow_shadow",
-          "level": 1,
+          "level": 350,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -172,7 +162,7 @@
         },
         {
           "charaId": "sukutsu_raven_blade",
-          "level": 1,
+          "level": 400,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -182,7 +172,7 @@
         },
         {
           "charaId": "sukutsu_karasu_venom",
-          "level": 1,
+          "level": 450,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -207,7 +197,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_null",
-          "level": 1,
+          "level": 1000,
           "rarity": "Mythical",
           "position": "random",
           "positionX": 0,
@@ -232,7 +222,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_shadow_self",
-          "level": 1,
+          "level": 2500,
           "rarity": "Mythical",
           "position": "random",
           "positionX": 0,
@@ -257,7 +247,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_balgas_prime",
-          "level": 1,
+          "level": 4000,
           "rarity": "Mythical",
           "position": "random",
           "positionX": 0,
@@ -282,7 +272,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_astaroth",
-          "level": 1,
+          "level": 50000,
           "rarity": "Mythical",
           "position": "random",
           "positionX": 0,
@@ -309,7 +299,7 @@
       "enemies": [
         {
           "charaId": "wolf",
-          "level": 1,
+          "level": 5,
           "rarity": "Normal",
           "position": "random",
           "positionX": 0,
@@ -334,7 +324,7 @@
       "enemies": [
         {
           "charaId": "centaur",
-          "level": 1,
+          "level": 15,
           "rarity": "Superior",
           "position": "random",
           "positionX": 0,
@@ -359,7 +349,7 @@
       "enemies": [
         {
           "charaId": "minotaur",
-          "level": 1,
+          "level": 25,
           "rarity": "Superior",
           "position": "random",
           "positionX": 0,
@@ -384,7 +374,7 @@
       "enemies": [
         {
           "charaId": "dragon",
-          "level": 1,
+          "level": 40,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -409,7 +399,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_balgas_training",
-          "level": 1,
+          "level": 200,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -434,7 +424,7 @@
       "enemies": [
         {
           "charaId": "gladiator",
-          "level": 1,
+          "level": 100,
           "rarity": "Superior",
           "position": "random",
           "positionX": 0,
@@ -444,7 +434,7 @@
         },
         {
           "charaId": "gladiator",
-          "level": 1,
+          "level": 80,
           "rarity": "Normal",
           "position": "random",
           "positionX": 0,
@@ -491,23 +481,13 @@
       "enemies": [
         {
           "charaId": "sukutsu_void_ooze",
-          "level": 1,
+          "level": 35,
           "rarity": "Normal",
           "position": "random",
           "positionX": 0,
           "positionZ": 0,
           "isBoss": false,
-          "count": 3
-        },
-        {
-          "charaId": "sukutsu_void_ooze",
-          "level": 1,
-          "rarity": "Normal",
-          "position": "random",
-          "positionX": 0,
-          "positionZ": 0,
-          "isBoss": true,
-          "count": 2
+          "count": 10
         }
       ],
       "gimmicks": [],
@@ -526,7 +506,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_frost_hound",
-          "level": 1,
+          "level": 45,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -571,7 +551,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_kain_ghost",
-          "level": 1,
+          "level": 100,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -596,7 +576,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_greed",
-          "level": 1,
+          "level": 250,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -641,7 +621,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_crow_shadow",
-          "level": 1,
+          "level": 350,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -651,7 +631,7 @@
         },
         {
           "charaId": "sukutsu_raven_blade",
-          "level": 1,
+          "level": 400,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -661,7 +641,7 @@
         },
         {
           "charaId": "sukutsu_karasu_venom",
-          "level": 1,
+          "level": 450,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -686,7 +666,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_null",
-          "level": 1,
+          "level": 1000,
           "rarity": "Mythical",
           "position": "random",
           "positionX": 0,
@@ -711,7 +691,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_shadow_self",
-          "level": 1,
+          "level": 2500,
           "rarity": "Mythical",
           "position": "random",
           "positionX": 0,
@@ -736,7 +716,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_balgas_prime",
-          "level": 1,
+          "level": 4000,
           "rarity": "Mythical",
           "position": "random",
           "positionX": 0,
@@ -761,7 +741,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_astaroth",
-          "level": 1,
+          "level": 50000,
           "rarity": "Mythical",
           "position": "random",
           "positionX": 0,
@@ -786,7 +766,7 @@
       "enemies": [
         {
           "charaId": "wolf",
-          "level": 1,
+          "level": 5,
           "rarity": "Normal",
           "position": "random",
           "positionX": 0,
@@ -811,7 +791,7 @@
       "enemies": [
         {
           "charaId": "centaur",
-          "level": 1,
+          "level": 15,
           "rarity": "Superior",
           "position": "random",
           "positionX": 0,
@@ -836,7 +816,7 @@
       "enemies": [
         {
           "charaId": "minotaur",
-          "level": 1,
+          "level": 25,
           "rarity": "Superior",
           "position": "random",
           "positionX": 0,
@@ -861,7 +841,7 @@
       "enemies": [
         {
           "charaId": "dragon",
-          "level": 1,
+          "level": 40,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -886,7 +866,7 @@
       "enemies": [
         {
           "charaId": "sukutsu_balgas_training",
-          "level": 1,
+          "level": 200,
           "rarity": "Legendary",
           "position": "random",
           "positionX": 0,
@@ -911,7 +891,7 @@
       "enemies": [
         {
           "charaId": "gladiator",
-          "level": 1,
+          "level": 100,
           "rarity": "Superior",
           "position": "random",
           "positionX": 0,
@@ -921,7 +901,7 @@
         },
         {
           "charaId": "gladiator",
-          "level": 1,
+          "level": 80,
           "rarity": "Normal",
           "position": "random",
           "positionX": 0,
@@ -991,7 +971,7 @@
       "enemies": [
         {
           "charaId": "dragon",
-          "level": 1,
+          "level": 100,
           "rarity": "Mythical",
           "position": "random",
           "positionX": 0,
@@ -1016,7 +996,7 @@
       "enemies": [
         {
           "charaId": "goblin",
-          "level": 1,
+          "level": 10,
           "rarity": "Normal",
           "position": "random",
           "positionX": 0,
@@ -1041,7 +1021,7 @@
       "enemies": [
         {
           "charaId": "putty",
-          "level": 1,
+          "level": 5,
           "rarity": "Normal",
           "position": "random",
           "positionX": 0,

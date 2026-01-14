@@ -564,6 +564,14 @@ class DramaBuilder:
         })
         return self
 
+    def eval(self, code: str, actor: Union[str, DramaActor] = None) -> 'DramaBuilder':
+        """C#コードを実行"""
+        entry = {'action': 'eval', 'param': code}
+        if actor:
+            entry['actor'] = self._resolve_key(actor)
+        self.entries.append(entry)
+        return self
+
     def _add_validation_error(self, message: str) -> None:
         """検証エラーを追加"""
         if not hasattr(self, '_validation_errors'):
@@ -1065,6 +1073,15 @@ class DramaBuilder:
         self.entries.append({'action': 'focusChara', 'param': chara_id})
         if wait_after > 0:
             self.entries.append({'action': 'wait', 'param': str(wait_after)})
+        return self
+
+    def unfocus(self) -> 'DramaBuilder':
+        """
+        カメラフォーカスを解除（PCに戻す）
+
+        ドラマ終了前に呼び出すことで、画面固定を防ぐ
+        """
+        self.entries.append({'action': 'unfocus'})
         return self
 
     # ============================================================================

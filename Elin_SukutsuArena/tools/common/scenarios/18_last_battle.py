@@ -49,14 +49,7 @@ def define_last_battle(builder: DramaBuilder):
     # 選択肢分岐ラベル（通常版用）
     act3_allies_protect = builder.label("act3_allies_protect")
     act3_take_all = builder.label("act3_take_all")
-    act5 = builder.label("act5_victory")
-    act6 = builder.label("act6_return")
-    ending_choice = builder.label("ending_choice")
-    ending_a_rescue = builder.label("ending_a_rescue")  # 連れ出し
-    ending_b_inherit = builder.label("ending_b_inherit")  # 継承
-    ending_c_usurp = builder.label("ending_c_usurp")  # 簒奪
-    epilogue = builder.label("epilogue")
-    finale = builder.label("finale")
+    # 注: act5〜finale は 19_epilogue.py に移動済み（重複を避けるため削除）
 
     # ========================================
     # 第1幕: 決戦前夜
@@ -213,113 +206,8 @@ def define_last_battle(builder: DramaBuilder):
         .start_battle_by_stage("final_astaroth", master_id="sukutsu_arena_master") \
         .finish()
 
-    # ========================================
-    # 第5幕: 終焉と、はじまり
-    # ========================================
-    builder.step(act5) \
-        .play_bgm("BGM/Victory_Epilogue") \
-        .say("narr_14", "（激闘の末、アスタロトの身体が崩れ始める。王座は砕け、アリーナの外壁は剥がれ落ち、そこから美しい『本当の空』が姿を現した。）", "", actor=pc) \
-        .say("astaroth_6", "……見事だ。私は……ただ、この閉じられた孵化器を守るだけの、古い部品に過ぎなかったのかもしれないな。", "", actor=astaroth) \
-        .say("astaroth_7", "……リリィ、バルガス、ゼク。……そして新しき王よ。この世界の重さを、お前たちが分かち合うというのなら……私は、安心して土へ還ろう。", "", actor=astaroth) \
-        .say("narr_15", "（アスタロトが柔らかな光となって霧散していく。）", "", actor=pc) \
-        .focus_chara(Actors.ZEK) \
-        .say("zek_12", "……やれやれ。これほどの損失（コスト）を出して、得られた利益は『自由』だけですか。……悪くない取引でしたね。", "", actor=zek) \
-        .focus_chara(Actors.BALGAS) \
-        .say("balgas_5", "ケッ、重てえな。だが、一人で背負うよりはマシだ。……おい、次はどこの酒場へ行く？", "", actor=balgas) \
-        .focus_chara(Actors.LILY) \
-        .say("lily_4", "……リリィ、と呼んでくださいね。アリーナはなくなりました。でも、私たちの旅は、これから始まるのですから。", "", actor=lily) \
-        .jump(act6)
-
-    # ========================================
-    # 第6幕: 帰還の道
-    # ========================================
-    builder.step(act6) \
-        .play_bgm("BGM/Hopeful_Theme") \
-        .say("narr_16", "（アスタロトが消えた瞬間、アリーナ全体を覆っていた次元の壁が、ガラスのように砕け散り始める。）", "", actor=pc) \
-        .focus_chara(Actors.BALGAS) \
-        .say("balgas_6", "……おい、見ろ。あれは……", "", actor=balgas) \
-        .say("narr_18", "（崩れゆく次元の境界線の中に、一筋の光の階段が浮かび上がる。それは地上へと続く、帰還の道だ。）", "", actor=pc) \
-        .focus_chara(Actors.LILY) \
-        .say("lily_5", "……そういえば、あなたが初めてここに来た時、私は言いましたね。『ここから出る方法はただ一つ』と。", "", actor=lily) \
-        .say("lily_6", "その答えがこれです。……グランドマスターを倒し、この異次元の牢獄そのものを破壊すること。それが、唯一の『出口』でした。", "", actor=lily) \
-        .say("lily_7", "でも……もう、誰もここに閉じ込められることはありません。この道は、地上と、かつてのアリーナ跡を繋ぐ『自由な通路』になるでしょう。行きたい者は行き、留まりたい者は留まる。……それが、あなたが勝ち取った『解放』です。", "", actor=lily) \
-        .focus_chara(Actors.BALGAS) \
-        .say("balgas_7", "……おい、鴉。いや、屠竜者。お前、この先どうする？ 地上に戻るか？ それとも……", "", actor=balgas) \
-        .jump(ending_choice)
-
-    # ========================================
-    # エンディング選択
-    # ========================================
-    builder.step(ending_choice) \
-        .choice(ending_a_rescue, "皆を連れて、イルヴァへ行こう", "", text_id="ending_a_rescue") \
-        .choice(ending_b_inherit, "ここに残って、アリーナを作り直す", "", text_id="ending_b_inherit") \
-        .choice(ending_c_usurp, "俺は……一人で行く", "", text_id="ending_c_usurp")
-
-    # エンディングA: 連れ出し（皆を連れてイルヴァへ）
-    builder.step(ending_a_rescue) \
-        .focus_chara(Actors.LILY) \
-        .say("lily_ea1", "……！ 本当に……私を、連れて行ってくれるの？", "", actor=lily) \
-        .say("lily_ea2", "あなたとの契約を通じて、私も……初めて『帰る場所』を持てるのね。ありがとう……本当に、ありがとう。", "", actor=lily) \
-        .focus_chara(Actors.BALGAS) \
-        .say("balgas_ea1", "……ケッ、35年ぶりの故郷か。カインの魂も、これでやっと解放してやれる。", "", actor=balgas) \
-        .say("balgas_ea2", "おい、屠竜者……いや、もうそう呼ぶのも野暮か。……ありがとうな。", "", actor=balgas) \
-        .focus_chara(Actors.ZEK) \
-        .say("zek_ea1", "ふむ、私は……もう少しここに残りましょう。アルカディアの技術者として、この次元の安定化を見届ける義務がありますからね。", "", actor=zek) \
-        .say("zek_ea2", "……また会いましょう。私の最高傑作が、どんな人生を歩むのか、記録させてもらいますよ。", "", actor=zek) \
-        .set_flag(Keys.ENDING, FlagValues.Ending.RESCUE) \
-        .jump(epilogue)
-
-    # エンディングB: 継承（アリーナを純粋な闘技場として再建）
-    builder.step(ending_b_inherit) \
-        .focus_chara(Actors.LILY) \
-        .say("lily_eb1", "……ふふ、あなたらしいですね。この場所にも、居場所を必要とする者がいますから。", "", actor=lily) \
-        .say("lily_eb2", "私も残ります。あなたが新しいグランドマスターなら、私は……受付嬢ではなく、『伴侶』として支えさせてください。", "", actor=lily) \
-        .focus_chara(Actors.BALGAS) \
-        .say("balgas_eb1", "ハッ、そうこなくちゃな。『神の孵化場』はもう終わりだ。これからは、自分の意志で戦いたい奴だけが来る場所にする。", "", actor=balgas) \
-        .say("balgas_eb2", "俺は引退済みだが……まあ、若い奴らの相談役くらいはやってやるさ。", "", actor=balgas) \
-        .focus_chara(Actors.ZEK) \
-        .say("zek_eb1", "ふむ、それなら私が商店街を取り仕切りましょう。アルカディアの技術と、各次元の品物……ククッ、繁盛しそうですね。", "", actor=zek) \
-        .set_flag(Keys.ENDING, FlagValues.Ending.INHERIT) \
-        .jump(epilogue)
-
-    # エンディングC: 簒奪（裏切りルート・孤独な王）
-    builder.step(ending_c_usurp) \
-        .focus_chara(Actors.LILY) \
-        .say("lily_ec1", "……そう。あなたは……そういう人だったのね。", "", actor=lily) \
-        .say("lily_ec2", "私はもう、あなたについていけない。……さようなら。", "", actor=lily) \
-        .say("narr_ec1", "（リリィが背を向け、去っていく。）", "", actor=pc) \
-        .focus_chara(Actors.BALGAS) \
-        .say("balgas_ec1", "……お前は俺が育てた英雄じゃない。ただの、勝利に飢えた獣だ。", "", actor=balgas) \
-        .say("balgas_ec2", "俺はここで、カインと共に眠る。……もう、お前の顔は見たくねえ。", "", actor=balgas) \
-        .say("narr_ec2", "（バルガスが背を向け、去っていく。）", "", actor=pc) \
-        .focus_chara(Actors.ZEK) \
-        .say("zek_ec1", "……クク。孤独な王の誕生ですか。それもまた、一つの『作品』ですね。", "", actor=zek) \
-        .say("zek_ec2", "私は……見届けさせてもらいましょう。孤独がどれほど重いか、記録するために。", "", actor=zek) \
-        .say("narr_ec3", "（ゼクが影の中へ消える。）", "", actor=pc) \
-        .set_flag(Keys.ENDING, FlagValues.Ending.USURP) \
-        .jump(epilogue)
-
-    # ========================================
-    # エピローグ
-    # ========================================
-    builder.step(epilogue) \
-        .play_bgm("BGM/Credits") \
-        .say("narr_19", "（プレイヤーが光の階段を一歩踏み出すと、足元に温かな地上の風が吹き抜ける。）", "", actor=pc) \
-        .say("narr_20", "（遠くに見えるのは、緑の大地と、穏やかな街の灯。）", "", actor=pc) \
-        .say("narr_21", "かつて、異次元の闘技場に迷い込んだ一人の冒険者がいた。彼（彼女）は、絶望の底で友を得て、魂を賭けて戦い、ついには神をも超える存在となった。そして今、解放された魂は、新たな物語を紡ぎ始めるーー", "", actor=pc) \
-        .jump(finale)
-
-    # ========================================
-    # スタッフロール後
-    # ========================================
-    builder.step(finale) \
-        .play_bgm("BGM/Cheerful_Theme") \
-        .say("balgas_f1", "……おい、いつまで感傷に浸ってんだ。次は俺の奢りで、地上で一番うまい酒を飲みに行くぞ！", "", actor=balgas) \
-        .say("lily_f1", "ふふ、楽しみです。……リリィとして、初めての『デート』ですから。", "", actor=lily) \
-        .say("zek_f1", "おや、私も混ぜてくださいよ。……商談という名の、ね。", "", actor=zek) \
-        .complete_quest(QuestIds.LAST_BATTLE) \
-        .say("sys_complete", "【システム】クエスト『最終決戦』をクリアしました！", "") \
-        .finish()
+    # 注: act5〜finale（エピローグ）は 19_epilogue.py に移動済み
+    # 勝利後は add_last_battle_result_steps で drama_epilogue に遷移する
 
     # ========================================
     # バルガス死亡版: 第1幕

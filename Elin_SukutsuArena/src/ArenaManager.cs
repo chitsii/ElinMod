@@ -238,7 +238,8 @@ namespace Elin_SukutsuArena
                 const int featId = 10001; // featArenaSpirit
 
                 // フィートを設定（既存の場合はレベルアップ）
-                pc.elements.SetBase(featId, level);
+                // SetFeatを使用することでfeat.Apply()が呼ばれ、活力ボーナスが適用される
+                pc.SetFeat(featId, level, msg: false);
 
                 // 活力ボーナスを計算
                 int vigorBonus = level <= 5 ? level * 5 : (level == 6 ? 30 : 40);
@@ -543,6 +544,57 @@ namespace Elin_SukutsuArena
         public static void Makuma2ChooseKnowledge()
         {
             Debug.Log("[SukutsuArena] Makuma2: Chose knowledge");
+        }
+
+        /// <summary>
+        /// エンディングクレジットを表示
+        /// Dialog.Confettiを使用した華やかなダイアログ
+        /// </summary>
+        public static void ShowEndingCredit()
+        {
+            var storage = Core.ArenaContext.I?.Storage;
+            if (storage == null)
+            {
+                Debug.LogError("[SukutsuArena] ShowEndingCredit: Storage is null");
+                return;
+            }
+
+            // エンディングタイプを取得
+            int endingType = storage.GetInt("chitsii.arena.ending", -1);
+            bool balgasKilled = storage.GetInt("chitsii.arena.balgas_killed", 0) == 1;
+            bool lilyHostile = storage.GetInt("chitsii.arena.lily_hostile", 0) == 1;
+
+            // エンド名を決定
+            string endingName;
+            if (balgasKilled && lilyHostile)
+            {
+                endingName = "孤独エンド";
+            }
+            else if (endingType == 0) // RESCUE
+            {
+                endingName = "解放エンド";
+            }
+            else if (endingType == 1) // INHERIT
+            {
+                endingName = "継承エンド";
+            }
+            else
+            {
+                endingName = "エンディング";
+            }
+
+            string title = $"～{endingName}～";
+            string detail = "巣窟アリーナ\nメインストーリー完結\n\n" +
+                            "制作: chitsii\n" +
+                            "連絡先: X @chitsii";
+
+            // ドラマ終了後に遅延してダイアログを表示（レイヤー競合回避）
+            // 1.5秒待機: finish() + fade_in(0.5s) + GraphicRaycaster有効化(0.3s)を確実に待つ
+            DOVirtual.DelayedCall(1.5f, () =>
+            {
+                Dialog.Ok($"{title}\n\n{detail}");
+            });
+            Debug.Log($"[SukutsuArena] ShowEndingCredit: {endingName}");
         }
     }
 }

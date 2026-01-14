@@ -150,8 +150,7 @@ RANK_UP_STAGES: Dict[str, BattleStage] = {
         reward_plat=5,
         enemies=[
             # 虚空のウーズ：混沌ブレスを吐くスライム群
-            EnemyConfig("sukutsu_void_ooze", level=15, count=3),
-            EnemyConfig("sukutsu_void_ooze", level=20, count=2, is_boss=True),
+            EnemyConfig("sukutsu_void_ooze", level=35, count=10),
         ],
         description_jp="混沌の落とし子たち——彼らのブレスは魂を蝕む。耐性なくして生き残れない。",
         description_en="Children of Chaos—their breath corrodes the soul. Without resistance, you cannot survive.",

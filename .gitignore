@@ -77,3 +77,7 @@ crashlytics-build.properties
 Elin_SukutsuArena/.claude/logs/subagent-history.jsonl
 Elin_SukutsuArena/.claude/state/session.json
 Elin_SukutsuArena/.claude/state/tooling-policy.json
+
+
+**/tmpclaude-*-cwd
+**/.claude/*
