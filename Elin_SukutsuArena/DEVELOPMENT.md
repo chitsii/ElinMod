@@ -217,6 +217,119 @@ uv run python builder/validate_scenario_flags.py
 
 ドラマファイルで使用されるフラグがC#側で定義されているか検証。
 
+## ドラマ開発サイクル
+
+### 概要
+
+ドラマ（会話/イベント）の開発は以下のサイクルで行う：
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  1. シナリオ編集                                         │
+│     tools/common/scenarios/*.py を編集                   │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────┐
+│  2. ビルド                                               │
+│     build.bat 実行                                       │
+│     - 初回: Excelバックアップ作成                        │
+│     - 2回目以降: バックアップ保持（参照を維持）          │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────┐
+│  3. 差分確認                                             │
+│     ビルド完了時に自動表示:                              │
+│     - [CHANGED] 変更されたファイル                       │
+│     - 具体的なセル変更内容                               │
+└─────────────────────────────────────────────────────────┘
+                          ↓
+          ┌────────────┴────────────┐
+          ↓                         ↓
+    変更が意図通り            変更に問題あり
+          ↓                         ↓
+┌─────────────────┐    ┌─────────────────────────────────┐
+│  4a. 確定        │    │  4b. 修正                        │
+│  clean コマンド  │    │  シナリオを修正して再ビルド      │
+│  で参照を更新    │    │  （バックアップは保持される）    │
+└─────────────────┘    └─────────────────────────────────┘
+```
+
+### Excel差分管理コマンド
+
+ビルド時のExcel差分は `tools/builder/excel_diff_manager.py` で管理される。
+
+| コマンド | 動作 |
+|---------|------|
+| `backup` | バックアップがなければ作成（既存時スキップ） |
+| `backup --force` | 強制的にバックアップを上書き |
+| `diff` | バックアップとの差分を表示 |
+| `clean` | バックアップを削除（次回ビルドで新規作成） |
+
+### 使用例
+
+```bash
+cd tools
+
+# 手動で差分確認
+uv run python builder/excel_diff_manager.py diff
+
+# 修正完了後、バックアップを更新
+uv run python builder/excel_diff_manager.py clean
+
+# 強制的にバックアップを現在の状態に更新
+uv run python builder/excel_diff_manager.py backup --force
+```
+
+### 差分出力の読み方
+
+```
+--- Excel Changes ---
+[CHANGED] LangMod\JP\Dialog\Drama\drama_sukutsu_arena_master.xlsx
+  [sukutsu_arena_master] Row 45, Col D: '古いテキスト' -> '新しいテキスト'
+  [sukutsu_arena_master] Row 46, Col E: '' -> 'invoke_SomethingNew'
+  ... and 3 more changes
+[NEW] LangMod\JP\Dialog\Drama\drama_new_scenario.xlsx
+
+[Excel Diff] 1 changed, 1 new (of 37 tracked)
+```
+
+| 表示 | 意味 |
+|------|------|
+| `[CHANGED]` | 内容が変更されたファイル |
+| `[NEW]` | 新規追加されたファイル |
+| `[DELETED]` | 削除されたファイル |
+| `Sheets added` | 新しく追加されたシート |
+| `Sheets removed` | 削除されたシート |
+
+### 開発フローの例
+
+**新機能追加時:**
+```bash
+# 1. シナリオを編集
+# 2. ビルド（初回、バックアップ作成）
+build.bat
+
+# 3. 差分を確認 → 意図した変更か確認
+# 4. 問題があれば修正して再ビルド
+#    （バックアップは保持されるので、元の状態との比較が継続）
+build.bat
+
+# 5. 完了したらバックアップをクリア
+cd tools && uv run python builder/excel_diff_manager.py clean
+```
+
+**バグ修正時:**
+```bash
+# 1. 現在の正しい状態でバックアップを強制作成
+cd tools && uv run python builder/excel_diff_manager.py backup --force
+
+# 2. シナリオを修正
+# 3. ビルドして差分確認
+build.bat
+
+# 4. 修正箇所のみ変更されていることを確認
+```
+
 ## カスタムアイテム作成のハマりどころ
 
 ### SourceStat（カスタムCondition）
@@ -372,3 +485,113 @@ public class TraitSukutsuItem : TraitDrink
 
 **次のステップ**:
 - カスタムチップ画像を正式な規格で作成後に再テスト
+
+## 他Modの調査方法
+
+### Excel構造の調査
+
+他ModのExcelファイル構造を調査する際は、openpyxlを使用する。
+
+```bash
+cd tools
+uv run python -c "
+import openpyxl
+
+# 調査対象のExcelファイル
+excel_path = 'C:/path/to/target/Mod/LangMod/EN/Custom_Zone.xlsx'
+wb = openpyxl.load_workbook(excel_path)
+
+print(f'Sheets: {wb.sheetnames}')
+for sheet_name in wb.sheetnames:
+    ws = wb[sheet_name]
+    print(f'\\n--- Sheet: {sheet_name} ---')
+    for row_idx, row in enumerate(ws.iter_rows(max_row=5, values_only=True), 1):
+        print(f'Row {row_idx}: {row}')
+"
+```
+
+**出力例**:
+```
+Sheets: ['Zone']
+
+--- Sheet: Zone ---
+Row 1: ('id', 'parent', 'name_JP', 'name', 'type', ...)  # ヘッダー
+Row 2: ('string', 'string', 'string', 'string', ...)    # 型定義
+Row 3: (None, None, None, None, 'Zone', 1, ...)         # デフォルト値
+Row 4: ('my_zone', 'ntyris', '私のゾーン', ...)         # データ行
+```
+
+**今後の検討**: 汎用的なExcel調査ツールとして `tools/utils/inspect_excel.py` に切り出す
+
+### DLLの逆コンパイル
+
+他ModのDLLを逆コンパイルして実装を調査する際は、dnfileライブラリを使用する。
+
+#### 必要パッケージのインストール
+
+```bash
+cd tools
+uv pip install dnfile
+```
+
+#### 基本的な調査スクリプト
+
+```bash
+cd tools
+uv run python -c "
+import dnfile
+
+dll_path = 'C:/path/to/target/Mod/CustomMod.dll'
+pe = dnfile.dnPE(dll_path)
+
+if pe.net and pe.net.mdtables:
+    # 型定義の一覧
+    print('=== Types ===')
+    if pe.net.mdtables.TypeDef:
+        for row in pe.net.mdtables.TypeDef:
+            ns = row.TypeNamespace.value if row.TypeNamespace else ''
+            name = row.TypeName.value if row.TypeName else ''
+            extends = ''
+            if row.Extends:
+                try:
+                    if hasattr(row.Extends.row, 'TypeName'):
+                        extends = row.Extends.row.TypeName.value
+                except:
+                    pass
+            if name and not name.startswith('<'):
+                print(f'  {ns}.{name} : {extends}')
+
+    # メソッド一覧
+    print('\\n=== Methods ===')
+    if pe.net.mdtables.MethodDef:
+        for row in pe.net.mdtables.MethodDef[:30]:
+            name = row.Name.value if row.Name else ''
+            if name and not name.startswith('.'):
+                print(f'  {name}')
+"
+```
+
+**出力例**:
+```
+=== Types ===
+  YumuAcademyZone.YumuAcademyPlugin : BaseUnityPlugin
+  YumuAcademyZone.Zone_yumu_academy : Zone_Civilized
+  YumuAcademyZone.Zone_mining_town_NK : Zone_Civilized
+
+=== Methods ===
+  Awake
+  get_ShouldRegenerate
+  get_RestrictBuild
+  get_pathExport
+```
+
+#### 調査でわかること
+
+- **名前空間とクラス名**: Mod内で定義されている型
+- **基底クラス**: `Zone_Civilized`, `BaseUnityPlugin` など
+- **オーバーライドされているプロパティ**: `get_XXX` メソッドとして表示
+- **カスタムメソッド**: Awake, OnGenerateMap など
+
+**注意**: dnfileは.NETメタデータを解析するのみ。IL命令の詳細な解析にはILSpyなどのGUIツールが必要。
+
+**今後の検討**: 汎用的なDLL調査ツールとして `tools/utils/inspect_dll.py` に切り出す

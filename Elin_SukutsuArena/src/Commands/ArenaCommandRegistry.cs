@@ -37,7 +37,9 @@ namespace Elin_SukutsuArena.Commands
 
             Register(new CheckQuestAvailableCommand());
             Register(new CheckAvailableQuestsCommand());
+            Register(new CheckQuestsForDispatchCommand());
             Register(new StartQuestCommand());
+            Register(new StartDramaCommand());
             Register(new CompleteQuestCommand());
             Register(new IfFlagCommand());
             Register(new SwitchFlagCommand());

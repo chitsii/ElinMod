@@ -94,7 +94,7 @@ def define_lily_real_name(builder: DramaBuilder):
     builder.step(scene2) \
         .play_bgm("BGM/Lily_Seductive_Danger") \
         .say("narr_5", "（リリィはあなたの至近距離まで歩み寄り、その冷たいはずの指先であなたの胸元に触れた。）", "", actor=pc) \
-        .say("narr_6", "（そこには「黄金の戦鬼」としての力強い鼓動が刻まれている。）", "", actor=pc) \
+        .say("narr_6", "（そこには「戦鬼」としての力強い鼓動が刻まれている。）", "", actor=pc) \
         .say("lily_5", "私は、このアリーナに囚われた魂が、絶望に染まり、最後の一滴まで絞り出されるのを見届けるのが役割でした。", "", actor=lily) \
         .say("lily_6", "……あなたも、その一人になるはずだった。", "", actor=lily) \
         .say("lily_7", "けれど、あなたは強くなるほどに優しく、孤独になるほどに誰かの手を握ろうとした。", "", actor=lily) \

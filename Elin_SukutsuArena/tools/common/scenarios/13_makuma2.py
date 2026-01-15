@@ -72,17 +72,14 @@ def define_makuma2(builder: DramaBuilder):
         .say("narr_2", "（それは観客の喝采によるものではなく、あなたの強大すぎる存在感に、異次元の構造自体が悲鳴を上げているのだ。）", "", actor=pc) \
         .say("narr_3", "（リリィはカウンターの奥で、幾重にも重なった複雑な魔法幾何学の設計図と格闘していた。）", "", actor=pc) \
         .say("narr_4", "（彼女の瞳には、これまでにない焦燥と、それ以上の『愉悦』が宿っている。）", "", actor=pc) \
-        .say("lily_1", "……あぁ、困りました。あなたの魂が放つ『重力』が、このアリーナの許容量を超え始めています。", "", actor=lily) \
-        .say("lily_2", "このままでは、次の昇格試験を迎える前に、この空間ごと虚無の彼方へ霧散してしまうわ。", "", actor=lily) \
+        .say("lily_1", "……あぁ、困りました。あなたの魂が放つオーラが、このアリーナの空間構造を揺るがしています。", "", actor=lily) \
+        .say("lily_2", "このままでは、次の昇格試験を迎える前に、この空間が壊れて、私たちは虚無に投げ出されてしまうわ。", "", actor=lily) \
         .say("narr_5", "（彼女は設計図をあなたの前に広げる。）", "", actor=pc) \
-        .say("lily_3", "そこで、あなたの手でこれを作りなさい。アリーナの動力源を安定させるための楔……**『虚空の心臓（ヴォイド・コア）』**を。", "", actor=lily) \
-        .say("lily_4", "これは単なる機械でも石細工でもありません。あなたの『魔力』と『技術』、そしてこのアリーナに満ちる『死者の嘆き』を一つに鋳造する、究極の工芸品です。", "", actor=lily) \
-        .say("lily_5", "『高品質な宝石』、『エーテルの結晶』、そしてゼクの店に並ぶ**『星の断片』**……。これらを『宝石細工』または『機械製作』の極致で練り上げ、一つの心臓として拍動させなさい。", "", actor=lily) \
-        .say("lily_6", "……ふふ、これが完成した時、あなたはこの場所と文字通り『一心同体』になる。ランクAへの道は、そこからしか開かれません。", "", actor=lily) \
+        .say("lily_3", "だから、補修に協力して頂けますか？アリーナを安定させるための楔……『虚空の心臓』と呼んでいます。", "", actor=lily) \
         .jump(choice1)
 
     # プレイヤーの選択肢
-    builder.choice(react1_accept, "分かった。作ろう", "", text_id="c1_accept") \
+    builder.choice(react1_accept, "分かった。一緒に作ろう", "", text_id="c1_accept") \
            .choice(react1_soul, "俺の魂がアリーナを壊すのか……？", "", text_id="c1_soul") \
            .choice(react1_silent, "（無言で設計図を見つめる）", "", text_id="c1_silent")
 
@@ -92,11 +89,11 @@ def define_makuma2(builder: DramaBuilder):
         .jump(check_bottle)
 
     builder.step(react1_soul) \
-        .say("lily_r2", "ええ。あなたは既に、この異次元の限界を超え始めています。", "", actor=lily) \
+        .say("lily_r2", "ええ。あなたの力は既に、この異次元の限界を超え始めています。", "", actor=lily) \
         .jump(check_bottle)
 
     builder.step(react1_silent) \
-        .say("lily_r3", "……難しそうに見えますが、あなたなら作れます。信じていますよ。", "", actor=lily) \
+        .say("lily_r3", "……難しそうに見えますが、私が作りますから、大丈夫ですよ。", "", actor=lily) \
         .jump(check_bottle)
 
     # ========================================
@@ -194,13 +191,16 @@ def define_makuma2(builder: DramaBuilder):
         .say("lily_check", "……さて、素材はお持ちですか？", "", actor=lily)
 
     # 条件付き選択肢: 両方の素材を持っている場合のみ「渡す」が表示される
-    builder.choice_if(has_materials, "素材を渡す（心臓×1、ルーンモールド×1）", "hasItem,heart&hasItem,rune_mold", text_id="c_give_materials") \
+    # Note: CWLでは & での条件結合をサポートしていないため、if と if2 を別々に使用
+    builder.choice_if2(has_materials, "素材を渡す（心臓×1、ルーンモールド×1）",
+                       "hasItem,heart", "hasItem,rune_mold_earth",
+                       text_id="c_give_materials") \
            .choice(no_materials, "まだ揃っていない", "", text_id="c_no_materials")
 
     # 素材あり → 消費して製作へ
     builder.step(has_materials) \
         .cs_eval("var heart = EClass.pc.things.Find(t => t.id == \"heart\"); if(heart != null) heart.Destroy();") \
-        .cs_eval("var mold = EClass.pc.things.Find(t => t.id == \"rune_mold\"); if(mold != null) mold.Destroy();") \
+        .cs_eval("var mold = EClass.pc.things.Find(t => t.id == \"rune_mold_earth\"); if(mold != null) mold.Destroy();") \
         .say("lily_take", "……ありがとうございます。優秀ですこと。", "", actor=lily) \
         .jump(crafting_complete)
 
@@ -218,7 +218,7 @@ def define_makuma2(builder: DramaBuilder):
         .say("narr_20_1", "（彼女は素材に指先を当て、何やら呪文を唱え始める。）", "", actor=pc) \
         .say("narr_20_2", "（心臓とルーンの鋳型が淡く光り、徐々に融合していく。）", "", actor=pc) \
         .say("narr_20_3", "（数分後、淡い青白い光を放つ、拳大の結晶が完成した。）", "", actor=pc) \
-        .say("lily_craft", "……完成です。『虚空の心臓』。これがあれば、アスタロトの領域にも踏み込めるでしょう。", "", actor=lily) \
+        .say("lily_craft", "……これが『虚空の心臓』。稼働させるには、まだ調整が必要ですが。私が調整する間、少しお待ち下さいね。", "", actor=lily) \
         .jump(scene3)
 
     # ========================================
@@ -227,10 +227,10 @@ def define_makuma2(builder: DramaBuilder):
     builder.step(scene3) \
         .play_bgm("BGM/Ominous_Suspense_01") \
         .focus_chara(Actors.BALGAS) \
-        .say("narr_21", "（リリィとの打ち合わせを終え、素材を探しに出ようとするあなたの腕を、酒臭い、しかし岩のように力強い手が掴んだ。）", "", actor=pc) \
+        .say("narr_21", "（リリィの調整を待つ間、あなたがアリーナのロビーを歩いていると、酒臭い、しかし岩のように力強い手があなたの腕を掴んだ。）", "", actor=pc) \
         .say("narr_22", "（バルガスだ。彼はあなたを人気の無い柱の影へと引きずり込み、周囲を警戒しながら低く、掠れた声で話し始めた。）", "", actor=pc) \
-        .say("balgas_1", "……おい、待て。リリィに言われるがまま、ゼクの店へ行くつもりか？", "", actor=balgas) \
-        .say("balgas_2", "最近のお前は、あいつの吐く『毒』を飲みすぎだ。ヌルの記憶チップだの、世界のバグだの……ゼクが語る『真実』ってのはな、お前の足を止めるための泥濘（ぬかるみ）なんだよ。", "", actor=balgas) \
+        .say("balgas_1", "……おい、待て。最近、ゼクの野郎とよく話してるようだな。", "", actor=balgas) \
+        .say("balgas_2", "お前は、あいつの吐く『毒』を飲みすぎだ。ヌルの記憶チップだの、世界のバグだの……ゼクが語る『真実』ってのはな、お前の足を止めるための泥濘（ぬかるみ）なんだよ。", "", actor=balgas) \
         .say("balgas_3", "あいつはな、ただの商人じゃねえ。……『剥製師（はくせいし）』なんだ。", "", actor=balgas) \
         .say("balgas_4", "英雄が絶望し、魂が折れる瞬間を待っている。そして、その『最も美しい瞬間』を切り取って、永遠にコレクションしやがる。", "", actor=balgas) \
         .say("balgas_5", "カインの時もそうだ……あいつはただ、お前が友を裏切るかどうかをニヤニヤしながら見てたんだよ。", "", actor=balgas) \
@@ -312,18 +312,17 @@ def define_makuma2(builder: DramaBuilder):
         .jump(scene4)
 
     # ========================================
-    # シーン4: 虚空の心臓の完成
+    # シーン4: 虚空の心臓の設置
     # ========================================
     builder.step(scene4) \
         .play_bgm("BGM/Lily_Tranquil") \
         .focus_chara(Actors.LILY) \
-        .say("narr_30", "（素材を集め、虚空の心臓を完成させたあなた。それを手にしたあなたは、リリィのもとへ向かう。）", "", actor=pc) \
-        .say("lily_27", "……完成したのですね。見せてください。", "", actor=lily) \
-        .say("narr_31", "（リリィが虚空の心臓を手に取り、魔力を流し込む。）", "", actor=pc) \
-        .say("lily_28", "……完璧です。あなたの魔力と技術が、この異次元の構造を支える楔となりました。", "", actor=lily) \
-        .say("lily_29", "これで、ランクAへの挑戦権を授与いたします。……ふふ、あなたは既に、この異次元の一部となりました。誇っていいですよ。", "", actor=lily) \
-        .say("narr_32", "（彼女は台帳に何かを書き込む。）", "", actor=pc) \
-        .say("lily_30", "報酬として、**小さなコイン30枚**と**プラチナコイン15枚**を記録いたします。……それと、あなたは『虚空と共鳴する者』としての称号を獲得しました。", "", actor=lily) \
+        .say("narr_30", "（バルガスとの会話を終え、あなたはリリィのもとへ戻った。）", "", actor=pc) \
+        .say("lily_27", "お戻りになりましたか。……さて、虚空の心臓の設置を始めましょう。", "", actor=lily) \
+        .say("narr_31", "（リリィが虚空の心臓をアリーナの中心へ運び、設置の儀式を始める。）", "", actor=pc) \
+        .say("narr_31_2", "（淡い青白い光がアリーナ全体を包み込み、空間の震動が徐々に収まっていく。）", "", actor=pc) \
+        .say("lily_28", "……完璧です。あなたの協力のおかげで、この異次元の構造が安定しました。", "", actor=lily) \
+        .say("lily_30", "報酬をお渡ししましょう。", "", actor=lily) \
         .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantMakuma2Reward();") \
         .jump(ending)
 

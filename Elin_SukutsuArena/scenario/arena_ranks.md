@@ -22,7 +22,7 @@
 
 地上では伝説級。リリィが事務的ではなく「一人の異性（サキュバス）」として興味を持ち始めます。
 
-* **Rank A：黄金の戦鬼（Golden War Demon）**
+* **Rank A：戦鬼（Golden War Demon）**
 * **Rank S：屠竜者（Dragon Slayer）**
 
 ---

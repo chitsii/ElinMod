@@ -2,7 +2,7 @@ namespace Elin_SukutsuArena.Conditions
 {
     /// <summary>
     /// アスタロトの権能「終焉の削除命令」
-    /// 魔力を大幅に低下させ、MPを0にする
+    /// 魔力を大幅に低下させ、MPを0にする（elementsはExcel側で設定）
     /// </summary>
     public class ConAstarothDeletion : Condition
     {
@@ -10,16 +10,11 @@ namespace Elin_SukutsuArena.Conditions
 
         public override ConditionType Type => ConditionType.Debuff;
 
-        public override bool UseElements => true;
-
         public override int GetPhase() => 0;
 
         public override void SetOwner(Chara _owner, bool onDeserialize = false)
         {
             base.SetOwner(_owner);
-            // Element 72 = MAG, -1000で魔法攻撃力大幅低下
-            elements.SetBase(72, -1000);
-            elements.SetParent(owner);
             // MPを0にする
             owner.mana.value = 0;
         }

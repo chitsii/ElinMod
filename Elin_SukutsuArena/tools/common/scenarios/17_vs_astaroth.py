@@ -31,10 +31,13 @@ def define_vs_astaroth(builder: DramaBuilder):
     ending = builder.label("ending")
 
     # ========================================
-    # シーン1: 王の降臨
+    # シーン1: 王の降臨（アリーナロビー）
     # ========================================
     builder.step(main) \
-        .play_bgm("BGM/Astaroth_Theme") \
+        .drama_start(
+            bg_id="Drama/arena_lobby",
+            bgm_id="BGM/Astaroth_Theme"
+        ) \
         .say("narr_1", "（闘技場の空が、墨を流したように真っ黒に染まる。）", "", actor=pc) \
         .say("narr_2", "（観客の声は一瞬で消え失せ、代わりにこの世のものとは思えない巨大な『心音』が次元全体を揺さぶり始めた。）", "", actor=pc) \
         .shake() \
@@ -43,7 +46,6 @@ def define_vs_astaroth(builder: DramaBuilder):
         .say("narr_4", "（彼が地を踏んだ瞬間、床の石畳が恐怖に震えるように粉砕された。）", "", actor=pc) \
         .shake() \
         .say("astaroth_1", "……ごきげんよう、私の庭を騒がせる『特異点』よ。", "", actor=astaroth) \
-        .say("astaroth_2", "バルガスの命を救い、サキュバスに真名を吐かせ……あまつさえ、このアリーナの理を塗り替えようとするとは。", "", actor=astaroth) \
         .say("astaroth_3", "お前にはいつも驚かされている。", "", actor=astaroth) \
         .jump(scene2)
 
@@ -95,10 +97,13 @@ def define_vs_astaroth(builder: DramaBuilder):
         .jump(scene5)
 
     # ========================================
-    # シーン5: 次元のゴミ捨て場
+    # シーン5: 次元のゴミ捨て場（ゼクの隠れ家）
     # ========================================
     builder.step(scene5) \
-        .play_bgm("BGM/Zek_Hideout") \
+        .drama_start(
+            bg_id="Drama/zek_hideout",
+            bgm_id="BGM/Zek_Hideout"
+        ) \
         .say("narr_17", "（辿り着いたのは、アリーナのロビーでも私室でもない、無数のガラクタと遺品が積み上がった不気味な異空間ーーゼクの本拠地だった。）", "", actor=pc) \
         .focus_chara(Actors.BALGAS) \
         .say("narr_18", "（バルガスが激しく咳き込み、リリィが膝をついて震えている。）", "", actor=pc) \
@@ -106,8 +111,7 @@ def define_vs_astaroth(builder: DramaBuilder):
         .say("narr_20", "（ある戦士は、剣を掲げたまま絶望の表情で凍りついている。その顔には、『なぜ俺が……』という最期の疑問が刻まれたまま。）", "", actor=pc) \
         .say("narr_21", "（ある魔術師は、魔導書を抱きしめ、涙を流したまま時が止まっている。その指先には、唱えきれなかった最後の呪文の残滓が漂う。）", "", actor=pc) \
         .say("narr_22", "（ある盗賊は、仲間の死体にすがりつき、狂ったように笑い続けている。その笑顔は、正気を失った瞬間を永遠に閉じ込められた地獄。）", "", actor=pc) \
-        .say("narr_23", "（ガラスケースの一つに、見覚えのある鎧が展示されている。ーーそれは、あなたがRank Eで倒した『錆びついた英雄・カイン』の残骸だ。）", "", actor=pc) \
-        .say("narr_24", "（彼の表情は、最期の安堵と、それでも消えない後悔が混じり合っていた。）", "", actor=pc) \
+        .say("narr_23", "（ガラスケースの一つに、見覚えのある鎧が展示されている。ーーそれは、あなたが倒した『錆びついた英雄・カイン』のものだ。）", "", actor=pc) \
         .say("balgas_1", "……クソが。あいつら全員、ゼクの『作品』かよ。", "", actor=balgas) \
         .say("balgas_2", "こいつは博物館なんかじゃねえ。……英雄の墓場を、趣味で飾り立ててやがる。", "", actor=balgas) \
         .focus_chara(Actors.LILY) \
@@ -115,15 +119,13 @@ def define_vs_astaroth(builder: DramaBuilder):
         .say("lily_2", "彼らは死後も、こんな場所で……永遠に『最悪の瞬間』を演じ続けさせられている……。", "", actor=lily) \
         .focus_chara(Actors.ZEK) \
         .say("zek_6", "……ふぅ。命拾いしましたね。", "", actor=zek) \
-        .say("zek_7", "今のあなたは、アスタロトにとっては『目障りな不具合』に過ぎない。彼を殺すには……システムの外側にある力、**『レベル1億の深淵』**の力を引き出すしかありません。", "", actor=zek) \
-        .say("zek_8", "さあ、ここからが本当の『取引』の始まりです。王を殺すための武器。そして、この呪われたアリーナの真実。", "", actor=zek) \
+        .say("zek_7", "今のあなたは、アスタロトにとっては『目障りな不具合』に過ぎない。彼を殺すには……システムの外側、イルヴァの地で、力をつけてもらうしかありません。", "", actor=zek) \
         .say("zek_9", "……それらを手に入れる覚悟があるなら、このゴミの山をさらに奥へ進んでいただきましょうか。", "", actor=zek) \
         .jump(choice1)
 
     # プレイヤーの選択肢
     builder.choice(react1_proceed, "……分かった。進もう", "", text_id="c1_proceed") \
-           .choice(react1_unforgivable, "お前のコレクション……許せない", "", text_id="c1_unforgivable") \
-           .choice(react1_kain, "カインを……解放しろ", "", text_id="c1_kain")
+           .choice(react1_unforgivable, "お前のコレクション……許せない", "", text_id="c1_unforgivable")
 
     # 選択肢反応
     builder.step(react1_proceed) \
@@ -134,14 +136,15 @@ def define_vs_astaroth(builder: DramaBuilder):
         .say("zek_r2", "許さなくて結構。ですが、今はアスタロトを倒すことが先決でしょう？", "", actor=zek) \
         .jump(ending)
 
-    builder.step(react1_kain) \
-        .say("zek_r3", "……ふむ。それは、アスタロトを倒した後で考えましょう。今は無理です。", "", actor=zek) \
-        .jump(ending)
-
     # ========================================
     # 終了処理
     # ========================================
     builder.step(ending) \
+        .focus_chara(Actors.ZEK) \
+        .say("zek_final_1", "さあ、闘士殿。イルヴァの地で力を蓄えてきなさい。", "", actor=zek) \
+        .say("zek_final_2", "……準備が整い、『王殺し』の覚悟が決まったら、私に声をかけてください。", "", actor=zek) \
+        .say("zek_final_3", "あの忌々しい暴君との最終決戦へ……私がご案内いたしましょう。", "", actor=zek) \
+        .say("narr_final", "（ゼクは不敵な笑みを浮かべながら、影の中へ溶けていった。）", "", actor=pc) \
         .set_flag(Keys.FUGITIVE, FlagValues.TRUE) \
         .complete_quest(QuestIds.VS_ASTAROTH) \
         .finish()

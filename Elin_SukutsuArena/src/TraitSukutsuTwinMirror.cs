@@ -32,8 +32,16 @@ namespace Elin_SukutsuArena
             // ミニオンは別途セーブ/ロードされる
             if (onSetOwner) return;
 
-            // マップがまだ初期化されていない場合はスキップ
-            if (EClass._map == null) return;
+            // ゲーム初期化中（ニューゲーム時のアドベンチャラー生成等）はスキップ
+            // EClass._zone や EClass._map が未初期化の場合がある
+            try
+            {
+                if (EClass._zone == null || EClass._map == null) return;
+            }
+            catch
+            {
+                return;
+            }
 
             // 既に召喚済みなら何もしない
             int existingUid = SummonedMinionUid;

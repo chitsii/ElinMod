@@ -248,6 +248,7 @@ def main():
         set_cell(row, 'value', item_value)
         set_cell(row, 'LV', item.lv)
         set_cell(row, 'weight', item.weight)
+        set_cell(row, 'chance', item.chance)  # 0=ランダム生成対象外
 
         # レンダリング
         set_cell(row, 'tiles', item.tiles)

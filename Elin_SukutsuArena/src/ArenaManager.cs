@@ -500,7 +500,7 @@ namespace Elin_SukutsuArena
             var storage = Core.ArenaContext.I?.Storage;
             if (storage != null)
             {
-                storage.SetInt("chitsii.arena.lily_hostile", 1);
+                storage.SetInt("chitsii.arena.player.lily_hostile", 1);
             }
             // カルマ-30
             EClass.player.ModKarma(-30);
@@ -562,7 +562,7 @@ namespace Elin_SukutsuArena
             // エンディングタイプを取得
             int endingType = storage.GetInt("chitsii.arena.ending", -1);
             bool balgasKilled = storage.GetInt("chitsii.arena.balgas_killed", 0) == 1;
-            bool lilyHostile = storage.GetInt("chitsii.arena.lily_hostile", 0) == 1;
+            bool lilyHostile = storage.GetInt("chitsii.arena.player.lily_hostile", 0) == 1;
 
             // エンド名を決定
             string endingName;
@@ -595,6 +595,56 @@ namespace Elin_SukutsuArena
                 Dialog.Ok($"{title}\n\n{detail}");
             });
             Debug.Log($"[SukutsuArena] ShowEndingCredit: {endingName}");
+        }
+
+        // ============================================================
+        // クエストディスパッチャー用
+        // ============================================================
+
+        /// <summary>
+        /// クエストディスパッチ用のチェック
+        /// 指定されたクエストIDリストの中で、利用可能な最初のクエストのインデックスをフラグに設定
+        /// </summary>
+        /// <param name="flagName">設定するフラグ名</param>
+        /// <param name="questIds">クエストIDのカンマ区切りリスト</param>
+        public static void CheckQuestsForDispatch(string flagName, string questIds)
+        {
+            var storage = Core.ArenaContext.I?.Storage;
+            if (storage == null)
+            {
+                Debug.LogError("[SukutsuArena] CheckQuestsForDispatch: Storage is null");
+                return;
+            }
+
+            // クエストIDリストをパース
+            var questIdList = questIds.Split(',');
+            for (int i = 0; i < questIdList.Length; i++)
+            {
+                questIdList[i] = questIdList[i].Trim();
+            }
+
+            // 利用可能なクエストを取得
+            var availableQuests = ArenaQuestManager.Instance.GetAvailableQuests();
+            var availableIds = new System.Collections.Generic.HashSet<string>();
+            foreach (var q in availableQuests)
+            {
+                availableIds.Add(q.QuestId);
+            }
+
+            // 最初に見つかった利用可能なクエストのインデックスを設定
+            int selectedIndex = 0;  // 0はfallback
+            for (int i = 0; i < questIdList.Length; i++)
+            {
+                if (availableIds.Contains(questIdList[i]))
+                {
+                    selectedIndex = i + 1;  // 1から開始（0はfallback）
+                    Debug.Log($"[CheckQuestsForDispatch] Found available quest: {questIdList[i]} at index {selectedIndex}");
+                    break;
+                }
+            }
+
+            storage.SetInt(flagName, selectedIndex);
+            Debug.Log($"[CheckQuestsForDispatch] {flagName} = {selectedIndex} (checked {questIdList.Length} quests)");
         }
     }
 }

@@ -6,7 +6,7 @@ NPCクリック時の会話処理
 from arena_drama_builder import ArenaDramaBuilder
 from drama_constants import DramaNames
 from flag_definitions import Keys, Actors, QuestIds
-from arena_high_level_api import QuestEntry, build_quest_dispatcher
+from arena_types import QuestEntry
 
 
 # ゼクのクエストエントリ定義
@@ -14,6 +14,7 @@ ZEK_QUESTS = [
     QuestEntry(QuestIds.ZEK_INTRO, 21, "start_zek_intro"),
     QuestEntry(QuestIds.ZEK_STEAL_BOTTLE, 23, "start_zek_steal_bottle"),
     QuestEntry(QuestIds.ZEK_STEAL_SOULGEM, 24, "start_zek_steal_soulgem"),
+    QuestEntry(QuestIds.LAST_BATTLE, 33, "start_last_battle"),
 ]
 
 
@@ -58,8 +59,7 @@ def define_zek_main_drama(builder: ArenaDramaBuilder):
     # ========================================
     # クエストディスパッチ（高レベルAPI使用）
     # ========================================
-    quest_labels = build_quest_dispatcher(
-        builder,
+    quest_labels = builder.build_quest_dispatcher(
         ZEK_QUESTS,
         entry_step=check_quests,
         fallback_step=quest_none,
@@ -80,6 +80,9 @@ def define_zek_main_drama(builder: ArenaDramaBuilder):
 
     builder.step(quest_labels["start_zek_steal_soulgem"]) \
         .start_quest_drama(QuestIds.ZEK_STEAL_SOULGEM, DramaNames.ZEK_STEAL_SOULGEM)
+
+    builder.step(quest_labels["start_last_battle"]) \
+        .start_quest_drama(QuestIds.LAST_BATTLE, DramaNames.LAST_BATTLE)
 
     # ========================================
     # 終了

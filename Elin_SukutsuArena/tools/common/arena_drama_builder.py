@@ -1,13 +1,39 @@
+"""
+arena_drama_builder.py - Arena-specific Drama Builder
+
+ArenaDramaBuilder extends DramaBuilder with arena-specific functionality:
+- C# ArenaManager API wrappers
+- Quest/Battle/Reward convenience methods
+- High-level system builders via Mixins
+
+Mixin hierarchy:
+    RankSystemMixin    - Rank-up system (build_rank_system, build_greetings, etc.)
+    QuestSystemMixin   - Quest dispatching (build_quest_dispatcher, etc.)
+    BattleSystemMixin  - Battle stages (build_battle_stages)
+    MenuMixin          - Menu construction (add_menu)
+"""
 
 from typing import Dict, List, Tuple, Union, TYPE_CHECKING
 from drama_builder import DramaBuilder, DramaActor
 from flag_definitions import Keys
+from arena_mixins import (
+    RankSystemMixin,
+    QuestSystemMixin,
+    BattleSystemMixin,
+    MenuMixin,
+)
 
 if TYPE_CHECKING:
     from rewards import Reward, RankReward
 
 
-class ArenaDramaBuilder(DramaBuilder):
+class ArenaDramaBuilder(
+    RankSystemMixin,
+    QuestSystemMixin,
+    BattleSystemMixin,
+    MenuMixin,
+    DramaBuilder
+):
     """
     アリーナMod専用の拡張DramaBuilder
 
@@ -21,6 +47,16 @@ class ArenaDramaBuilder(DramaBuilder):
     低レベルAPI（内部用、_プレフィックス）:
     - _start_drama(): ドラマ遷移のみ（finish()が別途必要）
     - _start_battle_by_stage(): バトル開始のみ（finish()が別途必要）
+
+    Mixin提供API:
+    - build_rank_system(): ランクアップシステム構築
+    - build_greetings(): ランク別挨拶ステップ生成
+    - build_greeting_dispatcher(): 挨拶ディスパッチャー
+    - build_quest_dispatcher(): クエストディスパッチャー
+    - build_quest_info_steps(): クエスト情報ステップ
+    - build_quest_start_steps(): クエスト開始ステップ
+    - build_battle_stages(): バトルステージシステム
+    - add_menu(): メニュー選択肢追加
     """
 
     def show_rank_info_log(self) -> 'ArenaDramaBuilder':
@@ -47,9 +83,8 @@ class ArenaDramaBuilder(DramaBuilder):
         # 1. 開始ログ
         self.action("eval", param=f"UnityEngine.Debug.Log(\"[SukutsuArena] Pre-invoke StartDrama: {drama_name}\");")
 
-        # 2. メソッド呼び出し
-        script = f"Elin_SukutsuArena.ArenaManager.StartDrama(\"{drama_name}\");"
-        self.action("eval", param=script)
+        # 2. modInvoke経由でドラマ開始（CWLのeval名前空間問題を回避）
+        self.action("modInvoke", param=f"start_drama({drama_name})", actor="pc")
 
         # 3. 完了ログ
         self.action("eval", param="UnityEngine.Debug.Log(\"[SukutsuArena] Post-invoke StartDrama\");")
@@ -312,14 +347,12 @@ class ArenaDramaBuilder(DramaBuilder):
             self._grant_items(reward.items)
 
         # 3. クエスト完了
+        # NOTE: ランクはCheckAvailableQuestsCommandで自動同期されるため、
+        # set_rank呼び出しは不要（クエスト完了状態からランクを推論）
         if reward.quest_id:
             self.complete_quest(reward.quest_id)
 
-        # 4. ランク設定
-        if reward.rank_value > 0:
-            self.set_flag(Keys.RANK, reward.rank_value)
-
-        # 5. システムメッセージ
+        # 4. システムメッセージ
         if reward.system_message_jp:
             self.say(f"{text_id_prefix}_sys", reward.system_message_jp, reward.system_message_en)
 

@@ -65,6 +65,7 @@ class ItemDefinition:
     value: int = 100           # value（売却価格）
     lv: int = 1                # LV
     weight: int = 100          # weight (1/1000単位、100=0.1kg)
+    chance: int = 0            # chance（0=ランダム生成対象外）
 
     # レンダリング
     tiles: int = 0             # tiles（スプライトID）
@@ -446,8 +447,8 @@ CUSTOM_ITEMS: Dict[str, ItemDefinition] = {
         name_jp="禁断の覚醒剤",
         name_en="Forbidden Stimulant",
         category="drink",
-        detail_jp="狂戦士たちが決死の戦いの前に服用した禁断の薬。神経を極限まで研ぎ澄ませるが、効果が切れた時、血管が内側から破裂する。",
-        detail_en="A forbidden drug taken by berserkers before battles to the death. It sharpens the nerves to their limit, but when it wears off, blood vessels rupture from within. None are said to have survived.",
+        detail_jp="狂戦士たちが決死の戦いの前に服用した禁断の薬。神経を極限まで研ぎ澄ませるが、同時に血管が内側から破裂する。",
+        detail_en="A forbidden drug taken by berserkers before battles to the death. It sharpens the nerves to their limit, but blood vessels rupture from within.",
 
         trait_type=TraitType.CUSTOM,
         trait_name="SukutsuItem",

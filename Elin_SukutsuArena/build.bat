@@ -22,6 +22,13 @@ if "%BUILD_CONFIG%"=="Debug" (
 echo.
 
 REM ============================================================
+REM Step 0: Backup Excel files for diff
+REM ============================================================
+pushd tools
+uv run python builder/excel_diff_manager.py backup >nul 2>&1
+popd
+
+REM ============================================================
 REM Step 1: Validation
 REM ============================================================
 <nul set /p "=[1/13] Validation... "
@@ -65,7 +72,11 @@ REM Step 3: Chara Excel
 REM ============================================================
 <nul set /p "=[3/13] Chara Excel... "
 pushd tools
-uv run python builder/create_chara_excel.py >nul 2>&1
+if "%BUILD_CONFIG%"=="Debug" (
+    uv run python builder/create_chara_excel.py --debug >nul 2>&1
+) else (
+    uv run python builder/create_chara_excel.py >nul 2>&1
+)
 if %ERRORLEVEL% NEQ 0 (
     echo FAILED
     popd
@@ -177,17 +188,12 @@ REM Step 7: Drama Excel
 REM ============================================================
 <nul set /p "=[9/13] Drama Excel... "
 pushd tools
-uv run python builder/create_drama_excel.py >nul 2>&1
+REM -W default enables DeprecationWarning display, >nul hides stdout but keeps stderr
+uv run python -W default builder/create_drama_excel.py >nul
 if %ERRORLEVEL% NEQ 0 (
     echo FAILED
     echo.
-    uv run python builder/create_drama_excel.py
-    popd
-    goto :error
-)
-uv run python builder/create_opening_drama.py >nul 2>&1
-if %ERRORLEVEL% NEQ 0 (
-    echo FAILED
+    uv run python -W default builder/create_drama_excel.py
     popd
     goto :error
 )
@@ -306,6 +312,15 @@ xcopy "%~dp0Portrait" "%STEAM_PACKAGE_DIR%\Portrait\" /E /Y /I /Q >nul 2>&1
 xcopy "%~dp0Media" "%STEAM_PACKAGE_DIR%\Media\" /E /Y /I /Q >nul 2>&1
 xcopy "%~dp0Sound" "%STEAM_PACKAGE_DIR%\Sound\" /E /Y /I /Q >nul 2>&1
 echo OK
+
+REM ============================================================
+REM Show Excel Diff
+REM ============================================================
+echo.
+echo --- Excel Changes ---
+pushd tools
+uv run python builder/excel_diff_manager.py diff
+popd
 
 echo.
 echo === Build Complete ===

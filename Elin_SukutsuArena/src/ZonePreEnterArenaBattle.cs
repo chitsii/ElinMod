@@ -264,7 +264,8 @@ public class ZonePreEnterArenaBattle : ZonePreEnterEvent
         EClass._zone.AddCard(enemy, pos);
 
         // レベル設定（Zone追加後に行う必要あり - SetLv内部でFeat.Applyが呼ばれるため）
-        // DEBUGビルドではPython側でconfig.Level=1に設定済み
+        // DEBUGビルドではPython側でSourceChara.xlsxのLV=1に設定済み
+        // 注意: SetLvでレベルダウンするとFeat.ApplyでNullReferenceExceptionが発生するため、レベルアップのみ行う
         if (enemy.LV < config.Level)
         {
             enemy.SetLv(config.Level);

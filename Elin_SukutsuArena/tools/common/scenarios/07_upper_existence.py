@@ -6,6 +6,7 @@
 from drama_builder import DramaBuilder
 from arena_drama_builder import ArenaDramaBuilder
 from flag_definitions import Keys, Actors, QuestIds
+from battle_flags import QuestBattleFlags
 
 def define_upper_existence(builder: ArenaDramaBuilder):
     """
@@ -28,13 +29,20 @@ def define_upper_existence(builder: ArenaDramaBuilder):
     scene3 = builder.label("scene3_battle")
 
     # ========================================
-    # シーン1: 鉄格子の前の警告
+    # 導入: ランクD挑戦前の講義
     # ========================================
     builder.step(main) \
         .drama_start(
             bg_id="Drama/arena_battle_normal",
-            bgm_id="BGM/Ominous_Suspense_01"
+            bgm_id="BGM/Lobby_Normal"
         ) \
+        .say("narr_0", "（ロビーに戻ると、バルガスがあなたを呼び止めた。）", "", actor=pc) \
+        .focus_chara(Actors.BALGAS) \
+        .say("balgas_0a", "……おい、お前。次はランクD『銅貨稼ぎ』への挑戦だな。", "", actor=balgas) \
+        .say("balgas_0b", "まぁ待て。その前に、一つ教えておくことがある……", "", actor=balgas) \
+        .say("balgas_0c", "来い。実際に見せてやる。", "", actor=balgas) \
+        .say("narr_0b", "（バルガスに連れられ、闘技場の門扉前へと向かう。）", "", actor=pc) \
+        .play_bgm("BGM/Ominous_Suspense_01") \
         .say("narr_1", "（門扉の前に立つあなたに対し、バルガスはいつになく真剣な表情で、武器の調子を確認している。）", "", actor=pc) \
         .say("narr_2", "（上空からは、地鳴りのような低い笑い声が降ってきている。）", "", actor=pc) \
         .jump(scene1)
@@ -93,8 +101,8 @@ def define_upper_existence(builder: ArenaDramaBuilder):
         .shake() \
         .say("narr_7", "（紫色の閃光と共に、戦場に「異質な物体」が次々と降り注ぎ始めた……！）", "", actor=pc) \
         .shake() \
-        .set_flag("sukutsu_is_quest_battle_result", 1) \
-        .set_flag("sukutsu_quest_battle", 1) \
+        .set_flag(QuestBattleFlags.RESULT_FLAG, 1) \
+        .set_flag(QuestBattleFlags.FLAG_NAME, QuestBattleFlags.UPPER_EXISTENCE) \
         .start_battle_by_stage("upper_existence_battle", master_id="sukutsu_arena_master") \
         .finish()
 

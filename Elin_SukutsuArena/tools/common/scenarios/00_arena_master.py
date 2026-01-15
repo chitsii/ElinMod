@@ -11,13 +11,11 @@ from flag_definitions import (
     Motivation, Rank,
     PlayerFlags
 )
-from arena_high_level_api import (
+from arena_types import (
     RankDefinition, GreetingDefinition, QuestEntry,
     BattleStageDefinition, MenuItem, QuestInfoDefinition, QuestStartDefinition,
-    build_rank_system, build_greetings, build_greeting_dispatcher,
-    build_battle_stages, build_quest_dispatcher, add_menu,
-    build_quest_info_steps, build_quest_start_steps,
 )
+from battle_flags import QuestBattleFlags, RankUpTrialFlags
 import importlib
 
 # ランクアップ結果ステップ関数のインポート
@@ -406,7 +404,7 @@ def define_arena_master_drama(builder: DramaBuilder):
     # ========================================
     def add_choices(b):
         """共通の選択肢を追加"""
-        add_menu(b, [
+        b.add_menu([
             MenuItem("戦いに挑む", battle_prep, text_id="c3"),
             MenuItem("ランクを確認したい", rank_check, text_id="c_rank_check"),
             MenuItem("昇格試験を受けたい", rank_up_check, text_id="c_rank_up"),
@@ -438,8 +436,7 @@ def define_arena_master_drama(builder: DramaBuilder):
     # ランクアップ結果チェック
     # ========================================
     # ランクアップシステムを先に自動生成（ラベルを取得するため）
-    rank_labels = build_rank_system(
-        builder,
+    rank_labels = builder.build_rank_system(
         RANK_DEFINITIONS,
         actor=vargus,
         fallback_step=registered,
@@ -489,7 +486,9 @@ def define_arena_master_drama(builder: DramaBuilder):
         ])
 
     # sukutsu_arena_result: 0=未設定, 1=勝利, 2=敗北
+    # 各ステップでsukutsu_quest_battleをクリア（switch_flag後に次回影響しないように）
     builder.step(quest_battle_result_upper) \
+        .set_flag(QuestBattleFlags.FLAG_NAME, QuestBattleFlags.NONE) \
         .switch_flag("sukutsu_arena_result", [
             registered,               # 0: 未設定
             upper_existence_victory,  # 1: 勝利
@@ -497,6 +496,7 @@ def define_arena_master_drama(builder: DramaBuilder):
         ])
 
     builder.step(quest_battle_result_last) \
+        .set_flag(QuestBattleFlags.FLAG_NAME, QuestBattleFlags.NONE) \
         .switch_flag("sukutsu_arena_result", [
             registered,           # 0: 未設定
             last_battle_victory,  # 1: 勝利
@@ -504,6 +504,7 @@ def define_arena_master_drama(builder: DramaBuilder):
         ])
 
     builder.step(quest_battle_result_vs_balgas) \
+        .set_flag(QuestBattleFlags.FLAG_NAME, QuestBattleFlags.NONE) \
         .switch_flag("sukutsu_arena_result", [
             registered,          # 0: 未設定
             vs_balgas_victory,   # 1: 勝利
@@ -511,6 +512,7 @@ def define_arena_master_drama(builder: DramaBuilder):
         ])
 
     builder.step(quest_battle_result_balgas_training) \
+        .set_flag(QuestBattleFlags.FLAG_NAME, QuestBattleFlags.NONE) \
         .switch_flag("sukutsu_arena_result", [
             registered,              # 0: 未設定
             balgas_training_victory, # 1: 勝利
@@ -547,18 +549,19 @@ def define_arena_master_drama(builder: DramaBuilder):
     # ========================================
     # 昇格試験チェック
     # ========================================
-    # シンプル化: ランク値のみで判定
-    # switch_flag を使用 - drama.sequence.Play() を直接呼び出す
-    # rank=0(unranked)→G, rank=1(G)→F, rank=2(F)→E, ...
+    # GetAvailableQuests()からランクアップクエストを取得し、
+    # sukutsu_next_rank_upフラグでディスパッチ
     builder.step(rank_up_check) \
-        .switch_flag("chitsii.arena.player.rank", [
-            rank_labels["start_rank_g"],  # rank=0 (unranked) → Gランクアップ
-            rank_labels["start_rank_f"],  # rank=1 (G) → Fランクアップ
-            rank_labels["start_rank_e"],  # rank=2 (F) → Eランクアップ
-            rank_labels["start_rank_d"],  # rank=3 (E) → Dランクアップ
-            rank_labels["start_rank_c"],  # rank=4 (D) → Cランクアップ
-            rank_labels["start_rank_b"],  # rank=5 (C) → Bランクアップ
-            rank_labels["start_rank_a"],  # rank=6 (B) → Aランクアップ
+        .check_available_quests_for_npc("sukutsu_arena_master") \
+        .switch_flag("sukutsu_next_rank_up", [
+            rank_up_not_ready,            # 0: 利用可能なランクアップなし
+            rank_labels["start_rank_g"],  # 1: Gランクアップ
+            rank_labels["start_rank_f"],  # 2: Fランクアップ
+            rank_labels["start_rank_e"],  # 3: Eランクアップ
+            rank_labels["start_rank_d"],  # 4: Dランクアップ
+            rank_labels["start_rank_c"],  # 5: Cランクアップ
+            rank_labels["start_rank_b"],  # 6: Bランクアップ
+            rank_labels["start_rank_a"],  # 7: Aランクアップ
         ], fallback=rank_up_not_ready)
 
     b = builder.step(rank_up_not_ready) \
@@ -569,22 +572,22 @@ def define_arena_master_drama(builder: DramaBuilder):
     # 登録済みプレイヤーフロー
     # ========================================
     # 直接挨拶へ遷移（挨拶後すぐに選択肢を表示）
+    # 会話開始時にクエスト状態をチェックし、ランクを同期
     builder.step(pre_registered) \
+        .check_available_quests_for_npc("sukutsu_arena_master") \
         .jump(registered)
 
     # ========================================
     # 挨拶システム
     # ========================================
-    greeting_labels = build_greetings(
-        builder,
+    greeting_labels = builder.build_greetings(
         GREETINGS,
         actor=vargus,
         add_choices_func=add_choices,
         default_greeting=DEFAULT_GREETING,
     )
 
-    build_greeting_dispatcher(
-        builder,
+    builder.build_greeting_dispatcher(
         greeting_labels,
         entry_step=registered,
         flag_key="player.rank",
@@ -598,8 +601,7 @@ def define_arena_master_drama(builder: DramaBuilder):
     # ========================================
     # バトルステージシステム
     # ========================================
-    build_battle_stages(
-        builder,
+    builder.build_battle_stages(
         BATTLE_STAGES,
         actor=vargus,
         entry_step=battle_prep,
@@ -610,8 +612,7 @@ def define_arena_master_drama(builder: DramaBuilder):
     # ========================================
     # クエストディスパッチャー
     # ========================================
-    quest_labels = build_quest_dispatcher(
-        builder,
+    quest_labels = builder.build_quest_dispatcher(
         AVAILABLE_QUESTS,
         entry_step=check_available_quests,
         fallback_step=quest_none,
@@ -621,16 +622,14 @@ def define_arena_master_drama(builder: DramaBuilder):
     )
 
     # クエスト情報ステップ（情報提供のみ）
-    build_quest_info_steps(
-        builder,
+    builder.build_quest_info_steps(
         QUEST_INFOS,
         actor=vargus,
         return_step=registered_choices,
     )
 
     # 直接開始可能なクエスト
-    build_quest_start_steps(
-        builder,
+    builder.build_quest_start_steps(
         QUEST_STARTS,
         actor=vargus,
         cancel_step=registered_choices,

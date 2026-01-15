@@ -6,6 +6,7 @@ Rank S昇格試験 - バルガスとの決戦と慈悲の選択
 from arena_drama_builder import ArenaDramaBuilder
 from drama_builder import DramaBuilder
 from flag_definitions import Keys, Actors, FlagValues, QuestIds
+from battle_flags import QuestBattleFlags
 
 def define_vs_balgas(builder: DramaBuilder):
     """
@@ -59,7 +60,7 @@ def define_vs_balgas(builder: DramaBuilder):
 
     builder.step(scene1) \
         .focus_chara(Actors.BALGAS) \
-        .say("balgas_1", "……おい、黄金の戦鬼。お前はもう、俺の手の届かねえ高みへ行こうとしてやがる。", "", actor=balgas) \
+        .say("balgas_1", "……おい、戦鬼。お前はもう、俺の手の届かねえ高みへ行こうとしてやがる。", "", actor=balgas) \
         .say("balgas_2", "だがな、それでもアスタロト……あの竜神は、別格なんだ。", "", actor=balgas) \
         .say("balgas_2_1", "だからこそ、ここで俺が試金石になってやる。おまえを倒すために、対戦させてもらう。......冗談なんかじゃねえぞ。", "", actor=balgas) \
         .say("balgas_3", "俺を......『全盛期の俺』を越えてみせろ。それができなきゃ、このさきお前は犠牲になっちまう。", "", actor=balgas) \
@@ -129,7 +130,7 @@ def define_vs_balgas(builder: DramaBuilder):
         .say("obs_1", "観客「...殺せ！ ...師匠を殺せ！」", "", actor=pc) \
         .say("obs_2", "観客「...魂を捧げろ！」", "", actor=pc) \
         .say("lily_voice", "（リリィの小さな懇願の声が、あなたの耳に届く。「お願い……殺さないで……」）", "", actor=lily) \
-        .set_flag("sukutsu_quest_battle", 2) \
+        .set_flag(QuestBattleFlags.FLAG_NAME, QuestBattleFlags.VS_BALGAS) \
         .start_battle_by_stage("rank_s_trial", master_id="sukutsu_arena_master") \
         .finish()
 
@@ -301,7 +302,7 @@ def add_vs_balgas_result_steps(builder: ArenaDramaBuilder, victory_label: str, d
     # ========================================
     builder.step(victory_label) \
         .set_flag("sukutsu_arena_result", 0) \
-        .set_flag("sukutsu_quest_battle", 0) \
+        .set_flag(QuestBattleFlags.FLAG_NAME, QuestBattleFlags.NONE) \
         .play_bgm("BGM/Emotional_Sorrow_2") \
         .say("narr_v1", "（膝をつき、肩で息をするバルガス。）", "", actor=pc) \
         .say("narr_v2", "（全盛期の輝きが失われ、急速に元の老いた姿へと戻っていく。）", "", actor=pc) \
@@ -356,6 +357,7 @@ def add_vs_balgas_result_steps(builder: ArenaDramaBuilder, victory_label: str, d
         .focus_chara(Actors.BALGAS) \
         .say("balgas_s2", "……ハッ。甘っちょろい野郎だ。……だが、その甘さが、俺がカインに教えてやれなかった『本物の強さ』なのかもしれねえな。", "", actor=balgas) \
         .say("balgas_s3", "……負けたよ。今日からお前がランクS『屠竜者（Dragon Slayer）』だ。", "", actor=balgas) \
+        .complete_quest(QuestIds.RANK_UP_S) \
         .complete_quest(QuestIds.RANK_UP_S_BALGAS_SPARED) \
         .say("sys_title_s", "【システム】称号『理を拒む者（System Breaker）』を獲得しました。", "") \
         .say("sys_buff_s", "【システム】『戦鬼の証』を獲得しました。筋力+5、耐久+5、各種耐性+5 の加護を得た！", "") \
@@ -381,6 +383,7 @@ def add_vs_balgas_result_steps(builder: ArenaDramaBuilder, victory_label: str, d
 
     builder.step(killed_ending) \
         .set_flag(Keys.BALGAS_KILLED, FlagValues.BalgasChoice.KILLED) \
+        .complete_quest(QuestIds.RANK_UP_S) \
         .complete_quest(QuestIds.RANK_UP_S_BALGAS_KILLED) \
         .say("sys_title_k", "【システム】称号『観客の傀儡（Audience's Puppet）』を獲得しました。", "") \
         .say("sys_buff_k", "【システム】『血塗られた称号』を獲得しました。筋力+10、魔力+10……しかし、何かを失った気がする。", "") \
@@ -392,7 +395,7 @@ def add_vs_balgas_result_steps(builder: ArenaDramaBuilder, victory_label: str, d
     # ========================================
     builder.step(defeat_label) \
         .set_flag("sukutsu_arena_result", 0) \
-        .set_flag("sukutsu_quest_battle", 0) \
+        .set_flag(QuestBattleFlags.FLAG_NAME, QuestBattleFlags.NONE) \
         .play_bgm("BGM/Lobby_Normal") \
         .focus_chara(Actors.LILY) \
         .say("lily_d1", "……バルガスさんには、まだ勝てなかったようですね。", "", actor=lily) \

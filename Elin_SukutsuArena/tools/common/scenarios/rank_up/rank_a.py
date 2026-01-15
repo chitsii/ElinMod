@@ -1,5 +1,5 @@
 """
-12_rank_up_A.md - Rank A 昇格試験『黄金の戦鬼』
+12_rank_up_A.md - Rank A 昇格試験『戦鬼』
 影の自己との戦い - 自分自身を超える
 """
 
@@ -10,7 +10,7 @@ from flag_definitions import Keys, Rank, Actors, QuestIds
 
 def define_rank_up_A(builder: DramaBuilder):
     """
-    Rank A 昇格試験「黄金の戦鬼」
+    Rank A 昇格試験「戦鬼」
     シナリオ: 12_rank_up_A.md
 
     観客の「注目」が生み出した影の自己と戦う
@@ -57,7 +57,7 @@ def define_rank_up_A(builder: DramaBuilder):
         .focus_chara(Actors.BALGAS) \
         .say("balgas_1", "……おい、銀翼。お前、自分の影をよく見てみろ。", "", actor=balgas) \
         .say("balgas_2", "観客どもの『注目』が、お前に集まりすぎたんだ。その結果、お前の影から……『もう一人のお前』が生まれようとしている。", "", actor=balgas) \
-        .say("balgas_3", "『黄金の戦鬼』ーーそれが、次の試練の名前だ。", "", actor=balgas) \
+        .say("balgas_3", "『戦鬼』ーーそれが、次の試練の名前だ。", "", actor=balgas) \
         .say("balgas_4", "お前が積み上げてきた全ての技術、全ての経験、全ての殺意……それを完璧にコピーした存在と戦うことになる。", "", actor=balgas) \
         .say("narr_4", "（バルガスは苦々しげに首を振る。）", "", actor=pc) \
         .say("balgas_5", "こいつは、ヌルとは違う意味で厄介だ。虚無には『意味』で対抗できた。だが、影はお前自身だ。", "", actor=balgas) \
@@ -89,7 +89,7 @@ def define_rank_up_A(builder: DramaBuilder):
         .focus_chara(Actors.ZEK) \
         .say("narr_5", "（影の中から、ゼクが姿を現す。）", "", actor=pc) \
         .say("zek_1", "クク……影の自己との対決ですか。実に興味深い試練ですね。", "", actor=zek) \
-        .say("zek_2", "あの『黄金の戦鬼』は、あなたの『現在』を完璧に写し取った鏡。技術、反射、経験……全てが同じです。", "", actor=zek) \
+        .say("zek_2", "あの『戦鬼』は、あなたの『現在』を完璧に写し取った鏡。技術、反射、経験……全てが同じです。", "", actor=zek) \
         .say("zek_3", "ですが、一つだけ違うものがある。", "", actor=zek) \
         .say("narr_6", "（ゼクは意味深に微笑む。）", "", actor=pc) \
         .say("zek_4", "影には『未来』がない。あなたが次の瞬間に何を選ぶか……その『可能性』だけは、影にはコピーできない。", "", actor=zek) \
@@ -118,7 +118,6 @@ def define_rank_up_A(builder: DramaBuilder):
     # シーン3: リリィの祝福
     # ========================================
     builder.step(scene3) \
-        .play_bgm("BGM/Lily_Tranquil") \
         .focus_chara(Actors.LILY) \
         .say("narr_7", "（リリィが静かに近づき、あなたの手を取る。）", "", actor=pc) \
         .say("lily_1", "……あなたの影は、確かに強い。あなたと同じだけの力を持っている。", "", actor=lily) \
@@ -196,7 +195,7 @@ def add_rank_up_A_result_steps(builder: ArenaDramaBuilder, victory_label: str, d
         .focus_chara(Actors.LILY) \
         .say("lily_v1", "……おかえりなさい。", "", actor=lily) \
         .say("lily_v2", "あなたは今、このアリーナで最も輝く存在になりました。", "", actor=lily) \
-        .say("lily_v3", "今日からあなたは、ランクA……『黄金の戦鬼（Golden War Demon）』です。", "", actor=lily) \
+        .say("lily_v3", "今日からあなたは、ランクA……『戦鬼（Golden War Demon）』です。", "", actor=lily) \
         .complete_quest(QuestIds.RANK_UP_A) \
         .grant_rank_reward("A", actor=lily) \
         .finish()

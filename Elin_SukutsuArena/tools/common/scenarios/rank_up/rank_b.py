@@ -49,7 +49,7 @@ def define_rank_up_B(builder: DramaBuilder):
         .say("balgas_1", "……おい、闘技場の鴉。", "", actor=balgas) \
         .say("balgas_2", "お前はここまで、よく戦ってきた。だが、次の相手は……今までの敵とは次元が違う。", "", actor=balgas) \
         .say("balgas_3", "『虚無の処刑人ヌル』。", "", actor=balgas) \
-        .say("balgas_4", "あいつは、グランドマスター『アスタロト』の『人形』だ。感情も、意志も、魂すらも持たねえ。", "", actor=balgas) \
+        .say("balgas_4", "あいつは、グランドマスター『アスタロト』の直属の『人形』だ。感情も、意志も、魂すらも持たねえ。", "", actor=balgas) \
         .say("balgas_5", "ただひたすらに、『存在を無に還す』ことだけを目的に動く、生ける屍だ。", "", actor=balgas) \
         .say("narr_4", "（彼は深く息を吐く。）", "", actor=pc) \
         .say("balgas_6", "……かつての英雄たち、カインを含めた俺の仲間たちも、あいつに飲み込まれて消えた。", "", actor=balgas) \
@@ -77,14 +77,12 @@ def define_rank_up_B(builder: DramaBuilder):
     # シーン2: リリィの忠告
     # ========================================
     builder.step(scene2) \
-        .play_bgm("BGM/Lily_Seductive_Danger") \
         .focus_chara(Actors.LILY) \
         .say("narr_5", "（リリィが近づいてくる。その目には、珍しく真剣な光が宿っている。）", "", actor=pc) \
         .say("lily_1", "……お客様。ヌルは、このアリーナが生み出した『究極の絶望』の結晶です。", "", actor=lily) \
-        .say("lily_2", "あなたがどれほど強くなっても、どれほど技術を磨いても、『虚無』の前では全てが等しく無意味。", "", actor=lily) \
-        .say("narr_6", "（彼女は、あなたの手を取る。）", "", actor=pc) \
-        .say("lily_3", "でも……あなたには、私たちがいます。", "", actor=lily) \
-        .say("lily_4", "バルガスさんの技、あなたが救った魂たち、そして……私の真名を知るあなた。", "", actor=lily) \
+        .say("lily_2", "あなたがどれほど強くなっても、どれほど技術を磨いても、『虚無』の前では全てが等しく無意味となるかもしれません。", "", actor=lily) \
+        .say("lily_3", "それでも、あなたには、私たちがいます。", "", actor=lily) \
+        .say("lily_4", "バルガスさんの技、あなたが救った魂たち......", "", actor=lily) \
         .say("lily_5", "虚無に抗う唯一の方法は、『自身』を信じ続けることです。", "", actor=lily) \
         .say("lily_6", "あなたが今まで積み上げてきた全ての選択、全ての戦い……それが、あなたを虚無から守る盾になります。", "", actor=lily) \
         .say("narr_7", "（リリィは、あなたの額に軽く口づけをする。）", "", actor=pc) \

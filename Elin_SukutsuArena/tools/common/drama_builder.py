@@ -83,8 +83,8 @@ def _validate_flag(flag_key: str, value: Any) -> List[str]:
 
     return errors
 
-# CWL準拠ヘッダー (if2なし、version/text列あり)
-HEADERS = ['step', 'jump', 'if', 'action', 'param', 'actor', 'version', 'id', 'text_JP', 'text_EN', 'text']
+# CWL準拠ヘッダー (if + if2 で複合条件、version/text列あり)
+HEADERS = ['step', 'jump', 'if', 'if2', 'action', 'param', 'actor', 'version', 'id', 'text_JP', 'text_EN', 'text']
 
 
 class DramaLabel:
@@ -357,6 +357,22 @@ class DramaBuilder:
         }
         self.entries.append(entry)
         return self
+
+    def branch_quest_done(self, quest_id: str, jump_to: Union[str, DramaLabel],
+                          actor: Union[str, DramaActor] = None) -> 'DramaBuilder':
+        """
+        クエスト完了済みなら指定ラベルにジャンプ。
+
+        Args:
+            quest_id: クエストID（例: "07_upper_existence"）
+            jump_to: 完了済みの場合のジャンプ先
+            actor: アクター（デフォルト: pc）
+
+        Note:
+            クエスト完了フラグは "sukutsu_quest_done_{quest_id}" の形式で保存されている。
+        """
+        flag_key = f"sukutsu_quest_done_{quest_id}"
+        return self.branch_if(flag_key, "==", 1, jump_to, actor)
 
     def switch_on_flag(self, flag: str, cases: Dict[int, Union[str, DramaLabel]],
                        fallback: Union[str, DramaLabel] = None,
@@ -889,6 +905,37 @@ class DramaBuilder:
         self.entries.append(entry)
         return self
 
+    def choice_if2(self, jump_to: Union[str, DramaLabel], text_jp: str,
+                   condition1: str, condition2: str,
+                   text_en: str = "", text_id: str = "") -> 'DramaBuilder':
+        """
+        複数条件付き選択肢を追加（if + if2 の両方を使用）
+
+        CWLでは &での条件結合をサポートしていないため、
+        複数条件が必要な場合はif列とif2列を別々に使用する。
+
+        Args:
+            jump_to: ジャンプ先
+            text_jp: 選択肢テキスト（日本語）
+            condition1: if列の条件式
+            condition2: if2列の条件式
+            text_en: 選択肢テキスト（英語）
+            text_id: テキストID
+        """
+        key = self._resolve_key(jump_to)
+        entry = {
+            'if': condition1,
+            'if2': condition2,
+            'action': 'choice',
+            'jump': key,
+            'text_JP': text_jp,
+            'text_EN': text_en or text_jp,
+        }
+        if text_id:
+            entry['id'] = text_id
+        self.entries.append(entry)
+        return self
+
     # ============================================================================
     # CWL 拡張機能: 条件ヘルパー
     # ============================================================================
@@ -1270,6 +1317,28 @@ class DramaBuilder:
             actor: アクター（デフォルト: pc）
         """
         return self.mod_invoke(f'check_available_quests({npc_id})', actor)
+
+    def check_quests_for_dispatch(self, flag_name: str, quest_ids: List[str]) -> 'DramaBuilder':
+        """
+        クエストディスパッチ用のチェック
+
+        modInvokeでcheck_quests_for_dispatchコマンドを呼び出し、
+        指定されたクエストIDリストの中で利用可能な最初のクエストのインデックスをフラグに設定する。
+
+        設定されるフラグ値:
+        - 0: 利用可能なクエストなし（fallback）
+        - 1: リストの1番目のクエストが利用可能
+        - 2: リストの2番目のクエストが利用可能
+        - ...
+
+        Args:
+            flag_name: 設定するフラグ名
+            quest_ids: クエストIDのリスト（優先度順）
+        """
+        # modInvoke形式: check_quests_for_dispatch(flagName, questId1, questId2, ...)
+        args = [flag_name] + quest_ids
+        param = f'check_quests_for_dispatch({", ".join(args)})'
+        return self.action("modInvoke", param=param, actor="pc")
 
     def build(self) -> List[Dict[str, Any]]:
         """エントリーリストを返す（検証なし）"""

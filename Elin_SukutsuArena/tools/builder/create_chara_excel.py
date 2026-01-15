@@ -1,6 +1,16 @@
 import openpyxl
 import os
 import csv
+import argparse
+
+# コマンドライン引数の解析
+parser = argparse.ArgumentParser(description='Create Chara Excel for Elin_SukutsuArena')
+parser.add_argument('--debug', action='store_true', help='Debug mode: set all boss LV to 1')
+args = parser.parse_args()
+
+DEBUG_MODE = args.debug
+if DEBUG_MODE:
+    print("[DEBUG MODE] All boss characters will have LV=1")
 
 # パス設定
 # パス設定
@@ -121,7 +131,8 @@ npcs.append({
 })
 
 # 2. バルガス (人間 / 男性 / アリーナマスター)
-npcs.append({
+# Note: 敵バージョン（訓練・全盛期）と共通のベース定義を使用
+_sukutsu_balgas_base = {
     'id': 'sukutsu_arena_master',
     'Author': 'tishi.elin.sukutsu_arena',
     'name_JP': 'バルガス',
@@ -135,13 +146,14 @@ npcs.append({
     'LV': 800,
     'hostility': 'Friend',
     'bio': 'm/1002/185/90/stern',
-    'idText': 'sukutsu_arena_master',
+    'idText': 'sukutsu_arena_master',  # 共通テキストID
     # CWL タグ: ゾーン生成、ランダム移動無効、ドラマリンク、人間らしい会話
     'tag': f'neutral,addZone_{ZONE_ID},addFlag_StayHomeZone,addDrama_drama_sukutsu_arena_master,humanSpeak',
     'trait': 'SukutsuNPC',  # メインクエスト完了前はペット化不可
     'quality': 4,
     'chance': 0,
-})
+}
+npcs.append(_sukutsu_balgas_base)
 
 # 3. アスタロト (ドラゴン / 男性 / アリーナ創設者 / 最終ボス)
 # lore: イルヴァの神々と同格の竜神、Lv.50000
@@ -170,6 +182,7 @@ npcs.append({
     'actCombat': 'breathe_Void/35,breathe_Chaos/25,breathe_Nether/20,hand_Magic/30,SpGravity/10,SpBane/5,ActGazeInsane/15,ActGazeMutation/10,ActCurse/10,ActBurnMana/15,SpHeal/5,SpSummonDragon/5,SpEarthquake/5,SpShutterHex/5,SpSpeedDown/5,SpSilence/5,SpWeakness/5,SpNightmare/5,SpSummonTentacle/5,SpGate/5,ActTouchDrown/5,ActNeckHunt/5',
     # CWL タグ: ゾーン生成、ランダム移動無効
     'tag': f'boss,undead,addZone_{ZONE_ID},addFlag_StayHomeZone',
+    'trait': 'SukutsuNPC',  # メインクエスト完了前はペット化不可
     'quality': 5,
     'chance': 0,
 })
@@ -277,57 +290,45 @@ npcs.append({
 # 8. 訓練用バルガス (バルガス訓練クエスト / 手加減バージョン)
 # lore: 「お前の足を一歩でも動かしてみせろ」
 # 全力ではないが、それでも歴戦の覇者
-npcs.append({
+# Note: _sukutsu_balgas_baseをコピーし、必要な部分のみ上書き
+_sukutsu_balgas_training = _sukutsu_balgas_base.copy()
+_sukutsu_balgas_training.update({
     'id': 'sukutsu_balgas_training',
-    'Author': 'tishi.elin.sukutsu_arena',
-    'name_JP': 'バルガス',
-    'name': 'Balgas',
-    'aka_JP': '百戦の覇者',
-    'aka': 'Champion of Hundred Battles',
-    'race': 'juere',
-    'job': 'warrior',
-    '_idRenderData': '@chara',
-    'tiles': 0,  # human male warrior
     'LV': 200,  # 手加減バージョン
     'hostility': 'Enemy',
-    'bio': 'm/1002/185/90/stern',
-    'idText': 'sukutsu_balgas_training',
     # 能力: 物理特化（手加減）
     'mainElement': 'Cut',
     'elements': 'featElder/1,resCut/60,resImpact/60',
     'actCombat': '',
-    'tag': 'boss',
-    'quality': 4,
-    'chance': 0,
+    'tag': 'boss',  # addZoneなし（バトル専用）
+    'trait': '',  # トレイト不要（バトル専用）
 })
+npcs.append(_sukutsu_balgas_training)
 
 # 9. 全盛期バルガス (Rank S昇格試験 / 若返った最強の戦士)
 # lore: 68歳の現在はLv.85、全盛期（30代）はLv.120相当
 # 「若返りの薬」使用条件は「真に命を賭けた戦いの場」でのみ
 # 純粋な「武の極致」。魔法もブレスも使わず、剣と体術のみで全てを圧倒する
-npcs.append({
+# Note: _sukutsu_balgas_baseをコピーし、必要な部分のみ上書き
+_sukutsu_balgas_prime = _sukutsu_balgas_base.copy()
+_sukutsu_balgas_prime.update({
     'id': 'sukutsu_balgas_prime',
-    'Author': 'tishi.elin.sukutsu_arena',
     'name_JP': '全盛期のバルガス',
     'name': 'Balgas at His Prime',
     'aka_JP': '鉄血の覇者',
     'aka': 'Iron-Blooded Champion',
-    'race': 'juere',
-    'job': 'warrior',
-    '_idRenderData': '@chara',
-    'tiles': 0,  # human male warrior
     'LV': 8000,  # Tier3: Lv.1,000-10,000
     'hostility': 'Enemy',
     'bio': 'm/1002/188/95/stern',
-    'idText': 'sukutsu_balgas_prime',
     # 能力: 物理特化、8部位連撃、高物理耐性、魔法無効、ヴォーパル、連撃系
     'mainElement': 'Cut',
     'elements': 'featElder/1,featBodyParts/8,resCut/80,resImpact/80,resFire/40,resCold/40,resLightning/40,resMind/60,resNerve/60,antiMagic/60,vopal/60,mod_flurry/65,mod_chaser/30,mod_cleave/10,redirect_blaser/23,counter/20',
     'actCombat': 'breathe_Cut/40,breathe_Impact/30,SpHero/10,ActRush/25,ActBash/20',
-    'tag': 'boss',
+    'tag': 'boss',  # addZoneなし（バトル専用）
+    'trait': '',  # トレイト不要（バトル専用）
     'quality': 5,
-    'chance': 0,
 })
+npcs.append(_sukutsu_balgas_prime)
 
 # 10. カインの亡霊 (Rank E昇格試験 / バルガスの元副官)
 # lore: 次元の狭間で変異したカオスシェイプ
@@ -358,8 +359,8 @@ npcs.append({
 # 9. ヌル (Rank B昇格試験 / 暗殺人形 / 人造生命体)
 # lore: 「神の孵化場」計画の失敗作、アリーナの「清掃係」
 # 透明化 + 分裂能力で数で圧倒する暗殺者
-# Note: アリーナではNPCとして配置、ボス戦時はevalでhostility変更
-npcs.append({
+# Note: アリーナではNPCとして配置、ボス戦時は敵バージョン(sukutsu_null_enemy)を使用
+_sukutsu_null_base = {
     'id': 'sukutsu_null',
     'Author': 'tishi.elin.sukutsu_arena',
     'name_JP': 'Nul',
@@ -384,7 +385,20 @@ npcs.append({
     'trait': 'SukutsuNPC',  # メインクエスト完了前はペット化不可
     'quality': 4,
     'chance': 0,
+}
+npcs.append(_sukutsu_null_base)
+
+# 9b. Nul（敵バージョン / バトル用）
+# sukutsu_null_baseをコピーし、必要な部分のみ上書き
+# 分身（featSplit）もEnemyとして生成される
+_sukutsu_null_enemy = _sukutsu_null_base.copy()
+_sukutsu_null_enemy.update({
+    'id': 'sukutsu_null_enemy',
+    'hostility': 'Enemy',  # バトル用: 敵として生成
+    'tag': 'boss',  # addZoneなし（バトル専用、アリーナに配置しない）
+    'trait': '',  # トレイト不要（バトル専用）
 })
+npcs.append(_sukutsu_null_enemy)
 
 # 10. 影のドッペルゲンガー (Rank A昇格試験 / プレイヤーの影)
 # lore: 観客の「注目」がプレイヤーの影から生み出した存在
@@ -523,6 +537,13 @@ npcs.append({
     'chance': 0,
 })
 
+
+# デバッグモードの場合、全キャラのLVを1に設定
+if DEBUG_MODE:
+    for npc in npcs:
+        original_lv = npc.get('LV', 'N/A')
+        npc['LV'] = 1
+        print(f"  {npc['id']}: LV {original_lv} -> 1")
 
 for npc in npcs:
     rows.append(create_npc_row(npc))

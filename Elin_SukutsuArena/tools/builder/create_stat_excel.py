@@ -33,12 +33,12 @@ TYPES = [
 ]
 
 # デフォルト値（3行目）- idは記載している最大値より大きい必要がある
+# 注意: elementsはデフォルト値を設定しない（カスタムConditionで問題が発生するため）
 DEFAULTS = {
     'id': '100000',
     'group': 'Neutral',
     'duration': 'p/10',
     'hexPower': '10',
-    'elements': '0,1,2,3,4,5,6,7,8,9',
     'gradient': 'condition',
 }
 
@@ -52,7 +52,7 @@ def make_resist_buff(id, alias, name_jp, name_en, element_alias, detail_jp, deta
         'name': name_en,
         'type': 'BaseBuff',  # バニラのBaseBuffクラスを使用（GetPhase=>0でphase配列不要）
         'group': 'Buff',
-        'duration': 'p/15+8',
+        'duration': '3000',  # 固定3000ターン
         'phase': '',  # BaseBuffはGetPhase=>0なので不要
         'colors': 'buff',
         'elements': f'{element_alias},50',  # エレメントと値をカンマ区切りで指定
@@ -67,7 +67,7 @@ def make_resist_buff(id, alias, name_jp, name_en, element_alias, detail_jp, deta
 
 # カスタムCondition定義
 CONDITIONS = [
-    # アスタロトの権能
+    # アスタロトの権能（elementsはExcel側で設定）
     {
         'id': '10001',
         'alias': 'ConAstarothTyranny',
@@ -75,6 +75,7 @@ CONDITIONS = [
         'name': 'Tyranny of Time',
         'type': 'Elin_SukutsuArena.Conditions.ConAstarothTyranny',
         'phase': '0,0,0,0,0,0,0,0,0,0',
+        'elements': 'SPD,-1000',  # 速度大幅低下
         'detail_JP': 'アスタロトの権能により、速度が大幅に低下している。',
         'detail': "Your speed is drastically reduced by Astaroth's power.",
     },
@@ -85,6 +86,7 @@ CONDITIONS = [
         'name': 'Denial of Causality',
         'type': 'Elin_SukutsuArena.Conditions.ConAstarothDenial',
         'phase': '0,0,0,0,0,0,0,0,0,0',
+        'elements': 'STR,-1000',  # 筋力大幅低下
         'detail_JP': 'アスタロトの権能により、筋力が大幅に低下している。',
         'detail': "Your strength is drastically reduced by Astaroth's power.",
     },
@@ -95,8 +97,9 @@ CONDITIONS = [
         'name': 'Deletion Command of the End',
         'type': 'Elin_SukutsuArena.Conditions.ConAstarothDeletion',
         'phase': '0,0,0,0,0,0,0,0,0,0',
-        'detail_JP': 'アスタロトの権能により、魔力が消し去られている。MPが0になる。',
-        'detail': "Your magical power is erased by Astaroth's power. MP is reduced to 0.",
+        'elements': 'MAG,-1000',  # 魔力大幅低下
+        'detail_JP': 'アスタロトの権能により、魔力が消し去られている。',
+        'detail': "Your magical power is erased by Astaroth's power.",
     },
     # 個別の耐性バフ（バニラのConResEleパターン）
     make_resist_buff(10011, 'ConSukutsuResCold', '冷気耐性', 'Cold Resistance',
@@ -119,7 +122,7 @@ CONDITIONS = [
         'name': 'PV Buff',
         'type': 'BaseBuff',  # バニラのBaseBuffクラスを使用
         'group': 'Buff',
-        'duration': 'p/15+8',
+        'duration': '3000',  # 固定3000ターン
         'phase': '',  # BaseBuffはGetPhase=>0なので不要
         'colors': 'buff',
         'elements': 'PV,30',  # PVを+30
@@ -130,6 +133,64 @@ CONDITIONS = [
         'invert': 'TRUE',
         'detail_JP': '一時的にPVが上昇している。',
         'detail': 'PV is temporarily increased.',
+    },
+    # ブースト効果（禁断の覚醒剤用メリット）
+    {
+        'id': '10021',
+        'alias': 'ConSukutsuBoost',
+        'name_JP': '覚醒',
+        'name': 'Awakening',
+        'type': 'Elin_SukutsuArena.Conditions.ConSukutsuBoost',
+        'group': 'Buff',
+        'duration': '3000',  # 固定3000ターン
+        'phase': '0,0,0,0,0,0,0,0,0,0',
+        'colors': 'buff',
+        'elements': 'STR,30,END,30,DEX,30,SPD,50',  # 複数能力上昇
+        'textEnd_JP': '#1は力に目覚めた！',
+        'textEnd': '#1 awakens to power!',
+        'textPhase2_JP': '#1の覚醒が終わった。',
+        'textPhase2': "#1's awakening ends.",
+        'invert': 'TRUE',
+        'detail_JP': '身体能力が一時的に大幅上昇している。副作用に注意。',
+        'detail': 'Physical abilities are temporarily enhanced. Beware of side effects.',
+    },
+    # 出血効果（禁断の覚醒剤用デメリット）- elementsなし（Tickでダメージ処理）
+    {
+        'id': '10022',
+        'alias': 'ConSukutsuBleed',
+        'name_JP': '内出血',
+        'name': 'Internal Bleeding',
+        'type': 'Elin_SukutsuArena.Conditions.ConSukutsuBleed',
+        'group': 'Bad',
+        'duration': '3000',  # 固定3000ターン
+        'phase': '0,0,0,0,0,0,0,0,0,0',
+        'colors': 'debuff',
+        'elements': '',  # elementsなし（Tickでダメージ処理）
+        'textEnd_JP': '#1は内出血を起こした。',
+        'textEnd': '#1 suffers internal bleeding.',
+        'textPhase2_JP': '#1の内出血が止まった。',
+        'textPhase2': "#1's internal bleeding stops.",
+        'detail_JP': '覚醒剤の副作用で内出血している。毎ターンダメージを受ける。',
+        'detail': 'Internal bleeding from stimulant side effects. Takes damage every turn.',
+    },
+    # 毒効果（痛覚遮断薬用デメリット）
+    {
+        'id': '10023',
+        'alias': 'ConSukutsuPoison',
+        'name_JP': '薬物中毒',
+        'name': 'Drug Poisoning',
+        'type': 'Elin_SukutsuArena.Conditions.ConSukutsuPoison',
+        'group': 'Bad',
+        'duration': '3000',  # 固定3000ターン
+        'phase': '0,0,0,0,0,0,0,0,0,0',
+        'colors': 'debuff',
+        'elements': 'END,-10',  # 耐久低下
+        'textEnd_JP': '#1は薬物中毒を起こした。',
+        'textEnd': '#1 suffers from drug poisoning.',
+        'textPhase2_JP': '#1の薬物中毒が治った。',
+        'textPhase2': "#1 recovers from drug poisoning.",
+        'detail_JP': '痛覚遮断薬の副作用で中毒状態。自然回復が阻害される。',
+        'detail': 'Poisoned by painkiller side effects. Natural regeneration is blocked.',
     },
 ]
 

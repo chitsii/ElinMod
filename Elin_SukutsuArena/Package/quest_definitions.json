@@ -102,7 +102,7 @@
     "advancesPhaseOrdinal": 3,
     "requiredFlags": [],
     "requiredQuests": [
-      "06_rank_up_E"
+      "07_upper_existence"
     ],
     "completionFlags": {},
     "branchChoices": [],
@@ -124,7 +124,7 @@
     "advancesPhaseOrdinal": -1,
     "requiredFlags": [],
     "requiredQuests": [
-      "10_rank_up_D"
+      "09_balgas_training"
     ],
     "completionFlags": {},
     "branchChoices": [],
@@ -212,7 +212,8 @@
     "advancesPhaseOrdinal": -1,
     "requiredFlags": [],
     "requiredQuests": [
-      "12_rank_up_A"
+      "12_rank_up_A",
+      "15_vs_balgas"
     ],
     "completionFlags": {},
     "branchChoices": [],
@@ -236,7 +237,8 @@
     "advancesPhaseOrdinal": -1,
     "requiredFlags": [],
     "requiredQuests": [
-      "12_rank_up_A"
+      "12_rank_up_A",
+      "15_vs_balgas"
     ],
     "completionFlags": {},
     "branchChoices": [],
@@ -327,7 +329,8 @@
     "advancesPhaseOrdinal": -1,
     "requiredFlags": [],
     "requiredQuests": [
-      "05_1_lily_experiment"
+      "05_1_lily_experiment",
+      "05_2_zek_steal_bottle"
     ],
     "completionFlags": {},
     "branchChoices": [],
@@ -351,7 +354,8 @@
     "advancesPhaseOrdinal": -1,
     "requiredFlags": [],
     "requiredQuests": [
-      "05_1_lily_experiment"
+      "05_1_lily_experiment",
+      "05_2_zek_steal_bottle"
     ],
     "completionFlags": {},
     "branchChoices": [],
@@ -397,7 +401,8 @@
     "advancesPhaseOrdinal": -1,
     "requiredFlags": [],
     "requiredQuests": [
-      "06_rank_up_E"
+      "06_rank_up_E",
+      "06_2_zek_steal_soulgem"
     ],
     "completionFlags": {},
     "branchChoices": [],
@@ -421,7 +426,8 @@
     "advancesPhaseOrdinal": -1,
     "requiredFlags": [],
     "requiredQuests": [
-      "06_rank_up_E"
+      "06_rank_up_E",
+      "06_2_zek_steal_soulgem"
     ],
     "completionFlags": {},
     "branchChoices": [],
@@ -437,20 +443,20 @@
     "displayNameJP": "高次元存在の真実",
     "displayNameEN": "Truth of Higher Dimensional Beings",
     "description": "観客の正体と闘技場の真実が明らかになる",
-    "phase": "awakening",
-    "phaseOrdinal": 3,
+    "phase": "rising",
+    "phaseOrdinal": 2,
     "questGiver": "sukutsu_arena_master",
     "autoTrigger": false,
     "advancesPhase": null,
     "advancesPhaseOrdinal": -1,
     "requiredFlags": [],
     "requiredQuests": [
-      "10_rank_up_D"
+      "06_rank_up_E"
     ],
     "completionFlags": {},
     "branchChoices": [],
     "blocksQuests": [],
-    "priority": 800
+    "priority": 899
   },
   {
     "questId": "08_lily_private",
@@ -494,7 +500,7 @@
     "completionFlags": {},
     "branchChoices": [],
     "blocksQuests": [],
-    "priority": 650
+    "priority": 899
   },
   {
     "questId": "12_makuma",
@@ -527,14 +533,13 @@
     "description": "虚空の心臓を製作し、過去の選択の清算が行われる",
     "phase": "confrontation",
     "phaseOrdinal": 4,
-    "questGiver": null,
-    "autoTrigger": true,
+    "questGiver": "sukutsu_receptionist",
+    "autoTrigger": false,
     "advancesPhase": null,
     "advancesPhaseOrdinal": -1,
     "requiredFlags": [],
     "requiredQuests": [
-      "12_makuma",
-      "05_2_zek_steal_bottle_accept"
+      "12_makuma"
     ],
     "completionFlags": {},
     "branchChoices": [],
@@ -594,8 +599,8 @@
     "description": "アスタロトとの最終決戦、複数のエンディング分岐",
     "phase": "climax",
     "phaseOrdinal": 5,
-    "questGiver": null,
-    "autoTrigger": true,
+    "questGiver": "sukutsu_shady_merchant",
+    "autoTrigger": false,
     "advancesPhase": null,
     "advancesPhaseOrdinal": -1,
     "requiredFlags": [],
@@ -605,6 +610,6 @@
     "completionFlags": {},
     "branchChoices": [],
     "blocksQuests": [],
-    "priority": 1000
+    "priority": 500
   }
 ]

@@ -273,7 +273,8 @@ RANK_UP_STAGES: Dict[str, BattleStage] = {
         enemies=[
             # ヌル：透明化する暗殺人形、「神の孵化場」計画の失敗作
             # 誰かの記憶の欠片が眠っている
-            EnemyConfig("sukutsu_null", level=1000, rarity="Mythical", is_boss=True),
+            # Note: sukutsu_null_enemy を使用（hostility=Enemyで分身も敵として生成）
+            EnemyConfig("sukutsu_null_enemy", level=1000, rarity="Mythical", is_boss=True),
         ],
         description_jp="「神の孵化場」計画の失敗作——暗殺人形ヌル。透明化し、一撃で仕留める。彼女の中には、素材となった誰かの記憶が眠っている。",
         description_en="A failure of the 'God Hatchery' project—the assassin doll Null. She turns invisible and kills in one strike. Memories of whoever became her material still slumber within.",
@@ -284,11 +285,11 @@ RANK_UP_STAGES: Dict[str, BattleStage] = {
     # 地上では伝説級。リリィが事務的ではなく「一人の異性」として興味を持ち始める。
     # ========================================
 
-    # ランクA昇格試験: 黄金の戦鬼（影の自己）
+    # ランクA昇格試験: 戦鬼（影の自己）
     "rank_a_trial": BattleStage(
         stage_id="rank_a_trial",
-        display_name_jp="黄金の戦鬼",
-        display_name_en="Golden War Demon",
+        display_name_jp="戦鬼",
+        display_name_en="War Demon",
         zone_type="field_fine",
         bgm_battle="BGM/Battle_Shadow_Self",
         reward_plat=120,

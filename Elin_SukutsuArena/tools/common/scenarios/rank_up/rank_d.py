@@ -160,6 +160,7 @@ def add_rank_up_D_result_steps(builder: ArenaDramaBuilder, victory_label: str, d
         .say("lily_v3", "では、報酬の授与です。", "", actor=lily) \
         .complete_quest(QuestIds.RANK_UP_D) \
         .grant_rank_reward("D", actor=lily) \
+        .say("debug_d_done", "【DEBUG】ランクD報酬処理完了。F9で現在のランク値を確認してください。", "", actor=pc) \
         .finish()
 
     # ========================================

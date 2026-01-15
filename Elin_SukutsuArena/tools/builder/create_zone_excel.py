@@ -117,7 +117,7 @@ data_row[8] = 100 # I: value
 data_row[10] = 'sukutsu_arena' # K: idFile
 data_row[11] = 'Plain' # L: idBiome
 # M: idGen
-# N: idPlaylist
+data_row[13] = 'Lobby_Normal' # N: idPlaylist（アリーナロビーBGM）
 data_row[14] = 'addMap,light' # O: tag
 # P: cost
 # Q: dev

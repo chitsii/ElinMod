@@ -33,6 +33,11 @@ namespace Elin_SukutsuArena
 
         private List<QuestDefinition> allQuests = new List<QuestDefinition>();
 
+        /// <summary>
+        /// 全クエスト定義を取得
+        /// </summary>
+        public IReadOnlyList<QuestDefinition> GetAllQuests() => allQuests;
+
         private const string QuestDefinitionsPath = "Package/quest_definitions.json";
         private const string QuestCompletedFlagPrefix = "sukutsu_quest_done_";
         private const string CurrentPhaseFlagKey = "chitsii.arena.player.current_phase";
@@ -203,6 +208,24 @@ namespace Elin_SukutsuArena
                 if (flagsFailed)
                 {
                     if (isArenaMasterQuest) Debug.Log($"[ArenaQuest] {quest.QuestId}: SKIP (flag failed: {failedFlag})");
+                    continue;
+                }
+
+                // Check if blocked by another completed quest
+                bool isBlocked = false;
+                string blockingQuestId = null;
+                foreach (var otherQuest in allQuests)
+                {
+                    if (otherQuest.BlocksQuests.Contains(quest.QuestId) && IsQuestCompleted(otherQuest.QuestId))
+                    {
+                        isBlocked = true;
+                        blockingQuestId = otherQuest.QuestId;
+                        break;
+                    }
+                }
+                if (isBlocked)
+                {
+                    if (isArenaMasterQuest) Debug.Log($"[ArenaQuest] {quest.QuestId}: SKIP (blocked by: {blockingQuestId})");
                     continue;
                 }
 

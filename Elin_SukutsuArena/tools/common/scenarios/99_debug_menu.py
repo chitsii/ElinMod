@@ -54,6 +54,9 @@ def define_debug_menu(builder: DramaBuilder):
     main_menu = builder.label("main_menu")
     drama_menu = builder.label("drama_menu")
     battle_menu = builder.label("battle_menu")
+    quest_menu = builder.label("quest_menu")
+    items_menu = builder.label("items_menu")
+    npc_menu = builder.label("npc_menu")
     flags_menu = builder.label("flags_menu")
     end = builder.label("end")
 
@@ -75,6 +78,9 @@ def define_debug_menu(builder: DramaBuilder):
 
     builder.choice(drama_menu, "ドラマを再生", "", text_id="c_drama") \
            .choice(battle_menu, "バトルを開始", "", text_id="c_battle") \
+           .choice(quest_menu, "クエスト操作", "", text_id="c_quest") \
+           .choice(items_menu, "アイテム取得", "", text_id="c_items") \
+           .choice(npc_menu, "NPC操作", "", text_id="c_npc") \
            .choice(flags_menu, "フラグ操作", "", text_id="c_flags") \
            .choice(end, "終了", "", text_id="c_end")
 
@@ -84,6 +90,9 @@ def define_debug_menu(builder: DramaBuilder):
 
     builder.choice(drama_menu, "ドラマを再生", "", text_id="c_drama_2") \
            .choice(battle_menu, "バトルを開始", "", text_id="c_battle_2") \
+           .choice(quest_menu, "クエスト操作", "", text_id="c_quest_2") \
+           .choice(items_menu, "アイテム取得", "", text_id="c_items_2") \
+           .choice(npc_menu, "NPC操作", "", text_id="c_npc_2") \
            .choice(flags_menu, "フラグ操作", "", text_id="c_flags_2") \
            .choice(end, "終了", "", text_id="c_end_2")
 
@@ -131,6 +140,136 @@ def define_debug_menu(builder: DramaBuilder):
     _build_battle_submenu(builder, battle_debug, debug_only, battle_menu, debug_master)
 
     # ========================================
+    # クエスト操作メニュー（新規）
+    # ========================================
+    quest_pet_unlock = builder.label("quest_pet_unlock")
+    quest_rank_b = builder.label("quest_rank_b")
+    quest_rank_a = builder.label("quest_rank_a")
+    quest_all = builder.label("quest_all")
+    quest_reset = builder.label("quest_reset")
+
+    builder.step(quest_menu) \
+        .say("quest_info", "クエスト進行を操作します。", "", actor=debug_master)
+
+    builder.choice(quest_pet_unlock, "ペット解禁のみ", "", text_id="c_quest_pet") \
+           .choice(quest_rank_b, "Bランク到達", "", text_id="c_quest_b") \
+           .choice(quest_rank_a, "Aランク到達", "", text_id="c_quest_a") \
+           .choice(quest_all, "全クエスト完了", "", text_id="c_quest_all") \
+           .choice(quest_reset, "クエストリセット", "", text_id="c_quest_reset") \
+           .choice(main_menu, "戻る", "", text_id="c_quest_back")
+
+    builder.step(quest_pet_unlock) \
+        .action("eval", param="Elin_SukutsuArena.DebugHelper.CompleteQuestsUpTo(\"18_last_battle\");") \
+        .say("quest_pet_done", "18_last_battleまで完了しました。ペット化が解禁されました。", "", actor=debug_master) \
+        .jump(quest_menu)
+
+    builder.step(quest_rank_b) \
+        .action("eval", param="Elin_SukutsuArena.DebugHelper.CompleteQuestsUpTo(\"12_rank_b_trial\");") \
+        .say("quest_b_done", "Bランク到達まで完了しました。Nulが非表示になります。", "", actor=debug_master) \
+        .jump(quest_menu)
+
+    builder.step(quest_rank_a) \
+        .action("eval", param="Elin_SukutsuArena.DebugHelper.CompleteQuestsUpTo(\"14_rank_a_trial\");") \
+        .say("quest_a_done", "Aランク到達まで完了しました。", "", actor=debug_master) \
+        .jump(quest_menu)
+
+    builder.step(quest_all) \
+        .action("eval", param="Elin_SukutsuArena.ArenaQuestManager.Instance.DebugCompleteAllQuests();") \
+        .say("quest_all_done", "全クエストを完了しました。", "", actor=debug_master) \
+        .jump(quest_menu)
+
+    builder.step(quest_reset) \
+        .action("eval", param="Elin_SukutsuArena.DebugHelper.ResetAllQuests();") \
+        .say("quest_reset_done", "全クエストをリセットしました。", "", actor=debug_master) \
+        .jump(quest_menu)
+
+    # ========================================
+    # アイテム取得メニュー
+    # ========================================
+    item_makuma2 = builder.label("item_makuma2")
+    item_lily_exp = builder.label("item_lily_exp")
+    item_plat = builder.label("item_plat")
+
+    builder.step(items_menu) \
+        .say("items_info", "クエスト用素材を取得します。", "", actor=debug_master)
+
+    builder.choice(item_makuma2, "虚空の心臓素材（心臓+ルーンモールド）", "", text_id="c_item_makuma2") \
+           .choice(item_lily_exp, "残響の器素材（骨）", "", text_id="c_item_lily_exp") \
+           .choice(item_plat, "プラチナコイン×10", "", text_id="c_item_plat") \
+           .choice(main_menu, "戻る", "", text_id="c_items_back")
+
+    # makuma2素材: 心臓×1 + ルーンモールド×1
+    builder.step(item_makuma2) \
+        .cs_eval("EClass.pc.Pick(ThingGen.Create(\"heart\"));") \
+        .cs_eval("EClass.pc.Pick(ThingGen.Create(\"rune_mold_earth\"));") \
+        .say("item_makuma2_got", "心臓×1とルーンモールド（大地）×1を取得しました。", "", actor=debug_master) \
+        .jump(items_menu)
+
+    # lily_experiment素材: 骨×1
+    builder.step(item_lily_exp) \
+        .cs_eval("EClass.pc.Pick(ThingGen.Create(\"bone\"));") \
+        .say("item_lily_exp_got", "骨×1を取得しました。", "", actor=debug_master) \
+        .jump(items_menu)
+
+    # プラチナコイン×10
+    builder.step(item_plat) \
+        .cs_eval("for(int i=0; i<10; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
+        .say("item_plat_got", "プラチナコイン×10を取得しました。", "", actor=debug_master) \
+        .jump(items_menu)
+
+    # ========================================
+    # NPC操作メニュー（新規）
+    # ========================================
+    npc_status = builder.label("npc_status")
+    npc_hide_nul = builder.label("npc_hide_nul")
+    npc_hide_astaroth = builder.label("npc_hide_astaroth")
+    npc_restore_all = builder.label("npc_restore_all")
+    npc_bad_end = builder.label("npc_bad_end")
+    npc_flag_status = builder.label("npc_flag_status")
+
+    builder.step(npc_menu) \
+        .say("npc_info", "NPC状態を操作します。", "", actor=debug_master)
+
+    builder.choice(npc_status, "NPC状態確認", "", text_id="c_npc_status") \
+           .choice(npc_hide_nul, "Nul非表示", "", text_id="c_npc_hide_nul") \
+           .choice(npc_hide_astaroth, "Astaroth非表示", "", text_id="c_npc_hide_ast") \
+           .choice(npc_restore_all, "全NPC再表示", "", text_id="c_npc_restore") \
+           .choice(npc_bad_end, "バッドエンドシミュ", "", text_id="c_npc_bad") \
+           .choice(npc_flag_status, "フラグ状態確認", "", text_id="c_npc_flags") \
+           .choice(main_menu, "戻る", "", text_id="c_npc_back")
+
+    builder.step(npc_status) \
+        .action("eval", param="Elin_SukutsuArena.DebugHelper.ShowNpcStatus();") \
+        .say("npc_status_done", "NPC状態をログに出力しました。", "", actor=debug_master) \
+        .jump(npc_menu)
+
+    builder.step(npc_hide_nul) \
+        .action("eval", param="Elin_SukutsuArena.DebugHelper.HideNpc(\"sukutsu_null\");") \
+        .say("npc_hide_nul_done", "Nulを非表示にしました。", "", actor=debug_master) \
+        .jump(npc_menu)
+
+    builder.step(npc_hide_astaroth) \
+        .action("eval", param="Elin_SukutsuArena.DebugHelper.HideNpc(\"sukutsu_astaroth\");") \
+        .say("npc_hide_ast_done", "Astarothを非表示にしました。", "", actor=debug_master) \
+        .jump(npc_menu)
+
+    builder.step(npc_restore_all) \
+        .action("eval", param="Elin_SukutsuArena.DebugHelper.RestoreAllNpcs();") \
+        .say("npc_restore_done", "全NPCをアリーナに再表示しました。", "", actor=debug_master) \
+        .jump(npc_menu)
+
+    builder.step(npc_bad_end) \
+        .set_flag(Keys.BALGAS_KILLED, FlagValues.BalgasChoice.KILLED) \
+        .set_flag(Keys.LILY_HOSTILE, FlagValues.TRUE) \
+        .say("npc_bad_done", "バッドエンドフラグを設定しました（バルガス死亡+リリィ離反）", "", actor=debug_master) \
+        .jump(npc_menu)
+
+    builder.step(npc_flag_status) \
+        .action("eval", param="Elin_SukutsuArena.DebugHelper.ShowFlagStatus();") \
+        .say("npc_flag_done", "フラグ状態をログに出力しました。", "", actor=debug_master) \
+        .jump(npc_menu)
+
+    # ========================================
     # フラグ操作メニュー
     # ========================================
     set_rank_s = builder.label("set_rank_s")
@@ -141,19 +280,13 @@ def define_debug_menu(builder: DramaBuilder):
         .say("flags_info", "フラグ操作を選択してください。", "", actor=debug_master)
 
     builder.choice(set_rank_s, "ランクSに設定", "", text_id="c_set_rank_s") \
-           .choice(set_all_quests, "全クエスト完了", "", text_id="c_set_quests") \
            .choice(scenario_flags, "シナリオ分岐フラグ", "", text_id="c_scenario_flags") \
            .choice(main_menu, "戻る", "", text_id="c_flags_back")
 
+    # ランクSに設定するには、全ランクアップクエストを完了させる
     builder.step(set_rank_s) \
-        .set_flag("chitsii.arena.player.rank", 8) \
-        .set_flag("sukutsu_gladiator", 1) \
-        .say("rank_set", "ランクをSに設定しました。", "", actor=debug_master) \
-        .jump(flags_menu)
-
-    builder.step(set_all_quests) \
-        .action("eval", param="Elin_SukutsuArena.ArenaQuestManager.Instance.DebugCompleteAllQuests();") \
-        .say("quests_set", "全クエストを完了しました。", "", actor=debug_master) \
+        .action("eval", param="Elin_SukutsuArena.DebugHelper.SetRankS();") \
+        .say("rank_set", "ランクをSに設定しました（全ランクアップクエスト完了）", "", actor=debug_master) \
         .jump(flags_menu)
 
     # ========================================

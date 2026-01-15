@@ -163,7 +163,7 @@ def define_epilogue(builder: DramaBuilder):
         .branch_if(Keys.BALGAS_KILLED, "==", FlagValues.BalgasChoice.KILLED, finale_check_lily_dead) \
         .branch_if(Keys.LILY_HOSTILE, "==", FlagValues.TRUE, finale_lily_hostile) \
         .say("balgas_f1", "……おい、いつまで感傷に浸ってんだ。次は俺の奢りで、地上で一番うまい酒を飲みに行くぞ！", "", actor=balgas) \
-        .say("lily_f1", "ふふ、楽しみです。……リリィとして、初めての『デート』ですから。", "", actor=lily) \
+        .say("lily_f1", "ふふ、楽しみです。……バルガスさん、まだイルヴァのお金は残ってあるの？", "", actor=lily) \
         .say("zek_f1", "おや、私も混ぜてくださいよ？", "", actor=zek) \
         .complete_quest(QuestIds.LAST_BATTLE) \
         .say("sys_complete", "【巣窟アリーナ】メインストーリークリア！", actor=pc) \

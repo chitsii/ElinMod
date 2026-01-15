@@ -6,6 +6,7 @@
 from drama_builder import DramaBuilder
 from arena_drama_builder import ArenaDramaBuilder
 from flag_definitions import Keys, Actors, QuestIds
+from battle_flags import QuestBattleFlags
 
 def define_balgas_training(builder: DramaBuilder):
     """
@@ -43,10 +44,14 @@ def define_balgas_training(builder: DramaBuilder):
     ending = builder.label("ending")
 
     # ========================================
-    # シーン1: 酒場に響く「問い」
+    # 導入: ランクC挑戦前の訓練
     # ========================================
     builder.step(main) \
         .play_bgm("BGM/Lobby_Normal") \
+        .say("narr_0", "（バルガスに昇格試験を申し出ようとしたあなたを、彼が呼び止めた。）", "", actor=pc) \
+        .focus_chara(Actors.BALGAS) \
+        .say("balgas_0a", "……おい、ちょっと待て。", "", actor=balgas) \
+        .say("balgas_0b", "ランクCに挑む前に、お前に言っておきたいことがある。", "", actor=balgas) \
         .say("narr_1", "（ロビーの隅、いつもの酒瓶を横に置き、バルガスが自慢の大剣を丁寧に研いでいる。）", "", actor=pc) \
         .say("narr_2", "（研石が剣を研ぐ規則的な音が、静まり返ったロビーに響く。）", "", actor=pc) \
         .say("narr_3", "（あなたが近づくと、彼は研石を止め、濁った、しかし鋭い眼光を向けた。）", "", actor=pc) \
@@ -55,7 +60,7 @@ def define_balgas_training(builder: DramaBuilder):
     builder.step(scene1) \
         .focus_chara(Actors.BALGAS) \
         .say("balgas_1", "……おい、銅貨稼ぎ。最近の戦いぶり、悪かねえ。", "", actor=balgas) \
-        .say("balgas_2", "だがな、今のままじゃランクCの壁……あそこに巣食う『本当のバケモノ』どもに、鼻歌交じりで解体されるのがオチだ。", "", actor=balgas) \
+        .say("balgas_2", "だがな、今のままじゃランクCの壁……あそこで待ってる『歴戦の猛者』どもに、鼻歌交じりで解体されるのがオチだ。", "", actor=balgas) \
         .say("narr_4", "（彼は研石を置き、腕を組む。）", "", actor=pc) \
         .say("balgas_3", "お前には『技術』がある。だが、『哲学』がねえ。", "", actor=balgas) \
         .say("balgas_4", "……剣を振る時、お前は何を考えてる？ 敵のHPか？ 次に飲むポーションの種類か？", "", actor=balgas) \
@@ -128,8 +133,8 @@ def define_balgas_training(builder: DramaBuilder):
         .say("balgas_9", "魔法でも、薬でも、卑怯な手でも何でも使え。", "", actor=balgas) \
         .say("balgas_10", "戦士の哲学とは、『手段』を尽くした先にある『目的』の純粋さだ！", "", actor=balgas) \
         .say("narr_10", "（バルガスとの特別な手合わせが始まる……！）", "", actor=pc) \
-        .set_flag("sukutsu_is_quest_battle_result", 1) \
-        .set_flag("sukutsu_quest_battle", 4) \
+        .set_flag(QuestBattleFlags.RESULT_FLAG, 1) \
+        .set_flag(QuestBattleFlags.FLAG_NAME, QuestBattleFlags.BALGAS_TRAINING) \
         .start_battle_by_stage("balgas_training_battle", master_id="sukutsu_arena_master") \
         .finish()
 
@@ -152,32 +157,8 @@ def define_balgas_training(builder: DramaBuilder):
         .say("lily_4", "……素晴らしい。バルガスさんの説教を聞いて生き残るなんて、あなたは本当の意味で『闘技場の鴉』になる資格を得たようです。", "", actor=lily) \
         .say("lily_5", "カラスは死肉を喰らい、戦場を飛び回る。……今のあなたに、相応しい二つ名ですね。", "", actor=lily) \
         .say("narr_15", "（彼女は台帳に何かを書き込む。）", "", actor=pc) \
-        .say("lily_6", "観客からの報酬として、小さなコイン12枚とプラチナコイン5枚。それと、戦闘記録として素材を一つ選んでいただけます。", "", actor=lily) \
-        .jump(reward_choice)
-
-    # 報酬選択肢
-    builder.choice(reward_stone, "研磨石を頼む", "", text_id="c_reward_stone") \
-           .choice(reward_steel, "鋼鉄の欠片が欲しい", "", text_id="c_reward_steel") \
-           .choice(reward_bone, "骨を選ぶ", "", text_id="c_reward_bone")
-
-    builder.step(reward_stone) \
-        .say("lily_rew1", "『研磨石×1』、記録いたしました。バルガスさんの哲学を継ぐ、良い選択ですね。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"whetstone\"));") \
-        .jump(reward_end)
-
-    builder.step(reward_steel) \
-        .say("lily_rew2", "『鋼鉄の欠片×1』、記録いたしました。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"steel\"));") \
-        .jump(reward_end)
-
-    builder.step(reward_bone) \
-        .say("lily_rew3", "『骨×1』ですね。……地味ですが、実用的です。", "", actor=lily) \
-        .action("eval", param="EClass.pc.Pick(ThingGen.Create(\"bone\"));") \
-        .jump(reward_end)
-
-    builder.step(reward_end) \
-        .action("eval", param="for(int i=0; i<12; i++) { EClass.pc.Pick(ThingGen.Create(\"medal\")); } for(int i=0; i<5; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
-        .say("lily_7", "記録完了です。", "", actor=lily) \
+        .say("lily_6", "報酬として、プラチナコイン5枚を記録いたしました。", "", actor=lily) \
+        .action("eval", param="for(int i=0; i<5; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
         .say("lily_8", "……それと、今回の戦いで、あなたは『闘技場の鴉』としての称号を獲得しました。", "", actor=lily) \
         .say("lily_9", "死肉を喰らい、戦場を飛び回る……ふふ、あなたらしいですね。", "", actor=lily) \
         .say("narr_16", "（バルガスが酒瓶を傾けながら、あなたに背を向けたまま言う。）", "", actor=pc) \
@@ -272,11 +253,8 @@ def add_balgas_training_result_steps(builder: ArenaDramaBuilder, victory_label: 
         .say("lily_bt1", "……素晴らしい。バルガスさんの説教を聞いて生き残るなんて、あなたは本当の意味で『闘技場の鴉』になる資格を得たようです。", "", actor=lily) \
         .say("lily_bt2", "カラスは死肉を喰らい、戦場を飛び回る。……今のあなたに、相応しい二つ名ですね。", "", actor=lily) \
         .say("narr_bt5", "（彼女は台帳に何かを書き込む。）", "", actor=pc) \
-        .say("lily_bt3", "観客からの報酬として、小さなコイン12枚とプラチナコイン5枚。それと、戦闘記録として素材を一つ選んでいただけます。", "", actor=lily) \
-        .jump(reward_stone_bt)
-
-    builder.step(reward_end_bt) \
-        .action("eval", param="for(int i=0; i<12; i++) { EClass.pc.Pick(ThingGen.Create(\"medal\")); } for(int i=0; i<5; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
+        .say("lily_bt3", "報酬として、プラチナコイン5枚を記録いたしました。", "", actor=lily) \
+        .action("eval", param="for(int i=0; i<5; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
         .say("lily_bt5", "……それと、今回の戦いで、あなたは『闘技場の鴉』としての称号を獲得しました。", "", actor=lily) \
         .say("lily_bt6", "死肉を喰らい、戦場を飛び回る……ふふ、あなたらしいですね。", "", actor=lily) \
         .say("narr_bt6", "（バルガスが酒瓶を傾けながら、あなたに背を向けたまま言う。）", "", actor=pc) \

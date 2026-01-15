@@ -6,14 +6,17 @@ NPCクリック時の会話処理
 from arena_drama_builder import ArenaDramaBuilder
 from drama_constants import DramaNames
 from flag_definitions import Keys, Actors, QuestIds
-from arena_high_level_api import QuestEntry, build_quest_dispatcher
+from arena_types import QuestEntry
 
 
 # リリィのクエストエントリ定義
+# 順序: 前提クエストの進行度順（早い方が先）
 LILY_QUESTS = [
-    QuestEntry(QuestIds.LILY_EXPERIMENT, 22, "start_lily_experiment"),
-    QuestEntry(QuestIds.LILY_PRIVATE, 26, "start_lily_private"),
-    QuestEntry(QuestIds.LILY_REAL_NAME, 31, "start_lily_real_name"),
+    QuestEntry(QuestIds.LILY_EXPERIMENT, 22, "start_lily_experiment"),  # RANK_UP_F後
+    QuestEntry(QuestIds.LILY_PRIVATE, 26, "start_lily_private"),        # RANK_UP_D後
+    QuestEntry(QuestIds.MAKUMA, 28, "start_makuma"),                    # RANK_UP_B後（ヌル戦後）
+    QuestEntry(QuestIds.MAKUMA2, 29, "start_makuma2"),                  # MAKUMA後（瓶すり替え選択は内部分岐）
+    QuestEntry(QuestIds.LILY_REAL_NAME, 31, "start_lily_real_name"),    # RANK_UP_S_BALGAS_SPARED後
 ]
 
 
@@ -58,8 +61,7 @@ def define_lily_main_drama(builder: ArenaDramaBuilder):
     # ========================================
     # クエストディスパッチ（高レベルAPI使用）
     # ========================================
-    quest_labels = build_quest_dispatcher(
-        builder,
+    quest_labels = builder.build_quest_dispatcher(
         LILY_QUESTS,
         entry_step=check_quests,
         fallback_step=quest_none,
@@ -77,6 +79,12 @@ def define_lily_main_drama(builder: ArenaDramaBuilder):
 
     builder.step(quest_labels["start_lily_private"]) \
         .start_quest_drama(QuestIds.LILY_PRIVATE, DramaNames.LILY_PRIVATE)
+
+    builder.step(quest_labels["start_makuma"]) \
+        .start_quest_drama(QuestIds.MAKUMA, DramaNames.MAKUMA)
+
+    builder.step(quest_labels["start_makuma2"]) \
+        .start_quest_drama(QuestIds.MAKUMA2, DramaNames.MAKUMA2)
 
     builder.step(quest_labels["start_lily_real_name"]) \
         .start_quest_drama(QuestIds.LILY_REAL_NAME, DramaNames.LILY_REAL_NAME)

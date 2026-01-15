@@ -159,8 +159,8 @@ RANK_REWARDS: Dict[str, RankReward] = {
         quest_id=QuestIds.RANK_UP_A,
         message_jp="報酬として、小さなメダル70枚、エーテル抗体21本、媚薬210本をお渡しします。",
         message_en="As your reward, I present you with 70 small medals, 21 ether antibodies, and 210 love potions.",
-        system_message_jp="【システム】称号『黄金の戦鬼（Golden War Demon）』を獲得しました。フィート【闘志】Lv7（活力+40）に成長！",
-        system_message_en="[System] Title 'Golden War Demon' acquired. Feat 'Arena Spirit' Lv7 (Vigor+40) obtained!",
+        system_message_jp="【システム】称号『戦鬼（War Demon）』を獲得しました。フィート【闘志】Lv7（活力+40）に成長！",
+        system_message_en="[System] Title 'War Demon' acquired. Feat 'Arena Spirit' Lv7 (Vigor+40) obtained!",
     ),
 }
 

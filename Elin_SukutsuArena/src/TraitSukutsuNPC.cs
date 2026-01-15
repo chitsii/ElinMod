@@ -11,6 +11,10 @@ namespace Elin_SukutsuArena
 
         public override bool CanInvite =>
             ArenaQuestManager.Instance?.IsQuestCompleted("18_last_battle") ?? false;
+
+        public override bool CanJoinPartyResident =>
+            (ArenaQuestManager.Instance?.IsQuestCompleted("18_last_battle") ?? false)
+            && base.CanJoinPartyResident;
     }
 
     /// <summary>
@@ -24,5 +28,9 @@ namespace Elin_SukutsuArena
 
         public override bool CanInvite =>
             ArenaQuestManager.Instance?.IsQuestCompleted("18_last_battle") ?? false;
+
+        public override bool CanJoinPartyResident =>
+            (ArenaQuestManager.Instance?.IsQuestCompleted("18_last_battle") ?? false)
+            && base.CanJoinPartyResident;
     }
 }

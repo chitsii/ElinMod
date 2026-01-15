@@ -63,14 +63,30 @@ public class ZoneInstanceArenaBattle : ZoneInstance
             ScheduleAutoDialog();
         }
 
-        // ランクアップ戦かどうかをフラグに保存
-        if (isRankUp)
+        // クエストバトル（sukutsu_quest_battle != 0）が優先
+        // isRankUpよりも明示的に設定されたsukutsu_quest_battleを優先する
+        // 注意: フラグのクリアはドラマ側で行う（quest_battle_result_checkの後）
+        int questBattle = EClass.player.dialogFlags.ContainsKey("sukutsu_quest_battle")
+            ? EClass.player.dialogFlags["sukutsu_quest_battle"] : 0;
+
+        if (questBattle != 0)
         {
+            // クエストバトル結果として処理
+            EClass.player.dialogFlags["sukutsu_is_quest_battle_result"] = 1;
+            EClass.player.dialogFlags["sukutsu_is_rank_up_result"] = 0;
+            Debug.Log($"[SukutsuArena] Quest battle result flag set, questBattle={questBattle}");
+        }
+        else if (isRankUp)
+        {
+            // ランクアップ戦結果として処理
             EClass.player.dialogFlags["sukutsu_is_rank_up_result"] = 1;
+            EClass.player.dialogFlags["sukutsu_is_quest_battle_result"] = 0;
         }
         else
         {
+            // 通常バトル
             EClass.player.dialogFlags["sukutsu_is_rank_up_result"] = 0;
+            EClass.player.dialogFlags["sukutsu_is_quest_battle_result"] = 0;
         }
 
         // マスターIDを使って後処理などがあればここで行う

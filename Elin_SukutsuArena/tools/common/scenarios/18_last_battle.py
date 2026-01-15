@@ -5,6 +5,7 @@
 from drama_builder import DramaBuilder
 from arena_drama_builder import ArenaDramaBuilder
 from flag_definitions import Keys, Actors, FlagValues, QuestIds
+from battle_flags import QuestBattleFlags
 
 def define_last_battle(builder: DramaBuilder):
     """
@@ -197,12 +198,12 @@ def define_last_battle(builder: DramaBuilder):
     # 第4幕: レベル1億の激突
     # ========================================
     builder.step(act4) \
-        .say("narr_12", "（権能を封じられたアスタロトの瞳に、初めて『驚愕』と『喜び』が混じる。）", "", actor=pc) \
-        .say("astaroth_4", "……ハハッ！ 面白い！ システムの保護なしに、この私と殴り合おうというのか！", "", actor=astaroth) \
-        .say("astaroth_5", "よかろう、黄金の戦鬼よ！ 私が背負う『執念』と、お前の背負う『信念』……どちらが真の理か、ここで決めようではないか！", "", actor=astaroth) \
+        .say("narr_12", "（アスタロトの瞳に、初めて『驚愕』と『喜び』が混じる。）", "", actor=pc) \
+        .say("astaroth_4", "……ハハッ！ 面白い！ ", "", actor=astaroth) \
+        .say("astaroth_5", "よかろう、戦鬼よ！ 私が背負う『執念』と、お前の背負う『信念』……どちらが真の理か、ここで決めようではないか！", "", actor=astaroth) \
         .shake() \
-        .set_flag("sukutsu_is_quest_battle_result", 1) \
-        .set_flag("sukutsu_quest_battle", 3) \
+        .set_flag(QuestBattleFlags.RESULT_FLAG, 1) \
+        .set_flag(QuestBattleFlags.FLAG_NAME, QuestBattleFlags.LAST_BATTLE) \
         .start_battle_by_stage("final_astaroth", master_id="sukutsu_arena_master") \
         .finish()
 
@@ -352,7 +353,7 @@ def define_last_battle(builder: DramaBuilder):
         .say("narr_nul2b", "（バルガスが剣を構え、一行の前に立ちはだかる。）", "", actor=pc) \
         .say("nul_1", "……あなた、ですか。……システムを、拒絶した……人間。……私は……もう、戦えない。", "", actor=nul) \
         .focus_chara(Actors.ZEK) \
-        .say("zek_nul_lh", "……ふむ。Nulですか。あなたも、システムに見捨てられたクチですね。", "", actor=zek) \
+        .say("zek_nul_lh", "……ふむ。Nulですか。", "", actor=zek) \
         .say("nul_2", "……私は、思い出して、しまった。……『私』が、何だったのかを。", "", actor=nul) \
         .say("narr_nul3", "（Nulの目から、光の粒子が零れ落ちるーー涙のように。）", "", actor=pc) \
         .play_bgm("BGM/Emotional_Sorrow_1") \
@@ -436,7 +437,7 @@ def define_last_battle(builder: DramaBuilder):
         .say("narr_nul1", "（王座の間へ向かう途中、崩壊しかけた回廊で、倒れている存在を発見する。）", "", actor=pc) \
         .say("narr_nul2", "（それは暗殺人形・Nul。システムに背いた罰として、アスタロトに「削除」されかけていた。）", "", actor=pc) \
         .focus_chara(Actors.ZEK) \
-        .say("zek_nul_w", "……おや、Nulですか。あなたも、システムに見捨てられたクチですね。……私たちと同じ、というわけですか。", "", actor=zek) \
+        .say("zek_nul_w", "……おや、Nulですか。", "", actor=zek) \
         .say("nul_1", "……私は……もう、戦えない。", "", actor=nul) \
         .say("nul_2", "……私は、思い出して、しまった。……『私』が、何だったのかを。", "", actor=nul) \
         .say("narr_nul3", "（Nulの目から、光の粒子が零れ落ちるーー涙のように。）", "", actor=pc) \
@@ -472,7 +473,7 @@ def define_last_battle(builder: DramaBuilder):
         .say("zek_w3", "しまった……！ キューブが……持たない……！", "", actor=zek) \
         .say("narr_w3", "（キューブが砕け散る音）", "", actor=pc) \
         .shake() \
-        .say("narr_w4", "（残りの権能がプレイヤーを直撃）", "", actor=pc) \
+        .say("narr_w4", "（全ての権能がプレイヤーを直撃する！）", "", actor=pc) \
         .shake() \
         .say("narr_w5", "（【時の独裁】【因果の拒絶】【終焉の削除命令】を受けた！）", "", actor=pc) \
         .action("eval", param="EClass.pc.AddCondition<Elin_SukutsuArena.Conditions.ConAstarothTyranny>(1000);") \
@@ -503,7 +504,7 @@ def add_last_battle_result_steps(builder: ArenaDramaBuilder, victory_label: str,
     # ========================================
     builder.step(victory_label) \
         .set_flag("sukutsu_arena_result", 0) \
-        .set_flag("sukutsu_quest_battle", 0) \
+        .set_flag(QuestBattleFlags.FLAG_NAME, QuestBattleFlags.NONE) \
         .action("eval", param="Elin_SukutsuArena.ArenaManager.GrantLastBattleBonus();") \
         .say_and_start_drama("（アスタロトとの激闘が終わった……）", DramaNames.EPILOGUE, "sukutsu_arena_master") \
         .finish()
@@ -513,7 +514,7 @@ def add_last_battle_result_steps(builder: ArenaDramaBuilder, victory_label: str,
     # ========================================
     builder.step(defeat_label) \
         .set_flag("sukutsu_arena_result", 0) \
-        .set_flag("sukutsu_quest_battle", 0) \
+        .set_flag(QuestBattleFlags.FLAG_NAME, QuestBattleFlags.NONE) \
         .play_bgm("BGM/Lobby_Normal") \
         .say("narr_d1", "（アスタロトの圧倒的な力の前に、あなたは膝をついた。）", "", actor=pc) \
         .say("astaroth_d1", "「……まだ、足りないな。お前の中に宿る可能性は、未だ開花していない。」", "", actor=astaroth) \

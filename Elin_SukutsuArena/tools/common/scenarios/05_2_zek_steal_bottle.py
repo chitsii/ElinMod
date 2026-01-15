@@ -127,11 +127,11 @@ def define_zek_steal_bottle(builder: DramaBuilder):
     builder.step(accept) \
         .say("zek_acc1", "ふふ、賢明な判断です。", "", actor=zek) \
         .say("narr_acc1", "（ゼクは満足げに偽物の器をあなたの手に握らせる。）", "", actor=pc) \
-        .say("zek_acc2", "これがあなたへの報酬……**小さなコイン10枚**と**プラチナコイン3枚**を、台帳に記録する手はずを整えておきましょう。それと、この『影の印』を。", "", actor=zek) \
-        .shake() \
-        .say("zek_acc3", "これで、私の店での取引が、より『有利』になりますよ。……では、良い仕事を。彼女が寝静まった頃に、すり替えてきてくださいな。", "", actor=zek) \
-        .say("narr_acc2", "（ゼクは影の中へと消えていく。）", "", actor=pc) \
-        .cs_eval("for(int i=0; i<10; i++) { EClass.pc.Pick(ThingGen.Create(\"medal\")); } for(int i=0; i<3; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
+        .say("zek_acc2", "これがあなたへの報酬……私の店の品を、ひとつお分けしましょう。", "", actor=zek) \
+        .say("narr_acc2", "（ゼクは禍々しい瓶を取り出し、あなたの手に押し付けた。）", "", actor=pc) \
+        .say("zek_acc3", "『痛覚遮断薬』。次の戦いで、役に立つでしょう。……では、良い仕事を。彼女が寝静まった頃に、すり替えてきてくださいな。", "", actor=zek) \
+        .say("narr_acc3", "（ゼクは影の中へと消えていく。）", "", actor=pc) \
+        .cs_eval("EClass.pc.Pick(ThingGen.Create(\"sukutsu_painkiller\"));") \
         .jump(scene4_aftermath)
 
     # ========================================

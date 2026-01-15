@@ -31,12 +31,6 @@ def define_zek_steal_soulgem(builder: DramaBuilder):
     react2_balgas = builder.label("react2_balgas")
     react2_stare = builder.label("react2_stare")
     scene3 = builder.label("scene3_decision")
-    introspection = builder.label("introspection")
-    introspect_greed = builder.label("introspect_greed")
-    introspect_battle = builder.label("introspect_battle")
-    introspect_void = builder.label("introspect_void")
-    introspect_pride = builder.label("introspect_pride")
-    introspect_done = builder.label("introspect_done")
     final_choice = builder.label("final_choice")
     refuse = builder.label("refuse")
     refuse_balgas = builder.label("refuse_balgas")
@@ -113,59 +107,19 @@ def define_zek_steal_soulgem(builder: DramaBuilder):
         .jump(scene3)
 
     # ========================================
-    # シーン3: 決断の瞬間（動機別の内省）
+    # シーン3: 決断の瞬間
     # ========================================
     builder.step(scene3) \
         .play_bgm("BGM/Ominous_Heartbeat") \
         .say("narr_6", "（ゼクはあなたの返答を待つ。その目は、あなたの決断を愉しむように細められた。）", "", actor=pc) \
-        .say("narr_7", "（プレイヤーの脳裏に、自分の選んだ「動機」が蘇る。）", "", actor=pc) \
-        .jump(introspection)
-
-    # 動機別の内省分岐
-    # Motivation: 0=GREED, 1=BATTLE_LUST, 2=NIHILISM, 3=ARROGANCE
-    builder.step(introspection) \
-        .switch_flag(Keys.MOTIVATION, [
-            introspect_greed,   # 0: 強欲
-            introspect_battle,  # 1: 戦闘狂
-            introspect_void,    # 2: 虚無
-            introspect_pride,   # 3: 傲慢
-            introspect_done,    # fallback
-        ])
-
-    # 強欲の場合
-    builder.step(introspect_greed) \
-        .say("intro_greed", "（……ゼクの言う通り、これを売れば圧倒的な力が手に入る。金も名声も、その先にある。）", "", actor=pc) \
-        .say("intro_greed2", "（だが……バルガスの、あの目を裏切れるのか？ 俺が本当に欲しいのは、力か？ それとも……）", "", actor=pc) \
-        .jump(introspect_done)
-
-    # 戦闘狂の場合
-    builder.step(introspect_battle) \
-        .say("intro_battle", "（力が欲しい。もっと強い敵と戦いたい。それは今も変わらない。）", "", actor=pc) \
-        .say("intro_battle2", "（……だが、友を売って得た力で勝っても、それは本当の『勝利』なのか？ バルガスなら、何と言う？）", "", actor=pc) \
-        .jump(introspect_done)
-
-    # 虚無の場合
-    builder.step(introspect_void) \
-        .say("intro_void", "（どうせ全ては無意味だ。友情も、裏切りも、どちらを選んでも結果は同じ……そう思っていた。）", "", actor=pc) \
-        .say("intro_void2", "（だが、バルガスは俺に『意味』を教えてくれた。……それを、こんな形で終わらせていいのか？）", "", actor=pc) \
-        .jump(introspect_done)
-
-    # 傲慢の場合
-    builder.step(introspect_pride) \
-        .say("intro_pride", "（俺はこのアリーナを支配すると言った。ならば、ゼクの誘惑に屈するなど言語道断だ。）", "", actor=pc) \
-        .say("intro_pride2", "（……いや、待て。本当にそれだけか？ バルガスへの……あれは、感謝か？ それとも……）", "", actor=pc) \
-        .jump(introspect_done)
-
-    # 内省終了後、最終選択へ
-    builder.step(introspect_done) \
         .jump(final_choice)
 
     # ========================================
     # 最終選択
     # ========================================
     builder.step(final_choice) \
-        .choice(refuse, "断る。バルガスに返す", "", text_id="c_refuse") \
-        .choice(sell, "……分かった。売ろう", "", text_id="c_sell")
+        .choice(refuse, "バルガスとの絆を選ぶ", "", text_id="c_refuse") \
+        .choice(sell, "力を手に入れる。売る", "", text_id="c_sell")
 
     # ========================================
     # 分岐A: 断る（バルガスに返す）
@@ -197,12 +151,12 @@ def define_zek_steal_soulgem(builder: DramaBuilder):
     builder.step(sell) \
         .say("zek_sell1", "ふふ、素晴らしい！ これです、これこそが私が求めていた『合理的かつ冷酷な決断』だ！", "", actor=zek) \
         .say("zek_sell2", "友情を燃料にして、さらなる高みへ昇る……。あなたは、本物の怪物の素質がある。", "", actor=zek) \
-        .say("narr_sell1", "（彼は懐から何かを取り出す。）", "", actor=pc) \
-        .say("zek_sell3", "さあ、約束の報酬です。**小さなコイン15枚**と**プラチナコイン5枚**を、台帳に記録する手はずを整えておきましょう。それと、この『暗い印』を。", "", actor=zek) \
+        .say("narr_sell1", "（彼は懐から禍々しい注射器を取り出す。）", "", actor=pc) \
+        .say("zek_sell3", "さあ、約束の報酬です。私の店の秘蔵品……『禁断の覚醒剤』を差し上げましょう。", "", actor=zek) \
         .shake() \
         .say("zek_sell4", "これで、あなたは『魂を喰らう者』となりました。……では、良い演技を。彼に気づかれないよう、お気をつけて。", "", actor=zek) \
         .say("narr_sell2", "（ゼクは影の中へと消えていく。）", "", actor=pc) \
-        .action("eval", param="for(int i=0; i<15; i++) { EClass.pc.Pick(ThingGen.Create(\"medal\")); } for(int i=0; i<5; i++) { EClass.pc.Pick(ThingGen.Create(\"plat\")); }") \
+        .cs_eval("EClass.pc.Pick(ThingGen.Create(\"sukutsu_stimulant\"));") \
         .jump(sell_balgas)
 
     builder.step(sell_balgas) \

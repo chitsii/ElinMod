@@ -25,6 +25,7 @@ HEADERS = [
     'name',         # 英語名 (string)
     'type',         # C#クラス名 (string)
     'group',        # グループ (string)
+    'category',     # カテゴリ (string) - フィート一覧表示に必須
     'max',          # 最大レベル (int)
     'cost',         # 習得コスト (int)
     'tag',          # タグ (string[])
@@ -42,6 +43,7 @@ TYPES = [
     'string',       # name
     'string',       # type
     'string',       # group
+    'string',       # category
     'int',          # max
     'int',          # cost
     'string[]',     # tag
@@ -59,6 +61,7 @@ DEFAULTS = [
     '',             # name
     '',             # type
     'FEAT',         # group
+    'feat',         # category - フィート一覧表示に必須
     '1',            # max
     '0',            # cost
     '',             # tag
@@ -77,13 +80,14 @@ CUSTOM_FEATS = [
         'name': 'Arena Spirit',
         'type': 'FeatArenaSpirit',
         'group': 'FEAT',
+        'category': 'feat',  # フィート一覧表示に必須
         'max': 7,
         'cost': 0,
         'tag': '',
-        'textPhase_JP': '闘技場で戦い抜いた証。活力が向上する。',
-        'textPhase': 'Proof of surviving the arena. Increases vigor.',
-        'textExtra_JP': 'Lv1:活力+5 / Lv2:+10 / Lv3:+15 / Lv4:+20 / Lv5:+25 / Lv6:+30 / Lv7:+40',
-        'textExtra': 'Lv1:Vigor+5 / Lv2:+10 / Lv3:+15 / Lv4:+20 / Lv5:+25 / Lv6:+30 / Lv7:+40',
+        'textPhase_JP': '闘志',
+        'textPhase': 'Arena Spirit',
+        'textExtra_JP': '倒れても立ち上がる。それが闘士の本能だ。',
+        'textExtra': 'Fall and rise again. That is the instinct of a fighter.',
     },
 ]
 

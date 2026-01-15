@@ -19,7 +19,7 @@
 - [x] `scenarios/rank_up/rank_a.py` を新規作成
   - 参照: `battle_stages.py` の `rank_a_trial` 定義
   - 敵: `sukutsu_shadow_self` (レベル2500, Mythical)
-  - テーマ: 「黄金の戦鬼」（影の自己との戦い）
+  - テーマ: 「戦鬼」（影の自己との戦い）
   - 観客の「注目」が生み出した自分の影と戦う
 
 ### 1.2 drama_constants.py への追加 ✅
@@ -54,7 +54,7 @@ public static void GrantRankABonus()
     pc.elements.ModBase(152, 5);  // DV+5
     pc.elements.ModBase(153, 5);  // PV+5
 
-    Msg.Say("【黄金の戦鬼】筋力+5、魔力+5、回避+5、PV+5 を獲得！");
+    Msg.Say("【戦鬼】筋力+5、魔力+5、回避+5、PV+5 を獲得！");
 }
 ```
 

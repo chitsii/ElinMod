@@ -1,6 +1,7 @@
 using BepInEx;
 using HarmonyLib;
 using UnityEngine;
+using System.Linq;
 using System.Reflection;
 using System.Collections;
 using Elin_SukutsuArena.Core;
@@ -155,36 +156,84 @@ public class Plugin : BaseUnityPlugin
 #if DEBUG
     private void ShowArenaStatus()
     {
-        Debug.Log("[SukutsuArena] === Arena Status ===");
+        var sb = new System.Text.StringBuilder();
+        var flags = EClass.player?.dialogFlags;
 
-        // フラグ状態を表示
-        var ctx = ArenaContext.I;
-        Debug.Log($"  Rank: {ctx.Player.Rank}");
-        Debug.Log($"  Phase: {ctx.Player.CurrentPhase}");
-        Debug.Log($"  Karma: {ctx.Player.Karma}");
-        Debug.Log($"  Contribution: {ctx.Player.Contribution}");
-
-        // クエスト状態を表示
-        ArenaQuestManager.Instance.DebugLogQuestState();
-
-        // 画面にも表示
-        var rank = ctx.Player.Rank;
-        var gladiator = ctx.Storage.GetInt("sukutsu_gladiator") != 0;
-        Msg.Say($"[Arena] Rank: {rank}, Gladiator: {gladiator}");
-
-        var available = ArenaQuestManager.Instance.GetAvailableQuests();
-        if (available.Count > 0)
+        // === 全アリーナフラグ（生データ） ===
+        sb.AppendLine("=== Arena Flags (Raw) ===");
+        if (flags != null)
         {
-            Msg.Say($"[Arena] Available Quests: {available.Count}");
-            foreach (var quest in available)
+            // chitsii.arena.* と sukutsu_* プレフィックスのフラグを収集
+            var arenaFlags = flags
+                .Where(kvp => kvp.Key.StartsWith("chitsii.arena.") || kvp.Key.StartsWith("sukutsu_"))
+                .OrderBy(kvp => kvp.Key)
+                .ToList();
+
+            if (arenaFlags.Count > 0)
             {
-                Msg.Say($"  - {quest.QuestId}: {quest.DisplayNameJP}");
+                foreach (var kvp in arenaFlags)
+                {
+                    // プレフィックスを短縮して表示
+                    var displayKey = kvp.Key
+                        .Replace("chitsii.arena.", "")
+                        .Replace("sukutsu_", "");
+                    sb.AppendLine($"{displayKey} = {kvp.Value}");
+                }
+            }
+            else
+            {
+                sb.AppendLine("(なし)");
             }
         }
         else
         {
-            Msg.Say("[Arena] No quests available");
+            sb.AppendLine("(flags unavailable)");
         }
+        sb.AppendLine();
+
+        // === 完了クエスト ===
+        sb.AppendLine("=== 完了クエスト ===");
+        var completedQuests = ArenaQuestManager.Instance.GetAllQuests()
+            .Where(q => ArenaQuestManager.Instance.IsQuestCompleted(q.QuestId))
+            .ToList();
+
+        if (completedQuests.Count > 0)
+        {
+            foreach (var quest in completedQuests)
+            {
+                sb.AppendLine($"[完了] {quest.QuestId}");
+            }
+        }
+        else
+        {
+            sb.AppendLine("(なし)");
+        }
+        sb.AppendLine();
+
+        // === 利用可能クエスト ===
+        sb.AppendLine("=== 利用可能クエスト ===");
+        var available = ArenaQuestManager.Instance.GetAvailableQuests();
+        if (available.Count > 0)
+        {
+            foreach (var quest in available)
+            {
+                var marker = !string.IsNullOrEmpty(quest.QuestGiver) ? $" [{quest.QuestGiver}]" : "";
+                sb.AppendLine($"- {quest.QuestId}{marker}");
+            }
+        }
+        else
+        {
+            sb.AppendLine("(なし)");
+        }
+
+        // デバッグログにも出力
+        Debug.Log($"[SukutsuArena] Arena Status:\n{sb}");
+
+        // OKダイアログで表示
+        var dialog = Layer.Create<Dialog>();
+        dialog.textDetail.SetText(sb.ToString());
+        dialog.list.AddButton(null, "OK", dialog.Close);
+        ELayer.ui.AddLayer(dialog);
     }
 
     private void CycleRankUp()

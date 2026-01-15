@@ -1,0 +1,79 @@
+flowchart TD
+    subgraph PROLOGUE["Phase 0: PROLOGUE"]
+        Q01[01_opening<br/>AUTO]
+    end
+
+    subgraph INITIATION["Phase 1: INITIATION"]
+        Q02[02_rank_up_G<br/>Balgas]
+        Q03[03_zek_intro<br/>Zek]
+        Q04[04_rank_up_F<br/>Balgas]
+        Q05_1[05_1_lily_experiment<br/>Lily]
+        Q05_2[05_2_zek_steal_bottle<br/>Zek]
+        Q05_2A[05_2_accept]
+        Q05_2R[05_2_refuse]
+    end
+
+    subgraph RISING["Phase 2: RISING"]
+        Q06[06_rank_up_E<br/>Balgas]
+        Q06_2[06_2_zek_steal_soulgem<br/>Zek]
+        Q06_2S[06_2_sell]
+        Q06_2R[06_2_return]
+        Q10[10_rank_up_D<br/>Balgas]
+    end
+
+    subgraph AWAKENING["Phase 3: AWAKENING"]
+        Q07[07_upper_existence<br/>Balgas]
+        Q08[08_lily_private<br/>Lily]
+        Q09T[09_balgas_training<br/>Balgas]
+        Q09[09_rank_up_C<br/>Balgas]
+        Q11[11_rank_up_B<br/>Balgas]
+    end
+
+    subgraph CONFRONTATION["Phase 4: CONFRONTATION"]
+        Q12M[12_makuma<br/>Lily]
+        Q13[13_makuma2<br/>AUTO]
+        Q12A[12_rank_up_A<br/>Balgas]
+        Q15[15_vs_balgas<br/>Balgas]
+        Q15S[15_spared]
+        Q15K[15_killed]
+        Q16[16_lily_real_name<br/>Lily]
+        Q17[17_vs_astaroth<br/>AUTO]
+    end
+
+    subgraph CLIMAX["Phase 5: CLIMAX"]
+        Q18[18_last_battle<br/>AUTO]
+    end
+
+    %% 依存関係
+    Q01 --> Q02
+    Q02 --> Q03
+    Q02 --> Q04
+    Q04 --> Q05_1
+    Q04 --> Q06
+    Q05_1 --> Q05_2
+    Q05_2 -.-> Q05_2A
+    Q05_2 -.-> Q05_2R
+    Q06 --> Q06_2
+    Q06 --> Q10
+    Q06_2 -.-> Q06_2S
+    Q06_2 -.-> Q06_2R
+    Q10 --> Q07
+    Q10 --> Q08
+    Q10 --> Q09T
+    Q10 --> Q09
+    Q09 --> Q11
+    Q11 --> Q12M
+    Q11 --> Q12A
+    Q12M --> Q13
+    Q05_2A --> Q13
+    Q12A --> Q15
+    Q15 -.-> Q15S
+    Q15 -.-> Q15K
+    Q15S --> Q16
+    Q15S --> Q17
+    Q15K --> Q17
+    Q17 --> Q18
+
+    %% ブロック関係
+    Q15K -.->|blocks| Q08
+    Q15K -.->|blocks| Q16

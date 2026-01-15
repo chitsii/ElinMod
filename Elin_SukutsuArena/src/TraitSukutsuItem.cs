@@ -97,12 +97,10 @@ namespace Elin_SukutsuArena
                 "ConSukutsuResCut",
             };
 
-            // 長めの持続時間
-            int power = 2000;
-
+            // カスタムConditionはdurationで3000ターン固定なのでpower=100で十分
             foreach (string alias in conditionAliases)
             {
-                c.AddCondition(Condition.Create(alias, power));
+                c.AddCondition(Condition.Create(alias, 100));
             }
 
             Debug.Log($"[SukutsuArena] Applied Kiss of Inferno buffs ({conditionAliases.Length} resistances) to {c.Name}");
@@ -127,9 +125,8 @@ namespace Elin_SukutsuArena
                 c.PlaySound("buff");
                 c.PlayEffect("buff");
 
-                // Conditionを付与（power = 500 → 約27ターン持続）
-                int power = 500;
-                c.AddCondition(Condition.Create(conditionAlias, power));
+                // Conditionを付与（カスタムConditionはdurationで3000ターン固定）
+                c.AddCondition(Condition.Create(conditionAlias, 100));
 
                 Debug.Log($"[SukutsuArena] Applied {conditionAlias} to {c.Name}");
 
@@ -148,7 +145,7 @@ namespace Elin_SukutsuArena
         /// <summary>
         /// 痛覚遮断薬効果
         /// - 物理ダメージ軽減（PVバフ、一時的）
-        /// - 強力な毒状態付与
+        /// - 薬物中毒状態付与（回復阻止）
         /// </summary>
         private void ApplyPainkiller(Chara c)
         {
@@ -156,15 +153,13 @@ namespace Elin_SukutsuArena
             c.PlaySound("curse");
             c.PlayEffect("curse");
 
-            // PVを一時的に上昇
-            // power = 800 → 約33ターン持続
-            int power = 800;
-            c.AddCondition(Condition.Create("ConSukutsuPVBuff", power));
+            // PVを一時的に上昇（カスタムConditionはdurationで3000ターン固定）
+            c.AddCondition(Condition.Create("ConSukutsuPVBuff", 100));
 
-            // 強力な毒状態付与（power = 500で強力な毒）
-            c.AddCondition<ConPoison>(500);
+            // 薬物中毒状態付与（カスタムConditionはdurationで3000ターン固定）
+            c.AddCondition(Condition.Create("ConSukutsuPoison", 100));
 
-            Debug.Log($"[SukutsuArena] Applied Painkiller (PV buff + strong poison) to {c.Name}");
+            Debug.Log($"[SukutsuArena] Applied Painkiller (PV buff + poison) to {c.Name}");
 
             // カルマ減少
             if (c.IsPC)
@@ -175,8 +170,8 @@ namespace Elin_SukutsuArena
 
         /// <summary>
         /// 禁断の覚醒剤効果
-        /// - ブースト状態付与
-        /// - 後遺症として強力な出血（ブーストより長く持続）
+        /// - 覚醒状態付与（能力上昇）
+        /// - 後遺症として内出血
         /// </summary>
         private void ApplyStimulant(Chara c)
         {
@@ -184,16 +179,13 @@ namespace Elin_SukutsuArena
             c.PlaySound("boost2");
             c.PlayEffect("buff");
 
-            // ブースト状態付与（power = 200 → 約30ターン）
-            c.AddCondition<ConBoost>(200);
+            // 覚醒状態付与（カスタムConditionはdurationで3000ターン固定）
+            c.AddCondition(Condition.Create("ConSukutsuBoost", 100));
 
-            // 強力な出血状態付与（ブーストより長く持続）
-            // Conditionを直接作成してvalueを設定
-            var bleed = Condition.Create<ConBleed>(1);
-            bleed.value = 50;  // 50ターン持続
-            c.AddCondition(bleed);
+            // 内出血状態付与（カスタムConditionはdurationで3000ターン固定）
+            c.AddCondition(Condition.Create("ConSukutsuBleed", 100));
 
-            Debug.Log($"[SukutsuArena] Applied Stimulant (Boost + Bleed value={bleed.value}) to {c.Name}");
+            Debug.Log($"[SukutsuArena] Applied Stimulant (Boost + Bleed) to {c.Name}");
 
             // カルマ減少
             if (c.IsPC)
